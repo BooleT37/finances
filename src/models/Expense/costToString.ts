@@ -1,13 +1,13 @@
 import Currency from "../Currency";
 
 const currencySymbols: Record<Currency, string> = {
-    EUR: '€',
-    RUB: '₽'
+    Eur: '€',
+    Rub: '₽'
 }
 
 export default function costToString(cost: number, currency: Currency) {
     if (currency === Currency.Eur) {
-        return `${currencySymbols.EUR}${cost}`
+        return `${currencySymbols.Eur}${cost}`
     }
-    return `${cost}${currencySymbols.RUB}`
+    return `${cost}${currencySymbols.Rub}`
 }

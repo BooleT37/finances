@@ -1,40 +1,38 @@
 import { makeObservable, observable } from "mobx";
-import Category from "../models/Category";
+import Category, { Option } from "../models/Category";
 
 class CategoryStore {
-    public categories: Category[]
+  public categories: Category[]
 
-    constructor(categories: Category[]) {
-        makeObservable(this, { categories: observable, getByName: false })
-        this.categories = categories
-    }
+  constructor(categories: Category[]) {
+    makeObservable(
+      this,
+      {
+        categories: observable,
+        getByName: false,
+        asOptions: false
+      })
+    this.categories = categories
+  }
 
-    getByName(name: string): Category {
-        const category = this.categories.find((category) => category.name === name)
-        if (!category) {
-            throw new Error(`Cannot find category with the name ${name}`)
-        }
-        return category
+  getByName(name: string): Category {
+    const category = this.categories.find((category) => category.name === name)
+    if (!category) {
+      throw new Error(`Cannot find category with the name ${name}`)
     }
+    return category
+  }
+
+  get asOptions(): Option[] {
+    return this.categories.map(c => c.asOption)
+  }
 }
 
 const fakeCategories: Category[] = [
-    {
-        name: 'Подписки',
-        id: 1,
-    },
-    {
-        name: 'Рестораны',
-        id: 2,
-    },
-    {
-        name: 'Еда',
-        id: 3,
-    },
-    {
-        name: 'Аренда',
-        id: 4
-    }
+  new Category(1, 'Подписки'),
+  new Category(2, 'Рестораны'),
+  new Category(3, 'Еда'),
+  new Category(4, 'Аренда'),
 ]
 
 const categoryStore = new CategoryStore(fakeCategories)

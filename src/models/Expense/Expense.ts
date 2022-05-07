@@ -11,20 +11,23 @@ interface TableData {
 }
 
 export default class Expense {
+    id: number;
     name?: string;
-    cost: number;
+    cost: number | null;
     currency: Currency;
     date: string;
     category: Category;
 
     constructor(
-        cost: number,
+        id: number,
+        cost: number | null,
         currency: Currency,
         date: string,
         category: Category,
         name?: string
     ) {
         makeObservable(this, {
+            id: observable,
             cost: observable,
             currency: observable,
             date: observable,
@@ -32,6 +35,7 @@ export default class Expense {
             name: observable,
             asTableData: computed
         })
+        this.id = id
         this.cost = cost;
         this.currency = currency;
         this.date = date;
@@ -42,7 +46,7 @@ export default class Expense {
     get asTableData(): TableData {
         return {
             name: this.name || '',
-            cost: costToString(this.cost, this.currency),
+            cost: this.cost ? costToString(this.cost, this.currency) : '',
             category: this.category.name,
             date: this.date
         }

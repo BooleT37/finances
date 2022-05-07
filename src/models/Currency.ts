@@ -1,6 +1,6 @@
 enum Currency {
-    Eur = 'EUR',
-    Rub = 'RUB'
+    Eur = 'Eur',
+    Rub = 'Rub'
 }
 
 export default Currency
