@@ -4,6 +4,7 @@ import Currency from "../Currency";
 import costToString from "./costToString";
 
 interface TableData {
+    id: number
     name: string
     cost: string
     date: string
@@ -45,6 +46,7 @@ export default class Expense {
 
     get asTableData(): TableData {
         return {
+            id: this.id,
             name: this.name || '',
             cost: this.cost ? costToString(this.cost, this.currency) : '',
             category: this.category.name,
