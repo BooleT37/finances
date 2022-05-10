@@ -13,7 +13,8 @@ class ExpenseStore {
         expenses: observable,
         tableData: computed,
         nextId: computed,
-        insert: action
+        insert: action,
+        delete: action
       })
     this.expenses = expenses
   }
@@ -33,6 +34,14 @@ class ExpenseStore {
     } else {
       this.expenses[foundIndex] = expense
     }
+  }
+
+  delete(id: number): void {
+    const foundIndex = this.expenses.findIndex(e => e.id === id);
+    if (foundIndex === -1) {
+      return
+    }
+    this.expenses.splice(foundIndex, 1)
   }
 }
 
