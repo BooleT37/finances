@@ -17,7 +17,7 @@ import React from 'react';
 import Currency from '../../models/Currency';
 import Expense from '../../models/Expense';
 import categoryStore from '../../stores/categoryStore';
-import expenseStore from '../../stores/extenseStore';
+import expenseStore from '../../stores/expenseStore';
 import expenseModalStore from '../expenseModalStore';
 
 const { Option } = Select;

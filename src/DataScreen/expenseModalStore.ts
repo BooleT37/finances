@@ -1,6 +1,6 @@
 import { action, computed, makeObservable, observable } from "mobx";
 import Expense from "../models/Expense";
-import expenseStore from "../stores/extenseStore";
+import expenseStore from "../stores/expenseStore";
 
 class ExpenseModalStore {
   visible: boolean;

@@ -4,7 +4,7 @@ import { Typography, DatePicker, Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import moment, { Moment } from 'moment';
 import { AgGridReact } from 'ag-grid-react';
-import expenseStore from '../stores/extenseStore';
+import expenseStore from '../stores/expenseStore';
 import columnDefs from './columnDefs';
 import ExpenseModal from './ExpenseModal';
 import expenseModalStore from './expenseModalStore';
