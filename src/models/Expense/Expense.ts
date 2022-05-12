@@ -1,12 +1,14 @@
 import { computed, makeObservable, observable } from "mobx";
 import Category from "../Category";
 import Currency from "../Currency";
-import costToString from "./costToString";
 
 interface TableData {
     id: number
     name: string
-    cost: string
+    cost: {
+      value: number,
+      currency: Currency
+    } | null
     date: string
     category: string
 }
@@ -48,7 +50,10 @@ export default class Expense {
         return {
             id: this.id,
             name: this.name || '',
-            cost: this.cost ? costToString(this.cost, this.currency) : '',
+            cost: this.cost ? {
+              value: this.cost,
+              currency: this.currency
+            } : null,
             category: this.category.name,
             date: this.date
         }

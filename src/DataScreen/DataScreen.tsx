@@ -46,12 +46,14 @@ const DataScreen = observer(function DataScreen() {
       <Title>Экран данных</Title>
       <RangePicker value={[rangeStart, rangeEnd]} onChange={handleRangeChange} />
       <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>Добавить</Button>
-      <div className='ag-theme-alpine' style={{ height: 500 }}>
+      <div className='ag-theme-alpine' style={{ height: 500, width: 765 }}>
         <AgGridReact
           ref={gridRef}
           rowData={expenseStore.tableData}
           columnDefs={columnDefs}
           context={{ expandCategory }}
+          groupIncludeFooter
+          suppressAggFuncInHeader
         />
       </div>
       <ExpenseModal onSubmit={e => { expandCategory(e.category.name) }}/>
