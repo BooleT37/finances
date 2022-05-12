@@ -10,7 +10,7 @@ import {
   InputRef
 } from 'antd';
 import { action, reaction } from 'mobx';
-import { observer } from 'mobx-react';
+import { observer, useLocalObservable } from 'mobx-react';
 import moment from 'moment';
 import { Moment } from 'moment';
 import React from 'react';
@@ -42,9 +42,10 @@ interface Props {
   onSubmit(expense: Expense): void
 }
 
-const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ onSubmit: onClose }) {
+const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ onSubmit }) {
   const [form] = Form.useForm<FormValues>();
   const inputRef = React.useRef<InputRef>(null);
+  const addMore = useLocalObservable<{ value: boolean }>(() => ({ value: false }))
 
   const handleSubmit = () => {
     form
@@ -60,8 +61,12 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ onSubmit:
           values.name
         )
         expenseStore.insert(expense)
-        expenseModalStore.close()
-        onClose(expense)
+        if (addMore) {
+          expenseModalStore.expenseId = expenseStore.nextId
+        } else {
+          expenseModalStore.close()
+        }
+        onSubmit(expense)
       }))
       .catch(info => {
         console.log('Validate Failed:', info);
@@ -91,11 +96,19 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ onSubmit:
   return (
     <Modal
       visible={expenseModalStore.visible}
-      title={ expenseModalStore.isNewExpense ? 'Редактирование траты' : 'Новая трата'}
+      title={expenseModalStore.isNewExpense ? 'Новая трата' : 'Редактирование траты'}
       onOk={handleSubmit}
       onCancel={() => { expenseModalStore.close() }}
       footer={[
-        <Checkbox key="more">Добавить ещё</Checkbox>,
+        expenseModalStore.isNewExpense && (
+          <Checkbox
+            checked={addMore.value}
+            onChange={(e) => addMore.value = e.target.checked}
+            key="more"
+          >
+            Добавить ещё
+          </Checkbox>
+        ),
         <Button key="cancel" onClick={() => { expenseModalStore.close() }}>
           Отмена
         </Button>,

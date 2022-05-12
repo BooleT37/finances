@@ -1,4 +1,4 @@
-import { action, computed, makeObservable, observable } from "mobx";
+import { action, autorun, computed, makeObservable, observable } from "mobx";
 import Expense from "../models/Expense";
 import expenseStore from "../stores/expenseStore";
 
@@ -15,6 +15,7 @@ class ExpenseModalStore {
       open: action,
       close: action
     })
+    autorun(() => console.log(this.isNewExpense))
   }
   
   get currentExpense(): Expense | undefined {
@@ -22,7 +23,7 @@ class ExpenseModalStore {
   }
 
   get isNewExpense(): boolean {
-    return expenseStore.expenses.some(({ id }) => id === expenseModalStore.expenseId)
+    return this.currentExpense === undefined
   }
 
   open(expenseId: number): void {
