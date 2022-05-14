@@ -9,6 +9,7 @@ import columnDefs from './columnDefs';
 import ExpenseModal from './ExpenseModal';
 import expenseModalStore from './expenseModalStore';
 import { action } from 'mobx';
+import getRowStyle from './getRowStyle';
 
 const { RangePicker } = DatePicker;
 
@@ -52,6 +53,7 @@ const DataScreen = observer(function DataScreen() {
           rowData={expenseStore.tableData}
           columnDefs={columnDefs}
           context={{ expandCategory }}
+          getRowStyle={getRowStyle}
           groupIncludeFooter
           suppressAggFuncInHeader
         />

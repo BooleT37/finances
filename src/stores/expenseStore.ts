@@ -57,7 +57,8 @@ const fakeExpenses: Expense[] = [
   new Expense(9, 20.00, Currency.Eur, '2022-04-09', categoryStore.getByName('Рестораны')),
   new Expense(10, 67.40, Currency.Eur, '2022-04-12', categoryStore.getByName('Рестораны')),
   new Expense(11, 1100, Currency.Eur, '2022-03-26', categoryStore.getByName('Аренда')),
-  new Expense(12, 1100, Currency.Eur, '2022-04-27', categoryStore.getByName('Аренда'))
+  new Expense(12, 1100, Currency.Eur, '2022-04-27', categoryStore.getByName('Аренда')),
+  new Expense(13, 3000, Currency.Eur, '2022-04-10', categoryStore.getByName('Зарплата'))
 ]
 
 const expenseStore = new ExpenseStore(fakeExpenses);

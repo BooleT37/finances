@@ -5,11 +5,12 @@ export interface Option {
 }
 
 export default class Category {
-    constructor(public id: number, public name: string) {
+    constructor(public id: number, public name: string, public readonly isIncome = false) {
         makeObservable(this, {
             id: observable,
             name: observable,
-            asOption: computed
+            asOption: computed,
+            isIncome: false
         })
     }
 

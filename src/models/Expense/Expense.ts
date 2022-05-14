@@ -11,6 +11,7 @@ interface TableData {
     } | null
     date: string
     category: string
+    isIncome: boolean
 }
 
 export default class Expense {
@@ -55,7 +56,8 @@ export default class Expense {
               currency: this.currency
             } : null,
             category: this.category.name,
-            date: this.date
+            date: this.date,
+            isIncome: this.category.isIncome
         }
     }
 }
