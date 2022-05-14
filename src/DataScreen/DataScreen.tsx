@@ -10,6 +10,7 @@ import ExpenseModal from './ExpenseModal';
 import expenseModalStore from './expenseModalStore';
 import { action } from 'mobx';
 import getRowStyle from './getRowStyle';
+import autoGroupColumnDef from './autoGroupColumnDef';
 
 const { RangePicker } = DatePicker;
 
@@ -56,6 +57,7 @@ const DataScreen = observer(function DataScreen() {
           getRowStyle={getRowStyle}
           groupIncludeFooter
           suppressAggFuncInHeader
+          autoGroupColumnDef={autoGroupColumnDef}
         />
       </div>
       <ExpenseModal onSubmit={e => { expandCategory(e.category.name) }}/>
