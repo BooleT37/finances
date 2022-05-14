@@ -50,7 +50,7 @@ const SiteLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         />
       </Sider>
       <Layout className="site-layout">
-        <Content style={{ margin: '0 16px' }}>
+        <Content>
           {children}
         </Content>
         <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>

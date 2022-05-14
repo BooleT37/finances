@@ -8,7 +8,8 @@ import {
   AutoComplete,
   DatePicker,
   InputRef,
-  Radio
+  Radio,
+  Space
 } from 'antd';
 import { RuleObject } from 'antd/lib/form';
 import { action, autorun, reaction } from 'mobx';
@@ -48,10 +49,6 @@ interface Props {
 const RadioGroup = styled(Radio.Group)`
   display: block;
   margin: 0 0 24px 33%;
-`
-
-const LeftRadio = styled(Radio)`
-  margin-right: 10%
 `
 
 const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ onSubmit }) {
@@ -164,8 +161,10 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ onSubmit 
           value={isIncome.value ? "income" : "expense"}
           onChange={action(e => isIncome.value = e.target.value === "income")}
         >
-          <LeftRadio value="expense">Расход</LeftRadio>
-          <Radio value="income">Доход</Radio>
+          <Space size="large">
+            <Radio value="expense">Расход</Radio>
+            <Radio value="income">Доход</Radio>
+          </Space>
         </RadioGroup>
         <Form.Item
           name="cost"
