@@ -2,10 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import './index.css';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
 import configureMobx from './configureMobx';
+import SiteLayout from './SiteLayout';
 import DataScreen from './DataScreen';
+import StatisticsScreen from './StatisticsScreen';
 
 import 'antd/dist/antd.min.css';
 import 'ag-grid-community/dist/styles/ag-grid.css';
@@ -16,10 +17,12 @@ const container: HTMLElement | null = document.getElementById('root');
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
+      <SiteLayout>
         <Routes>
-            <Route path="/" element={<App />} />
-            <Route path="data" element={<DataScreen />} />
+          <Route path="data" element={<DataScreen />} />
+          <Route path="statistics" element={<StatisticsScreen />} />
         </Routes>
+      </SiteLayout>
     </BrowserRouter>
   </React.StrictMode>,
   container
