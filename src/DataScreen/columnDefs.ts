@@ -3,10 +3,7 @@ import Currency from '../models/Currency';
 import costToString from './costToString';
 import EditButtonRenderer from './EditButtonRenderer';
 import RemoveButtonRenderer from './RemoveButtonRenderer';
-import {
-  EditOutlined,
-  DeleteOutlined
-} from '@ant-design/icons';
+import { DeleteHeaderIcon, EditHeaderIcon } from './headerIcons';
 
 const columnDefs: GridOptions['columnDefs'] = [
   { field: 'name', width: 200, headerName: 'Имя' },
@@ -25,7 +22,7 @@ const columnDefs: GridOptions['columnDefs'] = [
   {
     field: 'edit',
     headerName: '',
-    headerComponent: EditOutlined,
+    headerComponent: EditHeaderIcon,
     cellRenderer: EditButtonRenderer,
     width: 50,
     cellStyle: {
@@ -36,7 +33,7 @@ const columnDefs: GridOptions['columnDefs'] = [
   {
     field: 'remove',
     headerName: '',
-    headerComponent: DeleteOutlined,
+    headerComponent: DeleteHeaderIcon,
     cellRendererSelector: (params: ICellRendererParams) => {
       // if it's a group row
       if (!params.data) {
