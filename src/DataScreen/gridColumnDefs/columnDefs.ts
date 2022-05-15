@@ -1,9 +1,9 @@
 import type { GridOptions, ICellRendererParams } from 'ag-grid-community';
-import Currency from '../models/Currency';
-import costToString from './costToString';
-import EditButtonRenderer from './EditButtonRenderer';
-import RemoveButtonRenderer from './RemoveButtonRenderer';
-import { DeleteHeaderIcon, EditHeaderIcon } from './headerIcons';
+import Currency from '../../models/Currency';
+import costToString from '../costToString';
+import EditButtonRenderer from '../buttonRenderers/EditButtonRenderer';
+import RemoveButtonRenderer from '../buttonRenderers/RemoveButtonRenderer';
+import { DeleteHeaderIcon, EditHeaderIcon } from '../headerIcons';
 
 const columnDefs: GridOptions['columnDefs'] = [
   { field: 'name', width: 200, headerName: 'Имя' },

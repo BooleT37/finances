@@ -1,7 +1,7 @@
 import { Button } from 'antd';
 import React from 'react'
 import { DeleteOutlined } from '@ant-design/icons';
-import expenseStore from '../stores/expenseStore';
+import expenseStore from '../../stores/expenseStore';
 
 interface Props {
   id: number;

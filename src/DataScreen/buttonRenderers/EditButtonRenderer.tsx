@@ -2,7 +2,7 @@ import { ICellRendererParams } from 'ag-grid-enterprise';
 import { Button } from 'antd';
 import React from 'react'
 import { EditFilled } from '@ant-design/icons';
-import expenseModalStore from './expenseModalStore';
+import expenseModalStore from '../expenseModalStore';
 
 // eslint-disable-next-line mobx/missing-observer
 const EditButtonRenderer: React.FC<ICellRendererParams> = (props) => {

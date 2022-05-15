@@ -5,12 +5,12 @@ import { PlusOutlined } from '@ant-design/icons';
 import moment, { Moment } from 'moment';
 import { AgGridReact } from 'ag-grid-react';
 import expenseStore from '../stores/expenseStore';
-import columnDefs from './columnDefs';
+import columnDefs from './gridColumnDefs/columnDefs';
 import ExpenseModal from './ExpenseModal';
 import expenseModalStore from './expenseModalStore';
 import { action } from 'mobx';
 import getRowStyle from './getRowStyle';
-import autoGroupColumnDef from './autoGroupColumnDef';
+import autoGroupColumnDef from './gridColumnDefs/autoGroupColumnDef';
 import WhiteHeader from '../WhiteHeader';
 import SiteContent from '../SiteContent';
 
