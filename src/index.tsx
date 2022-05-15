@@ -7,6 +7,7 @@ import configureMobx from './configureMobx';
 import SiteLayout from './SiteLayout';
 import DataScreen from './DataScreen';
 import StatisticsScreen from './StatisticsScreen';
+import PlanningScreen from './PlanningScreen';
 
 import 'antd/dist/antd.min.css';
 import 'ag-grid-community/dist/styles/ag-grid.css';
@@ -21,6 +22,7 @@ ReactDOM.render(
         <Routes>
           <Route path="data" element={<DataScreen />} />
           <Route path="statistics" element={<StatisticsScreen />} />
+          <Route path="planning" element={<PlanningScreen />} />
         </Routes>
       </SiteLayout>
     </BrowserRouter>

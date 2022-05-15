@@ -11,24 +11,13 @@ import expenseModalStore from './expenseModalStore';
 import { action } from 'mobx';
 import getRowStyle from './getRowStyle';
 import autoGroupColumnDef from './autoGroupColumnDef';
-import { Layout } from 'antd';
-import styled from 'styled-components';
+import WhiteHeader from '../WhiteHeader';
+import SiteContent from '../SiteContent';
 
 const { RangePicker } = DatePicker;
 const { Title } = Typography;
-const { Content, Header } = Layout;
 
 const today = moment()
-
-const WhiteHeader = styled(Header)`
-  background: white;
-`
-
-const StyledContent = styled(Content)`
-  margin: 24px 16px;
-  padding: 24px;
-  background: white;
-`
 
 const DataScreen = observer(function DataScreen() {
   const [rangeStart, setRangeStart] = React.useState<Moment | null>(today.clone().subtract(1, 'months').set('date', 1))
@@ -60,7 +49,7 @@ const DataScreen = observer(function DataScreen() {
       <WhiteHeader className="site-layout-background">
         <Title>Данные</Title>
       </WhiteHeader>
-      <StyledContent className="site-layout-background">
+      <SiteContent className="site-layout-background">
         <Space direction="vertical" size="middle">
           <Space size="middle">
             <RangePicker value={[rangeStart, rangeEnd]} onChange={handleRangeChange} />
@@ -79,7 +68,7 @@ const DataScreen = observer(function DataScreen() {
             />
           </div>
         </Space>
-      </StyledContent>
+      </SiteContent>
       <ExpenseModal onSubmit={e => { expandCategory(e.category.name) }} />
     </>
   )
