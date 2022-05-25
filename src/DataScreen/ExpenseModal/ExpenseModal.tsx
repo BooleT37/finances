@@ -66,7 +66,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ onSubmit 
           expenseModalStore.expenseId,
           parseFloat(values.cost),
           values.currency,
-          values.date.format('YYYY-MM-DD'),
+          values.date,
           categoryStore.getByName(values.category),
           values.name
         )
@@ -93,7 +93,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ onSubmit 
             currency: expenseModalStore.currentExpense.currency,
             category: expenseModalStore.currentExpense.category.name,
             name: expenseModalStore.currentExpense.name || '',
-            date: moment(expenseModalStore.currentExpense.date)
+            date: expenseModalStore.currentExpense.date
           })
         } else {
           form.setFieldsValue(INITIAL_VALUES)

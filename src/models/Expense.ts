@@ -1,6 +1,7 @@
 import { computed, makeObservable, observable } from "mobx";
-import Category from "../Category";
-import Currency from "../Currency";
+import { Moment } from "moment";
+import Category from "./Category";
+import Currency from "./Currency";
 
 interface TableData {
     id: number
@@ -19,14 +20,14 @@ export default class Expense {
     name?: string;
     cost: number | null;
     currency: Currency;
-    date: string;
+    date: Moment;
     category: Category;
 
     constructor(
         id: number,
         cost: number | null,
         currency: Currency,
-        date: string,
+        date: Moment,
         category: Category,
         name?: string
     ) {
@@ -56,7 +57,7 @@ export default class Expense {
               currency: this.currency
             } : null,
             category: this.category.name,
-            date: this.date,
+            date: this.date.format('YYYY-MM-DD'),
             isIncome: this.category.isIncome
         }
     }
