@@ -1,4 +1,4 @@
-import { makeObservable, observable } from "mobx";
+import { action, makeObservable, observable } from "mobx";
 import Forecast from "../models/Forecast";
 import categoryStore from "./categoryStore";
 import expenseStore from "./expenseStore";
@@ -17,11 +17,13 @@ function getPreviousMonth(month: number) {
 }
 
 class ForecastStore {
+  public forecasts: Forecast[]
 
-  constructor(public forecasts: Forecast[]) {
+  constructor() {
     makeObservable(this, {
       forecasts: observable,
       tableData: false,
+      fromFakeData: action
     })
   }
 
@@ -41,9 +43,13 @@ class ForecastStore {
         comment: forecast.comment || ''
       }))
   })
+
+  fromFakeData() {
+    this.forecasts = getFakeForecasts()
+  }
 }
 
-const fakeForecasts: Forecast[] = [
+const getFakeForecasts = (): Forecast[] => [
   new Forecast(categoryStore.getByName('Подписки'), 5, 2022, 50),
   new Forecast(categoryStore.getByName('Рестораны'), 5, 2022, 400),
   new Forecast(categoryStore.getByName('Аренда'), 5, 2022, 1100),
@@ -51,6 +57,6 @@ const fakeForecasts: Forecast[] = [
   new Forecast(categoryStore.getByName('Аренда'), 4, 2022, 1100),
 ]
 
-const forecastStore = new ForecastStore(fakeForecasts)
+const forecastStore = new ForecastStore()
 
 export default forecastStore

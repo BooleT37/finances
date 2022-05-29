@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import './index.css';
+import App from './App';
 import reportWebVitals from './reportWebVitals';
 import configureMobx from './configureMobx';
 import SiteLayout from './SiteLayout';
@@ -18,13 +19,15 @@ const container: HTMLElement | null = document.getElementById('root');
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
-      <SiteLayout>
-        <Routes>
-          <Route path="data" element={<DataScreen />} />
-          <Route path="statistics" element={<StatisticsScreen />} />
-          <Route path="planning" element={<PlanningScreen />} />
-        </Routes>
-      </SiteLayout>
+      <App>
+        <SiteLayout>
+          <Routes>
+            <Route path="data" element={<DataScreen />} />
+            <Route path="statistics" element={<StatisticsScreen />} />
+            <Route path="planning" element={<PlanningScreen />} />
+          </Routes>
+        </SiteLayout>
+      </App>
     </BrowserRouter>
   </React.StrictMode>,
   container

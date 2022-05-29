@@ -1,29 +1,44 @@
-import { computed, makeObservable, observable } from "mobx";
+import { action, computed, makeObservable, observable } from "mobx";
 import Category, { Option } from "../models/Category";
+
+interface CategoryJson {
+  id: number;
+  name: string;
+  is_income: boolean
+}
 
 class CategoryStore {
   public categories: Category[]
 
-  constructor(categories: Category[]) {
+  constructor() {
     makeObservable(
       this,
       {
         categories: observable,
         getByName: false,
+        getById: false,
         expenseCategories: computed,
         incomeCategories: computed,
         incomeCategoriesNames: computed,
         expenseOptions: computed,
         incomeOptions: computed,
         isIncomeCategory: false,
+        fromJson: action
       })
-    this.categories = categories
   }
 
   getByName(name: string): Category {
     const category = this.categories.find((category) => category.name === name)
     if (!category) {
       throw new Error(`Cannot find category with the name ${name}`)
+    }
+    return category
+  }
+
+  getById(id: number): Category {
+    const category = this.categories.find((category) => category.id === id)
+    if (!category) {
+      throw new Error(`Cannot find category with id ${id}`)
     }
     return category
   }
@@ -51,17 +66,12 @@ class CategoryStore {
   isIncomeCategory(categoryName: string): boolean {
     return this.incomeCategories.map(c => c.name).includes(categoryName)
   }
+
+  fromJson(json: CategoryJson[]) {
+    this.categories = json.map(c => new Category(c.id, c.name, c.is_income))
+  }
 }
 
-const fakeCategories: Category[] = [
-  new Category(1, 'Подписки'),
-  new Category(2, 'Рестораны'),
-  new Category(3, 'Еда'),
-  new Category(4, 'Аренда'),
-  new Category(5, 'Зарплата', true),
-  new Category(6, 'Прочие доходы', true)
-]
-
-const categoryStore = new CategoryStore(fakeCategories)
+const categoryStore = new CategoryStore()
 
 export default categoryStore
