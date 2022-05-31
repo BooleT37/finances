@@ -39,31 +39,27 @@ class ExpenseStore {
 
   *insert(expense: Expense): Generator<Promise<Response>> {
     const foundIndex = this.expenses.findIndex(e => e.id === expense.id);
-    if (foundIndex === -1) {
-      this.expenses.push(expense)
-      try {
-        yield fetch(
-          "https://rttvji9hud.execute-api.eu-central-1.amazonaws.com/dev/expense",
-          {
-            method: "POST", body: JSON.stringify({
-              id: expense.id,
-              name: expense.name,
-              cost: expense.cost,
-              currency: expense.currency,
-              date: expense.date.format("YYYY-MM-DD"),
-              category_id: expense.category.id
-            }),
-            headers: {
-              "content-type": "application/json"
-            }
-          })
-      } catch (e) {
-        console.error(e)
-        throw e
-      }
-    } else {
+    const found = foundIndex !== -1;
+    if (found) {
       this.expenses[foundIndex] = expense
+    } else {
+      this.expenses.push(expense)
     }
+    yield fetch(
+      "https://rttvji9hud.execute-api.eu-central-1.amazonaws.com/dev/expense",
+      {
+        method: found ? "PUT" : "POST", body: JSON.stringify({
+          id: expense.id,
+          name: expense.name,
+          cost: expense.cost,
+          currency: expense.currency,
+          date: expense.date.format("YYYY-MM-DD"),
+          category_id: expense.category.id
+        }),
+        headers: {
+          "content-type": "application/json"
+        }
+      })
   }
 
   delete(id: number): void {
