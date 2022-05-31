@@ -3,6 +3,7 @@ import Forecast from "../models/Forecast";
 import categoryStore from "./categoryStore";
 import expenseStore from "./expenseStore";
 import { computedFn } from 'mobx-utils'
+import Category from "../models/Category";
 
 interface ForecastTableItem {
   category: string,
@@ -31,7 +32,9 @@ class ForecastStore {
     makeObservable(this, {
       forecasts: observable,
       tableData: false,
-      fromJson: action
+      fromJson: action,
+      changeForecastSum: action,
+      changeForecastComment: action
     })
   }
 
@@ -66,6 +69,28 @@ class ForecastStore {
       f.sum,
       f.comment
     ))
+  }
+
+  changeForecastSum(category: Category, month: number, year: number, sum: number) {
+    const foundIndex = this.forecasts.findIndex(
+      f => f.category.id === category.id && f.month === month && f.year === year
+    )
+    if (foundIndex !== -1) {
+      this.forecasts[foundIndex].sum = sum
+    } else {
+      this.forecasts.push(new Forecast(category, month, year, sum, ''))
+    }
+  }
+
+  changeForecastComment(category: Category, month: number, year: number, comment: string) {
+    const foundIndex = this.forecasts.findIndex(
+      f => f.category.id === category.id && f.month === month && f.year === year
+    )
+    if (foundIndex !== -1) {
+      this.forecasts[foundIndex].comment = comment
+    } else {
+      this.forecasts.push(new Forecast(category, month, year, 0, comment))
+    }
   }
 }
 

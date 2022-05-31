@@ -8,11 +8,35 @@ import forecastStore from "../stores/forecastStore";
 import React from "react";
 import { Moment } from "moment";
 import moment from "moment";
+import type { CellEditRequestEvent } from "ag-grid-community";
+import { action } from "mobx";
+import categoryStore from "../stores/categoryStore";
 
 const { Title } = Typography;
 
 const PlanningScreen = observer(function PlanningScreen() {
   const [date, setDate] = React.useState<Moment | null>(moment())
+  const handleCellEditRequest = action((params: CellEditRequestEvent) => {
+    if (!date) {
+      return
+    }
+    const field = params.column.getColDef().field
+    if (field === 'sum') {
+      forecastStore.changeForecastSum(
+        categoryStore.getByName(params.data.category),
+        date.month(),
+        date.year(),
+        parseFloat(params.newValue)
+      )
+    } else if (field === 'comment') {
+      forecastStore.changeForecastComment(
+        categoryStore.getByName(params.data.category),
+        date.month(),
+        date.year(),
+        params.newValue
+      )
+    }
+  })
 
   return (
     <>
@@ -25,6 +49,8 @@ const PlanningScreen = observer(function PlanningScreen() {
           {date &&
             <div className='ag-theme-alpine' style={{ width: 790 }}>
               <AgGridReact
+                readOnlyEdit
+                onCellEditRequest={handleCellEditRequest}
                 columnDefs={columnDefs}
                 rowData={forecastStore.tableData(date.year(), date.month())}
                 domLayout="autoHeight"
