@@ -70,14 +70,15 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ onSubmit 
           categoryStore.getByName(values.category),
           values.name
         )
-        expenseStore.insert(expense)
         if (addMore.value) {
           expenseModalStore.expenseId = expenseStore.nextId
         } else {
           expenseModalStore.close()
         }
         onSubmit(expense)
+        return expense
       }))
+      .then(expenseStore.insert)
       .catch(info => {
         console.log('Validate Failed:', info);
       });

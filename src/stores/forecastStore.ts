@@ -12,6 +12,14 @@ interface ForecastTableItem {
   comment: string,
 }
 
+interface ForecastJson {
+  category_id: number,
+  month: number,
+  year: number,
+  sum: number,
+  comment?: string
+}
+
 function getPreviousMonth(month: number) {
   return month === 0 ? 11 : month - 1
 }
@@ -23,7 +31,7 @@ class ForecastStore {
     makeObservable(this, {
       forecasts: observable,
       tableData: false,
-      fromFakeData: action
+      fromJson: action
     })
   }
 
@@ -44,18 +52,16 @@ class ForecastStore {
       }))
   })
 
-  fromFakeData() {
-    this.forecasts = getFakeForecasts()
+  fromJson(json: ForecastJson[]) {
+    this.forecasts = json.map(f => new Forecast(
+      categoryStore.getById(f.category_id),
+      f.month,
+      f.year,
+      f.sum,
+      f.comment
+    ))
   }
 }
-
-const getFakeForecasts = (): Forecast[] => [
-  new Forecast(categoryStore.getByName('Подписки'), 5, 2022, 50),
-  new Forecast(categoryStore.getByName('Рестораны'), 5, 2022, 400),
-  new Forecast(categoryStore.getByName('Аренда'), 5, 2022, 1100),
-  new Forecast(categoryStore.getByName('Рестораны'), 4, 2022, 350),
-  new Forecast(categoryStore.getByName('Аренда'), 4, 2022, 1100),
-]
 
 const forecastStore = new ForecastStore()
 

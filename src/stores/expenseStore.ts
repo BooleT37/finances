@@ -1,4 +1,4 @@
-import { action, computed, makeObservable, observable } from "mobx";
+import { action, computed, flow, makeObservable, observable } from "mobx";
 import moment from "moment";
 import Currency from "../models/Currency";
 import Expense from "../models/Expense";
@@ -23,7 +23,7 @@ class ExpenseStore {
         expenses: observable,
         tableData: computed,
         nextId: computed,
-        insert: action,
+        insert: flow.bound,
         delete: action,
         fromJson: action
       })
@@ -37,10 +37,30 @@ class ExpenseStore {
     return Math.max(...this.expenses.map(e => e.id)) + 1
   }
 
-  insert(expense: Expense): void {
+  *insert(expense: Expense): Generator<Promise<Response>> {
     const foundIndex = this.expenses.findIndex(e => e.id === expense.id);
     if (foundIndex === -1) {
       this.expenses.push(expense)
+      try {
+        yield fetch(
+          "https://rttvji9hud.execute-api.eu-central-1.amazonaws.com/dev/expense",
+          {
+            method: "POST", body: JSON.stringify({
+              id: expense.id,
+              name: expense.name,
+              cost: expense.cost,
+              currency: expense.currency,
+              date: expense.date.format("YYYY-MM-DD"),
+              category_id: expense.category.id
+            }),
+            headers: {
+              "content-type": "application/json"
+            }
+          })
+      } catch (e) {
+        console.error(e)
+        throw e
+      }
     } else {
       this.expenses[foundIndex] = expense
     }
