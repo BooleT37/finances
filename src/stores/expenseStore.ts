@@ -24,7 +24,7 @@ class ExpenseStore {
         tableData: computed,
         nextId: computed,
         insert: flow.bound,
-        delete: action,
+        delete: flow.bound,
         fromJson: action
       })
   }
@@ -62,12 +62,16 @@ class ExpenseStore {
       })
   }
 
-  delete(id: number): void {
+  *delete(id: number): Generator<Promise<Response>> {
     const foundIndex = this.expenses.findIndex(e => e.id === id);
     if (foundIndex === -1) {
       return
     }
     this.expenses.splice(foundIndex, 1)
+    yield fetch(
+      `https://rttvji9hud.execute-api.eu-central-1.amazonaws.com/dev/expense?id=${id}`,
+      { method: "DELETE" }
+    )
   }
 
   fromJson(json: ExpenseJson[]) {
