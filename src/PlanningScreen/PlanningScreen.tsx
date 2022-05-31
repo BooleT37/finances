@@ -1,5 +1,5 @@
 import { observer } from "mobx-react"
-import { DatePicker, Typography } from 'antd';
+import { DatePicker, Space, Typography } from 'antd';
 import WhiteHeader from "../WhiteHeader"
 import SiteContent from "../SiteContent";
 import { AgGridReact } from "ag-grid-react";
@@ -20,16 +20,18 @@ const PlanningScreen = observer(function PlanningScreen() {
         <Title>Планирование</Title>
       </WhiteHeader>
       <SiteContent className="site-layout-background">
-        <DatePicker value={date} picker="month" onChange={(date) => setDate(date)} />
-        { date &&
-          <div className='ag-theme-alpine' style={{ width: 790 }}>
-            <AgGridReact
-              columnDefs={columnDefs}
-              rowData={forecastStore.tableData(date.year(), date.month())}
-              domLayout="autoHeight"
-            />
-          </div>
-        }
+        <Space direction="vertical" size="middle">
+          <DatePicker value={date} picker="month" onChange={(date) => setDate(date)} />
+          {date &&
+            <div className='ag-theme-alpine' style={{ width: 790 }}>
+              <AgGridReact
+                columnDefs={columnDefs}
+                rowData={forecastStore.tableData(date.year(), date.month())}
+                domLayout="autoHeight"
+              />
+            </div>
+          }
+        </Space>
       </SiteContent>
     </>
   )
