@@ -36,20 +36,26 @@ class ForecastStore {
   }
 
   tableData = computedFn((year: number, month: number): ForecastTableItem[] => {
-    return this.forecasts
+    const filtered = this.forecasts
       .filter(forecast => forecast.month === month && forecast.year === year)
-      .map(forecast => ({
-        category: forecast.category.name,
-        average: expenseStore.expenses
-          .filter(e => e.date.month() === forecast.month)
-          .reduce((a, c) => a + (c.cost || 0), 0),
-        lastMonth: this.forecasts.find(
-          ({ category, month }) => category === forecast.category
-            && month === getPreviousMonth(forecast.month)
-        )?.sum ?? 0,
-        sum: forecast.sum,
-        comment: forecast.comment || ''
-      }))
+    categoryStore.categories.forEach(category => {
+      if (filtered.every(f => f.category.id !== category.id)) {
+        filtered.push(new Forecast(category, month, year, 0))
+      }
+    })
+    filtered.sort((f1, f2) => f1.category.id - f2.category.id)
+    return filtered.map(forecast => ({
+      category: forecast.category.name,
+      average: expenseStore.expenses
+        .filter(e => e.date.month() === forecast.month)
+        .reduce((a, c) => a + (c.cost || 0), 0),
+      lastMonth: this.forecasts.find(
+        ({ category, month }) => category === forecast.category
+          && month === getPreviousMonth(forecast.month)
+      )?.sum ?? 0,
+      sum: forecast.sum,
+      comment: forecast.comment || ''
+    }))
   })
 
   fromJson(json: ForecastJson[]) {
