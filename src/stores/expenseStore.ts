@@ -1,5 +1,5 @@
 import { action, computed, flow, makeObservable, observable } from "mobx";
-import moment from "moment";
+import moment, { Moment } from "moment";
 import Currency from "../models/Currency";
 import Expense from "../models/Expense";
 import categoryStore from "./categoryStore";
@@ -21,7 +21,7 @@ class ExpenseStore {
       this,
       {
         expenses: observable,
-        tableData: computed,
+        tableData: false,
         nextId: computed,
         insert: flow.bound,
         delete: flow.bound,
@@ -29,8 +29,10 @@ class ExpenseStore {
       })
   }
 
-  get tableData() {
-    return this.expenses.map(ex => ex.asTableData)
+  tableData(startDate: Moment, endDate: Moment) {
+    return this.expenses
+      .filter(e => e.date.isSameOrAfter(startDate) && e.date.isSameOrBefore(endDate))
+      .map(ex => ex.asTableData)
   }
 
   get nextId(): number {

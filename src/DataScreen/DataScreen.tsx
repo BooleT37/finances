@@ -55,18 +55,20 @@ const DataScreen = observer(function DataScreen() {
             <RangePicker value={[rangeStart, rangeEnd]} onChange={handleRangeChange} />
             <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>Добавить</Button>
           </Space>
-          <div className='ag-theme-alpine' style={{ height: 500, width: 790 }}>
-            <AgGridReact
-              ref={gridRef}
-              rowData={expenseStore.tableData}
-              columnDefs={columnDefs}
-              context={{ expandCategory }}
-              getRowStyle={getRowStyle}
-              groupIncludeFooter
-              suppressAggFuncInHeader
-              autoGroupColumnDef={autoGroupColumnDef}
-            />
-          </div>
+          {rangeStart && rangeEnd && (
+            <div className='ag-theme-alpine' style={{ height: 500, width: 790 }}>
+              <AgGridReact
+                ref={gridRef}
+                rowData={expenseStore.tableData(rangeStart, rangeEnd)}
+                columnDefs={columnDefs}
+                context={{ expandCategory }}
+                getRowStyle={getRowStyle}
+                groupIncludeFooter
+                suppressAggFuncInHeader
+                autoGroupColumnDef={autoGroupColumnDef}
+              />
+            </div>
+          )}
         </Space>
       </SiteContent>
       <ExpenseModal onSubmit={e => { expandCategory(e.category.name) }} />
