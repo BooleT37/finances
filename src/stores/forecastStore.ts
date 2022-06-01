@@ -1,4 +1,4 @@
-import { action, makeObservable, observable } from "mobx";
+import { action, flow, makeObservable, observable } from "mobx";
 import Forecast from "../models/Forecast";
 import categoryStore from "./categoryStore";
 import expenseStore from "./expenseStore";
@@ -33,8 +33,8 @@ class ForecastStore {
       forecasts: observable,
       tableData: false,
       fromJson: action,
-      changeForecastSum: action,
-      changeForecastComment: action
+      changeForecastSum: flow.bound,
+      changeForecastComment: flow.bound
     })
   }
 
@@ -71,25 +71,68 @@ class ForecastStore {
     ))
   }
 
-  changeForecastSum(category: Category, month: number, year: number, sum: number) {
+  *changeForecastSum(category: Category, month: number, year: number, sum: number): Generator<Promise<Response>> {
     const foundIndex = this.forecasts.findIndex(
       f => f.category.id === category.id && f.month === month && f.year === year
     )
     if (foundIndex !== -1) {
       this.forecasts[foundIndex].sum = sum
+      yield fetch(
+        `https://rttvji9hud.execute-api.eu-central-1.amazonaws.com/dev/forecast?category_id=${category.id}&month=${month}&year=${year}`,
+        {
+          method: "PATCH", body: JSON.stringify({ sum }),
+          headers: {
+            "content-type": "application/json"
+          }
+        })
     } else {
       this.forecasts.push(new Forecast(category, month, year, sum, ''))
+      yield fetch(
+        "https://rttvji9hud.execute-api.eu-central-1.amazonaws.com/dev/forecast",
+        {
+          method: "POST", body: JSON.stringify({
+            category_id: category.id,
+            month,
+            year,
+            sum
+          }),
+          headers: {
+            "content-type": "application/json"
+          }
+        })
     }
   }
 
-  changeForecastComment(category: Category, month: number, year: number, comment: string) {
+  *changeForecastComment(category: Category, month: number, year: number, comment: string): Generator<Promise<Response>> {
     const foundIndex = this.forecasts.findIndex(
       f => f.category.id === category.id && f.month === month && f.year === year
     )
     if (foundIndex !== -1) {
       this.forecasts[foundIndex].comment = comment
+      yield fetch(
+        `https://rttvji9hud.execute-api.eu-central-1.amazonaws.com/dev/forecast?category_id=${category.id}&month=${month}&year=${year}`,
+        {
+          method: "PATCH", body: JSON.stringify({ comment }),
+          headers: {
+            "content-type": "application/json"
+          }
+        })
     } else {
       this.forecasts.push(new Forecast(category, month, year, 0, comment))
+      yield fetch(
+        "https://rttvji9hud.execute-api.eu-central-1.amazonaws.com/dev/forecast",
+        {
+          method: "POST", body: JSON.stringify({
+            category_id: category.id,
+            month,
+            year,
+            sum: 0,
+            comment
+          }),
+          headers: {
+            "content-type": "application/json"
+          }
+        })
     }
   }
 }
