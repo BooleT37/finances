@@ -25,10 +25,10 @@ function getItem(
 }
 
 const items: MenuItem[] = [
-  getItem('Данные', '/data', <TableOutlined />),
-  getItem('Статистика', '/statistics', <LineChartOutlined />),
-  getItem('Планирование', '/planning', <CalendarOutlined />,),
-  getItem('Подписки', '/subscriptions', <DollarOutlined />),
+  getItem('Данные', '/screens/data', <TableOutlined />),
+  getItem('Статистика', '/screens/statistics', <LineChartOutlined />),
+  getItem('Планирование', '/screens/planning', <CalendarOutlined />,),
+  getItem('Подписки', '/screens/subscriptions', <DollarOutlined />),
 ];
 
 /* eslint-disable mobx/missing-observer */

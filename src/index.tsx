@@ -22,9 +22,9 @@ ReactDOM.render(
       <App>
         <SiteLayout>
           <Routes>
-            <Route path="data" element={<DataScreen />} />
-            <Route path="statistics" element={<StatisticsScreen />} />
-            <Route path="planning" element={<PlanningScreen />} />
+            <Route path="screens/data" element={<DataScreen />} />
+            <Route path="screens/statistics" element={<StatisticsScreen />} />
+            <Route path="screens/planning" element={<PlanningScreen />} />
           </Routes>
         </SiteLayout>
       </App>
