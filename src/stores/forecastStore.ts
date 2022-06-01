@@ -78,7 +78,7 @@ class ForecastStore {
     if (foundIndex !== -1) {
       this.forecasts[foundIndex].sum = sum
       yield fetch(
-        `https://rttvji9hud.execute-api.eu-central-1.amazonaws.com/dev/forecast?category_id=${category.id}&month=${month}&year=${year}`,
+        `${process.env.REACT_APP_API_URL}/forecast?category_id=${category.id}&month=${month}&year=${year}`,
         {
           method: "PATCH", body: JSON.stringify({ sum }),
           headers: {
@@ -88,7 +88,7 @@ class ForecastStore {
     } else {
       this.forecasts.push(new Forecast(category, month, year, sum, ''))
       yield fetch(
-        "https://rttvji9hud.execute-api.eu-central-1.amazonaws.com/dev/forecast",
+        `${process.env.REACT_APP_API_URL}/forecast`,
         {
           method: "POST", body: JSON.stringify({
             category_id: category.id,
@@ -110,7 +110,7 @@ class ForecastStore {
     if (foundIndex !== -1) {
       this.forecasts[foundIndex].comment = comment
       yield fetch(
-        `https://rttvji9hud.execute-api.eu-central-1.amazonaws.com/dev/forecast?category_id=${category.id}&month=${month}&year=${year}`,
+        `${process.env.REACT_APP_API_URL}/forecast?category_id=${category.id}&month=${month}&year=${year}`,
         {
           method: "PATCH", body: JSON.stringify({ comment }),
           headers: {
@@ -120,7 +120,7 @@ class ForecastStore {
     } else {
       this.forecasts.push(new Forecast(category, month, year, 0, comment))
       yield fetch(
-        "https://rttvji9hud.execute-api.eu-central-1.amazonaws.com/dev/forecast",
+        `${process.env.REACT_APP_API_URL}/forecast`,
         {
           method: "POST", body: JSON.stringify({
             category_id: category.id,

@@ -11,15 +11,19 @@ const App = observer(function App({ children }: React.PropsWithChildren<{}>) {
   React.useEffect(() => {
     (async () => {
       const [categories, expenses, forecasts] = await Promise.all([
-        await fetch("https://rttvji9hud.execute-api.eu-central-1.amazonaws.com/dev/category").then(res => res.json()),
-        await fetch("https://rttvji9hud.execute-api.eu-central-1.amazonaws.com/dev/expense").then(res => res.json()),
-        await fetch("https://rttvji9hud.execute-api.eu-central-1.amazonaws.com/dev/forecast").then(res => res.json()),
+        await fetch(`${process.env.REACT_APP_API_URL}/category`).then(res => res.json()),
+        await fetch(`${process.env.REACT_APP_API_URL}/expense`).then(res => res.json()),
+        await fetch(`${process.env.REACT_APP_API_URL}/forecast`).then(res => res.json()),
       ])
       categoryStore.fromJson(categories)
       expenseStore.fromJson(expenses)
       forecastStore.fromJson(forecasts)
       setLoaded(true)
     })()}, [])
+
+  if (!process.env.REACT_APP_API_URL) {
+    return <div>ERROR: API url is undefined, please check your environmental settings</div>
+  }
 
   if (!loaded) {
     return <Spin size="large" />

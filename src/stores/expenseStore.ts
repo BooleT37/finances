@@ -48,7 +48,7 @@ class ExpenseStore {
       this.expenses.push(expense)
     }
     yield fetch(
-      "https://rttvji9hud.execute-api.eu-central-1.amazonaws.com/dev/expense",
+      `${process.env.REACT_APP_API_URL}/expense`,
       {
         method: found ? "PUT" : "POST", body: JSON.stringify({
           id: expense.id,
@@ -71,7 +71,7 @@ class ExpenseStore {
     }
     this.expenses.splice(foundIndex, 1)
     yield fetch(
-      `https://rttvji9hud.execute-api.eu-central-1.amazonaws.com/dev/expense?id=${id}`,
+      `${process.env.REACT_APP_API_URL}/expense?id=${id}`,
       { method: "DELETE" }
     )
   }
