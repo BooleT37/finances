@@ -9,6 +9,7 @@ interface ForecastTableItem {
   category: string,
   average: number,
   lastMonth: number,
+  thisMonth: number,
   sum: number,
   comment: string,
 }
@@ -49,12 +50,17 @@ class ForecastStore {
     filtered.sort((f1, f2) => f1.category.id - f2.category.id)
     return filtered.map(forecast => ({
       category: forecast.category.name,
-      average: expenseStore.expenses
-        .filter(e => e.date.month() === forecast.month)
-        .reduce((a, c) => a + (c.cost || 0), 0),
+      // average: expenseStore.expenses
+      //   .filter(e => e.category.id === forecast.category.id)
+      //   .reduce((a, c) => a + (c.cost || 0), 0) / ,
+      average: 0,
       lastMonth: this.forecasts.find(
         ({ category, month }) => category === forecast.category
           && month === getPreviousMonth(forecast.month)
+      )?.sum ?? 0,
+      thisMonth: this.forecasts.find(
+        ({ category, month }) => category === forecast.category
+          && month === forecast.month
       )?.sum ?? 0,
       sum: forecast.sum,
       comment: forecast.comment || ''
