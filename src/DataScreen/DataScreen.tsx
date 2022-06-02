@@ -71,7 +71,7 @@ const DataScreen = observer(function DataScreen() {
           )}
         </Space>
       </SiteContent>
-      <ExpenseModal onSubmit={e => { expandCategory(e.category.name) }} />
+      <ExpenseModal startDate={rangeStart} endDate={rangeEnd} onSubmit={e => { expandCategory(e.category.name) }} />
     </>
   )
 })

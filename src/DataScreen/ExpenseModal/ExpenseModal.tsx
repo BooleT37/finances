@@ -14,7 +14,6 @@ import {
 import { RuleObject } from 'antd/lib/form';
 import { action, autorun, reaction } from 'mobx';
 import { observer, useLocalObservable } from 'mobx-react';
-import moment from 'moment';
 import { Moment } from 'moment';
 import React from 'react';
 import styled from 'styled-components';
@@ -29,20 +28,14 @@ const { Option } = Select;
 interface FormValues {
   cost: string,
   currency: Currency,
-  date: Moment,
+  date: Moment | null,
   category: string,
   name: string
 }
 
-const INITIAL_VALUES: FormValues = {
-  cost: '',
-  currency: Currency.Eur,
-  category: '',
-  name: '',
-  date: moment()
-}
-
 interface Props {
+  startDate: Moment | null
+  endDate: Moment | null
   onSubmit(expense: Expense): void
 }
 
@@ -51,11 +44,19 @@ const RadioGroup = styled(Radio.Group)`
   margin: 0 0 24px 33%;
 `
 
-const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ onSubmit }) {
+const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate, endDate, onSubmit }) {
   const [form] = Form.useForm<FormValues>();
   const inputRef = React.useRef<InputRef>(null);
   const addMore = useLocalObservable<{ value: boolean }>(() => ({ value: false }))
   const isIncome = useLocalObservable<{ value: boolean }>(() => ({ value: false }))
+
+  const INITIAL_VALUES: FormValues = React.useMemo(() => ({
+    cost: '',
+    currency: Currency.Eur,
+    category: '',
+    name: '',
+    date: startDate
+  }), [startDate])
 
   const handleSubmit = () => {
     form
@@ -66,7 +67,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ onSubmit 
           expenseModalStore.expenseId,
           parseFloat(values.cost),
           values.currency,
-          values.date,
+          values.date!,
           categoryStore.getByName(values.category),
           values.name
         )
@@ -102,7 +103,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ onSubmit 
         inputRef.current?.focus()
       }
     })
-  }, [form])
+  }, [INITIAL_VALUES, form])
 
   reaction(() => isIncome.value, () => {
     form.resetFields(['category'])
@@ -123,6 +124,10 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ onSubmit 
       disposer()
       reject(new Error('Категория не найдена'))
     })
+  }
+
+  const disabledDate = (date: Moment) => {
+    return (startDate && date.isBefore(startDate)) || (endDate && date.isAfter(endDate)) || false
   }
 
   return (
@@ -185,7 +190,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ onSubmit 
           label="Дата"
           rules={[{ required: true, message: 'Введите дату' }]}
         >
-          <DatePicker />
+          <DatePicker disabledDate={disabledDate} />
         </Form.Item>
         <Form.Item
           name="category"
