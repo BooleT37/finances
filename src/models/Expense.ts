@@ -57,7 +57,7 @@ export default class Expense {
               currency: this.currency
             } : null,
             category: this.category.name,
-            date: this.date.format('YYYY-MM-DD'),
+            date: this.date.format('DD.MM.YYYY'),
             isIncome: this.category.isIncome
         }
     }
