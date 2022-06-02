@@ -101,6 +101,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
           form.setFieldsValue(INITIAL_VALUES)
         }
         inputRef.current?.focus()
+        inputRef.current?.select()
       }
     })
   }, [INITIAL_VALUES, form])
