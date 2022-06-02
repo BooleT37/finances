@@ -60,7 +60,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ onSubmit 
   const handleSubmit = () => {
     form
       .validateFields()
-      .then(action(values => {
+      .then(action(async (values) => {
         form.resetFields();
         const expense = new Expense(
           expenseModalStore.expenseId,
@@ -70,6 +70,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ onSubmit 
           categoryStore.getByName(values.category),
           values.name
         )
+        expenseStore.insert(expense)
         if (addMore.value) {
           expenseModalStore.expenseId = expenseStore.nextId
         } else {
@@ -78,7 +79,6 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ onSubmit 
         onSubmit(expense)
         return expense
       }))
-      .then(expenseStore.insert)
       .catch(info => {
         console.log('Validate Failed:', info);
       });
