@@ -201,6 +201,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ onSubmit 
           <AutoComplete
             options={isIncome.value ? categoryStore.incomeOptions : categoryStore.expenseOptions}
             placeholder="Начните вводить"
+            filterOption
           />
         </Form.Item>
         <Form.Item name="name" label="Коментарий">
