@@ -58,10 +58,9 @@ class ForecastStore {
         ({ category, month }) => category === forecast.category
           && month === getPreviousMonth(forecast.month)
       )?.sum ?? 0,
-      thisMonth: this.forecasts.find(
-        ({ category, month }) => category === forecast.category
-          && month === forecast.month
-      )?.sum ?? 0,
+      thisMonth: expenseStore.expenses
+        .filter(e => e.date.month() === month && e.category.id === forecast.category.id)
+        .reduce((a, c) => a + (c.cost || 0), 0),
       sum: forecast.sum,
       comment: forecast.comment || ''
     }))
