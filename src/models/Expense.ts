@@ -52,7 +52,7 @@ export default class Expense {
         return {
             id: this.id,
             name: this.name || '',
-            cost: this.cost ? {
+            cost: this.cost || this.cost === 0 ? {
               value: this.cost,
               currency: this.currency
             } : null,
