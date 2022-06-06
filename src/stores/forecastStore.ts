@@ -22,6 +22,10 @@ interface ForecastJson {
   comment?: string
 }
 
+function sum(arr: (number | null)[]): number {
+  return arr.reduce<number>((a, c) => a + (c || 0), 0)
+}
+
 function getPreviousMonth(month: number) {
   return month === 0 ? 11 : month - 1
 }
@@ -48,7 +52,7 @@ class ForecastStore {
       }
     })
     filtered.sort((f1, f2) => f1.category.id - f2.category.id)
-    return filtered.map(forecast => ({
+    const data = filtered.map(forecast => ({
       category: forecast.category.name,
       // average: expenseStore.expenses
       //   .filter(e => e.category.id === forecast.category.id)
@@ -64,6 +68,17 @@ class ForecastStore {
       sum: forecast.sum,
       comment: forecast.comment || ''
     }))
+
+    data.push({
+      average: sum(data.map(d => d.average)),
+      category: 'Всего',
+      comment: '',
+      lastMonth: sum(data.map(d => d.lastMonth)),
+      sum: sum(data.map(d => d.sum)),
+      thisMonth: sum(data.map(d => d.thisMonth))
+    })
+
+    return data
   })
 
   fromJson(json: ForecastJson[]) {
