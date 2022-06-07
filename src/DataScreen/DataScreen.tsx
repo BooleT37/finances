@@ -24,9 +24,9 @@ const DataScreen = observer(function DataScreen() {
   const [rangeEnd, setRangeEnd] = React.useState<Moment | null>(today.clone().set('date', 1).subtract(1, 'day'))
   const gridRef = React.useRef<AgGridReact>(null);
 
-  const handleRangeChange = ((dates: [Moment | null, Moment | null] | null) => {
-    setRangeStart(dates?.[0] ?? null)
-    setRangeEnd(dates?.[1] ?? null)
+  const handleRangeChange = ((_dates: [Moment | null, Moment | null] | null, dateStrings: [string, string]) => {
+    setRangeStart(dateStrings && dateStrings[0] ? moment(dateStrings[0]) : null)
+    setRangeEnd(dateStrings && dateStrings[1] ? moment(dateStrings[1]) : null)
   })
 
   const expandCategory = React.useCallback((category: string) => {
@@ -52,7 +52,7 @@ const DataScreen = observer(function DataScreen() {
       <SiteContent className="site-layout-background">
         <Space direction="vertical" size="middle">
           <Space size="middle">
-            <RangePicker value={[rangeStart, rangeEnd]} onChange={handleRangeChange} />
+            <RangePicker format="DD.MM.YYYY" value={[rangeStart, rangeEnd]} onChange={handleRangeChange} />
             <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>Добавить</Button>
           </Space>
           {rangeStart && rangeEnd && (
