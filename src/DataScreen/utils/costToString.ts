@@ -1,4 +1,4 @@
-import Currency from "../models/Currency";
+import Currency from "../../models/Currency";
 
 const currencySymbols: Record<Currency, string> = {
   Eur: '€',

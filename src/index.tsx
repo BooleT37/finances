@@ -1,6 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { ConfigProvider } from 'antd';
+import 'moment/locale/ru';
+import locale from 'antd/lib/locale/ru_RU';
+
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
@@ -19,15 +23,17 @@ const container: HTMLElement | null = document.getElementById('root');
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
-      <App>
-        <SiteLayout>
-          <Routes>
-            <Route path="screens/data" element={<DataScreen />} />
-            <Route path="screens/statistics" element={<StatisticsScreen />} />
-            <Route path="screens/planning" element={<PlanningScreen />} />
-          </Routes>
-        </SiteLayout>
-      </App>
+      <ConfigProvider locale={locale}>
+        <App>
+          <SiteLayout>
+            <Routes>
+              <Route path="screens/data" element={<DataScreen />} />
+              <Route path="screens/statistics" element={<StatisticsScreen />} />
+              <Route path="screens/planning" element={<PlanningScreen />} />
+            </Routes>
+          </SiteLayout>
+        </App>
+      </ConfigProvider>
     </BrowserRouter>
   </React.StrictMode>,
   container

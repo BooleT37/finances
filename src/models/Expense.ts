@@ -1,5 +1,6 @@
 import { computed, makeObservable, observable } from "mobx";
 import { Moment } from "moment";
+import { DATE_FORMAT } from "../constants";
 import Category from "./Category";
 import Currency from "./Currency";
 
@@ -57,7 +58,7 @@ export default class Expense {
               currency: this.currency
             } : null,
             category: this.category.name,
-            date: this.date.format('DD.MM.YYYY'),
+            date: this.date.format(DATE_FORMAT),
             isIncome: this.category.isIncome
         }
     }
