@@ -3,7 +3,7 @@ import { observer } from "mobx-react"
 import React from "react"
 import categoryStore from "../stores/categoryStore"
 import expenseStore from "../stores/expenseStore"
-import forecastStore from "../stores/forecastStore"
+import forecastStore from "../stores/forecastStore/forecastStore"
 
 const App = observer(function App({ children }: React.PropsWithChildren<{}>) {
   const [loaded, setLoaded] = React.useState(false)

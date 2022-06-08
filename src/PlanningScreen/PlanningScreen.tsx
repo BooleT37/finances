@@ -4,7 +4,7 @@ import WhiteHeader from "../WhiteHeader"
 import SiteContent from "../SiteContent";
 import { AgGridReact } from "ag-grid-react";
 import columnDefs from "./columnDefs";
-import forecastStore from "../stores/forecastStore";
+import forecastStore from "../stores/forecastStore/forecastStore";
 import React from "react";
 import { Moment } from "moment";
 import moment from "moment";
@@ -47,7 +47,7 @@ const PlanningScreen = observer(function PlanningScreen() {
         <Space direction="vertical" size="middle">
           <DatePicker value={date} picker="month" onChange={(date) => setDate(date)} />
           {date &&
-            <div className='ag-theme-alpine' style={{ width: 790 }}>
+            <div className='ag-theme-alpine' style={{ width: 915 }}>
               <AgGridReact
                 readOnlyEdit
                 onCellEditRequest={handleCellEditRequest}

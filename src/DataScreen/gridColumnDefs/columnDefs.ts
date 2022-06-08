@@ -1,6 +1,6 @@
 import type { GridOptions, ICellRendererParams } from 'ag-grid-community';
 import Currency from '../../models/Currency';
-import { costToString } from '../utils';
+import { costToString } from '../../utils';
 import EditButtonRenderer from '../buttonRenderers/EditButtonRenderer';
 import RemoveButtonRenderer from '../buttonRenderers/RemoveButtonRenderer';
 import { DeleteHeaderIcon, EditHeaderIcon } from '../headerIcons';

@@ -1,9 +1,10 @@
 import { action, flow, makeObservable, observable } from "mobx";
-import Forecast from "../models/Forecast";
-import categoryStore from "./categoryStore";
-import expenseStore from "./expenseStore";
+import Forecast from "../../models/Forecast";
+import categoryStore from "../categoryStore";
+import expenseStore from "../expenseStore";
 import { computedFn } from 'mobx-utils'
-import Category from "../models/Category";
+import Category from "../../models/Category";
+import { getPreviousMonth, sum, roundCost } from "./utils";
 
 interface ForecastTableItem {
   category: string,
@@ -20,14 +21,6 @@ interface ForecastJson {
   year: number,
   sum: number,
   comment?: string
-}
-
-function sum(arr: (number | null)[]): number {
-  return arr.reduce<number>((a, c) => a + (c || 0), 0)
-}
-
-function getPreviousMonth(month: number) {
-  return month === 0 ? 11 : month - 1
 }
 
 class ForecastStore {
@@ -59,12 +52,12 @@ class ForecastStore {
       //   .reduce((a, c) => a + (c.cost || 0), 0) / ,
       average: 0,
       lastMonth: this.forecasts.find(
-        ({ category, month }) => category === forecast.category
-          && month === getPreviousMonth(forecast.month)
-      )?.sum ?? 0,
-      thisMonth: expenseStore.expenses
-        .filter(e => e.date.month() === month && e.category.id === forecast.category.id)
-        .reduce((a, c) => a + (c.cost || 0), 0),
+          ({ category, month }) => category === forecast.category
+            && month === getPreviousMonth(forecast.month)
+        )?.sum ?? 0,
+      thisMonth: roundCost(expenseStore.expenses
+          .filter(e => e.date.month() === month && e.category.id === forecast.category.id)
+          .reduce((a, c) => a + (c.cost || 0), 0)),
       sum: forecast.sum,
       comment: forecast.comment || ''
     }))
