@@ -45,7 +45,7 @@ const PlanningScreen = observer(function PlanningScreen() {
       </WhiteHeader>
       <SiteContent className="site-layout-background">
         <Space direction="vertical" size="middle">
-          <DatePicker value={date} picker="month" onChange={(date) => setDate(date)} />
+          <DatePicker value={date} picker="month" onChange={(date) => setDate(date)} format='MMMM YYYY' />
           {date &&
             <div className='ag-theme-alpine' style={{ width: 915 }}>
               <AgGridReact
