@@ -9,6 +9,7 @@ import { countUniqueMonths, sum } from "../../utils";
 
 interface ForecastTableItem {
   category: string,
+  isIncome: boolean,
   average: number,
   monthsWithSpendings: string,
   lastMonth: number,
@@ -49,6 +50,7 @@ class ForecastStore {
     filtered.sort((f1, f2) => f1.category.id - f2.category.id)
     const data = filtered.map(forecast => ({
       category: forecast.category.name,
+      isIncome: forecast.category.isIncome,
       average: avgForNonEmpty(expenseStore.expenses
         .filter(e => e.category.id === forecast.category.id)
         .map(e => e.cost || 0)),
@@ -67,13 +69,14 @@ class ForecastStore {
     }))
 
     data.push({
-      average: sum(data.map(d => d.average)),
+      average: roundCost(sum(data.map(d => d.isIncome ? -d.average : d.average))),
       monthsWithSpendings: '',
       category: 'Всего',
+      isIncome: false,
       comment: '',
-      lastMonth: sum(data.map(d => d.lastMonth)),
-      sum: sum(data.map(d => d.sum)),
-      thisMonth: sum(data.map(d => d.thisMonth))
+      lastMonth: sum(data.map(d => d.isIncome ? -d.lastMonth : d.lastMonth)),
+      sum: sum(data.map(d => d.isIncome ? -d.sum : d.sum)),
+      thisMonth: sum(data.map(d => d.isIncome ? -d.thisMonth : d.thisMonth))
     })
 
     return data
