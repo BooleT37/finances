@@ -55,7 +55,7 @@ const DataScreen = observer(function DataScreen() {
   }, [])
 
   const handleAdd = action(() => { expenseModalStore.open(expenseStore.nextId); })
-  
+
   const goToPrevMonth = () => {
     setRangeStart(d => {
       if (!d) {
@@ -67,7 +67,10 @@ const DataScreen = observer(function DataScreen() {
       if (!d) {
         return d
       }
-      return d.clone().subtract(1, 'month')
+      return d
+        .clone()
+        .set('date', 1)
+        .subtract(1, 'day')
     })
   }
 
@@ -82,7 +85,11 @@ const DataScreen = observer(function DataScreen() {
       if (!d) {
         return d
       }
-      return d.clone().add(1, 'month')
+      return d
+        .clone()
+        .add(2, 'month')
+        .set('date', 1)
+        .subtract(1, 'day')
     })
   }
 
@@ -101,14 +108,14 @@ const DataScreen = observer(function DataScreen() {
                 onChange={handleRangeChange}
               />) : (
                 <div>
-                  <Button type="link" icon={<LeftOutlined />} onClick={ goToPrevMonth } />
+                  <Button type="link" icon={<LeftOutlined />} onClick={goToPrevMonth} />
                   <DatePicker
                     value={rangeStart}
                     picker="month"
                     onChange={handleMonthChange}
                     format='MMMM YYYY'
                   />
-                  <Button type="link" icon={<RightOutlined />} onClick={ goToNextMonth } />
+                  <Button type="link" icon={<RightOutlined />} onClick={goToNextMonth} />
                 </div>
               )}
               <Button
