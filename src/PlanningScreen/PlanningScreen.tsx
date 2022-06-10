@@ -1,5 +1,5 @@
 import { observer } from "mobx-react"
-import { DatePicker, Space, Typography } from 'antd';
+import { Button, DatePicker, Space, Typography } from 'antd';
 import WhiteHeader from "../WhiteHeader"
 import SiteContent from "../SiteContent";
 import { AgGridReact } from "ag-grid-react";
@@ -10,6 +10,7 @@ import { Moment } from "moment";
 import moment from "moment";
 import type { CellEditRequestEvent } from "ag-grid-community";
 import { action } from "mobx";
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import categoryStore from "../stores/categoryStore";
 
 const { Title } = Typography;
@@ -38,6 +39,24 @@ const PlanningScreen = observer(function PlanningScreen() {
     }
   })
 
+  const goToPrevMonth = () => {
+    setDate(d => {
+      if (!d) {
+        return d
+      }
+      return d.clone().subtract(1, 'month')
+    })
+  }
+
+  const goToNextMonth = () => {
+    setDate(d => {
+      if (!d) {
+        return d
+      }
+      return d.clone().add(1, 'month')
+    })
+  }
+
   return (
     <>
       <WhiteHeader className="site-layout-background">
@@ -45,7 +64,11 @@ const PlanningScreen = observer(function PlanningScreen() {
       </WhiteHeader>
       <SiteContent className="site-layout-background">
         <Space direction="vertical" size="middle">
-          <DatePicker value={date} picker="month" onChange={(date) => setDate(date)} format='MMMM YYYY' />
+          <div>
+            <Button type="link" icon={<LeftOutlined />} onClick={ goToPrevMonth } />
+            <DatePicker value={date} picker="month" onChange={(date) => setDate(date)} format='MMMM YYYY' />
+            <Button type="link" icon={<RightOutlined />} onClick={ goToNextMonth } />
+          </div>
           {date &&
             <div className='ag-theme-alpine' style={{ width: 915 }}>
               <AgGridReact
