@@ -4,11 +4,13 @@ import categoryStore from "../categoryStore";
 import expenseStore from "../expenseStore";
 import { computedFn } from 'mobx-utils'
 import Category from "../../models/Category";
-import { getPreviousMonth, sum, roundCost } from "./utils";
+import { getPreviousMonth, roundCost, avgForNonEmpty } from "./utils";
+import { countUniqueMonths, sum } from "../../utils";
 
 interface ForecastTableItem {
   category: string,
   average: number,
+  monthsWithSpendings: string,
   lastMonth: number,
   thisMonth: number,
   sum: number,
@@ -47,23 +49,26 @@ class ForecastStore {
     filtered.sort((f1, f2) => f1.category.id - f2.category.id)
     const data = filtered.map(forecast => ({
       category: forecast.category.name,
-      // average: expenseStore.expenses
-      //   .filter(e => e.category.id === forecast.category.id)
-      //   .reduce((a, c) => a + (c.cost || 0), 0) / ,
-      average: 0,
+      average: avgForNonEmpty(expenseStore.expenses
+        .filter(e => e.category.id === forecast.category.id)
+        .map(e => e.cost || 0)),
+      monthsWithSpendings: `${countUniqueMonths(expenseStore.expenses
+        .filter(e => e.category.id === forecast.category.id)
+        .map(e => e.date))} / ${expenseStore.totalMonths} месяцев`,
       lastMonth: this.forecasts.find(
-          ({ category, month }) => category === forecast.category
-            && month === getPreviousMonth(forecast.month)
-        )?.sum ?? 0,
+        ({ category, month }) => category === forecast.category
+          && month === getPreviousMonth(forecast.month)
+      )?.sum ?? 0,
       thisMonth: roundCost(expenseStore.expenses
-          .filter(e => e.date.month() === month && e.category.id === forecast.category.id)
-          .reduce((a, c) => a + (c.cost || 0), 0)),
+        .filter(e => e.date.month() === month && e.category.id === forecast.category.id)
+        .reduce((a, c) => a + (c.cost || 0), 0)),
       sum: forecast.sum,
       comment: forecast.comment || ''
     }))
 
     data.push({
       average: sum(data.map(d => d.average)),
+      monthsWithSpendings: '',
       category: 'Всего',
       comment: '',
       lastMonth: sum(data.map(d => d.lastMonth)),

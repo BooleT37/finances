@@ -2,6 +2,7 @@ import { action, computed, flow, makeObservable, observable } from "mobx";
 import moment, { Moment } from "moment";
 import Currency from "../models/Currency";
 import Expense from "../models/Expense";
+import { countUniqueMonths } from "../utils";
 import categoryStore from "./categoryStore";
 
 interface ExpenseJson {
@@ -25,7 +26,8 @@ class ExpenseStore {
         nextId: computed,
         insert: flow.bound,
         delete: flow.bound,
-        fromJson: action
+        fromJson: action,
+        totalMonths: computed
       })
   }
 
@@ -85,6 +87,10 @@ class ExpenseStore {
       categoryStore.getById(e.category_id),
       e.name
     ))
+  }
+
+  get totalMonths(): number {
+    return countUniqueMonths(this.expenses.map(e => e.date))
   }
 }
 
