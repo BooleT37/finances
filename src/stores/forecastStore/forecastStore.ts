@@ -62,7 +62,7 @@ class ForecastStore {
           && month === getPreviousMonth(forecast.month)
       )?.sum ?? 0,
       thisMonth: roundCost(expenseStore.expenses
-        .filter(e => e.date.month() === month && e.category.id === forecast.category.id)
+        .filter(e => e.date.month() === month && e.date.year() === year && e.category.id === forecast.category.id)
         .reduce((a, c) => a + (c.cost || 0), 0)),
       sum: forecast.sum,
       comment: forecast.comment || ''
