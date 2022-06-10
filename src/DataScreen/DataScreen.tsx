@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from "mobx-react"
 import { Typography, DatePicker, Button, Space } from 'antd';
-import { PlusOutlined, SwapOutlined } from '@ant-design/icons';
+import { PlusOutlined, SwapOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
 import moment, { Moment } from 'moment';
 import { AgGridReact } from 'ag-grid-react';
 import expenseStore from '../stores/expenseStore';
@@ -55,6 +55,36 @@ const DataScreen = observer(function DataScreen() {
   }, [])
 
   const handleAdd = action(() => { expenseModalStore.open(expenseStore.nextId); })
+  
+  const goToPrevMonth = () => {
+    setRangeStart(d => {
+      if (!d) {
+        return d
+      }
+      return d.clone().subtract(1, 'month')
+    })
+    setRangeEnd(d => {
+      if (!d) {
+        return d
+      }
+      return d.clone().subtract(1, 'month')
+    })
+  }
+
+  const goToNextMonth = () => {
+    setRangeStart(d => {
+      if (!d) {
+        return d
+      }
+      return d.clone().add(1, 'month')
+    })
+    setRangeEnd(d => {
+      if (!d) {
+        return d
+      }
+      return d.clone().add(1, 'month')
+    })
+  }
 
   return (
     <>
@@ -70,12 +100,16 @@ const DataScreen = observer(function DataScreen() {
                 value={[rangeStart, rangeEnd]}
                 onChange={handleRangeChange}
               />) : (
-                <DatePicker
-                  value={rangeStart}
-                  picker="month"
-                  onChange={handleMonthChange}
-                  format='MMMM YYYY'
-                />
+                <div>
+                  <Button type="link" icon={<LeftOutlined />} onClick={ goToPrevMonth } />
+                  <DatePicker
+                    value={rangeStart}
+                    picker="month"
+                    onChange={handleMonthChange}
+                    format='MMMM YYYY'
+                  />
+                  <Button type="link" icon={<RightOutlined />} onClick={ goToNextMonth } />
+                </div>
               )}
               <Button
                 type="primary"
