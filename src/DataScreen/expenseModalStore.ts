@@ -5,12 +5,15 @@ import expenseStore from "../stores/expenseStore";
 class ExpenseModalStore {
   visible: boolean;
   expenseId: number;
+  lastExpenseId: number | null = null
 
   constructor() {
     makeObservable(this, {
       visible: observable,
       expenseId: observable,
+      lastExpenseId: observable,
       currentExpense: computed,
+      lastExpense: computed,
       isNewExpense: computed,
       open: action,
       close: action
@@ -19,6 +22,10 @@ class ExpenseModalStore {
   
   get currentExpense(): Expense | undefined {
     return expenseStore.expenses.find(({ id }) => this.expenseId === id)
+  }
+
+  get lastExpense(): Expense | undefined {
+    return expenseStore.expenses.find(({ id }) => this.lastExpenseId === id)
   }
 
   get isNewExpense(): boolean {
@@ -33,6 +40,7 @@ class ExpenseModalStore {
   close(): void {
     this.expenseId = -1
     this.visible = false
+    this.lastExpenseId = null
   }
 }
 

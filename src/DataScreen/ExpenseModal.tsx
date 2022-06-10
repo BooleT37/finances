@@ -17,11 +17,11 @@ import { observer, useLocalObservable } from 'mobx-react';
 import { Moment } from 'moment';
 import React from 'react';
 import styled from 'styled-components';
-import Currency from '../../models/Currency';
-import Expense from '../../models/Expense';
-import categoryStore from '../../stores/categoryStore';
-import expenseStore from '../../stores/expenseStore';
-import expenseModalStore from '../expenseModalStore';
+import Currency from '../models/Currency';
+import Expense from '../models/Expense';
+import categoryStore from '../stores/categoryStore';
+import expenseStore from '../stores/expenseStore';
+import expenseModalStore from './expenseModalStore';
 
 const { Option } = Select;
 
@@ -31,6 +31,16 @@ interface FormValues {
   date: Moment | null,
   category: string,
   name: string
+}
+
+function expenseToFormValues(expense: Expense): FormValues {
+  return {
+    cost: String(expense.cost),
+    currency: expense.currency,
+    category: expense.category.name,
+    name: expense.name || '',
+    date: expense.date
+  };
 }
 
 interface Props {
@@ -73,6 +83,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
         )
         expenseStore.insert(expense)
         if (addMore.value) {
+          expenseModalStore.lastExpenseId = expenseModalStore.expenseId
           expenseModalStore.expenseId = expenseStore.nextId
         } else {
           expenseModalStore.close()
@@ -90,13 +101,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
     return reaction(() => expenseModalStore.visible, () => {
       if (expenseModalStore.visible) {
         if (expenseModalStore.currentExpense) {
-          form.setFieldsValue({
-            cost: String(expenseModalStore.currentExpense.cost),
-            currency: expenseModalStore.currentExpense.currency,
-            category: expenseModalStore.currentExpense.category.name,
-            name: expenseModalStore.currentExpense.name || '',
-            date: expenseModalStore.currentExpense.date
-          })
+          form.setFieldsValue(expenseToFormValues(expenseModalStore.currentExpense))
         } else {
           form.setFieldsValue(INITIAL_VALUES)
         }
@@ -131,6 +136,12 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
     return (startDate && date.isBefore(startDate)) || (endDate && date.isAfter(endDate)) || false
   }
 
+  const handleInsertPreviousClick = () => {
+    if (expenseModalStore.lastExpense) {
+      form.setFieldsValue(expenseToFormValues(expenseModalStore.lastExpense))
+    }
+  }
+
   return (
     <Modal
       visible={expenseModalStore.visible}
@@ -138,6 +149,14 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
       onOk={handleSubmit}
       onCancel={() => { expenseModalStore.close() }}
       footer={[
+        expenseModalStore.lastExpense && (
+          <Button
+            type="link"
+            onClick={handleInsertPreviousClick}
+          >
+            Подставить предыдущий
+          </Button>
+        ),
         expenseModalStore.isNewExpense && (
           <Checkbox
             checked={addMore.value}
