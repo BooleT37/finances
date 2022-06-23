@@ -1,22 +1,19 @@
 import type { GridOptions, ICellRendererParams } from 'ag-grid-community';
-import Currency from '../../models/Currency';
-import { costToString } from '../../utils';
 import EditButtonRenderer from '../buttonRenderers/EditButtonRenderer';
 import RemoveButtonRenderer from '../buttonRenderers/RemoveButtonRenderer';
 import { DeleteHeaderIcon, EditHeaderIcon } from '../headerIcons';
+import CostCellRenderer from './CostCellRenderer';
+import { costAggFunc } from './utils';
 
 const columnDefs: GridOptions['columnDefs'] = [
-  { field: 'name', width: 200, headerName: 'Имя' },
   {
     field: 'cost',
     width: 150,
     headerName: 'Сумма',
-    valueFormatter: params => costToString(params.value),
-    aggFunc: (params) => ({
-      value: Math.trunc(params.values.reduce((a, c) => a + c.value, 0) * 100) / 100,
-      currency: Currency.Eur
-    })
+    aggFunc: costAggFunc,
+    cellRenderer: CostCellRenderer
   },
+  { field: 'name', width: 200, headerName: 'Имя' },
   { field: 'date', width: 120, headerName: 'Дата' },
   { field: 'category', rowGroup: true, hide: true, headerName: 'Категория' },
   {

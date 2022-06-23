@@ -15,6 +15,7 @@ import WhiteHeader from '../WhiteHeader';
 import SiteContent from '../SiteContent';
 import styled from 'styled-components';
 import { DATE_FORMAT } from '../constants';
+import forecastStore from '../stores/forecastStore';
 
 const { RangePicker } = DatePicker;
 const { Title } = Typography;
@@ -93,6 +94,10 @@ const DataScreen = observer(function DataScreen() {
     })
   }
 
+  const isCurrentMonth = rangeStart
+    && today.month() === rangeStart.month()
+    && today.year() === rangeStart.year()
+
   return (
     <>
       <WhiteHeader className="site-layout-background">
@@ -137,7 +142,17 @@ const DataScreen = observer(function DataScreen() {
                 ref={gridRef}
                 rowData={expenseStore.tableData(rangeStart, rangeEnd)}
                 columnDefs={columnDefs}
-                context={{ expandCategory }}
+                context={{
+                  expandCategory,
+                  categoriesForecast: isRangePicker
+                    ? null
+                    : forecastStore.categoriesForecast(rangeStart.year(), rangeStart.month()),
+                  passedDaysRatio: isRangePicker
+                    ? null
+                    : isCurrentMonth
+                      ? today.date() / rangeStart.daysInMonth()
+                      : 1
+                }}
                 getRowStyle={getRowStyle}
                 groupIncludeFooter
                 suppressAggFuncInHeader

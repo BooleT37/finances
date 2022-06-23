@@ -7,13 +7,14 @@ const currencySymbols: Record<Currency, string> = {
 
 export default function costToString(cost?: {
   value: number,
-  currency: Currency
+  currency?: Currency
 }) {
   if (!cost) {
     return ''
   }
-  if (cost.currency === Currency.Eur) {
-    return `${currencySymbols.Eur}${cost.value}`
+  const { value, currency = Currency.Eur } = cost
+  if (currency === Currency.Eur) {
+    return `${currencySymbols.Eur}${value}`
   }
-  return `${cost.value}${currencySymbols.Rub}`
+  return `${value}${currencySymbols.Rub}`
 }

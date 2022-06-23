@@ -4,8 +4,8 @@ import categoryStore from "../categoryStore";
 import expenseStore from "../expenseStore";
 import { computedFn } from 'mobx-utils'
 import Category from "../../models/Category";
-import { getPreviousMonth, roundCost, avgForNonEmpty } from "./utils";
-import { countUniqueMonths, sum } from "../../utils";
+import { getPreviousMonth, avgForNonEmpty } from "./utils";
+import { countUniqueMonths, roundCost, sum } from "../../utils";
 
 interface ForecastTableItem {
   category: string,
@@ -33,6 +33,7 @@ class ForecastStore {
     makeObservable(this, {
       forecasts: observable,
       tableData: false,
+      categoriesForecast: false,
       fromJson: action,
       changeForecastSum: flow.bound,
       changeForecastComment: flow.bound
@@ -80,6 +81,14 @@ class ForecastStore {
     })
 
     return data
+  })
+
+  categoriesForecast = computedFn((year: number, month: number): Record<number, number> => {
+    return Object.fromEntries(
+      this.forecasts
+        .filter(f => f.month === month && f.year === year)
+        .map(f => [f.category.id, f.sum])
+    )
   })
 
   fromJson(json: ForecastJson[]) {
