@@ -4,7 +4,8 @@ import Category, { Option } from "../models/Category";
 interface CategoryJson {
   id: number;
   name: string;
-  is_income: boolean
+  is_income: boolean;
+  is_continuous: boolean;
 }
 
 class CategoryStore {
@@ -68,7 +69,7 @@ class CategoryStore {
   }
 
   fromJson(json: CategoryJson[]) {
-    this.categories = json.map(c => new Category(c.id, c.name, c.is_income))
+    this.categories = json.map(c => new Category(c.id, c.name, c.is_income, c.is_continuous))
   }
 }
 

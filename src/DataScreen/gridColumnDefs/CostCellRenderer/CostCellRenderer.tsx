@@ -44,7 +44,7 @@ const CostCellRenderer: React.FC<Props> = ({ value: col, context: { passedDaysRa
   }
   if (col.diff >= 0) {
     const spentRatio = col.value / (col.diff + col.value);
-    const exceedingForecast = spentRatio > passedDaysRatio
+    const exceedingForecast = col.isContinuous && spentRatio > passedDaysRatio
     const color = exceedingForecast
       ? 'orange'
       : 'green'
