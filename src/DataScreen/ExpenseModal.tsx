@@ -17,6 +17,7 @@ import { observer, useLocalObservable } from 'mobx-react';
 import { Moment } from 'moment';
 import React from 'react';
 import styled from 'styled-components';
+import { DATE_FORMAT } from '../constants';
 import Currency from '../models/Currency';
 import Expense from '../models/Expense';
 import categoryStore from '../stores/categoryStore';
@@ -210,7 +211,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
           label="Дата"
           rules={[{ required: true, message: 'Введите дату' }]}
         >
-          <DatePicker disabledDate={disabledDate} />
+          <DatePicker disabledDate={disabledDate} format={DATE_FORMAT} />
         </Form.Item>
         <Form.Item
           name="category"
