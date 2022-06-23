@@ -7,10 +7,10 @@ import {
   Select,
   AutoComplete,
   DatePicker,
-  InputRef,
   Radio,
   Space
 } from 'antd';
+import type { BaseSelectRef } from 'rc-select';
 import { RuleObject } from 'antd/lib/form';
 import { action, autorun, reaction } from 'mobx';
 import { observer, useLocalObservable } from 'mobx-react';
@@ -57,7 +57,7 @@ const RadioGroup = styled(Radio.Group)`
 
 const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate, endDate, onSubmit }) {
   const [form] = Form.useForm<FormValues>();
-  const inputRef = React.useRef<InputRef>(null);
+  const acRef = React.useRef<BaseSelectRef>(null);
   const addMore = useLocalObservable<{ value: boolean }>(() => ({ value: false }))
   const isIncome = useLocalObservable<{ value: boolean }>(() => ({ value: false }))
 
@@ -106,8 +106,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
         } else {
           form.setFieldsValue(INITIAL_VALUES)
         }
-        inputRef.current?.focus()
-        inputRef.current?.select()
+        setTimeout(() => { acRef.current?.focus(); }, 0)
       }
     })
   }, [INITIAL_VALUES, form])
@@ -194,26 +193,6 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
           </Space>
         </RadioGroup>
         <Form.Item
-          name="cost"
-          label="Сумма"
-          rules={[{ required: true, message: 'Введите сумму' }]}
-        >
-          <Input ref={inputRef} />
-        </Form.Item>
-        <Form.Item name="currency" label="Валюта">
-          <Select>
-            <Option value={Currency.Eur}>€</Option>
-            <Option value={Currency.Rub}>₽</Option>
-          </Select>
-        </Form.Item>
-        <Form.Item
-          name="date"
-          label="Дата"
-          rules={[{ required: true, message: 'Введите дату' }]}
-        >
-          <DatePicker disabledDate={disabledDate} format={DATE_FORMAT} />
-        </Form.Item>
-        <Form.Item
           name="category"
           label="Категория"
           rules={[
@@ -228,7 +207,28 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
             options={isIncome.value ? categoryStore.incomeOptions : categoryStore.expenseOptions}
             placeholder="Начните вводить"
             filterOption
+            ref={acRef}
           />
+        </Form.Item>
+        <Form.Item
+          name="cost"
+          label="Сумма"
+          rules={[{ required: true, message: 'Введите сумму' }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item name="currency" label="Валюта">
+          <Select>
+            <Option value={Currency.Eur}>€</Option>
+            <Option value={Currency.Rub}>₽</Option>
+          </Select>
+        </Form.Item>
+        <Form.Item
+          name="date"
+          label="Дата"
+          rules={[{ required: true, message: 'Введите дату' }]}
+        >
+          <DatePicker disabledDate={disabledDate} format={DATE_FORMAT} />
         </Form.Item>
         <Form.Item name="name" label="Коментарий">
           <Input />
