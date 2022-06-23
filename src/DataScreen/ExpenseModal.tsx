@@ -23,6 +23,7 @@ import Expense from '../models/Expense';
 import categoryStore from '../stores/categoryStore';
 import expenseStore from '../stores/expenseStore';
 import expenseModalStore from './expenseModalStore';
+import moment from 'moment';
 
 const { Option } = Select;
 
@@ -55,6 +56,8 @@ const RadioGroup = styled(Radio.Group)`
   margin: 0 0 24px 33%;
 `
 
+const today = moment()
+
 const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate, endDate, onSubmit }) {
   const [form] = Form.useForm<FormValues>();
   const acRef = React.useRef<BaseSelectRef>(null);
@@ -66,8 +69,8 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
     currency: Currency.Eur,
     category: '',
     name: '',
-    date: startDate
-  }), [startDate])
+    date: today.isBetween(startDate, endDate) ? today : startDate
+  }), [endDate, startDate])
 
   const handleSubmit = () => {
     form
