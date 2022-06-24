@@ -68,9 +68,6 @@ typings/
 # Yarn Integrity file
 .yarn-integrity
 
-# dotenv environment variables file
-.env.local
-
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 
@@ -121,6 +118,4 @@ dist
 .env.test.local
 .env.production.local
 
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+.idea
