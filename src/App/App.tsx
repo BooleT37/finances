@@ -1,7 +1,7 @@
 import { Spin } from "antd"
 import { observer } from "mobx-react"
 import React from "react"
-import categoryStore from "../stores/categoryStore"
+import categoriesManager from "../categories"
 import expenseStore from "../stores/expenseStore"
 import forecastStore from "../stores/forecastStore/forecastStore"
 
@@ -15,7 +15,7 @@ const App = observer(function App({ children }: React.PropsWithChildren<{}>) {
         await fetch(`${process.env.REACT_APP_API_URL}/expense`).then(res => res.json()),
         await fetch(`${process.env.REACT_APP_API_URL}/forecast`).then(res => res.json()),
       ])
-      categoryStore.fromJson(categories)
+      categoriesManager.fromJson(categories)
       expenseStore.fromJson(expenses)
       forecastStore.fromJson(forecasts)
       setLoaded(true)

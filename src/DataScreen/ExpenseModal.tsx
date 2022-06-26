@@ -20,7 +20,7 @@ import styled from 'styled-components';
 import { DATE_FORMAT } from '../constants';
 import Currency from '../models/Currency';
 import Expense from '../models/Expense';
-import categoryStore from '../stores/categoryStore';
+import categories from '../categories';
 import expenseStore from '../stores/expenseStore';
 import expenseModalStore from './expenseModalStore';
 import moment from 'moment';
@@ -82,7 +82,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
           parseFloat(values.cost),
           values.currency,
           values.date!,
-          categoryStore.getByName(values.category),
+          categories.getByName(values.category),
           values.name
         )
         expenseStore.insert(expense)
@@ -125,7 +125,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
         return
       }
       const disposer = autorun(() => {
-        if (categoryStore.getByName(value)) {
+        if (categories.getByName(value)) {
           resolve()
           return
         }
@@ -207,7 +207,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
           ]}
         >
           <AutoComplete
-            options={isIncome.value ? categoryStore.incomeOptions : categoryStore.expenseOptions}
+            options={isIncome.value ? categories.incomeOptions : categories.expenseOptions}
             placeholder="Начните вводить"
             filterOption
             ref={acRef}

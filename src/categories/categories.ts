@@ -1,4 +1,3 @@
-import { action, computed, makeObservable, observable } from "mobx";
 import Category, { Option } from "../models/Category";
 
 interface CategoryJson {
@@ -8,26 +7,15 @@ interface CategoryJson {
   is_continuous: boolean;
 }
 
-class CategoryStore {
-  public categories: Category[]
-
-  constructor() {
-    makeObservable(
-      this,
-      {
-        categories: observable,
-        getByName: false,
-        getById: false,
-        expenseCategories: computed,
-        incomeCategories: computed,
-        incomeCategoriesNames: computed,
-        expenseOptions: computed,
-        incomeOptions: computed,
-        isIncomeCategory: false,
-        fromJson: action
-      })
+// The categories are NOT mutable!
+// Having it like this makes using them much more easy
+class Categories {
+  private categories: Category[]
+  
+  getAll(): Category[] {
+    return this.categories
   }
-
+  
   getByName(name: string): Category {
     const category = this.categories.find((category) => category.name === name)
     if (!category) {
@@ -64,15 +52,11 @@ class CategoryStore {
     return this.incomeCategories.map(c => c.asOption)
   }
 
-  isIncomeCategory(categoryName: string): boolean {
-    return this.incomeCategories.map(c => c.name).includes(categoryName)
-  }
-
   fromJson(json: CategoryJson[]) {
     this.categories = json.map(c => new Category(c.id, c.name, c.is_income, c.is_continuous))
   }
 }
 
-const categoryStore = new CategoryStore()
+const categoryStore = new Categories()
 
 export default categoryStore

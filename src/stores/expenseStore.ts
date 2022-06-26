@@ -3,7 +3,7 @@ import moment, { Moment } from "moment";
 import Currency from "../models/Currency";
 import Expense from "../models/Expense";
 import { countUniqueMonths } from "../utils";
-import categoryStore from "./categoryStore";
+import categories from "../categories";
 
 interface ExpenseJson {
   id: number;
@@ -84,7 +84,7 @@ class ExpenseStore {
       e.cost,
       e.currency,
       moment(e.date),
-      categoryStore.getById(e.category_id),
+      categories.getById(e.category_id),
       e.name
     ))
   }

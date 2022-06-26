@@ -7,9 +7,6 @@ import Currency from "./Currency";
 export interface CostCol {
   value: number,
   currency: Currency,
-  categoryId: number,
-  isIncome: boolean,
-  isContinuous: boolean
 }
 
 interface TableData {
@@ -18,8 +15,7 @@ interface TableData {
   cost: CostCol | null
   date: string
   category: string
-  isIncome: boolean
-  isContinuous: boolean
+  categoryId: number
 }
 
 export default class Expense {
@@ -62,14 +58,10 @@ export default class Expense {
       cost: this.cost || this.cost === 0 ? {
         value: this.cost,
         currency: this.currency,
-        categoryId: this.category.id,
-        isIncome: this.category.isIncome,
-        isContinuous: this.category.isContinuous
       } : null,
       category: this.category.name,
       date: this.date.format(DATE_FORMAT),
-      isIncome: this.category.isIncome,
-      isContinuous: this.category.isContinuous
+      categoryId: this.category.id
     }
   }
 }

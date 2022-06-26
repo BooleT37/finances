@@ -1,6 +1,6 @@
 import { action, flow, makeObservable, observable } from "mobx";
 import Forecast from "../../models/Forecast";
-import categoryStore from "../categoryStore";
+import categories from "../../categories";
 import expenseStore from "../expenseStore";
 import { computedFn } from 'mobx-utils'
 import Category from "../../models/Category";
@@ -27,7 +27,7 @@ interface ForecastJson {
 }
 
 class ForecastStore {
-  public forecasts: Forecast[]
+  public forecasts = observable.array<Forecast>()
 
   constructor() {
     makeObservable(this, {
@@ -43,7 +43,7 @@ class ForecastStore {
   tableData = computedFn((year: number, month: number): ForecastTableItem[] => {
     const filtered = this.forecasts
       .filter(forecast => forecast.month === month && forecast.year === year)
-    categoryStore.categories.forEach(category => {
+    categories.getAll().forEach(category => {
       if (filtered.every(f => f.category.id !== category.id)) {
         filtered.push(new Forecast(category, month, year, 0))
       }
@@ -92,21 +92,21 @@ class ForecastStore {
   })
 
   fromJson(json: ForecastJson[]) {
-    this.forecasts = json.map(f => new Forecast(
-      categoryStore.getById(f.category_id),
+    this.forecasts.replace(json.map(f => new Forecast(
+      categories.getById(f.category_id),
       f.month,
       f.year,
       f.sum,
       f.comment
-    ))
+    )))
   }
 
   *changeForecastSum(category: Category, month: number, year: number, sum: number): Generator<Promise<Response>> {
-    const foundIndex = this.forecasts.findIndex(
+    const forecast = this.forecasts.find(
       f => f.category.id === category.id && f.month === month && f.year === year
     )
-    if (foundIndex !== -1) {
-      this.forecasts[foundIndex].sum = sum
+    if (forecast) {
+      forecast.sum = sum
       yield fetch(
         `${process.env.REACT_APP_API_URL}/forecast?category_id=${category.id}&month=${month}&year=${year}`,
         {
@@ -134,11 +134,11 @@ class ForecastStore {
   }
 
   *changeForecastComment(category: Category, month: number, year: number, comment: string): Generator<Promise<Response>> {
-    const foundIndex = this.forecasts.findIndex(
+    const forecast = this.forecasts.find(
       f => f.category.id === category.id && f.month === month && f.year === year
     )
-    if (foundIndex !== -1) {
-      this.forecasts[foundIndex].comment = comment
+    if (forecast) {
+      forecast.comment = comment
       yield fetch(
         `${process.env.REACT_APP_API_URL}/forecast?category_id=${category.id}&month=${month}&year=${year}`,
         {

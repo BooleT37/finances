@@ -1,4 +1,5 @@
 import { IAggFuncParams } from "ag-grid-enterprise";
+import categories from "../../../categories";
 import Currency from "../../../models/Currency";
 import { CostCol } from "../../../models/Expense";
 import { roundCost } from "../../../utils";
@@ -8,7 +9,7 @@ import { AggCostCol } from "../../models";
 export default function costAggFunc(params: IAggFuncParams): AggCostCol {
   const values: CostCol[] = params.values;
   const currency = Currency.Eur;
-  if (values.length === 0) {
+  if (values.length === 0 || !params.rowNode.childrenAfterGroup?.[0].data) {
     return {
       value: 0,
       currency,
@@ -18,14 +19,16 @@ export default function costAggFunc(params: IAggFuncParams): AggCostCol {
     }
   }
   const value = roundCost(values.reduce((a, c) => a + c.value, 0));
-  const forecast = params.context.categoriesForecast?.[values[0].categoryId]
+  const { categoryId } = params.rowNode.childrenAfterGroup[0].data
+  const { isIncome, isContinuous } = categories.getById(categoryId)
+  const forecast = params.context.categoriesForecast?.[categoryId]
   const diff = forecast ? roundCost(forecast - value) : -value
 
   return {
     value,
     currency,
     diff,
-    isIncome: values[0].isIncome,
-    isContinuous: values[0].isContinuous
+    isIncome,
+    isContinuous  
   }
 }

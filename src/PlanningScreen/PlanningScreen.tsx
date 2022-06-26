@@ -11,7 +11,7 @@ import moment from "moment";
 import type { CellEditRequestEvent } from "ag-grid-community";
 import { action } from "mobx";
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
-import categoryStore from "../stores/categoryStore";
+import categories from "../categories";
 
 const { Title } = Typography;
 
@@ -24,14 +24,14 @@ const PlanningScreen = observer(function PlanningScreen() {
     const field = params.column.getColDef().field
     if (field === 'sum') {
       forecastStore.changeForecastSum(
-        categoryStore.getByName(params.data.category),
+        categories.getByName(params.data.category),
         date.month(),
         date.year(),
         parseFloat(params.newValue)
       )
     } else if (field === 'comment') {
       forecastStore.changeForecastComment(
-        categoryStore.getByName(params.data.category),
+        categories.getByName(params.data.category),
         date.month(),
         date.year(),
         params.newValue
