@@ -25,6 +25,7 @@ export default class Expense {
   currency: Currency;
   date: Moment;
   category: Category;
+  personalExpense: Expense | null
 
   constructor(
     id: number,
@@ -32,7 +33,8 @@ export default class Expense {
     currency: Currency,
     date: Moment,
     category: Category,
-    name?: string
+    name?: string,
+    personalExpense: Expense | null = null
   ) {
     makeObservable(this, {
       id: observable,
@@ -40,6 +42,7 @@ export default class Expense {
       currency: observable,
       date: observable,
       category: observable,
+      personalExpense: observable,
       name: observable,
       asTableData: computed
     })
@@ -49,6 +52,7 @@ export default class Expense {
     this.date = date;
     this.category = category;
     this.name = name
+    this.personalExpense = personalExpense
   }
 
   get asTableData(): TableData {

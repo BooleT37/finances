@@ -6,7 +6,7 @@ import moment, { Moment } from 'moment';
 import { AgGridReact } from 'ag-grid-react';
 import expenseStore from '../stores/expenseStore';
 import columnDefs from './gridColumnDefs/columnDefs';
-import ExpenseModal from './ExpenseModal';
+import ExpenseModal from './ExpenseModal/ExpenseModal';
 import expenseModalStore from './expenseModalStore';
 import { action } from 'mobx';
 import { getRowStyle, resetTime, setTimeToMax } from './utils';
@@ -55,7 +55,7 @@ const DataScreen = observer(function DataScreen() {
     }, 0)
   }, [])
 
-  const handleAdd = action(() => { expenseModalStore.open(expenseStore.nextId); })
+  const handleAdd = action(() => { expenseModalStore.open(null); })
 
   const goToPrevMonth = () => {
     setRangeStart(d => {

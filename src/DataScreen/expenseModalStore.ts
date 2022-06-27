@@ -4,7 +4,7 @@ import expenseStore from "../stores/expenseStore";
 
 class ExpenseModalStore {
   visible: boolean;
-  expenseId: number;
+  expenseId: number | null;
   lastExpenseId: number | null = null
 
   constructor() {
@@ -32,13 +32,13 @@ class ExpenseModalStore {
     return this.currentExpense === undefined
   }
 
-  open(expenseId: number): void {
+  open(expenseId: number | null): void {
     this.expenseId = expenseId
     this.visible = true
   }
 
   close(): void {
-    this.expenseId = -1
+    this.expenseId = null
     this.visible = false
     this.lastExpenseId = null
   }
