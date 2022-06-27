@@ -6,8 +6,8 @@ export interface Option {
 
 export default class Category {
   constructor(
-    public id: number,
-    public name: string,
+    public readonly id: number,
+    public readonly name: string,
     public readonly isIncome = false,
     public readonly isContinuous = false,
   ) {

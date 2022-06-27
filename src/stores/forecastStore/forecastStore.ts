@@ -32,12 +32,17 @@ class ForecastStore {
   constructor() {
     makeObservable(this, {
       forecasts: observable,
+      find: false,
       tableData: false,
       categoriesForecast: false,
       fromJson: action,
       changeForecastSum: flow.bound,
       changeForecastComment: flow.bound
     })
+  }
+  
+  find(year: number, month: number, category: Category) {
+    return this.forecasts.find(f => f.year === year && f.month === month && f.category.id === category.id)
   }
 
   tableData = computedFn((year: number, month: number): ForecastTableItem[] => {
