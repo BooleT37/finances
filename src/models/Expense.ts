@@ -7,6 +7,7 @@ import Currency from "./Currency";
 export interface CostCol {
   value: number,
   currency: Currency,
+  personalExpStr?: string
 }
 
 interface TableData {

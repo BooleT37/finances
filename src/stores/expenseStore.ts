@@ -4,6 +4,8 @@ import Currency from "../models/Currency";
 import Expense from "../models/Expense";
 import { countUniqueMonths } from "../utils";
 import categories from "../categories";
+import {PersonalExpCategoryIds} from "../utils/constants";
+import costToString from "../utils/costToString";
 
 interface ExpenseJson {
   id: number;
@@ -42,7 +44,16 @@ class ExpenseStore {
   tableData(startDate: Moment, endDate: Moment) {
     return this.expenses
       .filter(e => e.date.isSameOrAfter(startDate) && e.date.isSameOrBefore(endDate))
-      .map(ex => ex.asTableData)
+      .map((ex) => {
+        const tableData = ex.asTableData
+        const pe = ex.personalExpense
+        if (tableData.cost && pe && pe.cost) {
+          const cost = costToString({ value: pe.cost, currency: pe.currency })
+          const author = pe.category.id === PersonalExpCategoryIds.Alexey ? 'А' : 'Л'
+          tableData.cost.personalExpStr = `${cost} личных (${author})`
+        }
+        return tableData
+      })
   }
 
   nextId(): number {

@@ -45,12 +45,12 @@ export default function insertExpense(
             modifyingPe.date,
             categories.getById(values.personalExpCategoryId),
             generatePersonalExpenseName({
-              date: values.date!,
               category: values.category,
               name: values.name
             }),
             null
           )
+          expenseStore.modify(personalExpense)
           newExpense.personalExpense = personalExpense
           newExpense.cost = (newExpense.cost || 0) - (personalExpense.cost || 0)
         }
@@ -62,7 +62,6 @@ export default function insertExpense(
           values.date!,
           categories.getById(values.personalExpCategoryId),
           generatePersonalExpenseName({
-            date: values.date!,
             category: values.category,
             name: values.name
           }),
@@ -91,7 +90,6 @@ export default function insertExpense(
         values.date!,
         categories.getById(values.personalExpCategoryId),
         generatePersonalExpenseName({
-          date: values.date!,
           category: values.category,
           name: values.name
         }),
