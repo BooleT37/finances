@@ -65,9 +65,15 @@ const PlanningScreen = observer(function PlanningScreen() {
       <SiteContent className="site-layout-background">
         <Space direction="vertical" size="middle">
           <div>
-            <Button type="link" icon={<LeftOutlined />} onClick={ goToPrevMonth } />
-            <DatePicker value={date} picker="month" onChange={(date) => setDate(date)} format='MMMM YYYY' />
-            <Button type="link" icon={<RightOutlined />} onClick={ goToNextMonth } />
+            <Button type="link" icon={<LeftOutlined />} onClick={goToPrevMonth} />
+            <DatePicker
+              value={date}
+              picker="month"
+              onChange={(date) => setDate(date)}
+              format='MMMM YYYY'
+              allowClear={false}
+            />
+            <Button type="link" icon={<RightOutlined />} onClick={goToNextMonth} />
           </div>
           {date &&
             <div className='ag-theme-alpine' style={{ width: 915 }}>

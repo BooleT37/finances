@@ -269,7 +269,11 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
           label="Дата"
           rules={[{ required: true, message: 'Введите дату' }]}
         >
-          <DatePicker disabledDate={disabledDate} format={DATE_FORMAT} />
+          <DatePicker
+            disabledDate={disabledDate}
+            format={DATE_FORMAT}
+            allowClear={false}
+          />
         </Form.Item>
         <Form.Item name="name" label="Коментарий">
           <Input />

@@ -111,6 +111,7 @@ const DataScreen = observer(function DataScreen() {
                 format={DATE_FORMAT}
                 value={[rangeStart, rangeEnd]}
                 onChange={handleRangeChange}
+                allowClear={false}
               />) : (
                 <div>
                   <Button type="link" icon={<LeftOutlined />} onClick={goToPrevMonth} />
@@ -119,6 +120,7 @@ const DataScreen = observer(function DataScreen() {
                     picker="month"
                     onChange={handleMonthChange}
                     format='MMMM YYYY'
+                    allowClear={false}
                   />
                   <Button type="link" icon={<RightOutlined />} onClick={goToNextMonth} />
                 </div>
