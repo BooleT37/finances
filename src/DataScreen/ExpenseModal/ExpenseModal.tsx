@@ -13,7 +13,7 @@ import {
 } from 'antd';
 import type { BaseSelectRef } from 'rc-select';
 import { RuleObject } from 'antd/lib/form';
-import { action, autorun, reaction } from 'mobx';
+import { action, autorun, reaction, runInAction } from 'mobx';
 import { observer, useLocalObservable } from 'mobx-react';
 import { Moment } from 'moment';
 import React from 'react';
@@ -39,7 +39,7 @@ function expenseToFormValues(expense: Expense): FormValues {
     currency: expense.currency,
     category: expense.category.name,
     name: expense.name || '',
-    personalExpCategoryId: expense.personalExpense?.category.id ?? null,
+    personalExpCategoryId: expense.personalExpense?.category.id ?? undefined,
     personalExpSpent: String(expense.personalExpense?.cost ?? ''),
     date: expense.date
   };
@@ -73,7 +73,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
     currency: Currency.Eur,
     category: '',
     name: '',
-    personalExpCategoryId: null,
+    personalExpCategoryId: undefined,
     personalExpSpent: '',
     date: today.isBetween(startDate, endDate) ? today : startDate
   }), [endDate, startDate])
@@ -104,6 +104,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
       if (expenseModalStore.visible) {
         if (expenseModalStore.currentExpense) {
           form.setFieldsValue(expenseToFormValues(expenseModalStore.currentExpense))
+          addMore.value = false;
         } else {
           form.setFieldsValue(INITIAL_VALUES)
         }
@@ -148,7 +149,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
   const getPersonalExpSpentExtra = (): string => {
     const categoryId = form.getFieldValue('personalExpCategoryId')
     const date: Moment = form.getFieldValue('date')
-    if (categoryId === null) {
+    if (categoryId === undefined) {
       return ''
     }
     const forecast = forecastStore.find(date.year(), date.month(), categories.getById(categoryId))
@@ -164,7 +165,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
       title={expenseModalStore.isNewExpense ? 'Новая трата' : 'Редактирование траты'}
       onOk={handleSubmit}
       onCancel={() => {
-        expenseModalStore.close()
+        expenseModalStore.close();
       }}
       footer={[
         expenseModalStore.lastExpense && (
@@ -178,7 +179,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
         expenseModalStore.isNewExpense && (
           <Checkbox
             checked={addMore.value}
-            onChange={(e) => addMore.value = e.target.checked}
+            onChange={(e) => runInAction(() => { addMore.value = e.target.checked })}
             key="more"
           >
             Добавить ещё

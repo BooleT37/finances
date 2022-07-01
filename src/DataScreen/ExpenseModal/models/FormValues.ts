@@ -7,7 +7,7 @@ export default interface FormValues {
   currency: Currency,
   date: Moment | null,
   category: string,
-  personalExpCategoryId: PersonalExpCategoryIds | null,
+  personalExpCategoryId: PersonalExpCategoryIds | undefined,
   personalExpSpent: string,
   name: string
 }

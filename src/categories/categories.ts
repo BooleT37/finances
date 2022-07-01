@@ -16,16 +16,24 @@ class Categories {
     return this.categories
   }
   
+  getByNameIfExists(name: string): Category | undefined {
+    return this.categories.find((category) => category.name === name)
+  }
+  
   getByName(name: string): Category {
-    const category = this.categories.find((category) => category.name === name)
+    const category = this.getByNameIfExists(name)
     if (!category) {
       throw new Error(`Cannot find category with the name ${name}`)
     }
     return category
   }
 
+  getByIdIfExists(id: number): Category | undefined {
+    return this.categories.find((category) => category.id === id)
+  }
+
   getById(id: number): Category {
-    const category = this.categories.find((category) => category.id === id)
+    const category = this.getByIdIfExists(id)
     if (!category) {
       throw new Error(`Cannot find category with id ${id}`)
     }

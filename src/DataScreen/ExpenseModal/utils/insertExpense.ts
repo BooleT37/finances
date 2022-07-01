@@ -26,7 +26,7 @@ export default function insertExpense(
       throw new Error(`Can't change the expense with id '${expenseModalStore.expenseId}'`)
     }
     // if there are personal expenses
-    if (values.personalExpCategoryId !== null) {
+    if (values.personalExpCategoryId !== undefined) {
       // if there were personal expenses in the modifying expense
       if (modifyingExpense.personalExpense) {
         const modifyingPe = modifyingExpense.personalExpense
@@ -81,7 +81,7 @@ export default function insertExpense(
     }
     expenseStore.modify(newExpense)
   } else {
-    if (values.personalExpCategoryId !== null) {
+    if (values.personalExpCategoryId !== undefined) {
       const personalExpense = new Expense(
         -1,
         parseFloat(values.personalExpSpent),
