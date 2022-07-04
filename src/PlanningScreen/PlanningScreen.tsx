@@ -76,13 +76,14 @@ const PlanningScreen = observer(function PlanningScreen() {
             <Button type="link" icon={<RightOutlined />} onClick={goToNextMonth} />
           </div>
           {date &&
-            <div className='ag-theme-alpine' style={{ width: 915 }}>
+            <div className='ag-theme-alpine' style={{ width: 1000 }}>
               <AgGridReact
                 readOnlyEdit
                 onCellEditRequest={handleCellEditRequest}
                 columnDefs={columnDefs}
                 rowData={forecastStore.tableData(date.year(), date.month())}
                 domLayout="autoHeight"
+                context={{year: date.year(), month: date.month()}}
               />
             </div>
           }

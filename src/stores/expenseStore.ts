@@ -1,9 +1,12 @@
-import { action, computed, flow, makeObservable, observable } from "mobx";
+import { action, computed, flow, makeObservable, observable, toJS } from "mobx";
 import moment, { Moment } from "moment";
 import Currency from "../models/Currency";
 import Expense from "../models/Expense";
 import { countUniqueMonths } from "../utils";
 import categories from "../categories";
+import { ComparisonData } from "../StatisticsScreen/models";
+import {PersonalExpCategoryIds} from "../utils/constants";
+import costToString from "../utils/costToString";
 
 interface ExpenseJson {
   id: number;
@@ -31,7 +34,8 @@ class ExpenseStore {
         delete: flow.bound,
         fromJson: action,
         totalMonths: computed,
-        fillPersonalExpenses: false
+        fillPersonalExpenses: false,
+        getComparisonData: action
       })
   }
 
@@ -42,7 +46,16 @@ class ExpenseStore {
   tableData(startDate: Moment, endDate: Moment) {
     return this.expenses
       .filter(e => e.date.isSameOrAfter(startDate) && e.date.isSameOrBefore(endDate))
-      .map(ex => ex.asTableData)
+      .map((ex) => {
+        const tableData = ex.asTableData
+        const pe = ex.personalExpense
+        if (tableData.cost && pe && pe.cost) {
+          const cost = costToString({ value: pe.cost, currency: pe.currency })
+          const author = pe.category.id === PersonalExpCategoryIds.Alexey ? 'А' : 'Л'
+          tableData.cost.personalExpStr = `${cost} личных (${author})`
+        }
+        return tableData
+      })
   }
 
   nextId(): number {
@@ -70,7 +83,7 @@ class ExpenseStore {
       })
   }
 
-  *modify(expense: Expense): Generator<Promise<Response>> {
+  *modify(expense: Expense, then?: () => void): Generator<Promise<Response>> {
     const foundIndex = this.expenses.findIndex(e => e.id === expense.id);
     if (foundIndex !== -1) {
       this.expenses[foundIndex] = expense
@@ -89,7 +102,10 @@ class ExpenseStore {
           headers: {
             "content-type": "application/json"
           }
-        })
+        }).then(res => {
+          then?.()
+          return res
+      })
     } else {
       throw new Error(`Can't find expense with id ${expense.id}`)
     }
@@ -100,11 +116,15 @@ class ExpenseStore {
     if (foundIndex === -1) {
       return
     }
+    const personalExpenseId = this.expenses[foundIndex].personalExpense?.id;
     this.expenses.splice(foundIndex, 1)
     yield fetch(
       `${process.env.REACT_APP_API_URL}/expense?id=${id}`,
       { method: "DELETE" }
     )
+    if (personalExpenseId) {
+      this.delete(personalExpenseId)
+    }
   }
 
   fillPersonalExpenses(json: ExpenseJson[]) {
@@ -133,6 +153,41 @@ class ExpenseStore {
 
   get totalMonths(): number {
     return countUniqueMonths(this.expenses.map(e => e.date))
+  }
+
+  getComparisonData(from: Moment, to: Moment, granularity: "month" | "quarter" | "year"): ComparisonData {
+    const expensesFrom = this.expenses.filter(
+      e => !e.category.isIncome
+        && e.date.isSame(from, granularity))
+    const expensesTo = this.expenses.filter(
+      e => !e.category.isIncome
+        && e.date.isSame(to, granularity))
+    const map: Record<string, { from: number, to: number }> = {}
+    expensesFrom.forEach(e => {
+      const categoryId = String(e.category.id)
+      if (e.cost) {
+        if (map[categoryId] && e.cost) {
+          map[categoryId].from += e.cost
+        } else {
+          map[categoryId] = { from: e.cost, to: 0 }
+        }
+      }
+    })
+    expensesTo.forEach(e => {
+      const categoryId = String(e.category.id)
+      if (e.cost) {
+        if (map[categoryId] && e.cost) {
+          map[categoryId].to += e.cost
+        } else {
+          map[categoryId] = { from: 0, to: e.cost }
+        }
+      }
+    })
+    return toJS(Object.entries(map).map(([category, costs]) => ({
+      category: categories.getById(parseInt(category)).shortname,
+      period1: costs.from,
+      period2: costs.to
+    })))
   }
 }
 

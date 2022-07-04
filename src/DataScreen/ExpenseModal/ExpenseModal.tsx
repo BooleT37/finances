@@ -24,10 +24,9 @@ import Expense from '../../models/Expense';
 import categories from '../../categories';
 import expenseModalStore from '../expenseModalStore';
 import moment from 'moment';
-import { PersonalExpCategoryIds } from "../../utils/constants";
-import forecastStore from "../../stores/forecastStore";
 import { FormValues } from './models';
 import { insertExpense } from './utils';
+import PersonalExpenses from "./PersonalExpenses";
 
 const { Option } = Select;
 
@@ -39,7 +38,7 @@ function expenseToFormValues(expense: Expense): FormValues {
     currency: expense.currency,
     category: expense.category.name,
     name: expense.name || '',
-    personalExpCategoryId: expense.personalExpense?.category.id ?? undefined,
+    personalExpCategoryId: expense.personalExpense?.category.id ?? null,
     personalExpSpent: String(expense.personalExpense?.cost ?? ''),
     date: expense.date
   };
@@ -73,7 +72,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
     currency: Currency.Eur,
     category: '',
     name: '',
-    personalExpCategoryId: undefined,
+    personalExpCategoryId: null,
     personalExpSpent: '',
     date: today.isBetween(startDate, endDate) ? today : startDate
   }), [endDate, startDate])
@@ -83,6 +82,10 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
       .validateFields()
       .then(action(async (values) => {
         form.resetFields();
+        if (!hasPersonalExp) {
+          values.personalExpCategoryId = null;
+          values.personalExpSpent = '0'
+        }
         const expense = insertExpense(values)
         if (addMore.value) {
           expenseModalStore.lastExpenseId = expenseModalStore.expenseId
@@ -104,16 +107,17 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
       if (expenseModalStore.visible) {
         if (expenseModalStore.currentExpense) {
           form.setFieldsValue(expenseToFormValues(expenseModalStore.currentExpense))
-          addMore.value = false;
+          setHasPersonalExp(!!expenseModalStore.currentExpense.personalExpense)
         } else {
           form.setFieldsValue(INITIAL_VALUES)
+          setHasPersonalExp(false)
         }
         setTimeout(() => {
           acRef.current?.focus();
         }, 0)
       }
     })
-  }, [INITIAL_VALUES, form])
+  }, [INITIAL_VALUES, addMore, form])
 
   reaction(() => isIncome.value, () => {
     form.resetFields(['category'])
@@ -146,26 +150,13 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
     }
   }
 
-  const getPersonalExpSpentExtra = (): string => {
-    const categoryId = form.getFieldValue('personalExpCategoryId')
-    const date: Moment = form.getFieldValue('date')
-    if (categoryId === undefined) {
-      return ''
-    }
-    const forecast = forecastStore.find(date.year(), date.month(), categories.getById(categoryId))
-    if (!forecast) {
-      return ''
-    }
-    return `Макс: ${forecast.sum}`
-  }
-
   return (
     <Modal
       visible={expenseModalStore.visible}
       title={expenseModalStore.isNewExpense ? 'Новая трата' : 'Редактирование траты'}
       onOk={handleSubmit}
       onCancel={() => {
-        expenseModalStore.close();
+        expenseModalStore.close()
       }}
       footer={[
         expenseModalStore.lastExpense && (
@@ -252,18 +243,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
           </Divider>
         )}
         {hasPersonalExp && !isIncome.value && (
-          <>
-            <Form.Item name="personalExpCategoryId" label="Чьи личные деньги">
-              <Select>
-                <Option value={PersonalExpCategoryIds.Alexey}>Алексей</Option>
-                <Option value={PersonalExpCategoryIds.Lena}>Лена</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item name="personalExpSpent" label="Сумма личных денег" extra={getPersonalExpSpentExtra()}>
-              <Input />
-            </Form.Item>
-            <Divider />
-          </>
+          <PersonalExpenses form={form} />
         )}
         <Form.Item
           name="date"

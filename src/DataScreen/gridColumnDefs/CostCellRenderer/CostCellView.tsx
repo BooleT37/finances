@@ -1,54 +1,38 @@
-import React from 'react'
-import styled from 'styled-components';
-
-const DiffNode = styled('span') <{ color: string }>`
-  font-size: 12px;
-  color: ${props => props.color}
-`
-
-const BarContainer = styled.div`
-  position: relative;
-  bottom: 8px;
-  border: 1px solid gray;
-  height: 4px;
-  width: 60px;
-`
-
-const Bar = styled("div") <{ color: string, width: number, offset?: number }>`
-  height: 2px;
-  background-color: ${props => props.color};
-  width: ${props => props.width * 100}%;
-  margin-left: ${props => props.offset ? `${props.offset * 100}%` : 0}
-`
+import React from "react";
+import styled from "styled-components";
 
 interface Props {
   cost: string;
-  suffix: string;
-  color: 'red' | 'orange' | 'green';
-  barWidth: number;
-  title?: string;
-  barOffset?: number;
+  personalExpStr?: string
 }
 
-// eslint-disable-next-line mobx/missing-observer
-const CostCellView: React.FC<Props> = (props) => {
-  const { cost, suffix, color, title, barOffset = 0, barWidth } = props;
+const ShiftedCost = styled.div`
+  position: relative;
+  bottom: 5px;
+`
 
+const PersonalExp = styled.div`
+  position: relative;
+  bottom: 30px;
+  font-size: 10px;
+  font-style: italic;
+  color: gray;
+`
+
+// eslint-disable-next-line mobx/missing-observer
+const CostCellView: React.FC<Props> = ({cost, personalExpStr}) => {
   return (
-    <div title={title}>
-      <div>
-        {cost}&nbsp;
-        <DiffNode color={color}>{suffix}</DiffNode>
-      </div>
-      <BarContainer>
-        <Bar
-          color={color}
-          width={barWidth}
-          offset={barOffset}
-        />
-      </BarContainer>
+    <div>
+      {personalExpStr
+        ? (
+          <>
+            <ShiftedCost>{cost}</ShiftedCost>
+            <PersonalExp>+{personalExpStr}</PersonalExp>
+          </>
+        ) : <div>{cost}</div>
+      }
     </div>
-  );
+  )
 }
 
 export default CostCellView

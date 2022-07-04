@@ -6,6 +6,7 @@ import { computedFn } from 'mobx-utils'
 import Category from "../../models/Category";
 import { getPreviousMonth, avgForNonEmpty } from "./utils";
 import { countUniqueMonths, roundCost, sum } from "../../utils";
+import {PersonalExpCategoryIds} from "../../utils/constants";
 
 interface ForecastTableItem {
   category: string,
@@ -36,6 +37,7 @@ class ForecastStore {
       tableData: false,
       categoriesForecast: false,
       fromJson: action,
+      transferPersonalExpense: action,
       changeForecastSum: flow.bound,
       changeForecastComment: flow.bound
     })
@@ -64,8 +66,9 @@ class ForecastStore {
         .filter(e => e.category.id === forecast.category.id)
         .map(e => e.date))} / ${expenseStore.totalMonths} месяцев`,
       lastMonth: this.forecasts.find(
-        ({ category, month }) => category === forecast.category
-          && month === getPreviousMonth(forecast.month)
+        ({ category, month, year }) => category === forecast.category
+          && month === getPreviousMonth(forecast.month, forecast.year).month
+          && year === getPreviousMonth(forecast.month, forecast.year).year
       )?.sum ?? 0,
       thisMonth: roundCost(expenseStore.expenses
         .filter(e => e.date.month() === month && e.date.year() === year && e.category.id === forecast.category.id)
@@ -168,6 +171,27 @@ class ForecastStore {
             "content-type": "application/json"
           }
         })
+    }
+  }
+  
+  transferPersonalExpense(categoryId: PersonalExpCategoryIds, month: number, year: number) {
+    const category = categories.getById(categoryId)
+    const { month: prevMonth, year: prevYear } = getPreviousMonth(month, year)
+    const prevMonthForecast = this.find(prevYear, prevMonth, category)
+    if (!prevMonthForecast) {
+      alert('Сначала заполните прогноз за прошлый месяц!')
+      return
+    }
+    const prevMonthSpends = roundCost(expenseStore.expenses
+      .filter(e => e.date.month() === prevMonth && e.date.year() === prevYear && e.category.id === categoryId)
+      .reduce((a, c) => a + (c.cost || 0), 0))
+    
+    const forecast = this.find(year, month, category)
+    const sum = prevMonthForecast.sum - prevMonthSpends
+    if (forecast) {
+      forecast.sum = sum
+    } else {
+      this.forecasts.push(new Forecast(category, month, year, sum))
     }
   }
 }

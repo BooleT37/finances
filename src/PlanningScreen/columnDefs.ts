@@ -1,6 +1,7 @@
 import type { GridOptions } from 'ag-grid-community';
 import Currency from '../models/Currency';
 import { costToString } from '../utils';
+import TransferPeButtonRenderer from "./TransferPeButtonRenderer";
 
 const costValueFormatter = ({ value }: { value: number }): string => costToString({ currency: Currency.Eur, value })
 
@@ -17,6 +18,7 @@ const columnDefs: GridOptions['columnDefs'] = [
   { field: 'thisMonth', width: 160, headerName: 'Этот месяц', valueFormatter: costValueFormatter },
   { field: 'sum', width: 120, headerName: 'План', valueFormatter: costValueFormatter, editable: true },
   { field: 'comment', width: 200, headerName: 'Комментарий', editable: true },
+  { field: 'actions', width: 70, headerName: '', cellRenderer: TransferPeButtonRenderer}
 ];
 
 export default columnDefs

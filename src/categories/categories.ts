@@ -5,21 +5,22 @@ interface CategoryJson {
   name: string;
   is_income: boolean;
   is_continuous: boolean;
+  shortname: string;
 }
 
 // The categories are NOT mutable!
 // Having it like this makes using them much more easy
 class Categories {
   private categories: Category[]
-  
+
   getAll(): Category[] {
     return this.categories
   }
-  
+
   getByNameIfExists(name: string): Category | undefined {
     return this.categories.find((category) => category.name === name)
   }
-  
+
   getByName(name: string): Category {
     const category = this.getByNameIfExists(name)
     if (!category) {
@@ -61,7 +62,14 @@ class Categories {
   }
 
   fromJson(json: CategoryJson[]) {
-    this.categories = json.map(c => new Category(c.id, c.name, c.is_income, c.is_continuous))
+    this.categories = json.map(
+      c => new Category(
+        c.id,
+        c.name,
+        c.shortname,
+        c.is_income,
+        c.is_continuous
+      ))
   }
 }
 

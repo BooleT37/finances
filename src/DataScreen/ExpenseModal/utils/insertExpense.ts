@@ -26,7 +26,7 @@ export default function insertExpense(
       throw new Error(`Can't change the expense with id '${expenseModalStore.expenseId}'`)
     }
     // if there are personal expenses
-    if (values.personalExpCategoryId !== undefined) {
+    if (values.personalExpCategoryId !== null) {
       // if there were personal expenses in the modifying expense
       if (modifyingExpense.personalExpense) {
         const modifyingPe = modifyingExpense.personalExpense
@@ -45,7 +45,6 @@ export default function insertExpense(
             modifyingPe.date,
             categories.getById(values.personalExpCategoryId),
             generatePersonalExpenseName({
-              date: values.date!,
               category: values.category,
               name: values.name
             }),
@@ -63,7 +62,6 @@ export default function insertExpense(
           values.date!,
           categories.getById(values.personalExpCategoryId),
           generatePersonalExpenseName({
-            date: values.date!,
             category: values.category,
             name: values.name
           }),
@@ -73,15 +71,18 @@ export default function insertExpense(
         newExpense.personalExpense = personalExpense
         newExpense.cost = (newExpense.cost || 0) - (personalExpense.cost || 0)
       }
+      expenseStore.modify(newExpense)
     } else {
       if (modifyingExpense.personalExpense) {
-        expenseStore.delete(modifyingExpense.personalExpense.id)
+        const { id: peId } = modifyingExpense.personalExpense
         newExpense.personalExpense = null
+        expenseStore.modify(newExpense, (() => {
+          expenseStore.delete(peId)
+        }))
       }
     }
-    expenseStore.modify(newExpense)
   } else {
-    if (values.personalExpCategoryId !== undefined) {
+    if (values.personalExpCategoryId !== null) {
       const personalExpense = new Expense(
         -1,
         parseFloat(values.personalExpSpent),
@@ -89,7 +90,6 @@ export default function insertExpense(
         values.date!,
         categories.getById(values.personalExpCategoryId),
         generatePersonalExpenseName({
-          date: values.date!,
           category: values.category,
           name: values.name
         }),

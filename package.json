@@ -28,8 +28,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "start:prod": "REACT_APP_API_URL=https://rttvji9hud.execute-api.eu-central-1.amazonaws.com/prod react-scripts start",
+    "start": "GENERATE_SOURCEMAP=false react-scripts start",
+    "start:prod": "GENERATE_SOURCEMAP=false REACT_APP_API_URL=https://rttvji9hud.execute-api.eu-central-1.amazonaws.com/prod react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

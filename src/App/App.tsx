@@ -1,11 +1,11 @@
 import { Spin } from "antd"
-import { observer } from "mobx-react"
 import React from "react"
 import categoriesManager from "../categories"
 import expenseStore from "../stores/expenseStore"
 import forecastStore from "../stores/forecastStore/forecastStore"
 
-const App = observer(function App({ children }: React.PropsWithChildren<{}>) {
+// eslint-disable-next-line mobx/missing-observer
+const App = function App({ children }: React.PropsWithChildren<{}>) {
   const [loaded, setLoaded] = React.useState(false)
 
   React.useEffect(() => {
@@ -29,6 +29,6 @@ const App = observer(function App({ children }: React.PropsWithChildren<{}>) {
     return <Spin size="large" />
   }
   return <>{children}</>
-})
+}
 
 export default App
