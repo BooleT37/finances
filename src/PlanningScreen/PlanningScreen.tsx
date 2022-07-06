@@ -11,7 +11,7 @@ import moment from "moment";
 import type { CellEditRequestEvent } from "ag-grid-community";
 import { action } from "mobx";
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
-import categories from "../categories";
+import categories from "../readonlyStores/categories";
 
 const { Title } = Typography;
 

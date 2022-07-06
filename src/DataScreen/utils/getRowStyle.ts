@@ -1,6 +1,6 @@
 import { RowClassParams, RowStyle } from "ag-grid-enterprise";
 import { action } from "mobx";
-import categories from "../../categories";
+import categories from "../../readonlyStores/categories";
 
 const getRowStyle = action((params: RowClassParams): RowStyle | undefined => {
   if (params.node.group) {

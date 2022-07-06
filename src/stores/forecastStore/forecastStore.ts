@@ -1,6 +1,6 @@
 import { action, flow, makeObservable, observable } from "mobx";
 import Forecast from "../../models/Forecast";
-import categories from "../../categories";
+import categories from "../../readonlyStores/categories";
 import expenseStore from "../expenseStore";
 import { computedFn } from 'mobx-utils'
 import Category from "../../models/Category";

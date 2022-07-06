@@ -1,5 +1,5 @@
 import { IAggFuncParams } from "ag-grid-enterprise";
-import categories from "../../../categories";
+import categories from "../../../readonlyStores/categories";
 import Currency from "../../../models/Currency";
 import { CostCol } from "../../../models/Expense";
 import { roundCost } from "../../../utils";

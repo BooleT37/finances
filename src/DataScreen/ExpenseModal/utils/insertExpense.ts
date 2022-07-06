@@ -1,4 +1,5 @@
-import categories from "../../../categories";
+import categories from "../../../readonlyStores/categories";
+import sources from "../../../readonlyStores/sources";
 import Currency from "../../../models/Currency";
 import Expense from "../../../models/Expense";
 import expenseStore from "../../../stores/expenseStore";
@@ -16,7 +17,8 @@ export default function insertExpense(
     values.date!,
     categories.getByName(values.category),
     values.name,
-    null
+    null,
+    values.source ? sources.getByName(values.source) : null
   )
   // if we are editing the expense
   if (expenseModalStore.expenseId) {
@@ -79,6 +81,8 @@ export default function insertExpense(
         expenseStore.modify(newExpense, (() => {
           expenseStore.delete(peId)
         }))
+      } else {
+        expenseStore.modify(newExpense)
       }
     }
   } else {

@@ -2,7 +2,7 @@ import {Divider, Form, FormInstance, Input, Select} from "antd";
 import {PersonalExpCategoryIds} from "../../utils/constants";
 import React from "react";
 import forecastStore from "../../stores/forecastStore";
-import categories from "../../categories";
+import categories from "../../readonlyStores/categories";
 import {observer} from "mobx-react";
 import {FormValues} from "./models";
 

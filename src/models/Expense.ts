@@ -3,6 +3,7 @@ import { Moment } from "moment";
 import { DATE_FORMAT } from "../constants";
 import Category from "./Category";
 import Currency from "./Currency";
+import Source from "./Source";
 
 export interface CostCol {
   value: number,
@@ -27,6 +28,7 @@ export default class Expense {
   date: Moment;
   category: Category;
   personalExpense: Expense | null
+  source: Source | null
 
   constructor(
     id: number,
@@ -35,7 +37,8 @@ export default class Expense {
     date: Moment,
     category: Category,
     name?: string,
-    personalExpense: Expense | null = null
+    personalExpense: Expense | null = null,
+    source: Source | null = null
   ) {
     makeObservable(this, {
       id: observable,
@@ -45,6 +48,7 @@ export default class Expense {
       category: observable,
       personalExpense: observable,
       name: observable,
+      source: observable,
       asTableData: computed
     })
     this.id = id
@@ -52,8 +56,9 @@ export default class Expense {
     this.currency = currency;
     this.date = date;
     this.category = category;
-    this.name = name
     this.personalExpense = personalExpense
+    this.name = name
+    this.source = source
   }
 
   get asTableData(): TableData {

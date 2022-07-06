@@ -3,7 +3,7 @@ import {Button} from 'antd';
 import React from 'react'
 import {RightSquareOutlined} from '@ant-design/icons';
 import forecastStore from "../stores/forecastStore";
-import categories from "../categories";
+import categories from "../readonlyStores/categories";
 import {PersonalExpCategoryIds} from "../utils/constants";
 
 // eslint-disable-next-line mobx/missing-observer

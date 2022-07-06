@@ -6,12 +6,14 @@ class ExpenseModalStore {
   visible: boolean;
   expenseId: number | null;
   lastExpenseId: number | null = null
+  lastSource: string
 
   constructor() {
     makeObservable(this, {
       visible: observable,
       expenseId: observable,
       lastExpenseId: observable,
+      lastSource: observable,
       currentExpense: computed,
       lastExpense: computed,
       isNewExpense: computed,
@@ -37,7 +39,8 @@ class ExpenseModalStore {
     this.visible = true
   }
 
-  close(): void {
+  close(source: string): void {
+    this.lastSource = source
     this.expenseId = null
     this.visible = false
     this.lastExpenseId = null

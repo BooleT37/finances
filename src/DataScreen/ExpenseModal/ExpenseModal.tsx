@@ -21,7 +21,8 @@ import styled from 'styled-components';
 import { DATE_FORMAT } from '../../constants';
 import Currency from '../../models/Currency';
 import Expense from '../../models/Expense';
-import categories from '../../categories';
+import categories from '../../readonlyStores/categories';
+import sources from "../../readonlyStores/sources";
 import expenseModalStore from '../expenseModalStore';
 import moment from 'moment';
 import { FormValues } from './models';
@@ -40,7 +41,8 @@ function expenseToFormValues(expense: Expense): FormValues {
     name: expense.name || '',
     personalExpCategoryId: expense.personalExpense?.category.id ?? null,
     personalExpSpent: String(expense.personalExpense?.cost ?? ''),
-    date: expense.date
+    date: expense.date,
+    source: expense.source?.name ?? ''
   };
 }
 
@@ -66,6 +68,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
   const addMore = useLocalObservable<{ value: boolean }>(() => ({ value: false }))
   const isIncome = useLocalObservable<{ value: boolean }>(() => ({ value: false }))
   const [hasPersonalExp, setHasPersonalExp] = React.useState(false)
+  const { lastSource } = expenseModalStore
 
   const INITIAL_VALUES: FormValues = React.useMemo(() => ({
     cost: '',
@@ -74,14 +77,16 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
     name: '',
     personalExpCategoryId: null,
     personalExpSpent: '',
-    date: today.isBetween(startDate, endDate) ? today : startDate
-  }), [endDate, startDate])
+    date: today.isBetween(startDate, endDate) ? today : startDate,
+    source: lastSource
+  }), [endDate, startDate, lastSource])
 
   const handleSubmit = () => {
     form
       .validateFields()
       .then(action(async (values) => {
         form.resetFields();
+        form.setFieldsValue({ source: values.source })
         if (!hasPersonalExp) {
           values.personalExpCategoryId = null;
           values.personalExpSpent = '0'
@@ -91,7 +96,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
           expenseModalStore.lastExpenseId = expenseModalStore.expenseId
           expenseModalStore.expenseId = null
         } else {
-          expenseModalStore.close()
+          expenseModalStore.close(values.source)
         }
         onSubmit(expense)
         return expense
@@ -156,7 +161,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
       title={expenseModalStore.isNewExpense ? 'Новая трата' : 'Редактирование траты'}
       onOk={handleSubmit}
       onCancel={() => {
-        expenseModalStore.close()
+        expenseModalStore.close(form.getFieldValue('source'))
       }}
       footer={[
         expenseModalStore.lastExpense && (
@@ -177,7 +182,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
           </Checkbox>
         ),
         <Button key="cancel" onClick={() => {
-          expenseModalStore.close()
+          expenseModalStore.close(form.getFieldValue('source'))
         }}>
           Отмена
         </Button>,
@@ -258,6 +263,9 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
         </Form.Item>
         <Form.Item name="name" label="Коментарий">
           <Input />
+        </Form.Item>
+        <Form.Item name="source" label="Источник">
+          <Select options={sources.asOptions} placeholder="Не указано"/>
         </Form.Item>
       </Form>
     </Modal>

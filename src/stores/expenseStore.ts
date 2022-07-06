@@ -3,10 +3,11 @@ import moment, { Moment } from "moment";
 import Currency from "../models/Currency";
 import Expense from "../models/Expense";
 import { countUniqueMonths } from "../utils";
-import categories from "../categories";
+import categories from "../readonlyStores/categories";
 import { ComparisonData } from "../StatisticsScreen/models";
 import {PersonalExpCategoryIds} from "../utils/constants";
 import costToString from "../utils/costToString";
+import sources from "../readonlyStores/sources";
 
 interface ExpenseJson {
   id: number;
@@ -16,6 +17,7 @@ interface ExpenseJson {
   date: string;
   category_id: number;
   personal_expense_id: number | null
+  source_id: number | null
 }
 
 class ExpenseStore {
@@ -75,7 +77,8 @@ class ExpenseStore {
           currency: expense.currency,
           date: expense.date.format("YYYY-MM-DD"),
           category_id: expense.category.id,
-          personal_expense_id: expense.personalExpense?.id ?? null
+          personal_expense_id: expense.personalExpense?.id ?? null,
+          source_id: expense.source?.id ?? null
         }),
         headers: {
           "content-type": "application/json"
@@ -97,7 +100,8 @@ class ExpenseStore {
             currency: expense.currency,
             date: expense.date.format("YYYY-MM-DD"),
             category_id: expense.category.id,
-            personal_expense_id: expense.personalExpense?.id ?? null
+            personal_expense_id: expense.personalExpense?.id ?? null,
+            source_id: expense.source?.id ?? null
           }),
           headers: {
             "content-type": "application/json"
@@ -146,7 +150,8 @@ class ExpenseStore {
       moment(e.date),
       categories.getById(e.category_id),
       e.name,
-      null
+      null,
+      e.source_id === null ? null : sources.getById(e.source_id)
     ))
     this.fillPersonalExpenses(json)
   }

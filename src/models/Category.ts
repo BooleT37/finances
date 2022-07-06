@@ -1,6 +1,4 @@
-export interface Option {
-  value: string
-}
+import type { Option } from '../types'
 
 export default class Category {
   constructor(

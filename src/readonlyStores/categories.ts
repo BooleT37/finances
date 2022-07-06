@@ -1,4 +1,5 @@
-import Category, { Option } from "../models/Category";
+import Category from "../models/Category";
+import type { Option } from '../types'
 
 interface CategoryJson {
   id: number;
@@ -73,6 +74,6 @@ class Categories {
   }
 }
 
-const categoryStore = new Categories()
+const categories = new Categories()
 
-export default categoryStore
+export default categories
