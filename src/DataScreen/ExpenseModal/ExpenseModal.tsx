@@ -13,7 +13,7 @@ import {
 } from 'antd';
 import type { BaseSelectRef } from 'rc-select';
 import { RuleObject } from 'antd/lib/form';
-import { action, autorun, reaction, runInAction } from 'mobx';
+import { action, reaction, runInAction } from 'mobx';
 import { observer, useLocalObservable } from 'mobx-react';
 import { Moment } from 'moment';
 import React from 'react';
@@ -130,17 +130,10 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({ startDate
 
   const categoryValidator = (_: RuleObject, value: string) => {
     return new Promise<void>((resolve, reject) => {
-      if (!value) {
+      if (!value || categories.getByName(value)) {
         resolve()
         return
       }
-      const disposer = autorun(() => {
-        if (categories.getByName(value)) {
-          resolve()
-          return
-        }
-      })
-      disposer()
       reject(new Error('Категория не найдена'))
     })
   }
