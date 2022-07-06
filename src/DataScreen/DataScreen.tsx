@@ -16,6 +16,7 @@ import SiteContent from '../SiteContent';
 import styled from 'styled-components';
 import { DATE_FORMAT } from '../constants';
 import forecastStore from '../stores/forecastStore';
+import LastEntries from './LastEntries';
 
 const { RangePicker } = DatePicker;
 const { Title } = Typography;
@@ -162,6 +163,7 @@ const DataScreen = observer(function DataScreen() {
               />
             </div>
           )}
+          <LastEntries />
         </Space>
       </SiteContent>
       <ExpenseModal startDate={rangeStart} endDate={rangeEnd} onSubmit={e => { expandCategory(e.category.name) }} />
