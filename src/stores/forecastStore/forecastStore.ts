@@ -5,8 +5,9 @@ import expenseStore from "../expenseStore";
 import { computedFn } from "mobx-utils";
 import Category from "../../models/Category";
 import { getPreviousMonth, avgForNonEmpty } from "./utils";
-import { countUniqueMonths, roundCost, sum } from "../../utils";
+import { countUniqueMonths, roundCost } from "../../utils";
 import { PersonalExpCategoryIds } from "../../utils/constants";
+import sum from "lodash/sum";
 
 interface ForecastTableItem {
   category: string;
