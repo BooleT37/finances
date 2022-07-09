@@ -102,12 +102,12 @@ class ForecastStore {
       category: "Всего",
       isIncome: false,
       comment: "",
-      lastMonth: sum(
-        data.map((d) => (d.isIncome ? -d.lastMonth : d.lastMonth))
+      lastMonth: roundCost(
+        sum(data.map((d) => (d.isIncome ? -d.lastMonth : d.lastMonth)))
       ),
-      sum: sum(data.map((d) => (d.isIncome ? -d.sum : d.sum))),
-      thisMonth: sum(
-        data.map((d) => (d.isIncome ? -d.thisMonth : d.thisMonth))
+      sum: roundCost(sum(data.map((d) => (d.isIncome ? -d.sum : d.sum)))),
+      thisMonth: roundCost(
+        sum(data.map((d) => (d.isIncome ? -d.thisMonth : d.thisMonth)))
       ),
     });
 
