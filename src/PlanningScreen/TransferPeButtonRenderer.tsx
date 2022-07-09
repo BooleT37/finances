@@ -16,7 +16,7 @@ const TransferPeButtonRenderer: React.FC<ICellRendererParams> = (props) => {
   if ([PersonalExpCategoryIds.Alexey, PersonalExpCategoryIds.Lena].includes(categoryId)) {
     return (
       <Button
-        title="Перенести с пред. месяца"
+        title="Сложить с остатком"
         icon={<RightSquareOutlined/>}
         onClick={() => {
           forecastStore.transferPersonalExpense(categoryId, month, year)

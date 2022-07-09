@@ -226,6 +226,7 @@ class ForecastStore {
     const category = categories.getById(categoryId);
     const { month: prevMonth, year: prevYear } = getPreviousMonth(month, year);
     const prevMonthForecast = this.find(prevYear, prevMonth, category);
+    const thisMonthSum = this.find(year, month, category)?.sum ?? 0;
     if (!prevMonthForecast) {
       alert("Сначала заполните прогноз за прошлый месяц!");
       return;
@@ -241,7 +242,9 @@ class ForecastStore {
         .reduce((a, c) => a + (c.cost || 0), 0)
     );
 
-    const sum = roundCost(prevMonthForecast.sum - prevMonthSpends);
+    const sum = roundCost(
+      prevMonthForecast.sum - prevMonthSpends + thisMonthSum
+    );
     return this.changeForecastSum(category, month, year, sum);
   }
 }
