@@ -1,24 +1,47 @@
-import type { GridOptions } from 'ag-grid-community';
-import Currency from '../models/Currency';
-import { costToString } from '../utils';
+import type { GridOptions } from "ag-grid-community";
+import Currency from "../models/Currency";
+import { costToString } from "../utils";
+import MonthCellRenderer from "./MonthCellRenderer";
 import TransferPeButtonRenderer from "./TransferPeButtonRenderer";
 
-const costValueFormatter = ({ value }: { value: number }): string => costToString({ currency: Currency.Eur, value })
+const costValueFormatter = ({ value }: { value: number }): string =>
+  costToString({ currency: Currency.Eur, value });
 
-const columnDefs: GridOptions['columnDefs'] = [
-  { field: 'category', width: 150, headerName: 'Категория' },
+const columnDefs: GridOptions["columnDefs"] = [
+  { field: "category", width: 150, headerName: "Категория" },
   {
-    field: 'average',
+    field: "average",
     width: 150,
-    headerName: 'В среднем',
+    headerName: "В среднем",
     valueFormatter: costValueFormatter,
-    tooltipField: 'monthsWithSpendings'
+    tooltipField: "monthsWithSpendings",
   },
-  { field: 'lastMonth', width: 160, headerName: 'Прошлый месяц', valueFormatter: costValueFormatter },
-  { field: 'thisMonth', width: 160, headerName: 'Этот месяц', valueFormatter: costValueFormatter },
-  { field: 'sum', width: 120, headerName: 'План', valueFormatter: costValueFormatter, editable: true },
-  { field: 'comment', width: 200, headerName: 'Комментарий', editable: true },
-  { field: 'actions', width: 70, headerName: '', cellRenderer: TransferPeButtonRenderer}
+  {
+    field: "lastMonth",
+    width: 160,
+    headerName: "Прошлый месяц",
+    cellRenderer: MonthCellRenderer,
+  },
+  {
+    field: "thisMonth",
+    width: 160,
+    headerName: "Этот месяц",
+    cellRenderer: MonthCellRenderer,
+  },
+  {
+    field: "sum",
+    width: 120,
+    headerName: "План",
+    valueFormatter: costValueFormatter,
+    editable: true,
+  },
+  { field: "comment", width: 200, headerName: "Комментарий", editable: true },
+  {
+    field: "actions",
+    width: 70,
+    headerName: "",
+    cellRenderer: TransferPeButtonRenderer,
+  },
 ];
 
-export default columnDefs
+export default columnDefs;
