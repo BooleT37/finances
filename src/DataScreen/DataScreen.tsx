@@ -33,9 +33,14 @@ const DateTypeButton = styled(Button)`
   padding-left: 0;
 `;
 
+const ContentWrapper = styled("div")`
+  position: relative;
+  max-width: 850px;
+`;
+
 const SearchStyled = styled(Search)`
   position: absolute;
-  right: 35px;
+  right: 50px;
   width: 300px;
 `;
 
@@ -142,89 +147,93 @@ const DataScreen = observer(function DataScreen() {
         <Title>Данные</Title>
       </WhiteHeader>
       <SiteContent className="site-layout-background">
-        <SearchStyled onSearch={handleSearch} allowClear={true} />
-        <Space direction="vertical" size="middle">
-          <div>
-            <Space size="middle">
-              {isRangePicker ? (
-                <RangePicker
-                  format={DATE_FORMAT}
-                  value={[rangeStart, rangeEnd]}
-                  onChange={handleRangeChange}
-                  allowClear={false}
-                />
-              ) : (
-                <div>
-                  <Button
-                    type="link"
-                    icon={<LeftOutlined />}
-                    onClick={goToPrevMonth}
-                  />
-                  <DatePicker
-                    value={rangeStart}
-                    picker="month"
-                    onChange={handleMonthChange}
-                    format={MONTH_DATE_FORMAT}
+        <ContentWrapper>
+          <SearchStyled onSearch={handleSearch} allowClear={true} />
+          <Space direction="vertical" size="middle">
+            <div>
+              <Space size="middle">
+                {isRangePicker ? (
+                  <RangePicker
+                    format={DATE_FORMAT}
+                    value={[rangeStart, rangeEnd]}
+                    onChange={handleRangeChange}
                     allowClear={false}
                   />
-                  <Button
-                    type="link"
-                    icon={<RightOutlined />}
-                    onClick={goToNextMonth}
-                  />
-                </div>
-              )}
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={handleAdd}
-              >
-                Добавить
-              </Button>
-            </Space>
-            <br />
-            <DateTypeButton
-              icon={<SwapOutlined />}
-              type="link"
-              onClick={() => {
-                setIsRangePicker((value) => !value);
-              }}
-            >
-              {isRangePicker ? "Выбрать только месяц" : "Выбрать точный период"}
-            </DateTypeButton>
-          </div>
-          {rangeStart && rangeEnd && (
-            <div
-              className="ag-theme-alpine"
-              style={{ height: 500, width: 800 }}
-            >
-              <AgGridReact
-                ref={gridRef}
-                rowData={expenseStore.tableData(rangeStart, rangeEnd, search)}
-                columnDefs={columnDefs}
-                context={{
-                  expandCategory,
-                  categoriesForecast: isRangePicker
-                    ? null
-                    : forecastStore.categoriesForecast(
-                        rangeStart.year(),
-                        rangeStart.month()
-                      ),
-                  passedDaysRatio: isRangePicker
-                    ? null
-                    : isCurrentMonth
-                    ? today.date() / rangeStart.daysInMonth()
-                    : 1,
+                ) : (
+                  <div>
+                    <Button
+                      type="link"
+                      icon={<LeftOutlined />}
+                      onClick={goToPrevMonth}
+                    />
+                    <DatePicker
+                      value={rangeStart}
+                      picker="month"
+                      onChange={handleMonthChange}
+                      format={MONTH_DATE_FORMAT}
+                      allowClear={false}
+                    />
+                    <Button
+                      type="link"
+                      icon={<RightOutlined />}
+                      onClick={goToNextMonth}
+                    />
+                  </div>
+                )}
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={handleAdd}
+                >
+                  Добавить
+                </Button>
+              </Space>
+              <br />
+              <DateTypeButton
+                icon={<SwapOutlined />}
+                type="link"
+                onClick={() => {
+                  setIsRangePicker((value) => !value);
                 }}
-                getRowStyle={getRowStyle}
-                groupIncludeFooter
-                suppressAggFuncInHeader
-                autoGroupColumnDef={autoGroupColumnDef}
-              />
+              >
+                {isRangePicker
+                  ? "Выбрать только месяц"
+                  : "Выбрать точный период"}
+              </DateTypeButton>
             </div>
-          )}
-          <LastEntries />
-        </Space>
+            {rangeStart && rangeEnd && (
+              <div
+                className="ag-theme-alpine"
+                style={{ height: 500, width: 800 }}
+              >
+                <AgGridReact
+                  ref={gridRef}
+                  rowData={expenseStore.tableData(rangeStart, rangeEnd, search)}
+                  columnDefs={columnDefs}
+                  context={{
+                    expandCategory,
+                    categoriesForecast: isRangePicker
+                      ? null
+                      : forecastStore.categoriesForecast(
+                          rangeStart.year(),
+                          rangeStart.month()
+                        ),
+                    passedDaysRatio: isRangePicker
+                      ? null
+                      : isCurrentMonth
+                      ? today.date() / rangeStart.daysInMonth()
+                      : 1,
+                  }}
+                  getRowStyle={getRowStyle}
+                  groupIncludeFooter
+                  suppressAggFuncInHeader
+                  autoGroupColumnDef={autoGroupColumnDef}
+                />
+              </div>
+            )}
+            <LastEntries />
+          </Space>
+        </ContentWrapper>
       </SiteContent>
       <ExpenseModal
         startDate={rangeStart}
