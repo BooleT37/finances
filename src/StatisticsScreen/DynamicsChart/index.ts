@@ -1,3 +1,3 @@
-import DynamicsChart from './DynamicsChart'
+import DynamicsChart from "./DynamicsChart";
 
-export default DynamicsChart
+export default DynamicsChart;

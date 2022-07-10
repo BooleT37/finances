@@ -26,14 +26,14 @@ const PlanningScreen = observer(function PlanningScreen() {
     const field = params.column.getColDef().field;
     if (field === "sum") {
       forecastStore.changeForecastSum(
-        categories.getByName(params.data.category),
+        categories.getById(params.data.category),
         date.month(),
         date.year(),
         parseFloat(params.newValue)
       );
     } else if (field === "comment") {
       forecastStore.changeForecastComment(
-        categories.getByName(params.data.category),
+        categories.getById(params.data.category),
         date.month(),
         date.year(),
         params.newValue

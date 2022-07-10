@@ -62,12 +62,24 @@ class Categories {
     return this.incomeCategories.map((c) => c.name);
   }
 
+  get options(): Option[] {
+    return this.categories.map((c) => c.asOption);
+  }
+
   get expenseOptions(): Option[] {
     return this.expenseCategories.map((c) => c.asOption);
   }
 
   get incomeOptions(): Option[] {
     return this.incomeCategories.map((c) => c.asOption);
+  }
+
+  get expenseAcOptions(): Option[] {
+    return this.expenseCategories.map((c) => c.asAutocompleteOption);
+  }
+
+  get incomeAcOptions(): Option[] {
+    return this.incomeCategories.map((c) => c.asAutocompleteOption);
   }
 
   fromJson(json: CategoryJson[]) {

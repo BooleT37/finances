@@ -214,30 +214,41 @@ class ExpenseStore {
     );
   }
 
-  getDynamicsData(from: Moment, to: Moment): DynamicsData {
+  getDynamicsData(
+    from: Moment,
+    to: Moment,
+    categoryId: number | null
+  ): DynamicsData {
     type MonthEntry = Record<string, number> & { date: Moment };
     const dict: Record<string, MonthEntry> = {};
 
-    this.expenses
-      .filter((e) => e.date.isBetween(from, to, "month", "[]"))
-      .forEach((e) => {
-        if (!e.cost) {
-          return;
-        }
-        const month = e.date.format(MONTH_DATE_FORMAT);
-        if (dict[month]) {
-          if (dict[month][e.category.id]) {
-            dict[month][e.category.id] += e.cost;
-          } else {
-            dict[month][e.category.id] = e.cost;
-          }
+    let filteredExpensed = this.expenses.filter((e) =>
+      e.date.isBetween(from, to, "month", "[]")
+    );
+
+    if (categoryId !== null) {
+      filteredExpensed = filteredExpensed.filter(
+        (e) => e.category.id === categoryId
+      );
+    }
+    filteredExpensed.forEach((e) => {
+      if (!e.cost) {
+        return;
+      }
+      const month = e.date.format(MONTH_DATE_FORMAT);
+      if (dict[month]) {
+        if (dict[month][e.category.id]) {
+          dict[month][e.category.id] += e.cost;
         } else {
-          dict[month] = {
-            date: e.date,
-            [e.category.id.toString()]: e.cost,
-          } as MonthEntry;
+          dict[month][e.category.id] = e.cost;
         }
-      });
+      } else {
+        dict[month] = {
+          date: e.date,
+          [e.category.id.toString()]: e.cost,
+        } as MonthEntry;
+      }
+    });
 
     const data: DynamicsDataMonth[] = Object.values(dict)
       .sort((a, b) => (a.date.isBefore(b.date, "month") ? -1 : 1))
