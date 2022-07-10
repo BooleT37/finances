@@ -12,6 +12,7 @@ import type { CellEditRequestEvent } from "ag-grid-community";
 import { action } from "mobx";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import categories from "../readonlyStores/categories";
+import SurplusData from "./SurplusData";
 
 const { Title } = Typography;
 
@@ -84,40 +85,45 @@ const PlanningScreen = observer(function PlanningScreen() {
             />
           </div>
           {date && (
-            <div>
-              <Title level={2}>Расходы</Title>
-              <div
-                className="ag-theme-alpine"
-                style={{ width: 1100, height: 720 }}
-              >
-                <AgGridReact
-                  readOnlyEdit
-                  onCellEditRequest={handleCellEditRequest}
-                  columnDefs={columnDefs}
-                  rowData={forecastStore.tableData(
-                    date.year(),
-                    date.month(),
-                    false
-                  )}
-                  context={{ year: date.year(), month: date.month() }}
-                />
+            <Space direction="vertical" size="middle">
+              <div>
+                <Title level={2}>Расходы</Title>
+                <div
+                  className="ag-theme-alpine"
+                  style={{ width: 1100, height: 720 }}
+                >
+                  <AgGridReact
+                    readOnlyEdit
+                    onCellEditRequest={handleCellEditRequest}
+                    columnDefs={columnDefs}
+                    rowData={forecastStore.tableData(
+                      date.year(),
+                      date.month(),
+                      false
+                    )}
+                    context={{ year: date.year(), month: date.month() }}
+                  />
+                </div>
               </div>
-              <Title level={2}>Доходы</Title>
-              <div className="ag-theme-alpine" style={{ width: 1100 }}>
-                <AgGridReact
-                  readOnlyEdit
-                  onCellEditRequest={handleCellEditRequest}
-                  columnDefs={columnDefs}
-                  rowData={forecastStore.tableData(
-                    date.year(),
-                    date.month(),
-                    true
-                  )}
-                  domLayout="autoHeight"
-                  context={{ year: date.year(), month: date.month() }}
-                />
+              <div>
+                <Title level={2}>Доходы</Title>
+                <div className="ag-theme-alpine" style={{ width: 1100 }}>
+                  <AgGridReact
+                    readOnlyEdit
+                    onCellEditRequest={handleCellEditRequest}
+                    columnDefs={columnDefs}
+                    rowData={forecastStore.tableData(
+                      date.year(),
+                      date.month(),
+                      true
+                    )}
+                    domLayout="autoHeight"
+                    context={{ year: date.year(), month: date.month() }}
+                  />
+                </div>
               </div>
-            </div>
+              <SurplusData month={date.month()} year={date.year()} />
+            </Space>
           )}
         </Space>
       </SiteContent>

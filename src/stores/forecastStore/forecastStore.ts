@@ -35,6 +35,7 @@ class ForecastStore {
       changeForecastSum: action,
       changeForecastComment: action,
       transferPersonalExpense: action,
+      totalForMonth: false,
     });
   }
 
@@ -149,6 +150,19 @@ class ForecastStore {
       return data;
     }
   );
+
+  totalForMonth(year: number, month: number, isIncome: boolean) {
+    return sum(
+      this.forecasts
+        .filter(
+          (forecast) =>
+            forecast.month === month &&
+            forecast.year === year &&
+            forecast.category.isIncome === isIncome
+        )
+        .map((f) => f.sum)
+    );
+  }
 
   categoriesForecast = computedFn(
     (year: number, month: number): Record<number, number> => {

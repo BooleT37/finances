@@ -9,6 +9,7 @@ import { PersonalExpCategoryIds } from "../utils/constants";
 import costToString from "../utils/costToString";
 import sources from "../readonlyStores/sources";
 import { DATE_FORMAT } from "../constants";
+import { sum } from "lodash";
 
 interface ExpenseJson {
   id: number;
@@ -38,6 +39,7 @@ class ExpenseStore {
       fillPersonalExpenses: false,
       getComparisonData: action,
       lastModifiedPerSource: computed,
+      totalForMonth: false,
     });
   }
 
@@ -221,6 +223,17 @@ class ExpenseStore {
         }
         return [s.id, null];
       })
+    );
+  }
+
+  totalForMonth(year: number, month: number, isIncome: boolean) {
+    return sum(
+      this.expenses.filter(
+        (expense) =>
+          expense.date.month() === month &&
+          expense.date.year() === year &&
+          expense.category.isIncome === isIncome
+      )
     );
   }
 }
