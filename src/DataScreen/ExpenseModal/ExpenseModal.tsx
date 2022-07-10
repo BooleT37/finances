@@ -174,6 +174,12 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
     }
   };
 
+  const sourcesOptions = React.useMemo(() => {
+    const options = sources.asOptions;
+    options.unshift({ value: null, label: "Нет источника" });
+    return options;
+  }, []);
+
   return (
     <Modal
       visible={expenseModalStore.visible}
@@ -297,7 +303,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
           <Input />
         </Form.Item>
         <Form.Item name="source" label="Источник">
-          <Select options={sources.asOptions} placeholder="Не указано" />
+          <Select options={sourcesOptions} placeholder="Не указано" />
         </Form.Item>
       </Form>
     </Modal>
