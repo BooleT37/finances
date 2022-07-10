@@ -94,7 +94,26 @@ const PlanningScreen = observer(function PlanningScreen() {
                   readOnlyEdit
                   onCellEditRequest={handleCellEditRequest}
                   columnDefs={columnDefs}
-                  rowData={forecastStore.tableData(date.year(), date.month())}
+                  rowData={forecastStore.tableData(
+                    date.year(),
+                    date.month(),
+                    false
+                  )}
+                  context={{ year: date.year(), month: date.month() }}
+                />
+              </div>
+              <Title level={2}>Доходы</Title>
+              <div className="ag-theme-alpine" style={{ width: 1100 }}>
+                <AgGridReact
+                  readOnlyEdit
+                  onCellEditRequest={handleCellEditRequest}
+                  columnDefs={columnDefs}
+                  rowData={forecastStore.tableData(
+                    date.year(),
+                    date.month(),
+                    true
+                  )}
+                  domLayout="autoHeight"
                   context={{ year: date.year(), month: date.month() }}
                 />
               </div>

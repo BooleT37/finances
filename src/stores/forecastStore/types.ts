@@ -5,7 +5,6 @@ export interface MonthSpendings {
 
 export interface ForecastTableItem {
   category: string;
-  isIncome: boolean;
   average: number;
   monthsWithSpendings: string;
   lastMonth: MonthSpendings;

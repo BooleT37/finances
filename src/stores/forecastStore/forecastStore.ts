@@ -45,123 +45,110 @@ class ForecastStore {
     );
   }
 
-  tableData = computedFn((year: number, month: number): ForecastTableItem[] => {
-    const filtered = this.forecasts.filter(
-      (forecast) => forecast.month === month && forecast.year === year
-    );
-    categories.getAll().forEach((category) => {
-      if (filtered.every((f) => f.category.id !== category.id)) {
-        filtered.push(new Forecast(category, month, year, 0));
-      }
-    });
-    sortForecastsForView(filtered);
-    const data = filtered.map((forecast) => {
-      const { month: prevMonth, year: prevYear } = getPreviousMonth(
-        forecast.month,
-        forecast.year
+  tableData = computedFn(
+    (year: number, month: number, isIncome: boolean): ForecastTableItem[] => {
+      const filtered = this.forecasts.filter(
+        (forecast) =>
+          forecast.month === month &&
+          forecast.year === year &&
+          forecast.category.isIncome === isIncome
       );
-      const lastMonthForecast =
-        this.forecasts.find(
-          ({ category, month, year }) =>
-            category === forecast.category &&
-            month === prevMonth &&
-            year === prevYear
-        )?.sum ?? 0;
+      const filteredCategories = isIncome
+        ? categories.getAllIncome()
+        : categories.getAllExpenses();
+      filteredCategories.forEach((category) => {
+        if (filtered.every((f) => f.category.id !== category.id)) {
+          filtered.push(new Forecast(category, month, year, 0));
+        }
+      });
+      sortForecastsForView(filtered);
+      const data = filtered.map((forecast) => {
+        const { month: prevMonth, year: prevYear } = getPreviousMonth(
+          forecast.month,
+          forecast.year
+        );
+        const lastMonthForecast =
+          this.forecasts.find(
+            ({ category, month, year }) =>
+              category === forecast.category &&
+              month === prevMonth &&
+              year === prevYear
+          )?.sum ?? 0;
 
-      const lastMonthSpendings = roundCost(
-        sum(
-          expenseStore.expenses
-            .filter(
-              (e) =>
-                e.date.month() === prevMonth &&
-                e.date.year() === prevYear &&
-                e.category.id === forecast.category.id
-            )
-            .map((e) => e.cost)
-        )
-      );
+        const lastMonthSpendings = roundCost(
+          sum(
+            expenseStore.expenses
+              .filter(
+                (e) =>
+                  e.date.month() === prevMonth &&
+                  e.date.year() === prevYear &&
+                  e.category.id === forecast.category.id
+              )
+              .map((e) => e.cost)
+          )
+        );
 
-      const thisMonthSpendings = roundCost(
-        sum(
-          expenseStore.expenses
-            .filter(
-              (e) =>
-                e.date.month() === month &&
-                e.date.year() === year &&
-                e.category.id === forecast.category.id
-            )
-            .map((e) => e.cost)
-        )
-      );
+        const thisMonthSpendings = roundCost(
+          sum(
+            expenseStore.expenses
+              .filter(
+                (e) =>
+                  e.date.month() === month &&
+                  e.date.year() === year &&
+                  e.category.id === forecast.category.id
+              )
+              .map((e) => e.cost)
+          )
+        );
 
-      return {
-        category: forecast.category.name,
-        isIncome: forecast.category.isIncome,
-        average: avgForNonEmpty(
-          expenseStore.expenses
-            .filter((e) => e.category.id === forecast.category.id)
-            .map((e) => e.cost || 0)
-        ),
-        monthsWithSpendings: `${countUniqueMonths(
-          expenseStore.expenses
-            .filter((e) => e.category.id === forecast.category.id)
-            .map((e) => e.date)
-        )} / ${expenseStore.totalMonths} месяцев`,
+        return {
+          category: forecast.category.name,
+          average: avgForNonEmpty(
+            expenseStore.expenses
+              .filter((e) => e.category.id === forecast.category.id)
+              .map((e) => e.cost || 0)
+          ),
+          monthsWithSpendings: `${countUniqueMonths(
+            expenseStore.expenses
+              .filter((e) => e.category.id === forecast.category.id)
+              .map((e) => e.date)
+          )} / ${expenseStore.totalMonths} месяцев`,
+          lastMonth: {
+            spendings: lastMonthSpendings,
+            diff:
+              roundCost(lastMonthForecast - lastMonthSpendings) *
+              (isIncome ? -1 : 1),
+          },
+          thisMonth: {
+            spendings: thisMonthSpendings,
+            diff:
+              roundCost(forecast.sum - thisMonthSpendings) *
+              (isIncome ? -1 : 1),
+          },
+          sum: forecast.sum,
+          comment: forecast.comment || "",
+        };
+      });
+
+      data.push({
+        average: roundCost(sum(data.map((d) => d.average))),
+        monthsWithSpendings: "",
+        category: "Всего",
+        comment: "",
         lastMonth: {
-          spendings: lastMonthSpendings,
-          diff: roundCost(lastMonthForecast - lastMonthSpendings),
+          spendings: roundCost(sum(data.map((d) => d.lastMonth.spendings))),
+          diff: roundCost(sum(data.map((d) => d.lastMonth.diff))),
         },
+        sum: roundCost(sum(data.map((d) => d.sum))),
         thisMonth: {
-          spendings: thisMonthSpendings,
-          diff: roundCost(forecast.sum - thisMonthSpendings),
+          spendings: roundCost(sum(data.map((d) => d.thisMonth.spendings))),
+          diff: roundCost(sum(data.map((d) => d.thisMonth.diff))),
         },
-        sum: forecast.sum,
-        comment: forecast.comment || "",
-      };
-    });
+      });
 
-    data.push({
-      average: roundCost(
-        sum(data.map((d) => (d.isIncome ? -d.average : d.average)))
-      ),
-      monthsWithSpendings: "",
-      category: "Всего",
-      isIncome: false,
-      comment: "",
-      lastMonth: {
-        spendings: roundCost(
-          sum(
-            data.map((d) =>
-              d.isIncome ? -d.lastMonth.spendings : d.lastMonth.spendings
-            )
-          )
-        ),
-        diff: roundCost(
-          sum(
-            data.map((d) => (d.isIncome ? -d.lastMonth.diff : d.lastMonth.diff))
-          )
-        ),
-      },
-      sum: roundCost(sum(data.map((d) => (d.isIncome ? -d.sum : d.sum)))),
-      // TOOD вынести в утилиту?
-      thisMonth: {
-        spendings: roundCost(
-          sum(
-            data.map((d) =>
-              d.isIncome ? -d.thisMonth.spendings : d.thisMonth.spendings
-            )
-          )
-        ),
-        diff: roundCost(
-          sum(
-            data.map((d) => (d.isIncome ? -d.thisMonth.diff : d.thisMonth.diff))
-          )
-        ),
-      },
-    });
-
-    return data;
-  });
+      return data;
+    }
+  );
 
   categoriesForecast = computedFn(
     (year: number, month: number): Record<number, number> => {
