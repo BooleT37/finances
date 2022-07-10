@@ -13,6 +13,7 @@ import { action } from "mobx";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import categories from "../readonlyStores/categories";
 import SurplusData from "./SurplusData";
+import { MONTH_DATE_FORMAT } from "../constants";
 
 const { Title } = Typography;
 
@@ -75,7 +76,7 @@ const PlanningScreen = observer(function PlanningScreen() {
               value={date}
               picker="month"
               onChange={(date) => setDate(date)}
-              format="MMMM YYYY"
+              format={MONTH_DATE_FORMAT}
               allowClear={false}
             />
             <Button

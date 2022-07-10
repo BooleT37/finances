@@ -19,7 +19,7 @@ import autoGroupColumnDef from "./gridColumnDefs/autoGroupColumnDef";
 import WhiteHeader from "../WhiteHeader";
 import SiteContent from "../SiteContent";
 import styled from "styled-components";
-import { DATE_FORMAT } from "../constants";
+import { DATE_FORMAT, MONTH_DATE_FORMAT } from "../constants";
 import forecastStore from "../stores/forecastStore";
 import LastEntries from "./LastEntries";
 
@@ -164,7 +164,7 @@ const DataScreen = observer(function DataScreen() {
                     value={rangeStart}
                     picker="month"
                     onChange={handleMonthChange}
-                    format="MMMM YYYY"
+                    format={MONTH_DATE_FORMAT}
                     allowClear={false}
                   />
                   <Button

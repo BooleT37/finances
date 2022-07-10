@@ -2,14 +2,16 @@ import { action, computed, flow, makeObservable, observable, toJS } from "mobx";
 import moment, { Moment } from "moment";
 import Currency from "../models/Currency";
 import Expense from "../models/Expense";
-import { countUniqueMonths } from "../utils";
+import { countUniqueMonths, roundCost } from "../utils";
 import categories from "../readonlyStores/categories";
-import { ComparisonData } from "../StatisticsScreen/models";
+import { ComparisonData } from "../StatisticsScreen/ComparisonChart/models";
 import { PersonalExpCategoryIds } from "../utils/constants";
 import costToString from "../utils/costToString";
 import sources from "../readonlyStores/sources";
-import { DATE_FORMAT } from "../constants";
+import { DATE_FORMAT, MONTH_DATE_FORMAT } from "../constants";
 import { sum } from "lodash";
+import { DynamicsData } from "../StatisticsScreen/DynamicsChart/models";
+import { DynamicsDataMonth } from "../StatisticsScreen/DynamicsChart/models/dynamicsData";
 
 interface ExpenseJson {
   id: number;
@@ -38,6 +40,7 @@ class ExpenseStore {
       totalMonths: computed,
       fillPersonalExpenses: false,
       getComparisonData: action,
+      getDynamicsData: action,
       lastModifiedPerSource: computed,
       totalForMonth: false,
     });
@@ -209,6 +212,50 @@ class ExpenseStore {
         period2: costs.to,
       }))
     );
+  }
+
+  getDynamicsData(from: Moment, to: Moment): DynamicsData {
+    type MonthEntry = Record<string, number> & { date: Moment };
+    const dict: Record<string, MonthEntry> = {};
+
+    this.expenses
+      .filter((e) => e.date.isBetween(from, to, "month", "[]"))
+      .forEach((e) => {
+        if (!e.cost) {
+          return;
+        }
+        const month = e.date.format(MONTH_DATE_FORMAT);
+        if (dict[month]) {
+          if (dict[month][e.category.id]) {
+            dict[month][e.category.id] += e.cost;
+          } else {
+            dict[month][e.category.id] = e.cost;
+          }
+        } else {
+          dict[month] = {
+            date: e.date,
+            [e.category.id.toString()]: e.cost,
+          } as MonthEntry;
+        }
+      });
+
+    const data: DynamicsDataMonth[] = Object.values(dict)
+      .sort((a, b) => (a.date.isBefore(b.date, "month") ? -1 : 1))
+      .map((e) => {
+        const month = e.date.format(MONTH_DATE_FORMAT);
+        const { date, ...eWithoutDate } = { ...e };
+        return { month, ...eWithoutDate } as DynamicsDataMonth;
+      });
+
+    data.forEach((m) => {
+      Object.keys(m).forEach((k) => {
+        if (typeof m[k] === "number") {
+          m[k] = roundCost(m[k]);
+        }
+      });
+    });
+
+    return data;
   }
 
   get lastModifiedPerSource(): Record<number, string | null> {

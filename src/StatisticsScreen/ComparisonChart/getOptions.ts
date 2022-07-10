@@ -8,22 +8,18 @@ const getOptions = (
 ): AgChartOptions => ({
   autoSize: true,
   data,
-  title: {
-    text: 'Сравнение с предыдущим периодом',
-    fontSize: 18
-  },
   series: [
-    { type: 'column', xKey: 'category', yKey: 'period1', yName: period1 },
-    { type: 'column', xKey: 'category', yKey: 'period2', yName: period2 }
+    { type: "column", xKey: "category", yKey: "period1", yName: period1 },
+    { type: "column", xKey: "category", yKey: "period2", yName: period2 },
   ],
   axes: [
     {
-      type: 'category',
-      position: 'bottom',
+      type: "category",
+      position: "bottom",
     },
     {
-      type: 'number',
-      position: 'left',
+      type: "number",
+      position: "left",
       label: {
         formatter: (params: { value: number }) => {
           return `€${params.value}`;
@@ -31,6 +27,6 @@ const getOptions = (
       },
     },
   ],
-})
+});
 
-export default getOptions
+export default getOptions;
