@@ -196,7 +196,7 @@ const DataScreen = observer(function DataScreen() {
           {rangeStart && rangeEnd && (
             <div
               className="ag-theme-alpine"
-              style={{ height: 500, width: 790 }}
+              style={{ height: 500, width: 800 }}
             >
               <AgGridReact
                 ref={gridRef}
