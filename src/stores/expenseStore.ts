@@ -47,10 +47,14 @@ class ExpenseStore {
     return this.expenses.find((e) => e.id === id);
   }
 
-  tableData(startDate: Moment, endDate: Moment) {
+  tableData(startDate: Moment, endDate: Moment, searchString: string) {
     return this.expenses
       .filter(
-        (e) => e.date.isSameOrAfter(startDate) && e.date.isSameOrBefore(endDate)
+        (e) =>
+          e.date.isSameOrAfter(startDate) &&
+          e.date.isSameOrBefore(endDate) &&
+          (!searchString ||
+            e.name?.toLowerCase().includes(searchString.toLowerCase()))
       )
       .map((ex) => {
         const tableData = ex.asTableData;
