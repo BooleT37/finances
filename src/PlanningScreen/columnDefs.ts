@@ -8,7 +8,7 @@ const costValueFormatter = ({ value }: { value: number }): string =>
   costToString({ currency: Currency.Eur, value });
 
 const columnDefs: GridOptions["columnDefs"] = [
-  { field: "category", width: 150, headerName: "Категория" },
+  { field: "category", width: 220, headerName: "Категория" },
   {
     field: "average",
     width: 150,

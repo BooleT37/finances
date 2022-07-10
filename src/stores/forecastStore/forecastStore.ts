@@ -4,26 +4,15 @@ import categories from "../../readonlyStores/categories";
 import expenseStore from "../expenseStore";
 import { computedFn } from "mobx-utils";
 import Category from "../../models/Category";
-import { getPreviousMonth, avgForNonEmpty } from "./utils";
+import {
+  getPreviousMonth,
+  avgForNonEmpty,
+  sortForecastsForView,
+} from "./utils";
 import { countUniqueMonths, roundCost } from "../../utils";
 import { PersonalExpCategoryIds } from "../../utils/constants";
 import sum from "lodash/sum";
-
-export interface MonthSpendings {
-  spendings: number;
-  diff: number;
-}
-
-interface ForecastTableItem {
-  category: string;
-  isIncome: boolean;
-  average: number;
-  monthsWithSpendings: string;
-  lastMonth: MonthSpendings;
-  thisMonth: MonthSpendings;
-  sum: number;
-  comment: string;
-}
+import { ForecastTableItem } from "./types";
 
 interface ForecastJson {
   category_id: number;
@@ -65,7 +54,7 @@ class ForecastStore {
         filtered.push(new Forecast(category, month, year, 0));
       }
     });
-    filtered.sort((f1, f2) => f1.category.id - f2.category.id);
+    sortForecastsForView(filtered);
     const data = filtered.map((forecast) => {
       const { month: prevMonth, year: prevYear } = getPreviousMonth(
         forecast.month,

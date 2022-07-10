@@ -84,17 +84,20 @@ const PlanningScreen = observer(function PlanningScreen() {
             />
           </div>
           {date && (
-            <div
-              className="ag-theme-alpine"
-              style={{ width: 1050, height: 720 }}
-            >
-              <AgGridReact
-                readOnlyEdit
-                onCellEditRequest={handleCellEditRequest}
-                columnDefs={columnDefs}
-                rowData={forecastStore.tableData(date.year(), date.month())}
-                context={{ year: date.year(), month: date.month() }}
-              />
+            <div>
+              <Title level={2}>Расходы</Title>
+              <div
+                className="ag-theme-alpine"
+                style={{ width: 1100, height: 720 }}
+              >
+                <AgGridReact
+                  readOnlyEdit
+                  onCellEditRequest={handleCellEditRequest}
+                  columnDefs={columnDefs}
+                  rowData={forecastStore.tableData(date.year(), date.month())}
+                  context={{ year: date.year(), month: date.month() }}
+                />
+              </div>
             </div>
           )}
         </Space>
