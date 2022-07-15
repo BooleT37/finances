@@ -10,22 +10,25 @@ const TransferPeButtonRenderer: React.FC<ICellRendererParams> = (props) => {
   if (props.data.category === "Всего") {
     return null;
   }
-  const { year, month } = props.context;
+  const { year, month, scrollToRow } = props.context;
   if (
     [PersonalExpCategoryIds.Alexey, PersonalExpCategoryIds.Lena].includes(
-      props.data.category
+      props.data.categoryId
     )
   ) {
     return (
       <Button
-        title="Сложить с остатком"
+        title="Рассчитать персональные расходы"
         icon={<RightSquareOutlined />}
         onClick={() => {
           forecastStore.transferPersonalExpense(
-            props.data.category,
+            props.data.categoryId,
             month,
             year
           );
+          setTimeout(() => {
+            scrollToRow(props.data.categoryId);
+          });
         }}
       />
     );

@@ -5,6 +5,7 @@ export interface MonthSpendings {
 
 export interface ForecastTableItem {
   category: string;
+  categoryId: number;
   average: number;
   monthsWithSpendings: string;
   lastMonth: MonthSpendings;

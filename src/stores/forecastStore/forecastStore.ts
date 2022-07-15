@@ -1,4 +1,5 @@
 import { action, makeObservable, observable } from "mobx";
+import lodashSum from "lodash/sum";
 import Forecast from "../../models/Forecast";
 import categories from "../../readonlyStores/categories";
 import expenseStore from "../expenseStore";
@@ -104,6 +105,7 @@ class ForecastStore {
 
         return {
           category: forecast.category.name,
+          categoryId: forecast.category.id,
           average: avgForNonEmpty(
             expenseStore.expenses
               .filter((e) => e.category.id === forecast.category.id)
@@ -135,6 +137,7 @@ class ForecastStore {
         average: roundCost(sum(data.map((d) => d.average))),
         monthsWithSpendings: "",
         category: "Всего",
+        categoryId: -1,
         comment: "",
         lastMonth: {
           spendings: roundCost(sum(data.map((d) => d.lastMonth.spendings))),
@@ -273,28 +276,28 @@ class ForecastStore {
     month: number,
     year: number
   ): Promise<Response | undefined> {
+    const monthSum = 50;
     const category = categories.getById(categoryId);
     const { month: prevMonth, year: prevYear } = getPreviousMonth(month, year);
     const prevMonthForecast = this.find(prevYear, prevMonth, category);
-    const thisMonthSum = this.find(year, month, category)?.sum ?? 0;
     if (!prevMonthForecast) {
       alert("Сначала заполните прогноз за прошлый месяц!");
       return;
     }
     const prevMonthSpends = roundCost(
-      expenseStore.expenses
-        .filter(
-          (e) =>
-            e.date.month() === prevMonth &&
-            e.date.year() === prevYear &&
-            e.category.id === categoryId
-        )
-        .reduce((a, c) => a + (c.cost || 0), 0)
+      lodashSum(
+        expenseStore.expenses
+          .filter(
+            (e) =>
+              e.date.month() === prevMonth &&
+              e.date.year() === prevYear &&
+              e.category.id === categoryId
+          )
+          .map((e) => e.cost)
+      )
     );
 
-    const sum = roundCost(
-      prevMonthForecast.sum - prevMonthSpends + thisMonthSum
-    );
+    const sum = roundCost(prevMonthForecast.sum - prevMonthSpends + monthSum);
     return this.changeForecastSum(category, month, year, sum);
   }
 }

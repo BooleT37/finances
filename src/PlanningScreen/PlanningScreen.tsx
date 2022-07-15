@@ -5,10 +5,10 @@ import SiteContent from "../SiteContent";
 import { AgGridReact } from "ag-grid-react";
 import columnDefs from "./columnDefs";
 import forecastStore from "../stores/forecastStore/forecastStore";
-import React from "react";
+import React, { useCallback } from "react";
 import { Moment } from "moment";
 import moment from "moment";
-import type { CellEditRequestEvent } from "ag-grid-community";
+import type { CellEditRequestEvent, RowNode } from "ag-grid-community";
 import { action } from "mobx";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import categories from "../readonlyStores/categories";
@@ -19,6 +19,15 @@ const { Title } = Typography;
 
 const PlanningScreen = observer(function PlanningScreen() {
   const [date, setDate] = React.useState<Moment | null>(moment());
+  const gridRef = React.useRef<AgGridReact>(null);
+
+  const scrollToRow = useCallback((categoryId: number) => {
+    gridRef.current?.api.ensureNodeVisible(
+      (node: RowNode) => node.data.categoryId === categoryId,
+      "middle"
+    );
+  }, []);
+
   const handleCellEditRequest = action((params: CellEditRequestEvent) => {
     if (!date) {
       return;
@@ -26,19 +35,22 @@ const PlanningScreen = observer(function PlanningScreen() {
     const field = params.column.getColDef().field;
     if (field === "sum") {
       forecastStore.changeForecastSum(
-        categories.getById(params.data.category),
+        categories.getById(params.data.categoryId),
         date.month(),
         date.year(),
         parseFloat(params.newValue)
       );
     } else if (field === "comment") {
       forecastStore.changeForecastComment(
-        categories.getById(params.data.category),
+        categories.getById(params.data.categoryId),
         date.month(),
         date.year(),
         params.newValue
       );
     }
+    setTimeout(() => {
+      scrollToRow(params.data.categoryId);
+    });
   });
 
   const goToPrevMonth = () => {
@@ -94,6 +106,7 @@ const PlanningScreen = observer(function PlanningScreen() {
                   style={{ width: 1110, height: 720 }}
                 >
                   <AgGridReact
+                    ref={gridRef}
                     readOnlyEdit
                     onCellEditRequest={handleCellEditRequest}
                     columnDefs={columnDefs}
@@ -102,7 +115,11 @@ const PlanningScreen = observer(function PlanningScreen() {
                       date.month(),
                       false
                     )}
-                    context={{ year: date.year(), month: date.month() }}
+                    context={{
+                      year: date.year(),
+                      month: date.month(),
+                      scrollToRow,
+                    }}
                   />
                 </div>
               </div>
@@ -119,7 +136,11 @@ const PlanningScreen = observer(function PlanningScreen() {
                       true
                     )}
                     domLayout="autoHeight"
-                    context={{ year: date.year(), month: date.month() }}
+                    context={{
+                      year: date.year(),
+                      month: date.month(),
+                      scrollToRow,
+                    }}
                   />
                 </div>
               </div>
