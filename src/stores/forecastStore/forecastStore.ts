@@ -14,6 +14,7 @@ import { countUniqueMonths, roundCost } from "../../utils";
 import { PersonalExpCategoryIds } from "../../utils/constants";
 import sum from "lodash/sum";
 import { ForecastTableItem } from "./types";
+import { PE_SUM_DEFAULT, PE_SUM_LS_KEY } from "../../constants";
 
 interface ForecastJson {
   category_id: number;
@@ -276,7 +277,8 @@ class ForecastStore {
     month: number,
     year: number
   ): Promise<Response | undefined> {
-    const monthSum = 50;
+    const peSumInLs = localStorage.getItem(PE_SUM_LS_KEY);
+    const peSum = peSumInLs ? parseInt(peSumInLs) : PE_SUM_DEFAULT;
     const category = categories.getById(categoryId);
     const { month: prevMonth, year: prevYear } = getPreviousMonth(month, year);
     const prevMonthForecast = this.find(prevYear, prevMonth, category);
@@ -297,7 +299,7 @@ class ForecastStore {
       )
     );
 
-    const sum = roundCost(prevMonthForecast.sum - prevMonthSpends + monthSum);
+    const sum = roundCost(prevMonthForecast.sum - prevMonthSpends + peSum);
     return this.changeForecastSum(category, month, year, sum);
   }
 }

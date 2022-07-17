@@ -1,25 +1,26 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from "react";
+import ReactDOM from "react-dom";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { ConfigProvider } from 'antd';
-import 'moment/locale/ru';
-import locale from 'antd/lib/locale/ru_RU';
+import { ConfigProvider } from "antd";
+import "moment/locale/ru";
+import locale from "antd/lib/locale/ru_RU";
 
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import configureMobx from './configureMobx';
-import SiteLayout from './SiteLayout';
-import DataScreen from './DataScreen';
-import StatisticsScreen from './StatisticsScreen';
-import PlanningScreen from './PlanningScreen';
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
+import configureMobx from "./configureMobx";
+import SiteLayout from "./SiteLayout";
+import DataScreen from "./DataScreen";
+import StatisticsScreen from "./StatisticsScreen";
+import PlanningScreen from "./PlanningScreen";
+import SettingsScreen from "./SettingsScreen";
 
-import 'antd/dist/antd.min.css';
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import 'ag-grid-enterprise';
+import "antd/dist/antd.min.css";
+import "ag-grid-community/dist/styles/ag-grid.css";
+import "ag-grid-community/dist/styles/ag-theme-alpine.css";
+import "ag-grid-enterprise";
 
-const container: HTMLElement | null = document.getElementById('root');
+const container: HTMLElement | null = document.getElementById("root");
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
@@ -30,6 +31,7 @@ ReactDOM.render(
               <Route path="screens/data" element={<DataScreen />} />
               <Route path="screens/statistics" element={<StatisticsScreen />} />
               <Route path="screens/planning" element={<PlanningScreen />} />
+              <Route path="screens/settings" element={<SettingsScreen />} />
             </Routes>
           </SiteLayout>
         </App>
