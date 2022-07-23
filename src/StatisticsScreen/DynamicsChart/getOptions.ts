@@ -7,6 +7,7 @@ const getOptions = (
   data: DynamicsData
 ): AgChartOptions => ({
   height: 500,
+  width: 1200,
   data,
   series: categories.map((s, i) => ({
     xKey: "month",

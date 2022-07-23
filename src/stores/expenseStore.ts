@@ -217,7 +217,7 @@ class ExpenseStore {
   getDynamicsData(
     from: Moment,
     to: Moment,
-    categoryId: number | null
+    categoriesIds: number[]
   ): DynamicsData {
     type MonthEntry = Record<string, number> & { date: Moment };
     const dict: Record<string, MonthEntry> = {};
@@ -226,9 +226,9 @@ class ExpenseStore {
       e.date.isBetween(from, to, "month", "[]")
     );
 
-    if (categoryId !== null) {
-      filteredExpensed = filteredExpensed.filter(
-        (e) => e.category.id === categoryId
+    if (categoriesIds.length > 0) {
+      filteredExpensed = filteredExpensed.filter((e) =>
+        categoriesIds.includes(e.category.id)
       );
     }
     filteredExpensed.forEach((e) => {
