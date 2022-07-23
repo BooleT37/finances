@@ -1,27 +1,34 @@
-import React from 'react'
-import {CostCol} from "../../../models/Expense";
-import {costToString, roundCost} from "../../../utils";
-import {AggCostCol} from "../../models";
-import {isAggCostCol} from '../utils';
-import CostGroupCellView from './CostGroupCellView';
+import React from "react";
+import { CostCol } from "../../../models/Expense";
+import { costToString, roundCost } from "../../../utils";
+import { AggCostCol } from "../../models";
+import { isAggCostCol } from "../utils";
+import CostGroupCellView from "./CostGroupCellView";
 import CostCellView from "./CostCellView";
 
-
 interface Props {
-  value: CostCol | AggCostCol,
-  context: { passedDaysRatio: number }
+  value: CostCol | AggCostCol;
+  context: { passedDaysRatio: number };
 }
 
 // eslint-disable-next-line mobx/missing-observer
-const CostCellRenderer: React.FC<Props> = ({value: col, context: {passedDaysRatio}}) => {
+const CostCellRenderer: React.FC<Props> = ({
+  value: col,
+  context: { passedDaysRatio },
+}) => {
   if (!col) {
-    return null
+    return null;
   }
-  const costString = costToString(col)
+  const costString = costToString(col);
   if (!isAggCostCol(col) || col.diff === null) {
-    return <CostCellView cost={costString} personalExpStr={col.personalExpStr} />
+    return (
+      <CostCellView cost={costString} personalExpStr={col.personalExpStr} />
+    );
   }
-  const diffSum = costToString({currency: col.currency, value: Math.abs(col.diff)})
+  const diffSum = costToString({
+    currency: col.currency,
+    value: Math.abs(col.diff),
+  });
   if (col.isIncome) {
     if (col.diff >= 0) {
       return (
@@ -45,17 +52,19 @@ const CostCellRenderer: React.FC<Props> = ({value: col, context: {passedDaysRati
   }
   if (col.diff >= 0) {
     const spentRatio = col.value / (col.diff + col.value);
-    const exceedingForecast = col.isContinuous && spentRatio > passedDaysRatio
-    const color = exceedingForecast
-      ? 'orange'
-      : 'green'
+    const exceedingForecast = col.isContinuous && spentRatio > passedDaysRatio;
+    const color = exceedingForecast ? "orange" : "green";
 
     const exceedingAmount = exceedingForecast
-      ? costToString({value: roundCost(col.value - passedDaysRatio * (col.value + col.diff))})
-      : undefined
+      ? costToString({
+          value: roundCost(
+            col.value - passedDaysRatio * (col.value + col.diff)
+          ),
+        })
+      : undefined;
     const title = exceedingAmount
       ? `Превышение на ${exceedingAmount}`
-      : undefined
+      : undefined;
 
     return (
       <CostGroupCellView
@@ -68,18 +77,18 @@ const CostCellRenderer: React.FC<Props> = ({value: col, context: {passedDaysRati
     );
   }
 
-  const spentRatio = -col.diff / col.value
-  const offset = col.diff / col.value + 1;
+  const spentRatio = Math.min(-col.diff / col.value, 1);
+  const offset = Math.max(col.diff / col.value + 1, 0);
 
   return (
     <CostGroupCellView
       cost={costString}
       suffix={`-${diffSum}`}
-      color='red'
+      color="red"
       barWidth={spentRatio}
       barOffset={offset}
     />
   );
-}
+};
 
-export default CostCellRenderer
+export default CostCellRenderer;
