@@ -1,5 +1,6 @@
 import { AgChartOptions } from "ag-charts-community";
 import { DynamicsData } from "./models";
+import { palette } from "./palette";
 
 const getOptions = (
   categories: string[],
@@ -23,6 +24,9 @@ const getOptions = (
   legend: {
     enabled: true,
     position: "bottom",
+  },
+  theme: {
+    palette,
   },
 });
 
