@@ -135,6 +135,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
           } else {
             form.setFieldsValue(INITIAL_VALUES);
             setHasPersonalExp(false);
+            addMore.value = false;
           }
           setTimeout(() => {
             acRef.current?.focus();
