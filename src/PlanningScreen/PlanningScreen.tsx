@@ -14,6 +14,7 @@ import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import categories from "../readonlyStores/categories";
 import SurplusData from "./SurplusData";
 import { MONTH_DATE_FORMAT } from "../constants";
+import personalExpensesColumnDefs from "./personalExpensesColumnDefs";
 
 const { Title } = Typography;
 
@@ -101,10 +102,7 @@ const PlanningScreen = observer(function PlanningScreen() {
             <Space direction="vertical" size="middle">
               <div>
                 <Title level={2}>Расходы</Title>
-                <div
-                  className="ag-theme-alpine"
-                  style={{ width: 1110, height: 720 }}
-                >
+                <div className="ag-theme-alpine" style={{ width: 1110 }}>
                   <AgGridReact
                     ref={gridRef}
                     readOnlyEdit
@@ -113,6 +111,7 @@ const PlanningScreen = observer(function PlanningScreen() {
                     rowData={forecastStore.tableData(
                       date.year(),
                       date.month(),
+                      false,
                       false
                     )}
                     context={{
@@ -120,6 +119,30 @@ const PlanningScreen = observer(function PlanningScreen() {
                       month: date.month(),
                       scrollToRow,
                     }}
+                    domLayout="autoHeight"
+                  />
+                </div>
+              </div>
+              <div>
+                <Title level={2}>Личные Расходы</Title>
+                <div className="ag-theme-alpine" style={{ width: 1110 }}>
+                  <AgGridReact
+                    ref={gridRef}
+                    readOnlyEdit
+                    onCellEditRequest={handleCellEditRequest}
+                    columnDefs={personalExpensesColumnDefs}
+                    rowData={forecastStore.tableData(
+                      date.year(),
+                      date.month(),
+                      false,
+                      true
+                    )}
+                    context={{
+                      year: date.year(),
+                      month: date.month(),
+                      scrollToRow,
+                    }}
+                    domLayout="autoHeight"
                   />
                 </div>
               </div>
@@ -133,7 +156,8 @@ const PlanningScreen = observer(function PlanningScreen() {
                     rowData={forecastStore.tableData(
                       date.year(),
                       date.month(),
-                      true
+                      true,
+                      false
                     )}
                     domLayout="autoHeight"
                     context={{

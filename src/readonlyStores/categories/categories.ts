@@ -19,8 +19,14 @@ class Categories {
     return this.categories;
   }
 
-  getAllExpenses(): Category[] {
-    return this.categories.filter((c) => !c.isIncome);
+  getAllExpenses(isPersonal?: boolean): Category[] {
+    return this.categories.filter((c) => {
+      if (isPersonal === undefined) {
+        return !c.isIncome;
+      } else {
+        return !c.isIncome && c.isPersonal === isPersonal;
+      }
+    });
   }
 
   getAllIncome(): Category[] {

@@ -8,13 +8,13 @@ class Forecast {
     public year: number,
     public sum: number,
     public comment?: string
-    ) {
-      makeObservable(this, {
-        category: observable,
-        sum: observable,
-        comment: observable,
-      })
-    }
+  ) {
+    makeObservable(this, {
+      category: observable,
+      sum: observable,
+      comment: observable,
+    });
+  }
 }
 
-export default Forecast
+export default Forecast;

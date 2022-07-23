@@ -1,4 +1,5 @@
 import type { Option } from "../types";
+import { PersonalExpCategoryIds } from "../utils/constants";
 
 export default class Category {
   constructor(
@@ -21,5 +22,12 @@ export default class Category {
       label: this.name,
       value: this.name,
     };
+  }
+
+  get isPersonal(): boolean {
+    return [
+      PersonalExpCategoryIds.Alexey,
+      PersonalExpCategoryIds.Lena,
+    ].includes(this.id);
   }
 }

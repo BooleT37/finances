@@ -49,16 +49,23 @@ class ForecastStore {
   }
 
   tableData = computedFn(
-    (year: number, month: number, isIncome: boolean): ForecastTableItem[] => {
-      const filtered = this.forecasts.filter(
-        (forecast) =>
+    (
+      year: number,
+      month: number,
+      isIncome: boolean,
+      isPersonal: boolean
+    ): ForecastTableItem[] => {
+      const filtered = this.forecasts.filter((forecast) => {
+        return (
           forecast.month === month &&
           forecast.year === year &&
-          forecast.category.isIncome === isIncome
-      );
+          forecast.category.isIncome === isIncome &&
+          forecast.category.isPersonal === isPersonal
+        );
+      });
       const filteredCategories = isIncome
         ? categories.getAllIncome()
-        : categories.getAllExpenses();
+        : categories.getAllExpenses(isPersonal);
       filteredCategories.forEach((category) => {
         if (filtered.every((f) => f.category.id !== category.id)) {
           filtered.push(new Forecast(category, month, year, 0));
@@ -134,22 +141,24 @@ class ForecastStore {
         };
       });
 
-      data.push({
-        average: roundCost(sum(data.map((d) => d.average))),
-        monthsWithSpendings: "",
-        category: "Всего",
-        categoryId: -1,
-        comment: "",
-        lastMonth: {
-          spendings: roundCost(sum(data.map((d) => d.lastMonth.spendings))),
-          diff: roundCost(sum(data.map((d) => d.lastMonth.diff))),
-        },
-        sum: roundCost(sum(data.map((d) => d.sum))),
-        thisMonth: {
-          spendings: roundCost(sum(data.map((d) => d.thisMonth.spendings))),
-          diff: roundCost(sum(data.map((d) => d.thisMonth.diff))),
-        },
-      });
+      if (!isPersonal) {
+        data.push({
+          average: roundCost(sum(data.map((d) => d.average))),
+          monthsWithSpendings: "",
+          category: "Всего",
+          categoryId: -1,
+          comment: "",
+          lastMonth: {
+            spendings: roundCost(sum(data.map((d) => d.lastMonth.spendings))),
+            diff: roundCost(sum(data.map((d) => d.lastMonth.diff))),
+          },
+          sum: roundCost(sum(data.map((d) => d.sum))),
+          thisMonth: {
+            spendings: roundCost(sum(data.map((d) => d.thisMonth.spendings))),
+            diff: roundCost(sum(data.map((d) => d.thisMonth.diff))),
+          },
+        });
+      }
 
       return data;
     }

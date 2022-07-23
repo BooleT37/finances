@@ -1,13 +1,12 @@
-import type { GridOptions } from "ag-grid-community";
+import type { ColDef, ColGroupDef } from "ag-grid-community";
 import Currency from "../models/Currency";
 import { costToString } from "../utils";
 import MonthCellRenderer from "./MonthCellRenderer";
-import TransferPeButtonRenderer from "./TransferPeButtonRenderer";
 
 const costValueFormatter = ({ value }: { value: number }): string =>
   costToString({ currency: Currency.Eur, value });
 
-const columnDefs: GridOptions["columnDefs"] = [
+const columnDefs: (ColDef | ColGroupDef)[] = [
   { field: "category", width: 220, headerName: "Категория" },
   {
     field: "average",
@@ -36,12 +35,6 @@ const columnDefs: GridOptions["columnDefs"] = [
     editable: true,
   },
   { field: "comment", width: 200, headerName: "Комментарий", editable: true },
-  {
-    field: "actions",
-    width: 70,
-    headerName: "",
-    cellRenderer: TransferPeButtonRenderer,
-  },
 ];
 
 export default columnDefs;
