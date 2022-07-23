@@ -250,6 +250,17 @@ class ExpenseStore {
       }
     });
 
+    const interim = from.clone();
+    while (to > interim || interim.format("M") === to.format("M")) {
+      const month = interim.format(MONTH_DATE_FORMAT);
+      if (!dict[month]) {
+        dict[month] = {
+          date: interim.clone(),
+        } as MonthEntry;
+      }
+      interim.add(1, "month");
+    }
+
     const data: DynamicsDataMonth[] = Object.values(dict)
       .sort((a, b) => (a.date.isBefore(b.date, "month") ? -1 : 1))
       .map((e) => {
