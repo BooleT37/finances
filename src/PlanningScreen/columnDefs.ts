@@ -25,7 +25,7 @@ const columnDefs: GridOptions["columnDefs"] = [
   {
     field: "thisMonth",
     width: 160,
-    headerName: "Этот месяц",
+    headerName: "Факт",
     cellRenderer: MonthCellRenderer,
   },
   {
