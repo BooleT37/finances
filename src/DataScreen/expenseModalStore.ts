@@ -6,7 +6,7 @@ class ExpenseModalStore {
   visible: boolean;
   expenseId: number | null;
   lastExpenseId: number | null = null;
-  lastSource: number | null;
+  lastSource: number | null = null;
 
   constructor() {
     makeObservable(this, {

@@ -107,6 +107,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
           if (addMore.value) {
             expenseModalStore.lastExpenseId = expenseModalStore.expenseId;
             expenseModalStore.expenseId = null;
+            form.setFieldsValue({ date: values.date });
           } else {
             expenseModalStore.close(values.source);
           }
@@ -303,7 +304,11 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
           <Input />
         </Form.Item>
         <Form.Item name="source" label="Источник">
-          <Select options={sourcesOptions} placeholder="Не указано" />
+          <Select
+            defaultValue={null}
+            options={sourcesOptions}
+            placeholder="Не указано"
+          />
         </Form.Item>
       </Form>
     </Modal>
