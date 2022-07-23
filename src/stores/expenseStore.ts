@@ -299,14 +299,20 @@ class ExpenseStore {
     );
   }
 
-  totalForMonth(year: number, month: number, isIncome: boolean) {
+  totalForMonth(
+    year: number,
+    month: number,
+    isIncome: boolean,
+    isPersonal: boolean
+  ) {
     return sum(
       this.expenses
         .filter(
           (expense) =>
             expense.date.month() === month &&
             expense.date.year() === year &&
-            expense.category.isIncome === isIncome
+            expense.category.isIncome === isIncome &&
+            expense.category.isPersonal === isPersonal
         )
         .map((expense) => expense.cost || 0)
     );

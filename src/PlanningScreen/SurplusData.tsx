@@ -20,24 +20,24 @@ const SurplusData: React.FC<Props> = observer(function SurplusData({
     <div>
       <Title level={4}>Разница в этом месяце:</Title>
       <div>
-        <Tooltip title="Планируемые доходы минус планируемые расходы">
+        <Tooltip title="Планируемые доходы минус планируемые расходы. Личные траты не учитываются">
           По плану: &nbsp;
         </Tooltip>
         {costToString({
           value: roundCost(
-            forecastStore.totalForMonth(year, month, true) -
-              forecastStore.totalForMonth(year, month, false)
+            forecastStore.totalForMonth(year, month, true, false) -
+              forecastStore.totalForMonth(year, month, false, false)
           ),
         })}
       </div>
       <div>
-        <Tooltip title="Фактические доходы минус фактические расходы">
+        <Tooltip title="Фактические доходы минус фактические расходы. Личные траты не учитываются">
           Факт: &nbsp;
         </Tooltip>
         {costToString({
           value: roundCost(
-            expenseStore.totalForMonth(year, month, true) -
-              expenseStore.totalForMonth(year, month, false)
+            expenseStore.totalForMonth(year, month, true, false) -
+              expenseStore.totalForMonth(year, month, false, false)
           ),
         })}
       </div>
