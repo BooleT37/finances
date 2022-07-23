@@ -148,7 +148,11 @@ const DataScreen = observer(function DataScreen() {
       </WhiteHeader>
       <SiteContent className="site-layout-background">
         <ContentWrapper>
-          <SearchStyled onSearch={handleSearch} allowClear={true} />
+          <SearchStyled
+            placeholder="Найти..."
+            onSearch={handleSearch}
+            allowClear={true}
+          />
           <Space direction="vertical" size="middle">
             <div>
               <Space size="middle">
