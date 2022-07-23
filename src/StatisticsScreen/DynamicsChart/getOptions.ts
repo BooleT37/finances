@@ -6,7 +6,7 @@ const getOptions = (
   categoriesNames: string[],
   data: DynamicsData
 ): AgChartOptions => ({
-  autoSize: true,
+  height: 500,
   data,
   series: categories.map((s, i) => ({
     xKey: "month",
@@ -21,7 +21,7 @@ const getOptions = (
   })),
   legend: {
     enabled: true,
-    position: "right",
+    position: "bottom",
   },
 });
 
