@@ -105,7 +105,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
           }
           const expense = insertExpense(values as ValidatedFormValues);
           if (addMore.value) {
-            expenseModalStore.lastExpenseId = expenseModalStore.expenseId;
+            expenseModalStore.lastExpenseId = expense.id;
             expenseModalStore.expenseId = null;
             form.setFieldsValue({ date: values.date });
           } else {
