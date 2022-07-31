@@ -28,6 +28,7 @@ import moment from "moment";
 import { FormValues, ValidatedFormValues } from "./models";
 import { insertExpense } from "./utils";
 import PersonalExpenses from "./PersonalExpenses";
+import expenseStore from "../../stores/expenseStore";
 
 const { Option } = Select;
 
@@ -182,6 +183,15 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
     return options;
   }, []);
 
+  const source = Form.useWatch("source", form);
+  const sourceExtra =
+    source === null ? null : (
+      <div>
+        Последняя модификация:{" "}
+        {expenseStore.lastModifiedPerSource[source] || "Никогда"}
+      </div>
+    );
+
   return (
     <Modal
       visible={expenseModalStore.visible}
@@ -304,7 +314,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
         <Form.Item name="name" label="Коментарий">
           <Input />
         </Form.Item>
-        <Form.Item name="source" label="Источник">
+        <Form.Item name="source" label="Источник" extra={sourceExtra}>
           <Select
             defaultValue={null}
             options={sourcesOptions}
