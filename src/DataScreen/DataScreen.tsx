@@ -205,10 +205,7 @@ const DataScreen = observer(function DataScreen() {
               </DateTypeButton>
             </div>
             {rangeStart && rangeEnd && (
-              <div
-                className="ag-theme-alpine"
-                style={{ height: 500, width: 900 }}
-              >
+              <div className="ag-theme-alpine" style={{ width: 900 }}>
                 <AgGridReact
                   ref={gridRef}
                   rowData={expenseStore.tableData(rangeStart, rangeEnd, search)}
@@ -231,6 +228,7 @@ const DataScreen = observer(function DataScreen() {
                   groupIncludeFooter
                   suppressAggFuncInHeader
                   autoGroupColumnDef={autoGroupColumnDef}
+                  domLayout="autoHeight"
                 />
               </div>
             )}
