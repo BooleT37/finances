@@ -10,7 +10,11 @@ import { countUniqueMonths, roundCost } from "../../utils";
 import { PersonalExpCategoryIds } from "../../utils/constants";
 import sum from "lodash/sum";
 import { ForecastTableItem } from "./types";
-import { PE_SUM_DEFAULT, PE_SUM_LS_KEY } from "../../constants";
+import {
+  MONTH_DATE_FORMAT,
+  PE_SUM_DEFAULT,
+  PE_SUM_LS_KEY,
+} from "../../constants";
 
 interface ForecastJson {
   category_id: number;
@@ -112,9 +116,19 @@ class ForecastStore {
           category: forecast.category.name,
           categoryId: forecast.category.id,
           average: avgForNonEmpty(
-            expenseStore.expenses
-              .filter((e) => e.category.id === forecast.category.id)
-              .map((e) => e.cost || 0)
+            Object.values(
+              expenseStore.expenses
+                .filter((e) => e.category.id === forecast.category.id)
+                .reduce<Record<string, number>>((a, c) => {
+                  const month = c.date.format(MONTH_DATE_FORMAT);
+                  if (a[month]) {
+                    a[month] += c.cost || 0;
+                  } else {
+                    a[month] = c.cost || 0;
+                  }
+                  return a;
+                }, {})
+            )
           ),
           monthsWithSpendings: `${countUniqueMonths(
             expenseStore.expenses
