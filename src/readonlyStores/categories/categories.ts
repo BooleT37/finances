@@ -1,6 +1,5 @@
 import Category from "../../models/Category";
 import type { Option } from "../../types";
-import getOrder from "./getOrder";
 
 interface CategoryJson {
   id: number;
@@ -94,10 +93,6 @@ class Categories {
       (c) =>
         new Category(c.id, c.name, c.shortname, c.is_income, c.is_continuous)
     );
-  }
-
-  get order(): Record<number, number> {
-    return this.categories ? getOrder(this.categories) : {};
   }
 }
 

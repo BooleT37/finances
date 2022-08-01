@@ -5,11 +5,7 @@ import categories from "../../readonlyStores/categories";
 import expenseStore from "../expenseStore";
 import { computedFn } from "mobx-utils";
 import Category from "../../models/Category";
-import {
-  getPreviousMonth,
-  avgForNonEmpty,
-  sortForecastsForView,
-} from "./utils";
+import { getPreviousMonth, avgForNonEmpty } from "./utils";
 import { countUniqueMonths, roundCost } from "../../utils";
 import { PersonalExpCategoryIds } from "../../utils/constants";
 import sum from "lodash/sum";
@@ -66,12 +62,13 @@ class ForecastStore {
       const filteredCategories = isIncome
         ? categories.getAllIncome()
         : categories.getAllExpenses(isPersonal);
-      filteredCategories.forEach((category) => {
-        if (filtered.every((f) => f.category.id !== category.id)) {
-          filtered.push(new Forecast(category, month, year, 0));
-        }
-      });
-      sortForecastsForView(filtered);
+      filteredCategories
+        .sort((a, b) => a.id - b.id)
+        .forEach((category) => {
+          if (filtered.every((f) => f.category.id !== category.id)) {
+            filtered.push(new Forecast(category, month, year, 0));
+          }
+        });
       const data = filtered.map((forecast) => {
         const { month: prevMonth, year: prevYear } = getPreviousMonth(
           forecast.month,
