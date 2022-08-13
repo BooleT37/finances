@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { ConfigProvider } from "antd";
 import "moment/locale/ru";
 import locale from "antd/lib/locale/ru_RU";
@@ -28,6 +28,7 @@ ReactDOM.render(
         <App>
           <SiteLayout>
             <Routes>
+              <Route index element={<Navigate replace to="/screens/data" />} />
               <Route path="screens/data" element={<DataScreen />} />
               <Route path="screens/statistics" element={<StatisticsScreen />} />
               <Route path="screens/planning" element={<PlanningScreen />} />
