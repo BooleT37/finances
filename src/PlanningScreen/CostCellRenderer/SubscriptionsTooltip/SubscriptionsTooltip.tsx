@@ -13,7 +13,10 @@ interface Props {
 // eslint-disable-next-line mobx/missing-observer
 const SubscriptionsTooltip: React.FC<Props> = ({ items }) => {
   const total = costToString({
-    value: roundCost(sum(items.map((item) => item.cost))),
+    // TODO fix
+    value: roundCost(
+      sum(items.map((item) => parseFloat(item.cost.toString())))
+    ),
   });
 
   const tooltipText = React.useMemo(
