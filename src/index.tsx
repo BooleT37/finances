@@ -14,6 +14,7 @@ import DataScreen from "./DataScreen";
 import StatisticsScreen from "./StatisticsScreen";
 import PlanningScreen from "./PlanningScreen";
 import SettingsScreen from "./SettingsScreen";
+import SubscriptionsScreen from "./SubscriptionsScreen";
 
 import "antd/dist/antd.min.css";
 import "ag-grid-community/dist/styles/ag-grid.css";
@@ -33,6 +34,10 @@ ReactDOM.render(
               <Route path="screens/statistics" element={<StatisticsScreen />} />
               <Route path="screens/planning" element={<PlanningScreen />} />
               <Route path="screens/settings" element={<SettingsScreen />} />
+              <Route
+                path="screens/subscriptions"
+                element={<SubscriptionsScreen />}
+              />
             </Routes>
           </SiteLayout>
         </App>

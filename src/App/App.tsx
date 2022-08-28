@@ -4,6 +4,7 @@ import categoriesManager from "../readonlyStores/categories";
 import sourcesManager from "../readonlyStores/sources";
 import expenseStore from "../stores/expenseStore";
 import forecastStore from "../stores/forecastStore/forecastStore";
+import subscriptionStore from "../stores/subscriptionStore";
 
 // eslint-disable-next-line mobx/missing-observer
 const App = function App({ children }: React.PropsWithChildren<{}>) {
@@ -11,24 +12,29 @@ const App = function App({ children }: React.PropsWithChildren<{}>) {
 
   React.useEffect(() => {
     (async () => {
-      const [categories, sources, expenses, forecasts] = await Promise.all([
-        await fetch(`${process.env.REACT_APP_API_URL}/category`).then((res) =>
-          res.json()
-        ),
-        await fetch(`${process.env.REACT_APP_API_URL}/source`).then((res) =>
-          res.json()
-        ),
-        await fetch(`${process.env.REACT_APP_API_URL}/expense`).then((res) =>
-          res.json()
-        ),
-        await fetch(`${process.env.REACT_APP_API_URL}/forecast`).then((res) =>
-          res.json()
-        ),
-      ]);
+      const [categories, sources, expenses, forecasts, subscriptions] =
+        await Promise.all([
+          await fetch(`${process.env.REACT_APP_API_URL}/category`).then((res) =>
+            res.json()
+          ),
+          await fetch(`${process.env.REACT_APP_API_URL}/source`).then((res) =>
+            res.json()
+          ),
+          await fetch(`${process.env.REACT_APP_API_URL}/expense`).then((res) =>
+            res.json()
+          ),
+          await fetch(`${process.env.REACT_APP_API_URL}/forecast`).then((res) =>
+            res.json()
+          ),
+          await fetch(`${process.env.REACT_APP_API_URL}/subscription`).then(
+            (res) => res.json()
+          ),
+        ]);
       categoriesManager.fromJson(categories);
       sourcesManager.set(sources);
       expenseStore.fromJson(expenses);
       forecastStore.fromJson(forecasts);
+      subscriptionStore.fromJson(subscriptions);
       setLoaded(true);
     })();
   }, []);

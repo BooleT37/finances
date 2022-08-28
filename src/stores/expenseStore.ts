@@ -8,7 +8,7 @@ import { ComparisonData } from "../StatisticsScreen/ComparisonChart/models";
 import { PersonalExpCategoryIds } from "../utils/constants";
 import costToString from "../utils/costToString";
 import sources from "../readonlyStores/sources";
-import { DATE_FORMAT, MONTH_DATE_FORMAT } from "../constants";
+import { DATE_FORMAT, DATE_SERVER_FORMAT, MONTH_DATE_FORMAT } from "../constants";
 import { sum } from "lodash";
 import { DynamicsData } from "../StatisticsScreen/DynamicsChart/models";
 import { DynamicsDataMonth } from "../StatisticsScreen/DynamicsChart/models/dynamicsData";
@@ -86,7 +86,7 @@ class ExpenseStore {
         name: expense.name,
         cost: expense.cost,
         currency: expense.currency,
-        date: expense.date.format("YYYY-MM-DD"),
+        date: expense.date.format(DATE_SERVER_FORMAT),
         category_id: expense.category.id,
         personal_expense_id: expense.personalExpense?.id ?? null,
         source_id: expense.source?.id ?? null,
@@ -108,7 +108,7 @@ class ExpenseStore {
           name: expense.name,
           cost: expense.cost,
           currency: expense.currency,
-          date: expense.date.format("YYYY-MM-DD"),
+          date: expense.date.format(DATE_SERVER_FORMAT),
           category_id: expense.category.id,
           personal_expense_id: expense.personalExpense?.id ?? null,
           source_id: expense.source?.id ?? null,

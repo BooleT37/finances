@@ -47,8 +47,6 @@ function expenseToFormValues(expense: Expense): FormValues {
   };
 }
 
-// TODO решить проблему с удалением личных расходов из модального окна
-
 interface Props {
   startDate: Moment | null;
   endDate: Moment | null;
