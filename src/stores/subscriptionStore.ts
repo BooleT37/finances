@@ -2,10 +2,12 @@ import { groupBy } from "lodash";
 import { action, computed, flow, makeObservable, observable } from "mobx";
 import moment from "moment";
 import { DATE_SERVER_FORMAT } from "../constants";
+import Category from "../models/Category";
 import Currency from "../models/Currency";
 import Subscription from "../models/Subscription";
 import categories from "../readonlyStores/categories";
 import sources from "../readonlyStores/sources";
+import { SubscriptionsItem } from "./forecastStore/types";
 
 interface SubscriptionJson {
   id: number;
@@ -18,11 +20,17 @@ interface SubscriptionJson {
   source_id: number | null;
 }
 
+const subscriptionToItem = (subscription: Subscription): SubscriptionsItem => ({
+  cost: subscription.cost,
+  name: subscription.name,
+});
+
 class SubscriptionStore {
   subscriptions: Subscription[];
 
   constructor() {
     makeObservable(this, {
+      getSubscriptionsForForecast: false,
       delete: flow,
       getById: false,
       getByIdOrThrow: false,
@@ -130,6 +138,20 @@ class SubscriptionStore {
     yield fetch(`${process.env.REACT_APP_API_URL}/subscription?id=${id}`, {
       method: "DELETE",
     });
+  }
+
+  getSubscriptionsForForecast(
+    month: number,
+    year: number,
+    category: Category | null
+  ): SubscriptionsItem[] {
+    return this.subscriptions
+      .filter(
+        (subscription) =>
+          (!category || subscription.category.id === category.id) &&
+          subscription.isInMonth(month, year)
+      )
+      .map(subscriptionToItem);
   }
 }
 

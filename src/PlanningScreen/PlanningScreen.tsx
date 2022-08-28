@@ -39,7 +39,7 @@ const PlanningScreen = observer(function PlanningScreen() {
         categories.getById(params.data.categoryId),
         date.month(),
         date.year(),
-        parseFloat(params.newValue)
+        parseFloat(params.newValue.value)
       );
     } else if (field === "comment") {
       forecastStore.changeForecastComment(

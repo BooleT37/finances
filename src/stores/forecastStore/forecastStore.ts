@@ -15,6 +15,7 @@ import {
   PE_SUM_DEFAULT,
   PE_SUM_LS_KEY,
 } from "../../constants";
+import subscriptionStore from "../subscriptionStore";
 
 interface ForecastJson {
   category_id: number;
@@ -147,7 +148,14 @@ class ForecastStore {
               roundCost(forecast.sum - thisMonthSpendings) *
               (isIncome ? -1 : 1),
           },
-          sum: forecast.sum,
+          sum: {
+            value: forecast.sum,
+            subscriptions: subscriptionStore.getSubscriptionsForForecast(
+              month,
+              year,
+              forecast.category
+            ),
+          },
           comment: forecast.comment || "",
         };
       });
@@ -163,7 +171,14 @@ class ForecastStore {
             spendings: roundCost(sum(data.map((d) => d.lastMonth.spendings))),
             diff: roundCost(sum(data.map((d) => d.lastMonth.diff))),
           },
-          sum: roundCost(sum(data.map((d) => d.sum))),
+          sum: {
+            value: roundCost(sum(data.map((d) => d.sum.value))),
+            subscriptions: subscriptionStore.getSubscriptionsForForecast(
+              month,
+              year,
+              null
+            ),
+          },
           thisMonth: {
             spendings: roundCost(sum(data.map((d) => d.thisMonth.spendings))),
             diff: roundCost(sum(data.map((d) => d.thisMonth.diff))),

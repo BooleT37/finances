@@ -1,4 +1,5 @@
 import type { ColDef, ColGroupDef } from "ag-grid-community";
+import CostCellRenderer from "./CostCellRenderer/CostCellRenderer";
 import Currency from "../models/Currency";
 import { costToString } from "../utils";
 import MonthCellRenderer from "./MonthCellRenderer";
@@ -29,9 +30,17 @@ const columnDefs: (ColDef | ColGroupDef)[] = [
   },
   {
     field: "sum",
-    width: 120,
+    width: 180,
     headerName: "План",
-    valueFormatter: costValueFormatter,
+    cellRenderer: CostCellRenderer,
+    valueFormatter: (data) => data.value.value,
+    cellEditorParams: {
+      useFormatter: true,
+    },
+    valueParser: (params) => ({
+      value: parseFloat(params.newValue),
+      subscriptions: params.oldValue.subscriptions,
+    }),
     editable: true,
   },
   { field: "comment", width: 200, headerName: "Комментарий", editable: true },

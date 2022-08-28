@@ -52,6 +52,7 @@ export default class Subscription {
       source: observable,
       costString: computed,
       nextDate: computed,
+      isInMonth: false,
     });
     this.id = id;
     this.name = name;
@@ -75,5 +76,14 @@ export default class Subscription {
       date.add(this.period, "months");
     }
     return date;
+  }
+
+  isInMonth(month: number, year: number): boolean {
+    const date = moment({ year, month });
+    const iDate = this.firstDate.clone();
+    while (iDate.isBefore(date, "month")) {
+      iDate.add(this.period, "months");
+    }
+    return date.isSame(iDate, "month");
   }
 }
