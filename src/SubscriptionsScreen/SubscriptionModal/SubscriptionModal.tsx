@@ -148,7 +148,7 @@ const SubscriptionModal: React.FC<Props> = function SubscriptionModal({
   }, []);
 
   const periodOptions = React.useMemo(() => {
-    return range(1, 11).map((period) => ({
+    return [1, 3, 6, 12].map((period) => ({
       value: period,
       label: Subscription.periodToString(period),
     }));
