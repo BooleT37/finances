@@ -230,7 +230,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
           Отмена
         </Button>,
         <Button key="submit" type="primary" onClick={handleSubmit}>
-          Ввод
+          Добавить
         </Button>,
       ]}
     >
