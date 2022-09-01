@@ -8,7 +8,11 @@ import { ComparisonData } from "../StatisticsScreen/ComparisonChart/models";
 import { PersonalExpCategoryIds } from "../utils/constants";
 import costToString from "../utils/costToString";
 import sources from "../readonlyStores/sources";
-import { DATE_FORMAT, DATE_SERVER_FORMAT, MONTH_DATE_FORMAT } from "../constants";
+import {
+  DATE_FORMAT,
+  DATE_SERVER_FORMAT,
+  MONTH_DATE_FORMAT,
+} from "../constants";
 import { sum } from "lodash";
 import { DynamicsData } from "../StatisticsScreen/DynamicsChart/models";
 import { DynamicsDataMonth } from "../StatisticsScreen/DynamicsChart/models/dynamicsData";
@@ -41,7 +45,7 @@ class ExpenseStore {
       fillPersonalExpenses: false,
       getComparisonData: action,
       getDynamicsData: action,
-      lastModifiedPerSource: computed,
+      lastExpensesPerSource: computed,
       totalForMonth: false,
     });
   }
@@ -280,21 +284,22 @@ class ExpenseStore {
     return data;
   }
 
-  get lastModifiedPerSource(): Record<number, string | null> {
+  get lastExpensesPerSource(): Record<number, Expense[]> {
     return Object.fromEntries(
-      sources.getAll().map((s) => {
+      sources.getAll().map<[number, Expense[]]>((s) => {
         const expensesWithSource = this.expenses.filter(
           (e) => e.source?.id === s.id
         );
         if (expensesWithSource.length > 0) {
+          const lastDate = moment.max(expensesWithSource.map((e) => e.date));
           return [
             s.id,
-            moment
-              .max(expensesWithSource.map((e) => e.date))
-              .format(DATE_FORMAT),
+            expensesWithSource.filter((expense) =>
+              expense.date.isSame(lastDate, "date")
+            ),
           ];
         }
-        return [s.id, null];
+        return [s.id, []];
       })
     );
   }
