@@ -128,10 +128,10 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
             setHasPersonalExp(
               !!expenseModalStore.currentExpense.personalExpense
             );
+            addMore.value = false;
           } else {
             form.setFieldsValue(INITIAL_VALUES);
             setHasPersonalExp(false);
-            addMore.value = false;
           }
           setTimeout(() => {
             acRef.current?.focus();
@@ -194,6 +194,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
       onCancel={() => {
         expenseModalStore.close(form.getFieldValue("source"));
       }}
+      width={540}
       footer={[
         expenseModalStore.lastExpense && (
           <Button type="link" onClick={handleInsertPreviousClick}>
