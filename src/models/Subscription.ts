@@ -7,6 +7,16 @@ import Source from "./Source";
 
 const today = moment();
 
+export interface SubscriptionFormValues {
+  id: number;
+  name: string;
+  cost: string;
+  category: string | null;
+  period: number;
+  firstDate: Moment | null;
+  source: number | null;
+}
+
 export default class Subscription {
   static periodToString(period: number): string {
     if (period === 1) {
@@ -48,8 +58,10 @@ export default class Subscription {
       source: observable,
       costString: computed,
       nextDate: computed,
+      toFormValues: computed,
       isInMonth: false,
     });
+
     this.id = id;
     this.name = name;
     this.cost = cost;
@@ -71,6 +83,18 @@ export default class Subscription {
       date.add(this.period, "months");
     }
     return date;
+  }
+
+  get toFormValues(): SubscriptionFormValues {
+    return {
+      id: this.id,
+      name: this.name,
+      cost: String(this.cost),
+      category: this.category.name || null,
+      period: this.period,
+      firstDate: this.firstDate,
+      source: this.source?.id ?? null,
+    };
   }
 
   isInMonth(month: number, year: number): boolean {

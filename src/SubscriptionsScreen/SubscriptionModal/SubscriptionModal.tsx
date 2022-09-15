@@ -9,44 +9,22 @@ import {
   InputRef,
 } from "antd";
 import { RuleObject } from "antd/lib/form";
-import { range } from "lodash";
 import moment from "moment";
 import { Moment } from "moment";
 import React from "react";
 import categories from "../../readonlyStores/categories";
 import sources from "../../readonlyStores/sources";
-import Subscription from "../../models/Subscription";
-import Currency from "../../models/Currency";
+import Subscription, {
+  SubscriptionFormValues as FormValues,
+} from "../../models/Subscription";
 import { DATE_FORMAT } from "../../constants";
 import subscriptionStore from "../../stores/subscriptionStore";
 
 const NEW_SUBSCRIPTION_ID = -1;
 
-const { Option } = Select;
-
-interface FormValues {
-  name: string;
-  cost: string;
-  category: string | null;
-  period: number;
-  firstDate: Moment | null;
-  source: number | null;
-}
-
 interface ValidatedFormValues extends Omit<FormValues, "date" | "category"> {
   firstDate: Moment;
   category: string;
-}
-
-function subscriptionToFormValues(subscription: Subscription): FormValues {
-  return {
-    name: subscription.name,
-    cost: String(subscription.cost),
-    category: subscription.category.name || null,
-    period: subscription.period,
-    firstDate: subscription.firstDate,
-    source: subscription.source?.id ?? null,
-  };
 }
 
 function formValuesToSubscription(
@@ -67,6 +45,7 @@ function formValuesToSubscription(
 const today = moment();
 
 const INITIAL_VALUES: FormValues = {
+  id: 0,
   name: "",
   cost: "",
   category: null,
@@ -116,9 +95,7 @@ const SubscriptionModal: React.FC<Props> = function SubscriptionModal({
         form.setFieldsValue(INITIAL_VALUES);
       } else {
         form.setFieldsValue(
-          subscriptionToFormValues(
-            subscriptionStore.getByIdOrThrow(subscriptionId)
-          )
+          subscriptionStore.getFormValuesByIdOrThrow(subscriptionId)
         );
       }
       setTimeout(() => {
@@ -208,7 +185,7 @@ const SubscriptionModal: React.FC<Props> = function SubscriptionModal({
           />
         </Form.Item>
         <Form.Item name="period" label="Период">
-          <Select defaultValue={1} options={periodOptions} />
+          <Select options={periodOptions} />
         </Form.Item>
         <Form.Item
           name="firstDate"
@@ -218,11 +195,7 @@ const SubscriptionModal: React.FC<Props> = function SubscriptionModal({
           <DatePicker format={DATE_FORMAT} allowClear={false} />
         </Form.Item>
         <Form.Item name="source" label="Источник">
-          <Select
-            defaultValue={null}
-            options={sourcesOptions}
-            placeholder="Не указано"
-          />
+          <Select options={sourcesOptions} placeholder="Не указано" />
         </Form.Item>
       </Form>
     </Modal>

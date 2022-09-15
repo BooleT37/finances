@@ -4,7 +4,7 @@ import moment from "moment";
 import { DATE_SERVER_FORMAT } from "../constants";
 import Category from "../models/Category";
 import Currency from "../models/Currency";
-import Subscription from "../models/Subscription";
+import Subscription, { SubscriptionFormValues } from "../models/Subscription";
 import categories from "../readonlyStores/categories";
 import sources from "../readonlyStores/sources";
 import { SubscriptionsItem } from "./forecastStore/types";
@@ -32,11 +32,14 @@ class SubscriptionStore {
     makeObservable(this, {
       getSubscriptionsForForecast: false,
       delete: flow,
-      getById: false,
-      getByIdOrThrow: false,
+      subscriptionsMap: computed,
+      getById: action,
+      getByIdOrThrow: action,
       add: action,
       modify: flow,
       subscriptions: observable,
+      formValuesMap: computed,
+      getFormValuesByIdOrThrow: action,
       fromJson: action,
       byCategory: computed,
     });
@@ -57,12 +60,38 @@ class SubscriptionStore {
     );
   }
 
+  get subscriptionsMap() {
+    return this.subscriptions.reduce<Record<string, Subscription>>(
+      (a, c) => ({ ...a, [c.id]: c }),
+      {}
+    );
+  }
+
+  get formValuesMap() {
+    return this.subscriptions
+      .map((s) => s.toFormValues)
+      .reduce<Record<string, SubscriptionFormValues>>(
+        (a, c) => ({ ...a, [c.id]: c }),
+        {}
+      );
+  }
+
   getById(id: number) {
-    return this.subscriptions.find((subscription) => subscription.id === id);
+    return this.subscriptionsMap[id];
   }
 
   getByIdOrThrow(id: number) {
-    const found = this.getById(id);
+    const found = this.subscriptionsMap[id];
+
+    if (!found) {
+      throw new Error(`Can't find subscription by id ${id}`);
+    }
+
+    return found;
+  }
+
+  getFormValuesByIdOrThrow(id: number) {
+    const found = this.formValuesMap[id];
 
     if (!found) {
       throw new Error(`Can't find subscription by id ${id}`);
