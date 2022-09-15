@@ -1,4 +1,4 @@
-import { Layout, Menu, MenuProps } from "antd";
+import { Layout, Menu } from "antd";
 import React from "react";
 import {
   TableOutlined,
@@ -7,25 +7,19 @@ import {
   DollarOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const { Content, Footer, Sider } = Layout;
 
-type MenuItem = Required<MenuProps>["items"][number];
-
-function getItem(
-  label: React.ReactNode,
-  key: React.Key,
-  icon?: React.ReactNode
-): MenuItem {
-  return {
-    key,
-    icon,
-    label,
-  } as MenuItem;
+function getItem(label: React.ReactNode, path: string, icon?: React.ReactNode) {
+  return (
+    <Menu.Item key={path} icon={icon}>
+      <Link to={path}>{label}</Link>
+    </Menu.Item>
+  );
 }
 
-const items: MenuItem[] = [
+const items: React.ReactNode[] = [
   getItem("Данные", "/screens/data", <TableOutlined />),
   getItem("Статистика", "/screens/statistics", <LineChartOutlined />),
   getItem("Планирование", "/screens/planning", <CalendarOutlined />),
@@ -50,8 +44,9 @@ const SiteLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           }}
           theme="dark"
           mode="inline"
-          items={items}
-        />
+        >
+          {items}
+        </Menu>
       </Sider>
       <Layout className="site-layout">
         <Content>{children}</Content>
