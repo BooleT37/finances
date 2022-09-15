@@ -1,5 +1,5 @@
 import { groupBy } from "lodash";
-import { action, computed, flow, makeObservable, observable } from "mobx";
+import { makeAutoObservable } from "mobx";
 import moment from "moment";
 import { DATE_SERVER_FORMAT } from "../constants";
 import Category from "../models/Category";
@@ -29,20 +29,7 @@ class SubscriptionStore {
   subscriptions: Subscription[];
 
   constructor() {
-    makeObservable(this, {
-      getSubscriptionsForForecast: false,
-      delete: flow,
-      subscriptionsMap: computed,
-      getById: action,
-      getByIdOrThrow: action,
-      add: action,
-      modify: flow,
-      subscriptions: observable,
-      formValuesMap: computed,
-      getFormValuesByIdOrThrow: action,
-      fromJson: action,
-      byCategory: computed,
-    });
+    makeAutoObservable(this);
   }
 
   fromJson(json: SubscriptionJson[]) {

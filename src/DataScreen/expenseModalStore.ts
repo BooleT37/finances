@@ -1,4 +1,4 @@
-import { action, computed, makeObservable, observable } from "mobx";
+import { makeAutoObservable } from "mobx";
 import Expense from "../models/Expense";
 import expenseStore from "../stores/expenseStore";
 
@@ -9,17 +9,7 @@ class ExpenseModalStore {
   lastSource: number | null = null;
 
   constructor() {
-    makeObservable(this, {
-      visible: observable,
-      expenseId: observable,
-      lastExpenseId: observable,
-      lastSource: observable,
-      currentExpense: computed,
-      lastExpense: computed,
-      isNewExpense: computed,
-      open: action,
-      close: action,
-    });
+    makeAutoObservable(this);
   }
 
   get currentExpense(): Expense | undefined {

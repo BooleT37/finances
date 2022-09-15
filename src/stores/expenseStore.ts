@@ -1,4 +1,4 @@
-import { action, computed, flow, makeObservable, observable, toJS } from "mobx";
+import { makeAutoObservable, toJS } from "mobx";
 import moment, { Moment } from "moment";
 import Currency from "../models/Currency";
 import Expense from "../models/Expense";
@@ -8,11 +8,7 @@ import { ComparisonData } from "../StatisticsScreen/ComparisonChart/models";
 import { PersonalExpCategoryIds } from "../utils/constants";
 import costToString from "../utils/costToString";
 import sources from "../readonlyStores/sources";
-import {
-  DATE_FORMAT,
-  DATE_SERVER_FORMAT,
-  MONTH_DATE_FORMAT,
-} from "../constants";
+import { DATE_SERVER_FORMAT, MONTH_DATE_FORMAT } from "../constants";
 import { sum } from "lodash";
 import { DynamicsData } from "../StatisticsScreen/DynamicsChart/models";
 import { DynamicsDataMonth } from "../StatisticsScreen/DynamicsChart/models/dynamicsData";
@@ -32,22 +28,7 @@ class ExpenseStore {
   public expenses: Expense[];
 
   constructor() {
-    makeObservable(this, {
-      getById: false,
-      expenses: observable,
-      tableData: false,
-      nextId: false,
-      add: flow.bound,
-      modify: flow.bound,
-      delete: flow.bound,
-      fromJson: action,
-      totalMonths: computed,
-      fillPersonalExpenses: false,
-      getComparisonData: action,
-      getDynamicsData: action,
-      lastExpensesPerSource: computed,
-      totalForMonth: false,
-    });
+    makeAutoObservable(this);
   }
 
   getById(id: number): Expense | undefined {

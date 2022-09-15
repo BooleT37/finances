@@ -1,4 +1,4 @@
-import { makeObservable, observable } from "mobx";
+import { makeAutoObservable } from "mobx";
 import Category from "./Category";
 
 class Forecast {
@@ -9,11 +9,7 @@ class Forecast {
     public sum: number,
     public comment?: string
   ) {
-    makeObservable(this, {
-      category: observable,
-      sum: observable,
-      comment: observable,
-    });
+    makeAutoObservable(this);
   }
 }
 

@@ -45,7 +45,10 @@
       "react-app",
       "react-app/jest",
       "plugin:mobx/recommended"
-    ]
+    ],
+    "rules": {
+      "mobx/exhaustive-make-observable": "off"
+    }
   },
   "browserslist": {
     "production": [

@@ -1,4 +1,4 @@
-import { computed, makeObservable, observable } from "mobx";
+import { makeAutoObservable } from "mobx";
 import { Moment } from "moment";
 import { DATE_FORMAT } from "../constants";
 import Category from "./Category";
@@ -36,16 +36,7 @@ export default class Expense {
     personalExpense: Expense | null = null,
     source: Source | null = null
   ) {
-    makeObservable(this, {
-      id: observable,
-      cost: observable,
-      date: observable,
-      category: observable,
-      personalExpense: observable,
-      name: observable,
-      source: observable,
-      asTableData: computed,
-    });
+    makeAutoObservable(this);
     this.id = id;
     this.cost = cost;
     this.date = date;

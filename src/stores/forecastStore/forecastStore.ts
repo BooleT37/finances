@@ -1,4 +1,4 @@
-import { action, makeObservable, observable } from "mobx";
+import { makeAutoObservable, observable } from "mobx";
 import lodashSum from "lodash/sum";
 import Forecast from "../../models/Forecast";
 import categories from "../../readonlyStores/categories";
@@ -29,17 +29,7 @@ class ForecastStore {
   public forecasts = observable.array<Forecast>();
 
   constructor() {
-    makeObservable(this, {
-      forecasts: observable,
-      find: false,
-      tableData: false,
-      categoriesForecast: false,
-      fromJson: action,
-      changeForecastSum: action,
-      changeForecastComment: action,
-      transferPersonalExpense: action,
-      totalForMonth: false,
-    });
+    makeAutoObservable(this);
   }
 
   find(year: number, month: number, category: Category) {

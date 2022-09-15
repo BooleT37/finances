@@ -1,4 +1,4 @@
-import { computed, makeObservable, observable } from "mobx";
+import { makeAutoObservable } from "mobx";
 import moment from "moment";
 import { Moment } from "moment";
 import { costToString } from "../utils";
@@ -48,19 +48,7 @@ export default class Subscription {
     firstDate: Moment,
     source: Source | null = null
   ) {
-    makeObservable(this, {
-      id: observable,
-      name: observable,
-      cost: observable,
-      category: observable,
-      period: observable,
-      firstDate: observable,
-      source: observable,
-      costString: computed,
-      nextDate: computed,
-      toFormValues: computed,
-      isInMonth: false,
-    });
+    makeAutoObservable(this);
 
     this.id = id;
     this.name = name;
