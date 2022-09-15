@@ -2,12 +2,25 @@ import type { ColDef, ColGroupDef } from "ag-grid-community";
 import CostCellRenderer from "./CostCellRenderer/CostCellRenderer";
 import { costToString } from "../utils";
 import MonthCellRenderer from "./MonthCellRenderer";
+import { sortAllCategories } from "../readonlyStores/categories/categoriesOrder";
 
 const costValueFormatter = ({ value }: { value: number }): string =>
   costToString(value);
 
 const columnDefs: (ColDef | ColGroupDef)[] = [
-  { field: "category", width: 220, headerName: "Категория" },
+  {
+    field: "category",
+    sort: "asc",
+    width: 220,
+    headerName: "Категория",
+    comparator: (categoryA, _categoryB, nodeA, nodeB) =>
+      categoryA === "Всего"
+        ? 1
+        : sortAllCategories(
+            nodeA.data.categoryShortname,
+            nodeB.data.categoryShortname
+          ),
+  },
   {
     field: "average",
     width: 150,

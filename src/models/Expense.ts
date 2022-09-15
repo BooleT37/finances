@@ -16,6 +16,7 @@ interface TableData {
   date: string;
   category: string;
   categoryId: number;
+  categoryShortname: string;
 }
 
 export default class Expense {
@@ -59,6 +60,7 @@ export default class Expense {
       category: this.category.name,
       date: this.date.format(DATE_FORMAT),
       categoryId: this.category.id,
+      categoryShortname: this.category.shortname,
     };
   }
 }

@@ -22,7 +22,7 @@ const SubscriptionsTooltip: React.FC<Props> = ({ items }) => {
         {total} из подписок:
         <List>
           {items.map((item) => (
-            <li>
+            <li key={item.name}>
               {costToString(item.cost)}
               {"\u00A0"}
               {item.name}

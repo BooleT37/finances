@@ -55,8 +55,10 @@ class ForecastStore {
         );
       });
       const filteredCategories = isIncome
-        ? categories.getAllIncome()
-        : categories.getAllExpenses(isPersonal);
+        ? categories.incomeCategories
+        : isPersonal
+        ? categories.personalExpensesCategories
+        : categories.nonPersonalExpenseCategories;
       filteredCategories
         .sort((a, b) => a.id - b.id)
         .forEach((category) => {
@@ -106,6 +108,7 @@ class ForecastStore {
         return {
           category: forecast.category.name,
           categoryId: forecast.category.id,
+          categoryShortname: forecast.category.shortname,
           average: avgForNonEmpty(
             Object.values(
               expenseStore.expenses
@@ -156,6 +159,7 @@ class ForecastStore {
           monthsWithSpendings: "",
           category: "Всего",
           categoryId: -1,
+          categoryShortname: "Всего",
           comment: "",
           lastMonth: {
             spendings: roundCost(sum(data.map((d) => d.lastMonth.spendings))),

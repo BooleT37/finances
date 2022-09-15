@@ -125,7 +125,7 @@ const PlanningScreen = observer(function PlanningScreen() {
               </div>
               <div>
                 <Title level={2}>Личные Расходы</Title>
-                <div className="ag-theme-alpine" style={{ width: 1110 }}>
+                <div className="ag-theme-alpine" style={{ width: 1150 }}>
                   <AgGridReact
                     ref={gridRef}
                     readOnlyEdit

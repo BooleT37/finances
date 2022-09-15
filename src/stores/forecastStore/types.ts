@@ -15,6 +15,7 @@ export interface ForecastSum {
 export interface ForecastTableItem {
   category: string;
   categoryId: number;
+  categoryShortname: string;
   average: number;
   monthsWithSpendings: string;
   lastMonth: MonthSpendings;
