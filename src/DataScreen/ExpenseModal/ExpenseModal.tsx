@@ -30,14 +30,11 @@ import { insertExpense } from "./utils";
 import PersonalExpenses from "./PersonalExpenses";
 import SourceLastExpenses from "./SourceLastExpenses";
 
-const { Option } = Select;
-
 function expenseToFormValues(expense: Expense): FormValues {
   return {
     cost: expense.personalExpense
       ? String((expense.personalExpense.cost || 0) + (expense.cost || 0))
       : String(expense.cost),
-    currency: expense.currency,
     category: expense.category.name || null,
     name: expense.name || "",
     personalExpCategoryId: expense.personalExpense?.category.id ?? null,
@@ -277,12 +274,6 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
           rules={[{ required: true, message: "Введите сумму" }]}
         >
           <Input />
-        </Form.Item>
-        <Form.Item name="currency" label="Валюта">
-          <Select>
-            <Option value={Currency.Eur}>€</Option>
-            <Option value={Currency.Rub}>₽</Option>
-          </Select>
         </Form.Item>
         {!isIncome.value && (
           <Divider orientation="center">

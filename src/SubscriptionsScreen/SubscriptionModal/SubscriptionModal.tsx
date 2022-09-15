@@ -27,7 +27,6 @@ const { Option } = Select;
 interface FormValues {
   name: string;
   cost: string;
-  currency: Currency;
   category: string | null;
   period: number;
   firstDate: Moment | null;
@@ -43,7 +42,6 @@ function subscriptionToFormValues(subscription: Subscription): FormValues {
   return {
     name: subscription.name,
     cost: String(subscription.cost),
-    currency: subscription.currency,
     category: subscription.category.name || null,
     period: subscription.period,
     firstDate: subscription.firstDate,
@@ -59,7 +57,6 @@ function formValuesToSubscription(
     id || NEW_SUBSCRIPTION_ID,
     values.name,
     parseFloat(values.cost),
-    values.currency,
     categories.getByName(values.category),
     values.period,
     values.firstDate,
@@ -72,7 +69,6 @@ const today = moment();
 const INITIAL_VALUES: FormValues = {
   name: "",
   cost: "",
-  currency: Currency.Eur,
   category: null,
   period: 1,
   firstDate: today,
@@ -193,12 +189,6 @@ const SubscriptionModal: React.FC<Props> = function SubscriptionModal({
           rules={[{ required: true, message: "Введите сумму" }]}
         >
           <Input />
-        </Form.Item>
-        <Form.Item name="currency" label="Валюта">
-          <Select>
-            <Option value={Currency.Eur}>€</Option>
-            <Option value={Currency.Rub}>₽</Option>
-          </Select>
         </Form.Item>
         <Form.Item
           name="category"

@@ -10,7 +10,7 @@ interface Props {
 const CostCellRenderer: React.FC<Props> = ({ value }) => {
   return (
     <>
-      {costToString({ value: value.value })}
+      {costToString(value.value)}
       {value.subscriptions.length > 0 && (
         <SubscriptionsTooltip items={value.subscriptions} />
       )}

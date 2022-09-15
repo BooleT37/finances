@@ -11,7 +11,6 @@ export default function insertExpense(values: ValidatedFormValues): Expense {
   const newExpense = new Expense(
     -1,
     parseFloat(values.cost),
-    values.currency,
     values.date!,
     categories.getByName(values.category),
     values.name,
@@ -43,7 +42,6 @@ export default function insertExpense(values: ValidatedFormValues): Expense {
           const personalExpense = new Expense(
             modifyingPe.id,
             parseFloat(values.personalExpSpent),
-            modifyingPe.currency,
             modifyingPe.date,
             categories.getById(values.personalExpCategoryId),
             generatePersonalExpenseName({
@@ -61,7 +59,6 @@ export default function insertExpense(values: ValidatedFormValues): Expense {
         const personalExpense = new Expense(
           -1,
           parseFloat(values.personalExpSpent),
-          Currency.Eur,
           values.date!,
           categories.getById(values.personalExpCategoryId),
           generatePersonalExpenseName({
@@ -91,7 +88,6 @@ export default function insertExpense(values: ValidatedFormValues): Expense {
       const personalExpense = new Expense(
         -1,
         parseFloat(values.personalExpSpent),
-        Currency.Eur,
         values.date!,
         categories.getById(values.personalExpCategoryId),
         generatePersonalExpenseName({

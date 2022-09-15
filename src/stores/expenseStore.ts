@@ -67,7 +67,7 @@ class ExpenseStore {
         const tableData = ex.asTableData;
         const pe = ex.personalExpense;
         if (tableData.cost && pe && pe.cost) {
-          const cost = costToString({ value: pe.cost, currency: pe.currency });
+          const cost = costToString(pe.cost);
           const author =
             pe.category.id === PersonalExpCategoryIds.Alexey ? "А" : "Л";
           tableData.cost.personalExpStr = `${cost} личных (${author})`;
@@ -89,7 +89,7 @@ class ExpenseStore {
         id: expense.id,
         name: expense.name,
         cost: expense.cost,
-        currency: expense.currency,
+        currency: Currency.Eur,
         date: expense.date.format(DATE_SERVER_FORMAT),
         category_id: expense.category.id,
         personal_expense_id: expense.personalExpense?.id ?? null,
@@ -111,7 +111,7 @@ class ExpenseStore {
           id: expense.id,
           name: expense.name,
           cost: expense.cost,
-          currency: expense.currency,
+          currency: Currency.Eur,
           date: expense.date.format(DATE_SERVER_FORMAT),
           category_id: expense.category.id,
           personal_expense_id: expense.personalExpense?.id ?? null,
@@ -162,7 +162,6 @@ class ExpenseStore {
         new Expense(
           e.id,
           e.cost,
-          e.currency,
           moment(e.date),
           categories.getById(e.category_id),
           e.name,

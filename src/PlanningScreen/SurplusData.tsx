@@ -23,23 +23,23 @@ const SurplusData: React.FC<Props> = observer(function SurplusData({
         <Tooltip title="Планируемые доходы минус планируемые расходы. Личные траты не учитываются">
           По плану: &nbsp;
         </Tooltip>
-        {costToString({
-          value: roundCost(
+        {costToString(
+          roundCost(
             forecastStore.totalForMonth(year, month, true, false) -
               forecastStore.totalForMonth(year, month, false, false)
-          ),
-        })}
+          )
+        )}
       </div>
       <div>
         <Tooltip title="Фактические доходы минус фактические расходы. Личные траты не учитываются">
           Факт: &nbsp;
         </Tooltip>
-        {costToString({
-          value: roundCost(
+        {costToString(
+          roundCost(
             expenseStore.totalForMonth(year, month, true, false) -
               expenseStore.totalForMonth(year, month, false, false)
-          ),
-        })}
+          )
+        )}
       </div>
     </div>
   );

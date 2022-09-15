@@ -1,11 +1,10 @@
 import type { ColDef, ColGroupDef } from "ag-grid-community";
 import CostCellRenderer from "./CostCellRenderer/CostCellRenderer";
-import Currency from "../models/Currency";
 import { costToString } from "../utils";
 import MonthCellRenderer from "./MonthCellRenderer";
 
 const costValueFormatter = ({ value }: { value: number }): string =>
-  costToString({ currency: Currency.Eur, value });
+  costToString(value);
 
 const columnDefs: (ColDef | ColGroupDef)[] = [
   { field: "category", width: 220, headerName: "Категория" },

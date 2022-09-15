@@ -3,7 +3,6 @@ import moment from "moment";
 import { Moment } from "moment";
 import { costToString } from "../utils";
 import Category from "./Category";
-import Currency from "./Currency";
 import Source from "./Source";
 
 const today = moment();
@@ -25,7 +24,6 @@ export default class Subscription {
   id: number;
   name: string;
   cost: number;
-  currency: Currency;
   category: Category;
   period: number;
   firstDate: Moment;
@@ -35,7 +33,6 @@ export default class Subscription {
     id: number,
     name: string,
     cost: number,
-    currency: Currency,
     category: Category,
     period: number,
     firstDate: Moment,
@@ -45,7 +42,6 @@ export default class Subscription {
       id: observable,
       name: observable,
       cost: observable,
-      currency: observable,
       category: observable,
       period: observable,
       firstDate: observable,
@@ -57,7 +53,6 @@ export default class Subscription {
     this.id = id;
     this.name = name;
     this.cost = cost;
-    this.currency = currency;
     this.category = category;
     this.period = period;
     this.firstDate = firstDate;
@@ -65,7 +60,7 @@ export default class Subscription {
   }
 
   get costString(): string {
-    return `${costToString({ value: this.cost })}/${Subscription.periodToString(
+    return `${costToString(this.cost)}/${Subscription.periodToString(
       this.period
     )}`;
   }

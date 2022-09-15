@@ -29,14 +29,14 @@ const MonthCellRenderer: React.FC<Props> = ({ value: col }) => {
   return (
     <>
       <WithOffset offset={col.diff ? 3 : 0}>
-        {costToString({ value: col.spendings })}
+        {costToString(col.spendings)}
       </WithOffset>
       {col.diff ? (
         <>
           {col.diff >= 0 ? (
-            <Green offset={29}>+{costToString({ value: col.diff })}</Green>
+            <Green offset={29}>+{costToString(col.diff)}</Green>
           ) : (
-            <Red offset={29}>{costToString({ value: col.diff })}</Red>
+            <Red offset={29}>{costToString(col.diff)}</Red>
           )}
         </>
       ) : null}

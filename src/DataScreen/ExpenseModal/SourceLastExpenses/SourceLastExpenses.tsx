@@ -35,9 +35,7 @@ const SourceLastExpenses: React.FC<Props> = observer(
               <Row>
                 <span>{expense.category.name}</span>
                 {expense.name && <span>- {expense.name}</span>}
-                {expense.cost && (
-                  <span>{costToString({ value: expense.cost })}</span>
-                )}
+                {expense.cost && <span>{costToString(expense.cost)}</span>}
               </Row>
             </div>
           ))}

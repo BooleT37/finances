@@ -19,16 +19,13 @@ const CostCellRenderer: React.FC<Props> = ({
   if (!col) {
     return null;
   }
-  const costString = costToString(col);
+  const costString = costToString(col.value);
   if (!isAggCostCol(col) || col.diff === null) {
     return (
       <CostCellView cost={costString} personalExpStr={col.personalExpStr} />
     );
   }
-  const diffSum = costToString({
-    currency: col.currency,
-    value: Math.abs(col.diff),
-  });
+  const diffSum = costToString(Math.abs(col.diff));
   if (col.isIncome) {
     if (col.diff >= 0) {
       return (
@@ -56,11 +53,9 @@ const CostCellRenderer: React.FC<Props> = ({
     const color = exceedingForecast ? "orange" : "green";
 
     const exceedingAmount = exceedingForecast
-      ? costToString({
-          value: roundCost(
-            col.value - passedDaysRatio * (col.value + col.diff)
-          ),
-        })
+      ? costToString(
+          roundCost(col.value - passedDaysRatio * (col.value + col.diff))
+        )
       : undefined;
     const title = exceedingAmount
       ? `Превышение на ${exceedingAmount}`
