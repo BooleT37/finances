@@ -43,8 +43,8 @@ const columnDefs: GridOptions["columnDefs"] = [
     headerName: "",
     headerComponent: DeleteHeaderIcon,
     cellRendererSelector: (params: ICellRendererParams) => {
-      // if it's a group row
-      if (!params.data) {
+      // if it's a group row or an upcoming subscription
+      if (!params.data || params.data.isUpcomingSubscription) {
         return;
       }
       return {

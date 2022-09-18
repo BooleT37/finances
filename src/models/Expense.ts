@@ -9,9 +9,10 @@ export interface CostCol {
   value: number;
   personalExpStr?: string;
   isSubscription?: boolean;
+  isUpcomingSubscription?: boolean;
 }
 
-interface TableData {
+export interface TableData {
   id: number;
   name: string;
   cost: CostCol | null;
@@ -19,7 +20,7 @@ interface TableData {
   category: string;
   categoryId: number;
   categoryShortname: string;
-  isSubscription: boolean;
+  isUpcomingSubscription: boolean;
 }
 
 export default class Expense {
@@ -62,13 +63,14 @@ export default class Expense {
           ? {
               value: this.cost,
               isSubscription: this.subscription !== null,
+              isUpcomingSubscription: false,
             }
           : null,
       category: this.category.name,
       date: this.date.format(DATE_FORMAT),
       categoryId: this.category.id,
       categoryShortname: this.category.shortname,
-      isSubscription: this.subscription !== null,
+      isUpcomingSubscription: false,
     };
   }
 }

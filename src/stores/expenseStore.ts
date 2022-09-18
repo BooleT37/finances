@@ -1,14 +1,18 @@
 import { makeAutoObservable, toJS } from "mobx";
 import moment, { Moment } from "moment";
 import Currency from "../models/Currency";
-import Expense from "../models/Expense";
+import Expense, { TableData } from "../models/Expense";
 import { countUniqueMonths, roundCost } from "../utils";
 import categories from "../readonlyStores/categories";
 import { ComparisonData } from "../StatisticsScreen/ComparisonChart/models";
 import { PersonalExpCategoryIds } from "../utils/constants";
 import costToString from "../utils/costToString";
 import sources from "../readonlyStores/sources";
-import { DATE_SERVER_FORMAT, MONTH_DATE_FORMAT } from "../constants";
+import {
+  DATE_FORMAT,
+  DATE_SERVER_FORMAT,
+  MONTH_DATE_FORMAT,
+} from "../constants";
 import { groupBy, sum } from "lodash";
 import { DynamicsData } from "../StatisticsScreen/DynamicsChart/models";
 import { DynamicsDataMonth } from "../StatisticsScreen/DynamicsChart/models/dynamicsData";
@@ -48,8 +52,13 @@ class ExpenseStore {
     return this.expenses.find((e) => e.id === id);
   }
 
-  tableData(startDate: Moment, endDate: Moment, searchString: string) {
-    return this.expenses
+  tableData(
+    startDate: Moment,
+    endDate: Moment,
+    searchString: string,
+    includeUpcomingSubscriptions: boolean
+  ): TableData[] {
+    const rows = this.expenses
       .filter(
         (e) =>
           e.date.isSameOrAfter(startDate) &&
@@ -68,6 +77,12 @@ class ExpenseStore {
         }
         return tableData;
       });
+    if (includeUpcomingSubscriptions) {
+      return rows.concat(
+        this.availableSubscriptionsAsTableData(startDate, endDate, searchString)
+      );
+    }
+    return rows;
   }
 
   nextId(): number {
@@ -324,9 +339,12 @@ class ExpenseStore {
   getAvailableSubscriptions(
     startDate: Moment,
     endDate: Moment,
-    category: Category
+    category?: Category
   ): SubscriptionForPeriod[] {
-    let subscriptionsForPeriod = subscriptionStore.byCategory[category.name]
+    const allSubscriptions = category
+      ? subscriptionStore.byCategory[category.name]
+      : subscriptionStore.subscriptions;
+    let subscriptionsForPeriod = allSubscriptions
       .map((subscription): SubscriptionForPeriod | null => {
         const firstDate = subscription.firstDateInInterval(startDate, endDate);
         if (firstDate) {
@@ -344,18 +362,48 @@ class ExpenseStore {
     if (subscriptionsForPeriod.length === 0) {
       return [];
     }
-    const addedSubscriptionsIds = this.expensesByCategoryId[category.id]
+    const allExpenses = category
+      ? this.expensesByCategoryId[category.id]
+      : this.expenses;
+    const addedSubscriptionsIds = allExpenses
       .filter(
-        (expense) =>
+        (expense): expense is Expense & { subscription: Subscription } =>
           expense.subscription !== null &&
           expense.date.isBetween(startDate, endDate, "day", "[]")
       )
-      .map((s) => s.id);
+      .map((e) => e.subscription.id);
     subscriptionsForPeriod = subscriptionsForPeriod.filter(
       (subscription) =>
         !addedSubscriptionsIds.includes(subscription.subscription.id)
     );
     return subscriptionsForPeriod;
+  }
+
+  availableSubscriptionsAsTableData(
+    startDate: Moment,
+    endDate: Moment,
+    searchString: string
+  ): TableData[] {
+    const subscriptions = this.getAvailableSubscriptions(startDate, endDate);
+
+    let rows = subscriptions.map(({ subscription, firstDate }) => ({
+      category: subscription.category.name,
+      categoryId: subscription.category.id,
+      categoryShortname: subscription.category.shortname,
+      cost: {
+        value: subscription.cost,
+        isSubscription: true,
+        isUpcomingSubscription: true,
+      },
+      date: firstDate.format(DATE_FORMAT),
+      id: 0,
+      isUpcomingSubscription: true,
+      name: subscription.name,
+    }));
+    if (searchString) {
+      rows = rows.filter((data) => data.name.includes(searchString));
+    }
+    return rows;
   }
 }
 

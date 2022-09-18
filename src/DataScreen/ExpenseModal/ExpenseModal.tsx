@@ -185,18 +185,20 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
 
   const sourceId = Form.useWatch("source", form);
   const categoryName = Form.useWatch("category", form);
-  const subscriptionId = Form.useWatch("subscription", form);
+  const currentCategory = categoryName
+    ? categories.getByNameIfExists(categoryName)
+    : null;
   const sourceExtra =
     sourceId === null || sourceId === undefined ? null : (
       <SourceLastExpenses sourceId={sourceId} />
     );
 
   const availabileSubscriptions =
-    startDate && endDate && categoryName
+    startDate && endDate && currentCategory
       ? expenseStore.getAvailableSubscriptions(
           startDate,
           endDate,
-          categories.getByName(categoryName)
+          currentCategory
         )
       : [];
   const subscriptionOptions: Option[] = availabileSubscriptions.map((s) => ({

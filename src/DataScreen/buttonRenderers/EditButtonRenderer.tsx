@@ -1,17 +1,24 @@
-import { ICellRendererParams } from 'ag-grid-enterprise';
-import { Button } from 'antd';
-import React from 'react'
-import { EditFilled } from '@ant-design/icons';
-import expenseModalStore from '../expenseModalStore';
+import { ICellRendererParams } from "ag-grid-enterprise";
+import { Button } from "antd";
+import React from "react";
+import { EditFilled } from "@ant-design/icons";
+import expenseModalStore from "../expenseModalStore";
 
 // eslint-disable-next-line mobx/missing-observer
 const EditButtonRenderer: React.FC<ICellRendererParams> = (props) => {
-  // if it's a group row
-  if (!props.data) {
-    return null
+  // if it's a group row or an upcoming subscription
+  if (!props.data || props.data.isUpcomingSubscription) {
+    return null;
   }
-  const id = props.data.id
-  return <Button icon={ <EditFilled /> } onClick={ () => { expenseModalStore.open(id) } }/>
-}
+  const id = props.data.id;
+  return (
+    <Button
+      icon={<EditFilled />}
+      onClick={() => {
+        expenseModalStore.open(id);
+      }}
+    />
+  );
+};
 
 export default EditButtonRenderer;

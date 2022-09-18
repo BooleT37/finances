@@ -1,6 +1,6 @@
 import React from "react";
 import { observer } from "mobx-react";
-import { Typography, DatePicker, Button, Space, Input } from "antd";
+import { Typography, DatePicker, Button, Space, Input, Checkbox } from "antd";
 import {
   PlusOutlined,
   SwapOutlined,
@@ -43,6 +43,12 @@ const SearchStyled = styled(Search)`
   width: 300px;
 `;
 
+const AgGridStyled = styled(AgGridReact)`
+  .data-row-upcoming-subscription {
+    color: darkgray;
+  }
+`;
+
 const DataScreen = observer(function DataScreen() {
   const [rangeStart, setRangeStart] = React.useState<Moment | null>(
     resetTime(today.clone().set("date", 1))
@@ -55,6 +61,8 @@ const DataScreen = observer(function DataScreen() {
   const gridRef = React.useRef<AgGridReact>(null);
   const [isRangePicker, setIsRangePicker] = React.useState(false);
   const [search, setSearch] = React.useState("");
+  const [upcSubscriptionsShown, setUpcSubscriptionsShown] =
+    React.useState(false);
 
   const handleRangeChange = (
     _dates: [Moment | null, Moment | null] | null,
@@ -204,11 +212,29 @@ const DataScreen = observer(function DataScreen() {
                   : "Выбрать точный период"}
               </DateTypeButton>
             </div>
+            <div>
+              <Checkbox
+                value={upcSubscriptionsShown}
+                onChange={(e) => setUpcSubscriptionsShown(e.target.checked)}
+              >
+                Предстоящие подписки
+              </Checkbox>
+            </div>
             {rangeStart && rangeEnd && (
               <div className="ag-theme-alpine" style={{ width: 900 }}>
-                <AgGridReact
+                <AgGridStyled
                   ref={gridRef}
-                  rowData={expenseStore.tableData(rangeStart, rangeEnd, search)}
+                  rowData={expenseStore.tableData(
+                    rangeStart,
+                    rangeEnd,
+                    search,
+                    upcSubscriptionsShown
+                  )}
+                  getRowClass={({ data }) =>
+                    data && data.isUpcomingSubscription
+                      ? "data-row-upcoming-subscription"
+                      : undefined
+                  }
                   columnDefs={columnDefs}
                   context={{
                     expandCategory,
@@ -229,6 +255,7 @@ const DataScreen = observer(function DataScreen() {
                   suppressAggFuncInHeader
                   autoGroupColumnDef={autoGroupColumnDef}
                   domLayout="autoHeight"
+                  groupDefaultExpanded={1}
                 />
               </div>
             )}

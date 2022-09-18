@@ -14,7 +14,9 @@ export default function costAggFunc(params: IAggFuncParams): AggCostCol {
       isContinuous: false,
     };
   }
-  const value = roundCost(values.reduce((a, c) => a + c.value, 0));
+  const value = roundCost(
+    values.reduce((a, c) => (c.isUpcomingSubscription ? a : a + c.value), 0)
+  );
   const { categoryId } = params.rowNode.childrenAfterGroup[0].data;
   const { isIncome, isContinuous } = categories.getById(categoryId);
   const forecast = params.context.categoriesForecast?.[categoryId];
