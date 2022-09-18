@@ -93,4 +93,15 @@ export default class Subscription {
     }
     return date.isSame(iDate, "month");
   }
+
+  firstDateInInterval(startDate: Moment, endDate: Moment): Moment | null {
+    const iDate = this.firstDate.clone();
+    while (iDate.isBefore(startDate, "day")) {
+      iDate.add(this.period, "months");
+    }
+    if (iDate.isBetween(startDate, endDate, "day", "[]")) {
+      return iDate;
+    }
+    return null;
+  }
 }

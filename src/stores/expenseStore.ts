@@ -9,9 +9,12 @@ import { PersonalExpCategoryIds } from "../utils/constants";
 import costToString from "../utils/costToString";
 import sources from "../readonlyStores/sources";
 import { DATE_SERVER_FORMAT, MONTH_DATE_FORMAT } from "../constants";
-import { sum } from "lodash";
+import { groupBy, sum } from "lodash";
 import { DynamicsData } from "../StatisticsScreen/DynamicsChart/models";
 import { DynamicsDataMonth } from "../StatisticsScreen/DynamicsChart/models/dynamicsData";
+import Category from "../models/Category";
+import Subscription from "../models/Subscription";
+import subscriptionStore from "./subscriptionStore";
 
 interface ExpenseJson {
   id: number;
@@ -22,6 +25,12 @@ interface ExpenseJson {
   category_id: number;
   personal_expense_id: number | null;
   source_id: number | null;
+  subscription_id: number | null;
+}
+
+interface SubscriptionForPeriod {
+  subscription: Subscription;
+  firstDate: Moment;
 }
 
 class ExpenseStore {
@@ -29,6 +38,10 @@ class ExpenseStore {
 
   constructor() {
     makeAutoObservable(this);
+  }
+
+  get expensesByCategoryId(): Record<string, Expense[]> {
+    return groupBy(this.expenses, "category.id");
   }
 
   getById(id: number): Expense | undefined {
@@ -75,6 +88,7 @@ class ExpenseStore {
         category_id: expense.category.id,
         personal_expense_id: expense.personalExpense?.id ?? null,
         source_id: expense.source?.id ?? null,
+        subscription_id: expense.subscription?.id ?? null,
       }),
       headers: {
         "content-type": "application/json",
@@ -97,6 +111,7 @@ class ExpenseStore {
           category_id: expense.category.id,
           personal_expense_id: expense.personalExpense?.id ?? null,
           source_id: expense.source?.id ?? null,
+          subscription_id: expense.subscription?.id ?? null,
         }),
         headers: {
           "content-type": "application/json",
@@ -147,7 +162,10 @@ class ExpenseStore {
           categories.getById(e.category_id),
           e.name,
           null,
-          e.source_id === null ? null : sources.getById(e.source_id)
+          e.source_id === null ? null : sources.getById(e.source_id),
+          e.subscription_id === null
+            ? null
+            : subscriptionStore.getById(e.subscription_id)
         )
     );
     this.fillPersonalExpenses(json);
@@ -301,6 +319,43 @@ class ExpenseStore {
         )
         .map((expense) => expense.cost || 0)
     );
+  }
+
+  getAvailableSubscriptions(
+    startDate: Moment,
+    endDate: Moment,
+    category: Category
+  ): SubscriptionForPeriod[] {
+    let subscriptionsForPeriod = subscriptionStore.byCategory[category.name]
+      .map((subscription): SubscriptionForPeriod | null => {
+        const firstDate = subscription.firstDateInInterval(startDate, endDate);
+        if (firstDate) {
+          return {
+            subscription,
+            firstDate,
+          };
+        }
+        return null;
+      })
+      .filter(
+        (subscription): subscription is SubscriptionForPeriod => !!subscription
+      );
+
+    if (subscriptionsForPeriod.length === 0) {
+      return [];
+    }
+    const addedSubscriptionsIds = this.expensesByCategoryId[category.id]
+      .filter(
+        (expense) =>
+          expense.subscription !== null &&
+          expense.date.isBetween(startDate, endDate, "day", "[]")
+      )
+      .map((s) => s.id);
+    subscriptionsForPeriod = subscriptionsForPeriod.filter(
+      (subscription) =>
+        !addedSubscriptionsIds.includes(subscription.subscription.id)
+    );
+    return subscriptionsForPeriod;
   }
 }
 

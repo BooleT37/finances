@@ -32,9 +32,9 @@ const App = function App({ children }: React.PropsWithChildren<{}>) {
         ]);
       categoriesManager.fromJson(categories);
       sourcesManager.set(sources);
+      subscriptionStore.fromJson(subscriptions);
       expenseStore.fromJson(expenses);
       forecastStore.fromJson(forecasts);
-      subscriptionStore.fromJson(subscriptions);
       setLoaded(true);
     })();
   }, []);

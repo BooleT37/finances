@@ -3,6 +3,7 @@ import { Moment } from "moment";
 import { DATE_FORMAT } from "../constants";
 import Category from "./Category";
 import Source from "./Source";
+import Subscription from "./Subscription";
 
 export interface CostCol {
   value: number;
@@ -27,6 +28,7 @@ export default class Expense {
   category: Category;
   personalExpense: Expense | null;
   source: Source | null;
+  subscription: Subscription | null;
 
   constructor(
     id: number,
@@ -35,7 +37,8 @@ export default class Expense {
     category: Category,
     name?: string,
     personalExpense: Expense | null = null,
-    source: Source | null = null
+    source: Source | null = null,
+    subscription: Subscription | null = null
   ) {
     makeAutoObservable(this);
     this.id = id;
@@ -45,6 +48,7 @@ export default class Expense {
     this.personalExpense = personalExpense;
     this.name = name;
     this.source = source;
+    this.subscription = subscription;
   }
 
   get asTableData(): TableData {

@@ -29,6 +29,9 @@ import { FormValues, ValidatedFormValues } from "./models";
 import { insertExpense } from "./utils";
 import PersonalExpenses from "./PersonalExpenses";
 import SourceLastExpenses from "./SourceLastExpenses";
+import expenseStore from "../../stores/expenseStore";
+import type { Option } from "../../types";
+import subscriptionStore from "../../stores/subscriptionStore";
 
 function expenseToFormValues(expense: Expense): FormValues {
   return {
@@ -41,6 +44,7 @@ function expenseToFormValues(expense: Expense): FormValues {
     personalExpSpent: String(expense.personalExpense?.cost ?? ""),
     date: expense.date,
     source: expense.source?.id ?? null,
+    subscription: expense.subscription?.id ?? null,
   };
 }
 
@@ -77,6 +81,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
   const INITIAL_VALUES: FormValues = React.useMemo(
     () => ({
       cost: "",
+      subscription: null,
       currency: Currency.Eur,
       category: null,
       name: "",
@@ -179,10 +184,47 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
   }, []);
 
   const sourceId = Form.useWatch("source", form);
+  const categoryName = Form.useWatch("category", form);
+  const subscriptionId = Form.useWatch("subscription", form);
   const sourceExtra =
     sourceId === null || sourceId === undefined ? null : (
       <SourceLastExpenses sourceId={sourceId} />
     );
+
+  const availabileSubscriptions =
+    startDate && endDate && categoryName
+      ? expenseStore.getAvailableSubscriptions(
+          startDate,
+          endDate,
+          categories.getByName(categoryName)
+        )
+      : [];
+  const subscriptionOptions: Option[] = availabileSubscriptions.map((s) => ({
+    label: s.subscription.name,
+    value: s.subscription.id,
+  }));
+
+  const handleValuesChange = (changedValues: Partial<FormValues>) => {
+    if (changedValues.subscription) {
+      const subscription = subscriptionStore.getById(
+        changedValues.subscription
+      );
+      const subscriptionData = availabileSubscriptions.find(
+        (s) => s.subscription.id === changedValues.subscription
+      );
+      if (!subscriptionData) {
+        throw new Error(
+          `Couldn't fin subscription with id ${changedValues.subscription}`
+        );
+      }
+      form.setFieldsValue({
+        cost: subscription.cost.toString(),
+        date: subscriptionData.firstDate,
+        name: subscriptionData.subscription.name,
+        source: subscription.source?.id,
+      });
+    }
+  };
 
   return (
     <Modal
@@ -235,6 +277,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
         initialValues={INITIAL_VALUES}
         onFinish={handleSubmit}
         autoComplete="off"
+        onValuesChange={handleValuesChange}
       >
         <RadioGroup
           value={isIncome.value ? "income" : "expense"}
@@ -269,6 +312,19 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
             ref={acRef}
           />
         </Form.Item>
+        {subscriptionOptions.length > 0 && (
+          <Form.Item
+            name="subscription"
+            label="Подписка"
+            getValueFromEvent={(value) => value.value}
+          >
+            <Select
+              options={subscriptionOptions}
+              labelInValue
+              placeholder="Не указана"
+            />
+          </Form.Item>
+        )}
         <Form.Item
           name="cost"
           label="Сумма"

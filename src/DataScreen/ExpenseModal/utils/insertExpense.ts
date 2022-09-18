@@ -6,6 +6,7 @@ import expenseStore from "../../../stores/expenseStore";
 import expenseModalStore from "../../expenseModalStore";
 import { ValidatedFormValues } from "../models";
 import generatePersonalExpenseName from "./generatePersonalExpenseName";
+import subscriptionStore from "../../../stores/subscriptionStore";
 
 export default function insertExpense(values: ValidatedFormValues): Expense {
   const newExpense = new Expense(
@@ -15,7 +16,10 @@ export default function insertExpense(values: ValidatedFormValues): Expense {
     categories.getByName(values.category),
     values.name,
     null,
-    values.source !== null ? sources.getById(values.source) : null
+    values.source !== null ? sources.getById(values.source) : null,
+    values.subscription !== null
+      ? subscriptionStore.getById(values.subscription)
+      : null
   );
   // if we are editing the expense
   if (expenseModalStore.expenseId) {
@@ -48,6 +52,7 @@ export default function insertExpense(values: ValidatedFormValues): Expense {
               category: values.category,
               name: values.name,
             }),
+            null,
             null
           );
           expenseStore.modify(personalExpense);
@@ -65,6 +70,7 @@ export default function insertExpense(values: ValidatedFormValues): Expense {
             category: values.category,
             name: values.name,
           }),
+          null,
           null
         );
         expenseStore.add(personalExpense);
@@ -94,6 +100,7 @@ export default function insertExpense(values: ValidatedFormValues): Expense {
           category: values.category,
           name: values.name,
         }),
+        null,
         null
       );
       expenseStore.add(personalExpense);
