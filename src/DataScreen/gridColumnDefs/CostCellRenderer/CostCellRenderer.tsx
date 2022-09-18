@@ -26,6 +26,7 @@ const CostCellRenderer: React.FC<Props> = ({
         cost={costString}
         personalExpStr={col.personalExpStr}
         isSubscription={col.isSubscription}
+        isUpcomingSubscription={col.isUpcomingSubscription}
       />
     );
   }

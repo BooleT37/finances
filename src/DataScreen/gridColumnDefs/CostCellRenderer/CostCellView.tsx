@@ -7,6 +7,7 @@ interface Props {
   cost: string;
   personalExpStr?: string;
   isSubscription?: boolean;
+  isUpcomingSubscription?: boolean;
 }
 
 const ShiftedCost = styled.div`
@@ -27,6 +28,7 @@ const CostCellView: React.FC<Props> = ({
   cost,
   personalExpStr,
   isSubscription,
+  isUpcomingSubscription,
 }) => {
   const costElement = (
     <div>
@@ -34,7 +36,9 @@ const CostCellView: React.FC<Props> = ({
       {isSubscription && (
         <>
           &nbsp;
-          <Tooltip title="Подписка">
+          <Tooltip
+            title={isUpcomingSubscription ? "Предстоящая подписка" : "Подписка"}
+          >
             <MoneyCollectOutlined style={{ color: "gray" }} />
           </Tooltip>
         </>
