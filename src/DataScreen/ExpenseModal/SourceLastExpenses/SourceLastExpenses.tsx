@@ -31,7 +31,7 @@ const SourceLastExpenses: React.FC<Props> = observer(
       lastExpenses.length === 0 ? null : (
         <>
           {lastExpenses.map((expense) => (
-            <div>
+            <div key={expense.id}>
               <Row>
                 <span>{expense.category.name}</span>
                 {expense.name && <span>- {expense.name}</span>}
