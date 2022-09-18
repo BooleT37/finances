@@ -5,7 +5,7 @@ export default interface FormValues {
   cost: string;
   subscription: number | null;
   date: Moment | null;
-  category: string | null;
+  category: number | null;
   personalExpCategoryId: PersonalExpCategoryIds | null;
   personalExpSpent: string;
   name: string;

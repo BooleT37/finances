@@ -5,14 +5,12 @@ import {
   Input,
   Modal,
   Select,
-  AutoComplete,
   DatePicker,
   Radio,
   Space,
   Divider,
 } from "antd";
 import type { BaseSelectRef } from "rc-select";
-import { RuleObject } from "antd/lib/form";
 import { action, reaction, runInAction } from "mobx";
 import { observer, useLocalObservable } from "mobx-react";
 import { Moment } from "moment";
@@ -38,7 +36,7 @@ function expenseToFormValues(expense: Expense): FormValues {
     cost: expense.personalExpense
       ? String((expense.personalExpense.cost || 0) + (expense.cost || 0))
       : String(expense.cost),
-    category: expense.category.name || null,
+    category: expense.category.id || null,
     name: expense.name || "",
     personalExpCategoryId: expense.personalExpense?.category.id ?? null,
     personalExpSpent: String(expense.personalExpense?.cost ?? ""),
@@ -68,7 +66,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
   onSubmit,
 }) {
   const [form] = Form.useForm<FormValues>();
-  const acRef = React.useRef<BaseSelectRef>(null);
+  const firstFieldRef = React.useRef<BaseSelectRef>(null);
   const addMore = useLocalObservable<{ value: boolean }>(() => ({
     value: false,
   }));
@@ -139,7 +137,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
             setHasPersonalExp(false);
           }
           setTimeout(() => {
-            acRef.current?.focus();
+            firstFieldRef.current?.focus();
           }, 0);
         }
       }
@@ -152,16 +150,6 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
       form.resetFields(["category"]);
     }
   );
-
-  const categoryValidator = (_: RuleObject, value: string) => {
-    return new Promise<void>((resolve, reject) => {
-      if (!value || categories.getByName(value)) {
-        resolve();
-        return;
-      }
-      reject(new Error("Категория не найдена"));
-    });
-  };
 
   const disabledDate = (date: Moment) => {
     return (
@@ -184,10 +172,8 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
   }, []);
 
   const sourceId = Form.useWatch("source", form);
-  const categoryName = Form.useWatch("category", form);
-  const currentCategory = categoryName
-    ? categories.getByNameIfExists(categoryName)
-    : null;
+  const categoryId = Form.useWatch("category", form);
+  const currentCategory = categoryId ? categories.getById(categoryId) : null;
   const sourceExtra =
     sourceId === null || sourceId === undefined ? null : (
       <SourceLastExpenses sourceId={sourceId} />
@@ -208,7 +194,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
 
   const handleValuesChange = (changedValues: Partial<FormValues>) => {
     if (changedValues.subscription) {
-      const subscription = subscriptionStore.getById(
+      const subscription = subscriptionStore.getJsById(
         changedValues.subscription
       );
       const subscriptionData = availabileSubscriptions.find(
@@ -295,34 +281,27 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
         <Form.Item
           name="category"
           label="Категория"
-          rules={[
-            { required: true, message: "Выберите категорию" },
-            {
-              validator: categoryValidator,
-              validateTrigger: "onSubmit",
-            },
-          ]}
+          rules={[{ required: true, message: "Выберите категорию" }]}
         >
-          <AutoComplete
+          <Select
             options={
               isIncome.value
-                ? categories.incomeAcOptions
-                : categories.expenseAcOptions
+                ? categories.incomeOptions
+                : categories.expenseOptions
             }
-            placeholder="Начните вводить"
-            filterOption
-            ref={acRef}
+            placeholder="Выберите категорию"
+            ref={firstFieldRef}
           />
         </Form.Item>
         {subscriptionOptions.length > 0 && (
-          <Form.Item
-            name="subscription"
-            label="Подписка"
-            getValueFromEvent={(value) => value.value}
-          >
+          <Form.Item name="subscription" label="Подписка">
             <Select
-              options={subscriptionOptions}
-              labelInValue
+              options={[
+                {
+                  label: "Не указана",
+                  value: null,
+                } as Option,
+              ].concat(subscriptionOptions)}
               placeholder="Не указана"
             />
           </Form.Item>

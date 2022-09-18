@@ -342,7 +342,7 @@ class ExpenseStore {
     category?: Category
   ): SubscriptionForPeriod[] {
     const allSubscriptions = category
-      ? subscriptionStore.byCategory[category.name]
+      ? subscriptionStore.byCategory[category.name] || []
       : subscriptionStore.subscriptions;
     let subscriptionsForPeriod = allSubscriptions
       .map((subscription): SubscriptionForPeriod | null => {

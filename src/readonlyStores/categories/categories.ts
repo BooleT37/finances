@@ -26,8 +26,6 @@ class Categories {
   public options: Option[];
   public expenseOptions: Option[];
   public incomeOptions: Option[];
-  public expenseAcOptions: Option[];
-  public incomeAcOptions: Option[];
 
   getAll(): Category[] {
     return this.categories;
@@ -86,12 +84,6 @@ class Categories {
     this.options = this.categories.map((c) => c.asOption);
     this.expenseOptions = this.expenseCategories.map((c) => c.asOption);
     this.incomeOptions = this.incomeCategories.map((c) => c.asOption);
-    this.expenseAcOptions = this.expenseCategories.map(
-      (c) => c.asAutocompleteOption
-    );
-    this.incomeAcOptions = this.incomeCategories.map(
-      (c) => c.asAutocompleteOption
-    );
   }
 }
 

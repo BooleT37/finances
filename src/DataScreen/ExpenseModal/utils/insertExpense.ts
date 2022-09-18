@@ -1,6 +1,5 @@
 import categories from "../../../readonlyStores/categories";
 import sources from "../../../readonlyStores/sources";
-import Currency from "../../../models/Currency";
 import Expense from "../../../models/Expense";
 import expenseStore from "../../../stores/expenseStore";
 import expenseModalStore from "../../expenseModalStore";
@@ -13,7 +12,7 @@ export default function insertExpense(values: ValidatedFormValues): Expense {
     -1,
     parseFloat(values.cost),
     values.date!,
-    categories.getByName(values.category),
+    categories.getById(values.category),
     values.name,
     null,
     values.source !== null ? sources.getById(values.source) : null,
@@ -49,7 +48,7 @@ export default function insertExpense(values: ValidatedFormValues): Expense {
             modifyingPe.date,
             categories.getById(values.personalExpCategoryId),
             generatePersonalExpenseName({
-              category: values.category,
+              category: categories.getById(values.category).name,
               name: values.name,
             }),
             null,
@@ -67,7 +66,7 @@ export default function insertExpense(values: ValidatedFormValues): Expense {
           values.date!,
           categories.getById(values.personalExpCategoryId),
           generatePersonalExpenseName({
-            category: values.category,
+            category: categories.getById(values.category).name,
             name: values.name,
           }),
           null,
@@ -97,7 +96,7 @@ export default function insertExpense(values: ValidatedFormValues): Expense {
         values.date!,
         categories.getById(values.personalExpCategoryId),
         generatePersonalExpenseName({
-          category: values.category,
+          category: categories.getById(values.category).name,
           name: values.name,
         }),
         null,

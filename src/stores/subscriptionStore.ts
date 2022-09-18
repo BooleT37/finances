@@ -1,5 +1,5 @@
 import { groupBy } from "lodash";
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, toJS } from "mobx";
 import moment from "moment";
 import { DATE_SERVER_FORMAT } from "../constants";
 import Category from "../models/Category";
@@ -65,6 +65,10 @@ class SubscriptionStore {
 
   getById(id: number) {
     return this.subscriptionsMap[id];
+  }
+
+  getJsById(id: number) {
+    return toJS(this.getById(id));
   }
 
   getByIdOrThrow(id: number) {

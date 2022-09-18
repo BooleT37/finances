@@ -22,11 +22,4 @@ export default class Category {
       label: this.name,
     };
   }
-
-  get asAutocompleteOption(): Option {
-    return {
-      label: this.name,
-      value: this.name,
-    };
-  }
 }

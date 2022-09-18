@@ -4,5 +4,5 @@ import FormValues from "./FormValues";
 export default interface ValidatedFormValues
   extends Omit<FormValues, "date" | "category"> {
   date: Moment;
-  category: string;
+  category: number;
 }

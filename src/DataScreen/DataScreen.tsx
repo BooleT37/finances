@@ -214,7 +214,7 @@ const DataScreen = observer(function DataScreen() {
             </div>
             <div>
               <Checkbox
-                value={upcSubscriptionsShown}
+                checked={upcSubscriptionsShown}
                 onChange={(e) => setUpcSubscriptionsShown(e.target.checked)}
               >
                 Предстоящие подписки

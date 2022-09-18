@@ -179,7 +179,7 @@ const SubscriptionModal: React.FC<Props> = function SubscriptionModal({
           ]}
         >
           <AutoComplete
-            options={categories.expenseAcOptions}
+            options={categories.expenseOptions}
             placeholder="Начните вводить"
             filterOption
           />
