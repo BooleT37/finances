@@ -8,6 +8,7 @@ import Subscription from "./Subscription";
 export interface CostCol {
   value: number;
   personalExpStr?: string;
+  isSubscription?: boolean;
 }
 
 interface TableData {
@@ -18,6 +19,7 @@ interface TableData {
   category: string;
   categoryId: number;
   categoryShortname: string;
+  isSubscription: boolean;
 }
 
 export default class Expense {
@@ -59,12 +61,14 @@ export default class Expense {
         this.cost || this.cost === 0
           ? {
               value: this.cost,
+              isSubscription: this.subscription !== null,
             }
           : null,
       category: this.category.name,
       date: this.date.format(DATE_FORMAT),
       categoryId: this.category.id,
       categoryShortname: this.category.shortname,
+      isSubscription: this.subscription !== null,
     };
   }
 }

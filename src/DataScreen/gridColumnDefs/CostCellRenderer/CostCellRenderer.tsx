@@ -22,7 +22,11 @@ const CostCellRenderer: React.FC<Props> = ({
   const costString = costToString(col.value);
   if (!isAggCostCol(col) || col.diff === null) {
     return (
-      <CostCellView cost={costString} personalExpStr={col.personalExpStr} />
+      <CostCellView
+        cost={costString}
+        personalExpStr={col.personalExpStr}
+        isSubscription={col.isSubscription}
+      />
     );
   }
   const diffSum = costToString(Math.abs(col.diff));
