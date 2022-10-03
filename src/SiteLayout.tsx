@@ -6,6 +6,7 @@ import {
   CalendarOutlined,
   DollarOutlined,
   SettingOutlined,
+  BankOutlined,
 } from "@ant-design/icons";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
@@ -21,6 +22,7 @@ function getItem(label: React.ReactNode, path: string, icon?: React.ReactNode) {
 
 const items: React.ReactNode[] = [
   getItem("Данные", "/screens/data", <TableOutlined />),
+  getItem("Траты из сбережений", "/screens/saving-spendings", <BankOutlined />),
   getItem("Статистика", "/screens/statistics", <LineChartOutlined />),
   getItem("Планирование", "/screens/planning", <CalendarOutlined />),
   getItem("Подписки", "/screens/subscriptions", <DollarOutlined />),
@@ -35,7 +37,12 @@ const SiteLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
+      <Sider
+        width={210}
+        collapsible
+        collapsed={collapsed}
+        onCollapse={setCollapsed}
+      >
         <div className="logo" />
         <Menu
           selectedKeys={[location.pathname]}

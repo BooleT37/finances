@@ -20,6 +20,7 @@ import "antd/dist/antd.min.css";
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 import "ag-grid-enterprise";
+import SavingSpendingsScreen from "./SavingSpendingsScreen";
 
 const container: HTMLElement | null = document.getElementById("root");
 ReactDOM.render(
@@ -31,6 +32,10 @@ ReactDOM.render(
             <Routes>
               <Route index element={<Navigate replace to="/screens/data" />} />
               <Route path="screens/data" element={<DataScreen />} />
+              <Route
+                path="/screens/saving-spendings"
+                element={<SavingSpendingsScreen />}
+              />
               <Route path="screens/statistics" element={<StatisticsScreen />} />
               <Route path="screens/planning" element={<PlanningScreen />} />
               <Route path="screens/settings" element={<SettingsScreen />} />
