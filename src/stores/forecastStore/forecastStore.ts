@@ -16,14 +16,8 @@ import {
   PE_SUM_LS_KEY,
 } from "../../constants";
 import subscriptionStore from "../subscriptionStore";
-
-interface ForecastJson {
-  category_id: number;
-  month: number;
-  year: number;
-  sum: number;
-  comment?: string;
-}
+import { api } from "../../api";
+import { ForecastJson } from "../../api/forecastApi";
 
 class ForecastStore {
   public forecasts = observable.array<Forecast>();
@@ -240,29 +234,17 @@ class ForecastStore {
     );
     if (forecast) {
       forecast.sum = sum;
-      return fetch(
-        `${process.env.REACT_APP_API_URL}/forecast?category_id=${category.id}&month=${month}&year=${year}`,
-        {
-          method: "PATCH",
-          body: JSON.stringify({ sum }),
-          headers: {
-            "content-type": "application/json",
-          },
-        }
+      return api.forecast.modify(
+        { sum },
+        { category_id: category.id, month, year }
       );
     } else {
       this.forecasts.push(new Forecast(category, month, year, sum, ""));
-      return fetch(`${process.env.REACT_APP_API_URL}/forecast`, {
-        method: "POST",
-        body: JSON.stringify({
-          category_id: category.id,
-          month,
-          year,
-          sum,
-        }),
-        headers: {
-          "content-type": "application/json",
-        },
+      return api.forecast.create({
+        category_id: category.id,
+        month,
+        year,
+        sum,
       });
     }
   }
@@ -279,30 +261,18 @@ class ForecastStore {
     );
     if (forecast) {
       forecast.comment = comment;
-      return fetch(
-        `${process.env.REACT_APP_API_URL}/forecast?category_id=${category.id}&month=${month}&year=${year}`,
-        {
-          method: "PATCH",
-          body: JSON.stringify({ comment }),
-          headers: {
-            "content-type": "application/json",
-          },
-        }
+      return api.forecast.modify(
+        { comment },
+        { category_id: category.id, month, year }
       );
     } else {
       this.forecasts.push(new Forecast(category, month, year, 0, comment));
-      return fetch(`${process.env.REACT_APP_API_URL}/forecast`, {
-        method: "POST",
-        body: JSON.stringify({
-          category_id: category.id,
-          month,
-          year,
-          sum: 0,
-          comment,
-        }),
-        headers: {
-          "content-type": "application/json",
-        },
+      return api.forecast.create({
+        category_id: category.id,
+        month,
+        year,
+        sum: 0,
+        comment,
       });
     }
   }

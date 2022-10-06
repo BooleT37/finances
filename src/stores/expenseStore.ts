@@ -19,18 +19,8 @@ import { DynamicsDataMonth } from "../StatisticsScreen/DynamicsChart/models/dyna
 import Category from "../models/Category";
 import Subscription from "../models/Subscription";
 import subscriptionStore from "./subscriptionStore";
-
-interface ExpenseJson {
-  id: number;
-  name?: string;
-  cost: number | null;
-  currency: Currency;
-  date: string;
-  category_id: number;
-  personal_expense_id: number | null;
-  source_id: number | null;
-  subscription_id: number | null;
-}
+import { api } from "../api";
+import { ExpenseJson } from "../api/expenseApi";
 
 interface SubscriptionForPeriod {
   subscription: Subscription;
@@ -92,22 +82,16 @@ class ExpenseStore {
   *add(expense: Expense): Generator<Promise<Response>> {
     expense.id = this.nextId();
     this.expenses.push(expense);
-    yield fetch(`${process.env.REACT_APP_API_URL}/expense`, {
-      method: "POST",
-      body: JSON.stringify({
-        id: expense.id,
-        name: expense.name,
-        cost: expense.cost,
-        currency: Currency.Eur,
-        date: expense.date.format(DATE_SERVER_FORMAT),
-        category_id: expense.category.id,
-        personal_expense_id: expense.personalExpense?.id ?? null,
-        source_id: expense.source?.id ?? null,
-        subscription_id: expense.subscription?.id ?? null,
-      }),
-      headers: {
-        "content-type": "application/json",
-      },
+    yield api.expense.add({
+      id: expense.id,
+      name: expense.name,
+      cost: expense.cost,
+      currency: Currency.Eur,
+      date: expense.date.format(DATE_SERVER_FORMAT),
+      category_id: expense.category.id,
+      personal_expense_id: expense.personalExpense?.id ?? null,
+      source_id: expense.source?.id ?? null,
+      subscription_id: expense.subscription?.id ?? null,
     });
   }
 
@@ -115,9 +99,8 @@ class ExpenseStore {
     const foundIndex = this.expenses.findIndex((e) => e.id === expense.id);
     if (foundIndex !== -1) {
       this.expenses[foundIndex] = expense;
-      yield fetch(`${process.env.REACT_APP_API_URL}/expense`, {
-        method: "PUT",
-        body: JSON.stringify({
+      yield api.expense
+        .modify({
           id: expense.id,
           name: expense.name,
           cost: expense.cost,
@@ -127,14 +110,11 @@ class ExpenseStore {
           personal_expense_id: expense.personalExpense?.id ?? null,
           source_id: expense.source?.id ?? null,
           subscription_id: expense.subscription?.id ?? null,
-        }),
-        headers: {
-          "content-type": "application/json",
-        },
-      }).then((res) => {
-        then?.();
-        return res;
-      });
+        })
+        .then((res) => {
+          then?.();
+          return res;
+        });
     } else {
       throw new Error(`Can't find expense with id ${expense.id}`);
     }
@@ -147,9 +127,7 @@ class ExpenseStore {
     }
     const personalExpenseId = this.expenses[foundIndex].personalExpense?.id;
     this.expenses.splice(foundIndex, 1);
-    yield fetch(`${process.env.REACT_APP_API_URL}/expense?id=${id}`, {
-      method: "DELETE",
-    });
+    yield api.expense.delete(id);
     if (personalExpenseId) {
       this.delete(personalExpenseId);
     }

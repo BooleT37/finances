@@ -1,6 +1,8 @@
 import { groupBy } from "lodash";
 import { makeAutoObservable, toJS } from "mobx";
 import moment from "moment";
+import { api } from "../api";
+import { SubscriptionJson } from "../api/subscriptionApi";
 import { DATE_SERVER_FORMAT } from "../constants";
 import Category from "../models/Category";
 import Currency from "../models/Currency";
@@ -8,17 +10,6 @@ import Subscription, { SubscriptionFormValues } from "../models/Subscription";
 import categories from "../readonlyStores/categories";
 import sources from "../readonlyStores/sources";
 import { SubscriptionsItem } from "./forecastStore/types";
-
-interface SubscriptionJson {
-  id: number;
-  name: string;
-  cost: number;
-  currency: Currency;
-  category_id: number;
-  period: number;
-  first_date: string;
-  source_id: number | null;
-}
 
 const subscriptionToItem = (subscription: Subscription): SubscriptionsItem => ({
   cost: subscription.cost,
@@ -97,7 +88,7 @@ class SubscriptionStore {
 
   async add(subscription: Subscription): Promise<void> {
     this.subscriptions.push(subscription);
-    const body: Omit<SubscriptionJson, "id"> = {
+    const { id } = await api.subscription.add({
       name: subscription.name,
       cost: subscription.cost,
       currency: Currency.Eur,
@@ -105,18 +96,7 @@ class SubscriptionStore {
       period: subscription.period,
       first_date: subscription.firstDate.format(DATE_SERVER_FORMAT),
       source_id: subscription.source?.id ?? null,
-    };
-    const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/subscription`,
-      {
-        method: "POST",
-        body: JSON.stringify(body),
-        headers: {
-          "content-type": "application/json",
-        },
-      }
-    );
-    const { id } = await response.json();
+    });
     subscription.id = id;
   }
 
@@ -126,7 +106,7 @@ class SubscriptionStore {
     );
     if (foundIndex !== -1) {
       this.subscriptions[foundIndex] = subscription;
-      const body: SubscriptionJson = {
+      yield api.subscription.modify({
         id: subscription.id,
         name: subscription.name,
         cost: subscription.cost,
@@ -135,13 +115,6 @@ class SubscriptionStore {
         period: subscription.period,
         first_date: subscription.firstDate.format(DATE_SERVER_FORMAT),
         source_id: subscription.source?.id ?? null,
-      };
-      yield fetch(`${process.env.REACT_APP_API_URL}/subscription`, {
-        method: "PUT",
-        body: JSON.stringify(body),
-        headers: {
-          "content-type": "application/json",
-        },
       });
     } else {
       throw new Error(`Can't find subscription with id ${subscription.id}`);
@@ -154,9 +127,7 @@ class SubscriptionStore {
       return;
     }
     this.subscriptions.splice(foundIndex, 1);
-    yield fetch(`${process.env.REACT_APP_API_URL}/subscription?id=${id}`, {
-      method: "DELETE",
-    });
+    yield api.subscription.delete(id);
   }
 
   getSubscriptionsForForecast(

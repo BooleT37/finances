@@ -1,3 +1,4 @@
+import { CategoryJson } from "../../api/categoryApi";
 import Category from "../../models/Category";
 import type { Option } from "../../types";
 import {
@@ -5,14 +6,6 @@ import {
   sortExpenseCategories,
   sortIncomeCategories,
 } from "./categoriesOrder";
-
-interface CategoryJson {
-  id: number;
-  name: string;
-  is_income: boolean;
-  is_continuous: boolean;
-  shortname: string;
-}
 
 // The categories are NOT mutable!
 // Having it like this makes using them much more easy
