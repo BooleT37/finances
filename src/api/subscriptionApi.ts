@@ -1,6 +1,7 @@
 import Currency from "../models/Currency";
 import {
   createApiEndpoint,
+  createApiEndpointWithResponse,
   createDeleteApiEndpoint,
   createGetApiEndpoint,
 } from "./createApiEndpoint";
@@ -20,13 +21,11 @@ type AddSubscriptionRequest = Omit<SubscriptionJson, "id">;
 
 export const subscriptionApi = {
   getAll: createGetApiEndpoint<SubscriptionJson[]>("subscription"),
-  add: createApiEndpoint<AddSubscriptionRequest, never, { id: number }>(
-    "subscription",
-    "POST"
-  ),
-  modify: createApiEndpoint<SubscriptionJson, never, never>(
-    "subscription",
-    "PUT"
-  ),
+  add: createApiEndpointWithResponse<
+    AddSubscriptionRequest,
+    never,
+    { id: number }
+  >("subscription", "POST"),
+  modify: createApiEndpoint<SubscriptionJson, never>("subscription", "PUT"),
   delete: createDeleteApiEndpoint("subscription"),
 };

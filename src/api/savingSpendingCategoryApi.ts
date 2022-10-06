@@ -1,5 +1,6 @@
 import {
   createApiEndpoint,
+  createApiEndpointWithResponse,
   createDeleteApiEndpoint,
   createGetApiEndpoint,
 } from "./createApiEndpoint";
@@ -18,12 +19,12 @@ export const savingSpendingCategoryApi = {
   getAll: createGetApiEndpoint<SavingSpendingCategoryJson[]>(
     "saving-spending-category"
   ),
-  add: createApiEndpoint<
+  add: createApiEndpointWithResponse<
     AddSavingSpendingCategoryRequest,
     never,
     { id: number }
   >("saving-spending-category", "POST"),
-  modify: createApiEndpoint<SavingSpendingCategoryJson, never, never>(
+  modify: createApiEndpoint<SavingSpendingCategoryJson, never>(
     "saving-spending-category",
     "PUT"
   ),

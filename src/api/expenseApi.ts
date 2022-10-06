@@ -20,6 +20,6 @@ export interface ExpenseJson {
 export const expenseApi = {
   delete: createDeleteApiEndpoint("expense"),
   getAll: createGetApiEndpoint<ExpenseJson[]>("expense"),
-  add: createApiEndpoint<ExpenseJson, never, never>("expense", "POST"),
-  modify: createApiEndpoint<ExpenseJson, never, never>("expense", "PUT"),
+  add: createApiEndpoint<ExpenseJson, never>("expense", "POST"),
+  modify: createApiEndpoint<ExpenseJson, never>("expense", "PUT"),
 };

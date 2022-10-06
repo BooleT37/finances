@@ -1,5 +1,6 @@
 import {
   createApiEndpoint,
+  createApiEndpointWithResponse,
   createDeleteApiEndpoint,
   createGetApiEndpoint,
 } from "./createApiEndpoint";
@@ -15,13 +16,11 @@ interface AddSavingSpendingRequest {
 
 export const savingSpendingApi = {
   getAll: createGetApiEndpoint<SavingSpendingJson[]>("saving-spending"),
-  add: createApiEndpoint<AddSavingSpendingRequest, never, { id: number }>(
-    "saving-spending",
-    "POST"
-  ),
-  edit: createApiEndpoint<SavingSpendingJson, never, never>(
-    "saving-spending",
-    "PUT"
-  ),
+  add: createApiEndpointWithResponse<
+    AddSavingSpendingRequest,
+    never,
+    { id: number }
+  >("saving-spending", "POST"),
+  edit: createApiEndpoint<SavingSpendingJson, never>("saving-spending", "PUT"),
   delete: createDeleteApiEndpoint("saving-spending"),
 };

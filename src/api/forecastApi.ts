@@ -21,9 +21,9 @@ interface ModifyForecastQuery {
 
 export const forecastApi = {
   getAll: createGetApiEndpoint<ForecastJson[]>("forecast"),
-  modify: createApiEndpoint<ModifyForecastRequest, ModifyForecastQuery, never>(
+  modify: createApiEndpoint<ModifyForecastRequest, ModifyForecastQuery>(
     "forecast",
     "PATCH"
   ),
-  create: createApiEndpoint<ForecastJson, never, never>("forecast", "POST"),
+  create: createApiEndpoint<ForecastJson, never>("forecast", "POST"),
 };

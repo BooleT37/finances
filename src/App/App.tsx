@@ -5,7 +5,7 @@ import categoriesManager from "../readonlyStores/categories";
 import sourcesManager from "../readonlyStores/sources";
 import expenseStore from "../stores/expenseStore";
 import forecastStore from "../stores/forecastStore/forecastStore";
-import savingsSpendingStore from "../stores/savingsSpendingStore";
+import savingsSpendingStore from "../stores/savingSpendingStore";
 import subscriptionStore from "../stores/subscriptionStore";
 
 // eslint-disable-next-line mobx/missing-observer

@@ -1,26 +1,26 @@
+import { groupBy, sum } from "lodash";
 import { makeAutoObservable, toJS } from "mobx";
 import moment, { Moment } from "moment";
-import Currency from "../models/Currency";
-import Expense, { TableData } from "../models/Expense";
-import { countUniqueMonths, roundCost } from "../utils";
-import categories from "../readonlyStores/categories";
-import { ComparisonData } from "../StatisticsScreen/ComparisonChart/models";
-import { PersonalExpCategoryIds } from "../utils/constants";
-import costToString from "../utils/costToString";
-import sources from "../readonlyStores/sources";
+import { api } from "../api";
+import { ExpenseJson } from "../api/expenseApi";
 import {
   DATE_FORMAT,
   DATE_SERVER_FORMAT,
   MONTH_DATE_FORMAT,
 } from "../constants";
-import { groupBy, sum } from "lodash";
+import Category from "../models/Category";
+import Currency from "../models/Currency";
+import Expense, { TableData } from "../models/Expense";
+import Subscription from "../models/Subscription";
+import categories from "../readonlyStores/categories";
+import sources from "../readonlyStores/sources";
+import { ComparisonData } from "../StatisticsScreen/ComparisonChart/models";
 import { DynamicsData } from "../StatisticsScreen/DynamicsChart/models";
 import { DynamicsDataMonth } from "../StatisticsScreen/DynamicsChart/models/dynamicsData";
-import Category from "../models/Category";
-import Subscription from "../models/Subscription";
+import { countUniqueMonths, roundCost } from "../utils";
+import { PersonalExpCategoryIds } from "../utils/constants";
+import costToString from "../utils/costToString";
 import subscriptionStore from "./subscriptionStore";
-import { api } from "../api";
-import { ExpenseJson } from "../api/expenseApi";
 
 interface SubscriptionForPeriod {
   subscription: Subscription;

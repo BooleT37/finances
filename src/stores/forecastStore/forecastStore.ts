@@ -1,23 +1,22 @@
+import { default as lodashSum, default as sum } from "lodash/sum";
 import { makeAutoObservable, observable } from "mobx";
-import lodashSum from "lodash/sum";
-import Forecast from "../../models/Forecast";
-import categories from "../../readonlyStores/categories";
-import expenseStore from "../expenseStore";
 import { computedFn } from "mobx-utils";
-import Category from "../../models/Category";
-import { getPreviousMonth, avgForNonEmpty } from "./utils";
-import { countUniqueMonths, roundCost } from "../../utils";
-import { PersonalExpCategoryIds } from "../../utils/constants";
-import sum from "lodash/sum";
-import { ForecastTableItem } from "./types";
+import { api } from "../../api";
+import { ForecastJson } from "../../api/forecastApi";
 import {
   MONTH_DATE_FORMAT,
   PE_SUM_DEFAULT,
   PE_SUM_LS_KEY,
 } from "../../constants";
+import Category from "../../models/Category";
+import Forecast from "../../models/Forecast";
+import categories from "../../readonlyStores/categories";
+import { countUniqueMonths, roundCost } from "../../utils";
+import { PersonalExpCategoryIds } from "../../utils/constants";
+import expenseStore from "../expenseStore";
 import subscriptionStore from "../subscriptionStore";
-import { api } from "../../api";
-import { ForecastJson } from "../../api/forecastApi";
+import { ForecastTableItem } from "./types";
+import { avgForNonEmpty, getPreviousMonth } from "./utils";
 
 class ForecastStore {
   public forecasts = observable.array<Forecast>();
