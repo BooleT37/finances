@@ -19,7 +19,7 @@ function getItem(
   icon?: React.ReactNode
 ): ItemType {
   return {
-    key: label,
+    key: path,
     icon,
     label: <Link to={path}>{label}</Link>,
   };
