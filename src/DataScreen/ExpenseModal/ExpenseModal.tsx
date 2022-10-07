@@ -75,7 +75,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
   const [form] = Form.useForm<FormValues>();
   const firstFieldRef = React.useRef<BaseSelectRef>(null);
   const addMore = useLocalObservable<{ value: boolean }>(() => ({
-    value: false,
+    value: true,
   }));
   const isIncome = useLocalObservable<{ value: boolean }>(() => ({
     value: false,
