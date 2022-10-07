@@ -1,26 +1,33 @@
-import {Divider, Form, FormInstance, Input, Select} from "antd";
-import {PersonalExpCategoryIds} from "../../utils/constants";
+import { Divider, Form, FormInstance, Input, Select } from "antd";
+import { observer } from "mobx-react";
 import React from "react";
-import forecastStore from "../../stores/forecastStore";
 import categories from "../../readonlyStores/categories";
-import {observer} from "mobx-react";
-import {FormValues} from "./models";
+import forecastStore from "../../stores/forecastStore";
+import { PersonalExpCategoryIds } from "../../utils/constants";
+import { FormValues } from "./models";
 
-const {Option} = Select;
+const { Option } = Select;
 
 interface Props {
-  form: FormInstance<FormValues>
+  form: FormInstance<FormValues>;
 }
 
-const PersonalExpenses: React.FC<Props> = observer(function PersonalExpenses({form}) {
-  const spent = Form.useWatch('personalExpSpent', form);
-  const categoryId = Form.useWatch('personalExpCategoryId', form);
-  const date = Form.useWatch('date', form);
-  const forecastSum = date && categoryId !== null
-    ? forecastStore.find(date.year(), date.month(), categories.getById(categoryId))?.sum
-    : undefined
-  const extra = forecastSum ? `Макс: ${forecastSum}` : null
-  const exceeds = (forecastSum !== undefined) && (parseFloat(spent) > forecastSum)
+const PersonalExpenses: React.FC<Props> = observer(function PersonalExpenses({
+  form,
+}) {
+  const spent = Form.useWatch("personalExpSpent", form);
+  const categoryId = Form.useWatch("personalExpCategoryId", form);
+  const date = Form.useWatch("date", form);
+  const forecastSum =
+    date && categoryId !== null
+      ? forecastStore.find(
+          date.year(),
+          date.month(),
+          categories.getById(categoryId)
+        )?.sum
+      : undefined;
+  const extra = forecastSum !== undefined ? `Макс: ${forecastSum}` : null;
+  const exceeds = forecastSum !== undefined && parseFloat(spent) > forecastSum;
 
   return (
     <>
@@ -30,12 +37,16 @@ const PersonalExpenses: React.FC<Props> = observer(function PersonalExpenses({fo
           <Option value={PersonalExpCategoryIds.Lena}>Лена</Option>
         </Select>
       </Form.Item>
-      <Form.Item name="personalExpSpent" label="Сумма личных денег" extra={extra}>
-        <Input status={exceeds ? 'warning' : ''}/>
+      <Form.Item
+        name="personalExpSpent"
+        label="Сумма личных денег"
+        extra={extra}
+      >
+        <Input status={exceeds ? "warning" : ""} />
       </Form.Item>
-      <Divider/>
+      <Divider />
     </>
-  )
-})
+  );
+});
 
-export default PersonalExpenses
+export default PersonalExpenses;

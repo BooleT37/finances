@@ -49,7 +49,30 @@
     ],
     "rules": {
       "mobx/exhaustive-make-observable": "off"
-    }
+    },
+    "overrides": [
+      {
+        "files": [
+          "**/*.ts?(x)"
+        ],
+        "rules": {
+          "@typescript-eslint/strict-boolean-expressions": [
+            "warn",
+            {
+              "allowString": true,
+              "allowNullableString": true,
+              "allowAny": true,
+              "allowNullableBoolean": true
+            }
+          ]
+        },
+        "parserOptions": {
+          "project": [
+            "./tsconfig.json"
+          ]
+        }
+      }
+    ]
   },
   "browserslist": {
     "production": [

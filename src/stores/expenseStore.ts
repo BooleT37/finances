@@ -60,7 +60,7 @@ class ExpenseStore {
       .map((ex) => {
         const tableData = ex.asTableData;
         const pe = ex.personalExpense;
-        if (tableData.cost && pe && pe.cost) {
+        if (tableData.cost && pe && pe.cost !== null) {
           const cost = costToString(pe.cost);
           const author =
             pe.category.id === PersonalExpCategoryIds.Alexey ? "А" : "Л";
@@ -135,14 +135,14 @@ class ExpenseStore {
     const personalExpenseId = this.expenses[foundIndex].personalExpense?.id;
     this.expenses.splice(foundIndex, 1);
     yield api.expense.delete(id);
-    if (personalExpenseId) {
+    if (personalExpenseId !== undefined) {
       this.delete(personalExpenseId);
     }
   }
 
   fillPersonalExpenses(json: ExpenseJson[]) {
     json.forEach((eJson) => {
-      if (eJson.personal_expense_id) {
+      if (eJson.personal_expense_id !== null) {
         const expense = this.getById(eJson.id);
         if (expense) {
           expense.personalExpense =
@@ -205,8 +205,8 @@ class ExpenseStore {
     const map: Record<string, { from: number; to: number }> = {};
     expensesFrom.forEach((e) => {
       const categoryId = String(e.category.id);
-      if (e.cost) {
-        if (map[categoryId] && e.cost) {
+      if (e.cost !== null) {
+        if (map[categoryId] !== undefined) {
           map[categoryId].from += e.cost;
         } else {
           map[categoryId] = { from: e.cost, to: 0 };
@@ -215,8 +215,8 @@ class ExpenseStore {
     });
     expensesTo.forEach((e) => {
       const categoryId = String(e.category.id);
-      if (e.cost) {
-        if (map[categoryId] && e.cost) {
+      if (e.cost !== null) {
+        if (map[categoryId] !== undefined) {
           map[categoryId].to += e.cost;
         } else {
           map[categoryId] = { from: 0, to: e.cost };
@@ -250,11 +250,11 @@ class ExpenseStore {
       );
     }
     filteredExpensed.forEach((e) => {
-      if (!e.cost) {
+      if (e.cost === null) {
         return;
       }
       const month = e.date.format(MONTH_DATE_FORMAT);
-      if (dict[month]) {
+      if (dict[month] !== undefined) {
         if (dict[month][e.category.id]) {
           dict[month][e.category.id] += e.cost;
         } else {
@@ -271,7 +271,7 @@ class ExpenseStore {
     const interim = from.clone();
     while (to > interim || interim.format("M") === to.format("M")) {
       const month = interim.format(MONTH_DATE_FORMAT);
-      if (!dict[month]) {
+      if (dict[month] !== undefined) {
         dict[month] = {
           date: interim.clone(),
         } as MonthEntry;
@@ -334,7 +334,7 @@ class ExpenseStore {
             expense.category.isPersonal === isPersonal &&
             !expense.category.isSavingSpending
         )
-        .map((expense) => expense.cost || 0)
+        .map((expense) => expense.cost ?? 0)
     );
   }
 
@@ -344,7 +344,7 @@ class ExpenseStore {
     category?: Category
   ): SubscriptionForPeriod[] {
     const allSubscriptions = category
-      ? subscriptionStore.byCategory[category.name] || []
+      ? subscriptionStore.byCategory[category.name] ?? []
       : subscriptionStore.subscriptions;
     let subscriptionsForPeriod = allSubscriptions
       .map((subscription): SubscriptionForPeriod | null => {

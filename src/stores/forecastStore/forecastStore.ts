@@ -112,9 +112,9 @@ class ForecastStore {
                 .reduce<Record<string, number>>((a, c) => {
                   const month = c.date.format(MONTH_DATE_FORMAT);
                   if (a[month]) {
-                    a[month] += c.cost || 0;
+                    a[month] += c.cost ?? 0;
                   } else {
-                    a[month] = c.cost || 0;
+                    a[month] = c.cost ?? 0;
                   }
                   return a;
                 }, {})

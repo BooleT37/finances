@@ -66,7 +66,7 @@ const DataScreen = observer(function DataScreen() {
 
   const handleRangeChange = (
     _dates: [Moment | null, Moment | null] | null,
-    dateStrings: [string, string]
+    dateStrings: [string, string] | null
   ) => {
     setRangeStart(
       dateStrings && dateStrings[0] ? moment(dateStrings[0], DATE_FORMAT) : null

@@ -19,14 +19,15 @@ export default function insertExpense(values: ValidatedFormValues): Expense {
     values.subscription === null
       ? null
       : subscriptionStore.getById(values.subscription),
-    values.savingSpendingCategoryId === null
+    values.savingSpendingCategoryId === null ||
+    values.savingSpendingCategoryId === undefined
       ? null
       : expenseStore.getSavingSpendingByCategoryId(
           values.savingSpendingCategoryId
         )
   );
   // if we are editing the expense
-  if (expenseModalStore.expenseId) {
+  if (expenseModalStore.expenseId !== null) {
     newExpense.id = expenseModalStore.expenseId;
     const modifyingExpense = expenseStore.getById(expenseModalStore.expenseId);
     if (!modifyingExpense) {
@@ -45,7 +46,7 @@ export default function insertExpense(values: ValidatedFormValues): Expense {
           modifyingPe.cost?.toString() === values.personalExpSpent
         ) {
           newExpense.personalExpense = modifyingPe;
-          newExpense.cost = (newExpense.cost || 0) - (modifyingPe.cost || 0);
+          newExpense.cost = (newExpense.cost ?? 0) - (modifyingPe.cost ?? 0);
         } else {
           const personalExpense = new Expense(
             modifyingPe.id,
@@ -62,7 +63,7 @@ export default function insertExpense(values: ValidatedFormValues): Expense {
           expenseStore.modify(personalExpense);
           newExpense.personalExpense = personalExpense;
           newExpense.cost =
-            (newExpense.cost || 0) - (personalExpense.cost || 0);
+            (newExpense.cost ?? 0) - (personalExpense.cost ?? 0);
         }
       } else {
         const personalExpense = new Expense(
@@ -79,7 +80,7 @@ export default function insertExpense(values: ValidatedFormValues): Expense {
         );
         expenseStore.add(personalExpense);
         newExpense.personalExpense = personalExpense;
-        newExpense.cost = (newExpense.cost || 0) - (personalExpense.cost || 0);
+        newExpense.cost = (newExpense.cost ?? 0) - (personalExpense.cost ?? 0);
       }
       expenseStore.modify(newExpense);
     } else {
@@ -108,7 +109,7 @@ export default function insertExpense(values: ValidatedFormValues): Expense {
         null
       );
       expenseStore.add(personalExpense);
-      newExpense.cost = (newExpense.cost || 0) - (personalExpense.cost || 0);
+      newExpense.cost = (newExpense.cost ?? 0) - (personalExpense.cost ?? 0);
       newExpense.personalExpense = personalExpense;
     }
     expenseStore.add(newExpense);

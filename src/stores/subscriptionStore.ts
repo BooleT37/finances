@@ -65,7 +65,7 @@ class SubscriptionStore {
   getByIdOrThrow(id: number) {
     const found = this.subscriptionsMap[id];
 
-    if (!found) {
+    if (found === undefined) {
       throw new Error(`Can't find subscription by id ${id}`);
     }
 
@@ -75,7 +75,7 @@ class SubscriptionStore {
   getFormValuesByIdOrThrow(id: number) {
     const found = this.formValuesMap[id];
 
-    if (!found) {
+    if (found === undefined) {
       throw new Error(`Can't find subscription by id ${id}`);
     }
 

@@ -1,10 +1,10 @@
-import React from 'react'
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
 
-const DiffNode = styled('span') <{ color: string }>`
+const DiffNode = styled("span")<{ color: string }>`
   font-size: 12px;
-  color: ${props => props.color}
-`
+  color: ${(props) => props.color};
+`;
 
 const BarContainer = styled.div`
   position: relative;
@@ -12,19 +12,20 @@ const BarContainer = styled.div`
   border: 1px solid gray;
   height: 4px;
   width: 60px;
-`
+`;
 
-const Bar = styled("div") <{ color: string, width: number, offset?: number }>`
+const Bar = styled("div")<{ color: string; width: number; offset?: number }>`
   height: 2px;
-  background-color: ${props => props.color};
-  width: ${props => props.width * 100}%;
-  margin-left: ${props => props.offset ? `${props.offset * 100}%` : 0}
-`
+  background-color: ${(props) => props.color};
+  width: ${(props) => props.width * 100}%;
+  margin-left: ${(props) =>
+    props.offset !== undefined ? `${props.offset * 100}%` : 0};
+`;
 
 interface Props {
   cost: string;
   suffix: string;
-  color: 'red' | 'orange' | 'green';
+  color: "red" | "orange" | "green";
   barWidth: number;
   title?: string;
   barOffset?: number;
@@ -41,14 +42,10 @@ const CostGroupCellView: React.FC<Props> = (props) => {
         <DiffNode color={color}>{suffix}</DiffNode>
       </div>
       <BarContainer>
-        <Bar
-          color={color}
-          width={barWidth}
-          offset={barOffset}
-        />
+        <Bar color={color} width={barWidth} offset={barOffset} />
       </BarContainer>
     </div>
   );
-}
+};
 
-export default CostGroupCellView
+export default CostGroupCellView;

@@ -82,7 +82,7 @@ export default class Expense {
       id: this.id,
       name: this.tableDataName,
       cost:
-        this.cost || this.cost === 0
+        this.cost !== null
           ? {
               value: this.cost,
               isSubscription: this.subscription !== null,

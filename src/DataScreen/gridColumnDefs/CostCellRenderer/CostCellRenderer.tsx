@@ -3,11 +3,11 @@ import { CostCol } from "../../../models/Expense";
 import { costToString, roundCost } from "../../../utils";
 import { AggCostCol } from "../../models";
 import { isAggCostCol } from "../utils";
-import CostGroupCellView from "./CostGroupCellView";
 import CostCellView from "./CostCellView";
+import CostGroupCellView from "./CostGroupCellView";
 
 interface Props {
-  value: CostCol | AggCostCol;
+  value: CostCol | AggCostCol | undefined;
   context: { passedDaysRatio: number };
 }
 

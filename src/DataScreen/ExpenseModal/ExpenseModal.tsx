@@ -35,7 +35,7 @@ import { insertExpense } from "./utils";
 function expenseToFormValues(expense: Expense): FormValues {
   return {
     cost: expense.personalExpense
-      ? String((expense.personalExpense.cost || 0) + (expense.cost || 0))
+      ? String((expense.personalExpense.cost ?? 0) + (expense.cost ?? 0))
       : String(expense.cost),
     category: expense.category.id || null,
     name: expense.name || "",
@@ -190,7 +190,8 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
   const categoryId: number | null = Form.useWatch("category", form) ?? null;
   const savingSpendingId: number | null =
     Form.useWatch("savingSpendingId", form) ?? null;
-  const currentCategory = categoryId ? categories.getById(categoryId) : null;
+  const currentCategory =
+    categoryId !== null ? categories.getById(categoryId) : null;
   const sourceExtra =
     sourceId === null ? null : <SourceLastExpenses sourceId={sourceId} />;
 
@@ -215,7 +216,10 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
   }));
 
   const handleValuesChange = (changedValues: Partial<FormValues>) => {
-    if (changedValues.subscription) {
+    if (
+      changedValues.subscription !== null &&
+      changedValues.subscription !== undefined
+    ) {
       const subscription = subscriptionStore.getJsById(
         changedValues.subscription
       );

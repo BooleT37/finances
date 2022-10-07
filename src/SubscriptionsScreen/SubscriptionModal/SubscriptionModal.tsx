@@ -1,23 +1,22 @@
 import {
+  AutoComplete,
   Button,
+  DatePicker,
   Form,
   Input,
+  InputRef,
   Modal,
   Select,
-  AutoComplete,
-  DatePicker,
-  InputRef,
 } from "antd";
 import { RuleObject } from "antd/lib/form";
-import moment from "moment";
-import { Moment } from "moment";
+import moment, { Moment } from "moment";
 import React from "react";
-import categories from "../../readonlyStores/categories";
-import sources from "../../readonlyStores/sources";
+import { DATE_FORMAT } from "../../constants";
 import Subscription, {
   SubscriptionFormValues as FormValues,
 } from "../../models/Subscription";
-import { DATE_FORMAT } from "../../constants";
+import categories from "../../readonlyStores/categories";
+import sources from "../../readonlyStores/sources";
 import subscriptionStore from "../../stores/subscriptionStore";
 
 const NEW_SUBSCRIPTION_ID = -1;
@@ -32,7 +31,7 @@ function formValuesToSubscription(
   values: ValidatedFormValues
 ): Subscription {
   return new Subscription(
-    id || NEW_SUBSCRIPTION_ID,
+    id ?? NEW_SUBSCRIPTION_ID,
     values.name,
     parseFloat(values.cost),
     categories.getByName(values.category),
@@ -106,7 +105,9 @@ const SubscriptionModal: React.FC<Props> = function SubscriptionModal({
 
   const categoryValidator = (_: RuleObject, value: string) => {
     return new Promise<void>((resolve, reject) => {
-      if (!value || categories.getByName(value)) {
+      if (!value) {
+        // TODO simplify category validation now that it's select
+        categories.getByName(value);
         resolve();
         return;
       }

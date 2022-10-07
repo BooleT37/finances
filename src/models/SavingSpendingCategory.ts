@@ -36,7 +36,7 @@ export default class SavingSpendingCategory {
         .filter(
           (e) => e.savingSpending && e.savingSpending.category.id === this.id
         )
-        .map((e) => e.cost || 0)
+        .map((e) => e.cost ?? 0)
     );
   }
 

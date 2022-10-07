@@ -7,7 +7,7 @@ export default function countUniqueMonths(dates: Moment[]): number {
   dates.forEach((date) => {
     const year = date.year();
     const month = date.month();
-    if (!map[year]) {
+    if (map[year] === undefined) {
       map[year] = new Set<number>([month]);
     } else {
       map[year].add(month);
