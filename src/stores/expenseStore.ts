@@ -20,6 +20,7 @@ import { DynamicsDataMonth } from "../StatisticsScreen/DynamicsChart/models/dyna
 import { countUniqueMonths, roundCost } from "../utils";
 import { PersonalExpCategoryIds } from "../utils/constants";
 import costToString from "../utils/costToString";
+import savingSpendingStore from "./savingSpendingStore";
 import subscriptionStore from "./subscriptionStore";
 
 interface SubscriptionForPeriod {
@@ -92,6 +93,9 @@ class ExpenseStore {
       personal_expense_id: expense.personalExpense?.id ?? null,
       source_id: expense.source?.id ?? null,
       subscription_id: expense.subscription?.id ?? null,
+      saving_spending_category_id: expense.savingSpending
+        ? expense.savingSpending.category.id
+        : null,
     });
   }
 
@@ -110,6 +114,9 @@ class ExpenseStore {
           personal_expense_id: expense.personalExpense?.id ?? null,
           source_id: expense.source?.id ?? null,
           subscription_id: expense.subscription?.id ?? null,
+          saving_spending_category_id: expense.savingSpending
+            ? expense.savingSpending.category.id
+            : null,
         })
         .then((res) => {
           then?.();
@@ -145,6 +152,19 @@ class ExpenseStore {
     });
   }
 
+  getSavingSpendingByCategoryId(id: number): Expense["savingSpending"] {
+    for (const spending of savingSpendingStore.savingSpendings) {
+      const found = spending.categories.find((c) => c.id === id);
+      if (found) {
+        return {
+          spending,
+          category: found,
+        };
+      }
+    }
+    throw new Error(`Can't find spending by category id ${id}`);
+  }
+
   fromJson(json: ExpenseJson[]) {
     this.expenses = json.map(
       (e) =>
@@ -158,7 +178,10 @@ class ExpenseStore {
           e.source_id === null ? null : sources.getById(e.source_id),
           e.subscription_id === null
             ? null
-            : subscriptionStore.getById(e.subscription_id)
+            : subscriptionStore.getById(e.subscription_id),
+          e.saving_spending_category_id === null
+            ? null
+            : this.getSavingSpendingByCategoryId(e.saving_spending_category_id)
         )
     );
     this.fillPersonalExpenses(json);

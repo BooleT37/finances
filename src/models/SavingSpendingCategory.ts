@@ -1,6 +1,9 @@
+import { sum } from "lodash";
 import { makeAutoObservable, runInAction } from "mobx";
 import { api } from "../api";
 import { RecordType } from "../SavingSpendingsScreen/SavingSpendingCard";
+import expenseStore from "../stores/expenseStore";
+import type { Option } from "../types";
 import { isTempId } from "../utils/tempId";
 
 export default class SavingSpendingCategory {
@@ -28,7 +31,13 @@ export default class SavingSpendingCategory {
   }
 
   get expenses() {
-    return this.id;
+    return sum(
+      expenseStore.expenses
+        .filter(
+          (e) => e.savingSpending && e.savingSpending.category.id === this.id
+        )
+        .map((e) => e.cost || 0)
+    );
   }
 
   isSame(anotherCategory: SavingSpendingCategory) {
@@ -81,5 +90,12 @@ export default class SavingSpendingCategory {
     }
 
     await api.savingSpendingCategory.delete(this.id);
+  }
+
+  get asOption(): Option {
+    return {
+      value: this.id,
+      label: this.name,
+    };
   }
 }

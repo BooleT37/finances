@@ -8,6 +8,8 @@ export default interface FormValues {
   category: number | null;
   personalExpCategoryId: PersonalExpCategoryIds | null;
   personalExpSpent: string;
+  savingSpendingId: number | null;
+  savingSpendingCategoryId: number | null;
   name: string;
   source: number | null;
 }

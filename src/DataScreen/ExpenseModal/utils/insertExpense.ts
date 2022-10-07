@@ -1,11 +1,11 @@
+import Expense from "../../../models/Expense";
 import categories from "../../../readonlyStores/categories";
 import sources from "../../../readonlyStores/sources";
-import Expense from "../../../models/Expense";
 import expenseStore from "../../../stores/expenseStore";
+import subscriptionStore from "../../../stores/subscriptionStore";
 import expenseModalStore from "../../expenseModalStore";
 import { ValidatedFormValues } from "../models";
 import generatePersonalExpenseName from "./generatePersonalExpenseName";
-import subscriptionStore from "../../../stores/subscriptionStore";
 
 export default function insertExpense(values: ValidatedFormValues): Expense {
   const newExpense = new Expense(
@@ -16,9 +16,14 @@ export default function insertExpense(values: ValidatedFormValues): Expense {
     values.name,
     null,
     values.source !== null ? sources.getById(values.source) : null,
-    values.subscription !== null
-      ? subscriptionStore.getById(values.subscription)
-      : null
+    values.subscription === null
+      ? null
+      : subscriptionStore.getById(values.subscription),
+    values.savingSpendingCategoryId === null
+      ? null
+      : expenseStore.getSavingSpendingByCategoryId(
+          values.savingSpendingCategoryId
+        )
   );
   // if we are editing the expense
   if (expenseModalStore.expenseId) {

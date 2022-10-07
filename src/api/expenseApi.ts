@@ -15,6 +15,7 @@ export interface ExpenseJson {
   personal_expense_id: number | null;
   source_id: number | null;
   subscription_id: number | null;
+  saving_spending_category_id: number | null;
 }
 
 export const expenseApi = {

@@ -1,4 +1,5 @@
 import { makeAutoObservable } from "mobx";
+import type { Option } from "../types";
 import { isTempId } from "../utils/tempId";
 import SavingSpendingCategory from "./SavingSpendingCategory";
 
@@ -88,5 +89,12 @@ export default class SavingSpending {
     for (const category of categoriesToDelete) {
       await category.delete();
     }
+  }
+
+  get asOption(): Option {
+    return {
+      value: this.id,
+      label: this.name,
+    };
   }
 }

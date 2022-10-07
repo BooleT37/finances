@@ -1,19 +1,19 @@
 import {
   Button,
   Checkbox,
+  DatePicker,
+  Divider,
   Form,
   Input,
   Modal,
-  Select,
-  DatePicker,
   Radio,
+  Select,
   Space,
-  Divider,
 } from "antd";
-import type { BaseSelectRef } from "rc-select";
 import { action, reaction, runInAction } from "mobx";
 import { observer, useLocalObservable } from "mobx-react";
-import { Moment } from "moment";
+import moment, { Moment } from "moment";
+import type { BaseSelectRef } from "rc-select";
 import React from "react";
 import styled from "styled-components";
 import { DATE_FORMAT } from "../../constants";
@@ -21,15 +21,16 @@ import Currency from "../../models/Currency";
 import Expense from "../../models/Expense";
 import categories from "../../readonlyStores/categories";
 import sources from "../../readonlyStores/sources";
+import expenseStore from "../../stores/expenseStore";
+import savingSpendingStore from "../../stores/savingSpendingStore";
+import subscriptionStore from "../../stores/subscriptionStore";
+import type { Option } from "../../types";
+import { SAVINGS_CATEGORY_ID } from "../../utils/constants";
 import expenseModalStore from "../expenseModalStore";
-import moment from "moment";
 import { FormValues, ValidatedFormValues } from "./models";
-import { insertExpense } from "./utils";
 import PersonalExpenses from "./PersonalExpenses";
 import SourceLastExpenses from "./SourceLastExpenses";
-import expenseStore from "../../stores/expenseStore";
-import type { Option } from "../../types";
-import subscriptionStore from "../../stores/subscriptionStore";
+import { insertExpense } from "./utils";
 
 function expenseToFormValues(expense: Expense): FormValues {
   return {
@@ -43,6 +44,12 @@ function expenseToFormValues(expense: Expense): FormValues {
     date: expense.date,
     source: expense.source?.id ?? null,
     subscription: expense.subscription?.id ?? null,
+    savingSpendingId: expense.savingSpending
+      ? expense.savingSpending.spending.id
+      : null,
+    savingSpendingCategoryId: expense.savingSpending
+      ? expense.savingSpending.category.id
+      : null,
   };
 }
 
@@ -87,6 +94,8 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
       personalExpSpent: "",
       date: today.isBetween(startDate, endDate) ? today : startDate,
       source: lastSource,
+      savingSpendingId: null,
+      savingSpendingCategoryId: null,
     }),
     [endDate, startDate, lastSource]
   );
@@ -171,13 +180,26 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
     return options;
   }, []);
 
-  const sourceId = Form.useWatch("source", form);
-  const categoryId = Form.useWatch("category", form);
+  const savingSpendingOptions = React.useMemo(() => {
+    const options = savingSpendingStore.asOptions.slice();
+    options.unshift({ value: null, label: "Нет события" });
+    return options;
+  }, []);
+
+  const sourceId: number | null = Form.useWatch("source", form) ?? null;
+  const categoryId: number | null = Form.useWatch("category", form) ?? null;
+  const savingSpendingId: number | null =
+    Form.useWatch("savingSpendingId", form) ?? null;
   const currentCategory = categoryId ? categories.getById(categoryId) : null;
   const sourceExtra =
-    sourceId === null || sourceId === undefined ? null : (
-      <SourceLastExpenses sourceId={sourceId} />
-    );
+    sourceId === null ? null : <SourceLastExpenses sourceId={sourceId} />;
+
+  const savingSpendingCategoryOptions = React.useMemo(() => {
+    if (savingSpendingId === null) {
+      return [];
+    }
+    return savingSpendingStore.categoriesAsOptions(savingSpendingId);
+  }, [savingSpendingId]);
 
   const availabileSubscriptions =
     startDate && endDate && currentCategory
@@ -281,7 +303,12 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
         <Form.Item
           name="category"
           label="Категория"
-          rules={[{ required: true, message: "Выберите категорию" }]}
+          rules={[
+            {
+              required: true,
+              message: "Выберите категорию",
+            },
+          ]}
         >
           <Select
             options={
@@ -293,6 +320,42 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
             ref={firstFieldRef}
           />
         </Form.Item>
+        {categoryId === SAVINGS_CATEGORY_ID && (
+          <Form.Item
+            name="savingSpendingId"
+            label="Событие"
+            rules={[
+              {
+                required: categoryId === SAVINGS_CATEGORY_ID,
+                message: "Выберите событие",
+              },
+            ]}
+          >
+            <Select options={savingSpendingOptions} placeholder="Не указано" />
+          </Form.Item>
+        )}
+        {categoryId === SAVINGS_CATEGORY_ID && (
+          <Form.Item
+            name="savingSpendingCategoryId"
+            label="Категория события"
+            rules={[
+              {
+                required: categoryId === SAVINGS_CATEGORY_ID,
+                message: "Выберите категорию",
+              },
+            ]}
+            extra={
+              savingSpendingId === null ? "Сначала выберите событие" : undefined
+            }
+          >
+            <Select
+              disabled={savingSpendingId === null}
+              options={savingSpendingCategoryOptions}
+              placeholder="Выберите категорию"
+              ref={firstFieldRef}
+            />
+          </Form.Item>
+        )}
         {subscriptionOptions.length > 0 && (
           <Form.Item name="subscription" label="Подписка">
             <Select

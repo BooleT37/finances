@@ -4,6 +4,7 @@ import { SavingSpendingJson } from "../api/savingSpendingApi";
 import { SavingSpendingCategoryJson } from "../api/savingSpendingCategoryApi";
 import SavingSpending from "../models/SavingSpending";
 import SavingSpendingCategory from "../models/SavingSpendingCategory";
+import { Option } from "../types";
 
 class SavingSpendingStore {
   savingSpendings = observable.array<SavingSpending>();
@@ -105,6 +106,14 @@ class SavingSpendingStore {
     runInAction(() => {
       this.savingSpendings.remove(spending);
     });
+  }
+
+  get asOptions(): Option[] {
+    return this.savingSpendings.map((s) => s.asOption);
+  }
+
+  categoriesAsOptions(id: number): Option[] {
+    return this.getById(id).categories.map((c) => c.asOption);
   }
 }
 

@@ -2,6 +2,8 @@ import { makeAutoObservable } from "mobx";
 import { Moment } from "moment";
 import { DATE_FORMAT } from "../constants";
 import Category from "./Category";
+import SavingSpending from "./SavingSpending";
+import SavingSpendingCategory from "./SavingSpendingCategory";
 import Source from "./Source";
 import Subscription from "./Subscription";
 
@@ -32,6 +34,10 @@ export default class Expense {
   personalExpense: Expense | null;
   source: Source | null;
   subscription: Subscription | null;
+  savingSpending: {
+    spending: SavingSpending;
+    category: SavingSpendingCategory;
+  } | null;
 
   constructor(
     id: number,
@@ -41,7 +47,11 @@ export default class Expense {
     name?: string,
     personalExpense: Expense | null = null,
     source: Source | null = null,
-    subscription: Subscription | null = null
+    subscription: Subscription | null = null,
+    savingSpending: {
+      spending: SavingSpending;
+      category: SavingSpendingCategory;
+    } | null = null
   ) {
     makeAutoObservable(this);
     this.id = id;
@@ -52,6 +62,7 @@ export default class Expense {
     this.name = name;
     this.source = source;
     this.subscription = subscription;
+    this.savingSpending = savingSpending;
   }
 
   get asTableData(): TableData {
