@@ -1,6 +1,5 @@
 import { makeAutoObservable } from "mobx";
-import moment from "moment";
-import { Moment } from "moment";
+import moment, { Moment } from "moment";
 import { costToString } from "../utils";
 import Category from "./Category";
 import Source from "./Source";
@@ -11,7 +10,7 @@ export interface SubscriptionFormValues {
   id: number;
   name: string;
   cost: string;
-  category: string | null;
+  categoryId: number | null;
   period: number;
   firstDate: Moment | null;
   source: number | null;
@@ -78,7 +77,7 @@ export default class Subscription {
       id: this.id,
       name: this.name,
       cost: String(this.cost),
-      category: this.category.name || null,
+      categoryId: this.category.id ?? null,
       period: this.period,
       firstDate: this.firstDate,
       source: this.source?.id ?? null,

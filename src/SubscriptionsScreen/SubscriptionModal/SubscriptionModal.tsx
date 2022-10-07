@@ -1,14 +1,5 @@
-import {
-  AutoComplete,
-  Button,
-  DatePicker,
-  Form,
-  Input,
-  InputRef,
-  Modal,
-  Select,
-} from "antd";
-import { RuleObject } from "antd/lib/form";
+import { Button, DatePicker, Form, Input, InputRef, Modal, Select } from "antd";
+import { runInAction } from "mobx";
 import moment, { Moment } from "moment";
 import React from "react";
 import { DATE_FORMAT } from "../../constants";
@@ -21,9 +12,9 @@ import subscriptionStore from "../../stores/subscriptionStore";
 
 const NEW_SUBSCRIPTION_ID = -1;
 
-interface ValidatedFormValues extends Omit<FormValues, "date" | "category"> {
+interface ValidatedFormValues extends Omit<FormValues, "date" | "categoryId"> {
   firstDate: Moment;
-  category: string;
+  categoryId: number;
 }
 
 function formValuesToSubscription(
@@ -34,7 +25,7 @@ function formValuesToSubscription(
     id ?? NEW_SUBSCRIPTION_ID,
     values.name,
     parseFloat(values.cost),
-    categories.getByName(values.category),
+    categories.getById(values.categoryId),
     values.period,
     values.firstDate,
     values.source !== null ? sources.getById(values.source) : null
@@ -47,7 +38,7 @@ const INITIAL_VALUES: FormValues = {
   id: 0,
   name: "",
   cost: "",
-  category: null,
+  categoryId: null,
   period: 1,
   firstDate: today,
   source: null,
@@ -72,16 +63,18 @@ const SubscriptionModal: React.FC<Props> = function SubscriptionModal({
     form
       .validateFields()
       .then(async (values: FormValues) => {
-        const subscription = formValuesToSubscription(
-          subscriptionId,
-          values as ValidatedFormValues
-        );
-        if (subscriptionId === null) {
-          await subscriptionStore.add(subscription);
-        } else {
-          subscriptionStore.modify(subscription);
-        }
-        onClose();
+        runInAction(async () => {
+          const subscription = formValuesToSubscription(
+            subscriptionId,
+            values as ValidatedFormValues
+          );
+          if (subscriptionId === null) {
+            await subscriptionStore.add(subscription);
+          } else {
+            subscriptionStore.modify(subscription);
+          }
+          onClose();
+        });
       })
       .catch((info) => {
         console.error("Validate Failed:", info);
@@ -102,18 +95,6 @@ const SubscriptionModal: React.FC<Props> = function SubscriptionModal({
       }, 0);
     }
   }, [form, subscriptionId, visible]);
-
-  const categoryValidator = (_: RuleObject, value: string) => {
-    return new Promise<void>((resolve, reject) => {
-      if (!value) {
-        // TODO simplify category validation now that it's select
-        categories.getByName(value);
-        resolve();
-        return;
-      }
-      reject(new Error("Категория не найдена"));
-    });
-  };
 
   const sourcesOptions = React.useMemo(() => {
     const options = sources.asOptions;
@@ -164,25 +145,25 @@ const SubscriptionModal: React.FC<Props> = function SubscriptionModal({
         <Form.Item
           name="cost"
           label="Сумма"
-          rules={[{ required: true, message: "Введите сумму" }]}
+          rules={[
+            { required: true, message: "Введите сумму" },
+            {
+              pattern: /^[0-9.-]+$/,
+              message: "Сумма должна быть числом",
+              validateTrigger: "onChange",
+            },
+          ]}
         >
           <Input />
         </Form.Item>
         <Form.Item
-          name="category"
+          name="categoryId"
           label="Категория"
-          rules={[
-            { required: true, message: "Выберите категорию" },
-            {
-              validator: categoryValidator,
-              validateTrigger: "onSubmit",
-            },
-          ]}
+          rules={[{ required: true, message: "Выберите категорию" }]}
         >
-          <AutoComplete
+          <Select
             options={categories.expenseOptions}
             placeholder="Начните вводить"
-            filterOption
           />
         </Form.Item>
         <Form.Item name="period" label="Период">
