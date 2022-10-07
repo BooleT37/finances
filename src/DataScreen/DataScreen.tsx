@@ -260,7 +260,6 @@ const DataScreen = observer(function DataScreen() {
                   suppressAggFuncInHeader
                   autoGroupColumnDef={autoGroupColumnDef}
                   domLayout="autoHeight"
-                  groupDefaultExpanded={1}
                 />
               </div>
             )}
