@@ -1,8 +1,9 @@
 import type { ColDef, ColGroupDef } from "ag-grid-community";
-import CostCellRenderer from "./CostCellRenderer/CostCellRenderer";
-import { costToString } from "../utils";
-import MonthCellRenderer from "./MonthCellRenderer";
 import { sortAllCategories } from "../readonlyStores/categories/categoriesOrder";
+import { ForecastTableItem } from "../stores/forecastStore/types";
+import { costToString } from "../utils";
+import CostCellRenderer from "./CostCellRenderer/CostCellRenderer";
+import MonthCellRenderer from "./MonthCellRenderer";
 
 const costValueFormatter = ({ value }: { value: number }): string =>
   costToString(value);
@@ -53,7 +54,8 @@ const columnDefs: (ColDef | ColGroupDef)[] = [
       value: parseFloat(params.newValue),
       subscriptions: params.oldValue.subscriptions,
     }),
-    editable: true,
+    // The "Total" row
+    editable: ({ data }) => (data as ForecastTableItem).categoryId !== -1,
   },
   { field: "comment", width: 200, headerName: "Комментарий", editable: true },
 ];

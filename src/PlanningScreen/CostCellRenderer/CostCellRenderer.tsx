@@ -16,7 +16,10 @@ type Props = Omit<ICellRendererParams, "value" | "data"> & {
 const CostCellRenderer: React.FC<Props> = ({ value, data, context }) => {
   const handleClick = useCallback(
     (totalCost: number) => {
-      context.setForecastSum(data.categoryId, totalCost);
+      // the "Total" row
+      if (data.categoryId !== -1) {
+        context.setForecastSum(data.categoryId, totalCost);
+      }
     },
     [context, data.categoryId]
   );
