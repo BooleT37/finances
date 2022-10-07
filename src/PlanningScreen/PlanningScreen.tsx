@@ -1,20 +1,19 @@
-import { observer } from "mobx-react";
-import { Button, DatePicker, Space, Typography } from "antd";
-import WhiteHeader from "../WhiteHeader";
-import SiteContent from "../SiteContent";
-import { AgGridReact } from "ag-grid-react";
-import columnDefs from "./columnDefs";
-import forecastStore from "../stores/forecastStore/forecastStore";
-import React, { useCallback } from "react";
-import { Moment } from "moment";
-import moment from "moment";
-import type { CellEditRequestEvent, RowNode } from "ag-grid-community";
-import { action } from "mobx";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
-import categories from "../readonlyStores/categories";
-import SurplusData from "./SurplusData";
+import type { CellEditRequestEvent, RowNode } from "ag-grid-community";
+import { AgGridReact } from "ag-grid-react";
+import { Button, DatePicker, Space, Typography } from "antd";
+import { action } from "mobx";
+import { observer } from "mobx-react";
+import moment, { Moment } from "moment";
+import React, { useCallback } from "react";
 import { MONTH_DATE_FORMAT } from "../constants";
+import categories from "../readonlyStores/categories";
+import SiteContent from "../SiteContent";
+import forecastStore from "../stores/forecastStore/forecastStore";
+import WhiteHeader from "../WhiteHeader";
+import columnDefs from "./columnDefs";
 import personalExpensesColumnDefs from "./personalExpensesColumnDefs";
+import SurplusData from "./SurplusData";
 
 const { Title } = Typography;
 
@@ -72,6 +71,20 @@ const PlanningScreen = observer(function PlanningScreen() {
     });
   };
 
+  const setForecastSum = useCallback(
+    (categoryId: number, sum: number) => {
+      if (date) {
+        forecastStore.changeForecastSum(
+          categories.getById(categoryId),
+          date.month(),
+          date.year(),
+          sum
+        );
+      }
+    },
+    [date]
+  );
+
   return (
     <>
       <WhiteHeader className="site-layout-background">
@@ -118,6 +131,7 @@ const PlanningScreen = observer(function PlanningScreen() {
                       year: date.year(),
                       month: date.month(),
                       scrollToRow,
+                      setForecastSum,
                     }}
                     domLayout="autoHeight"
                   />
