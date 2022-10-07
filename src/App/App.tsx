@@ -1,5 +1,6 @@
 import { Spin } from "antd";
 import React from "react";
+import styled from "styled-components";
 import { api } from "../api";
 import categoriesManager from "../readonlyStores/categories";
 import sourcesManager from "../readonlyStores/sources";
@@ -7,6 +8,14 @@ import expenseStore from "../stores/expenseStore";
 import forecastStore from "../stores/forecastStore/forecastStore";
 import savingsSpendingStore from "../stores/savingSpendingStore";
 import subscriptionStore from "../stores/subscriptionStore";
+
+const SpinWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+`;
 
 // eslint-disable-next-line mobx/missing-observer
 const App = function App({ children }: React.PropsWithChildren<{}>) {
@@ -50,7 +59,11 @@ const App = function App({ children }: React.PropsWithChildren<{}>) {
   }
 
   if (!loaded) {
-    return <Spin size="large" />;
+    return (
+      <SpinWrapper>
+        <Spin size="large" tip="Загрузка финансов..." />
+      </SpinWrapper>
+    );
   }
   return <>{children}</>;
 };
