@@ -407,6 +407,23 @@ class ExpenseStore {
     }
     return rows;
   }
+
+  savingSpendingsForecast(year: number, month: number): number {
+    return sum(
+      this.expenses
+        .filter(
+          (
+            expense
+          ): expense is Expense & {
+            savingSpending: NonNullable<Expense["savingSpending"]>;
+          } =>
+            expense.savingSpending !== null &&
+            expense.date.month() === month &&
+            expense.date.year() === year
+        )
+        .map((expense) => expense.savingSpending.category.forecast)
+    );
+  }
 }
 
 const expenseStore = new ExpenseStore();

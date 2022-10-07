@@ -14,7 +14,7 @@ const columnDefs: GridOptions["columnDefs"] = [
     aggFunc: costAggFunc,
     cellRenderer: CostCellRenderer,
   },
-  { field: "name", width: 200, headerName: "Имя" },
+  { field: "name", width: 200, headerName: "Имя", resizable: true },
   { field: "date", width: 120, headerName: "Дата" },
   {
     field: "category",

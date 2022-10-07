@@ -65,10 +65,22 @@ export default class Expense {
     this.savingSpending = savingSpending;
   }
 
+  get tableDataName(): string {
+    const name = this.name || "";
+    if (this.savingSpending !== null) {
+      const savingSpendingInfo = `${this.savingSpending.spending.name} - ${this.savingSpending.category.name}`;
+      if (name) {
+        return `${savingSpendingInfo} (${name})`;
+      }
+      return savingSpendingInfo;
+    }
+    return name;
+  }
+
   get asTableData(): TableData {
     return {
       id: this.id,
-      name: this.name || "",
+      name: this.tableDataName,
       cost:
         this.cost || this.cost === 0
           ? {

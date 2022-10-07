@@ -1,26 +1,26 @@
-import React from "react";
-import { observer } from "mobx-react";
-import { Typography, DatePicker, Button, Space, Input, Checkbox } from "antd";
 import {
-  PlusOutlined,
-  SwapOutlined,
   LeftOutlined,
+  PlusOutlined,
   RightOutlined,
+  SwapOutlined,
 } from "@ant-design/icons";
-import moment, { Moment } from "moment";
 import { AgGridReact } from "ag-grid-react";
-import expenseStore from "../stores/expenseStore";
-import columnDefs from "./gridColumnDefs/columnDefs";
-import ExpenseModal from "./ExpenseModal/ExpenseModal";
-import expenseModalStore from "./expenseModalStore";
+import { Button, Checkbox, DatePicker, Input, Space, Typography } from "antd";
 import { action } from "mobx";
-import { getRowStyle, resetTime, setTimeToMax } from "./utils";
-import autoGroupColumnDef from "./gridColumnDefs/autoGroupColumnDef";
-import WhiteHeader from "../WhiteHeader";
-import SiteContent from "../SiteContent";
+import { observer } from "mobx-react";
+import moment, { Moment } from "moment";
+import React from "react";
 import styled from "styled-components";
 import { DATE_FORMAT, MONTH_DATE_FORMAT } from "../constants";
+import SiteContent from "../SiteContent";
+import expenseStore from "../stores/expenseStore";
 import forecastStore from "../stores/forecastStore";
+import WhiteHeader from "../WhiteHeader";
+import ExpenseModal from "./ExpenseModal/ExpenseModal";
+import expenseModalStore from "./expenseModalStore";
+import autoGroupColumnDef from "./gridColumnDefs/autoGroupColumnDef";
+import columnDefs from "./gridColumnDefs/columnDefs";
+import { getRowStyle, resetTime, setTimeToMax } from "./utils";
 
 const { RangePicker } = DatePicker;
 const { Title } = Typography;
@@ -249,6 +249,11 @@ const DataScreen = observer(function DataScreen() {
                       : isCurrentMonth
                       ? today.date() / rangeStart.daysInMonth()
                       : 1,
+                    savingSpendingsForecast:
+                      expenseStore.savingSpendingsForecast(
+                        rangeStart.year(),
+                        rangeStart.month()
+                      ),
                   }}
                   getRowStyle={getRowStyle}
                   groupIncludeFooter
