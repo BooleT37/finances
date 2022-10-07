@@ -1,8 +1,12 @@
 import type { Option } from "../types";
-import { PersonalExpCategoryIds } from "../utils/constants";
+import {
+  PersonalExpCategoryIds,
+  SAVINGS_CATEGORY_ID,
+} from "../utils/constants";
 
 export default class Category {
   public readonly isPersonal: boolean;
+  public readonly isSavingSpending: boolean;
   constructor(
     public readonly id: number,
     public readonly name: string,
@@ -14,6 +18,7 @@ export default class Category {
       PersonalExpCategoryIds.Alexey,
       PersonalExpCategoryIds.Lena,
     ].includes(id);
+    this.isSavingSpending = id === SAVINGS_CATEGORY_ID;
   }
 
   get asOption(): Option {

@@ -44,14 +44,17 @@ class ForecastStore {
           forecast.month === month &&
           forecast.year === year &&
           forecast.category.isIncome === isIncome &&
-          forecast.category.isPersonal === isPersonal
+          forecast.category.isPersonal === isPersonal &&
+          !forecast.category.isSavingSpending
         );
       });
       const filteredCategories = isIncome
         ? categories.incomeCategories
         : isPersonal
         ? categories.personalExpensesCategories
-        : categories.nonPersonalExpenseCategories;
+        : categories.nonPersonalExpenseCategories.filter(
+            (c) => !c.isSavingSpending
+          );
       filteredCategories
         .sort((a, b) => a.id - b.id)
         .forEach((category) => {
@@ -190,7 +193,8 @@ class ForecastStore {
             forecast.month === month &&
             forecast.year === year &&
             forecast.category.isIncome === isIncome &&
-            forecast.category.isPersonal === isPersonal
+            forecast.category.isPersonal === isPersonal &&
+            !forecast.category.isSavingSpending
         )
         .map((f) => f.sum)
     );
