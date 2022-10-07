@@ -1,15 +1,15 @@
-import { Layout, Menu } from "antd";
-import React from "react";
 import {
-  TableOutlined,
-  LineChartOutlined,
+  BankOutlined,
   CalendarOutlined,
   DollarOutlined,
+  LineChartOutlined,
   SettingOutlined,
-  BankOutlined,
+  TableOutlined,
 } from "@ant-design/icons";
-import { Link, useLocation } from "react-router-dom";
+import { Layout, Menu } from "antd";
 import { ItemType } from "antd/lib/menu/hooks/useItems";
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
 
 const { Content, Footer, Sider } = Layout;
 
@@ -57,9 +57,6 @@ const SiteLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </Sider>
       <Layout className="site-layout">
         <Content>{children}</Content>
-        <Footer style={{ textAlign: "center" }}>
-          Ant Design ©2018 Created by Ant UED
-        </Footer>
       </Layout>
     </Layout>
   );
