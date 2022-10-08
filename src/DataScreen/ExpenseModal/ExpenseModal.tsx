@@ -53,6 +53,12 @@ function expenseToFormValues(expense: Expense): FormValues {
   };
 }
 
+const ModalStyled = styled(Modal)`
+  .ant-modal-footer {
+    white-space: nowrap;
+  }
+`;
+
 interface Props {
   startDate: Moment | null;
   endDate: Moment | null;
@@ -241,7 +247,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
   };
 
   return (
-    <Modal
+    <ModalStyled
       visible={expenseModalStore.visible}
       title={
         expenseModalStore.isNewExpense ? "Новая трата" : "Редактирование траты"
@@ -409,7 +415,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
           <Select options={sourcesOptions} placeholder="Не указано" />
         </Form.Item>
       </Form>
-    </Modal>
+    </ModalStyled>
   );
 });
 
