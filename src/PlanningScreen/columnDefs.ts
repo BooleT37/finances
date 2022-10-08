@@ -1,4 +1,5 @@
 import type { ColDef, ColGroupDef } from "ag-grid-community";
+import { CATEGORY_IDS } from "../models/Category";
 import { sortAllCategories } from "../readonlyStores/categories/categoriesOrder";
 import { ForecastTableItem } from "../stores/forecastStore/types";
 import { costToString } from "../utils";
@@ -54,8 +55,10 @@ const columnDefs: (ColDef | ColGroupDef)[] = [
       value: parseFloat(params.newValue),
       subscriptions: params.oldValue.subscriptions,
     }),
-    // The "Total" row
-    editable: ({ data }) => (data as ForecastTableItem).categoryId !== -1,
+    editable: ({ data }) =>
+      ![CATEGORY_IDS.total, CATEGORY_IDS.fromSavings].includes(
+        (data as ForecastTableItem).categoryId
+      ),
   },
   { field: "comment", width: 200, headerName: "Комментарий", editable: true },
 ];

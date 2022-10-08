@@ -1,5 +1,5 @@
 import { Moment } from "moment";
-import { PersonalExpCategoryIds } from "../../../utils/constants";
+import { PersonalExpCategoryIds } from "../../../models/Category";
 
 export default interface FormValues {
   cost: string;

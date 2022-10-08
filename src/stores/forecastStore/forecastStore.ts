@@ -8,11 +8,14 @@ import {
   PE_SUM_DEFAULT,
   PE_SUM_LS_KEY,
 } from "../../constants";
-import Category from "../../models/Category";
+import Category, {
+  CATEGORY_IDS,
+  PersonalExpCategoryIds,
+} from "../../models/Category";
 import Forecast from "../../models/Forecast";
 import categories from "../../readonlyStores/categories";
 import { countUniqueMonths, roundCost } from "../../utils";
-import { PersonalExpCategoryIds } from "../../utils/constants";
+import { negateIf } from "../../utils/negateIf";
 import expenseStore from "../expenseStore";
 import subscriptionStore from "../subscriptionStore";
 import { ForecastTableItem } from "./types";
@@ -37,7 +40,8 @@ class ForecastStore {
       year: number,
       month: number,
       isIncome: boolean,
-      isPersonal: boolean
+      isPersonal: boolean,
+      isSavings: boolean
     ): ForecastTableItem[] => {
       const filtered = this.forecasts.filter((forecast) => {
         return (
@@ -45,16 +49,21 @@ class ForecastStore {
           forecast.year === year &&
           forecast.category.isIncome === isIncome &&
           forecast.category.isPersonal === isPersonal &&
-          !forecast.category.isSavingSpending
+          forecast.category.isSavings === isSavings
         );
       });
-      const filteredCategories = isIncome
-        ? categories.incomeCategories
-        : isPersonal
-        ? categories.personalExpensesCategories
-        : categories.nonPersonalExpenseCategories.filter(
-            (c) => !c.isSavingSpending
-          );
+
+      let filteredCategories: Category[];
+
+      if (isIncome) {
+        filteredCategories = categories.incomeCategories;
+      } else if (isPersonal) {
+        filteredCategories = categories.personalExpensesCategories;
+      } else if (isSavings) {
+        filteredCategories = categories.savingsCategories;
+      } else {
+        filteredCategories = categories.generalExpenseCategories;
+      }
       filteredCategories
         .sort((a, b) => a.id - b.id)
         .forEach((category) => {
@@ -101,6 +110,8 @@ class ForecastStore {
           )
         );
 
+        const { toSavings } = forecast.category;
+
         return {
           category: forecast.category.name,
           categoryId: forecast.category.id,
@@ -127,18 +138,24 @@ class ForecastStore {
           )} / ${expenseStore.totalMonths} месяцев`,
           lastMonth: {
             spendings: lastMonthSpendings,
-            diff:
-              roundCost(lastMonthForecast - lastMonthSpendings) *
-              (isIncome ? -1 : 1),
+            diff: forecast.category.fromSavings
+              ? 0
+              : negateIf(
+                  roundCost(lastMonthForecast - lastMonthSpendings),
+                  isIncome || toSavings
+                ),
           },
           thisMonth: {
             spendings: thisMonthSpendings,
-            diff:
-              roundCost(forecast.sum - thisMonthSpendings) *
-              (isIncome ? -1 : 1),
+            diff: forecast.category.fromSavings
+              ? 0
+              : negateIf(
+                  roundCost(forecast.sum - thisMonthSpendings),
+                  isIncome || toSavings
+                ),
           },
           sum: {
-            value: forecast.sum,
+            value: forecast.category.fromSavings ? null : forecast.sum,
             subscriptions: subscriptionStore.getSubscriptionsForForecast(
               month,
               year,
@@ -158,11 +175,33 @@ class ForecastStore {
           categoryShortname: "Всего",
           comment: "",
           lastMonth: {
-            spendings: roundCost(sum(data.map((d) => d.lastMonth.spendings))),
-            diff: roundCost(sum(data.map((d) => d.lastMonth.diff))),
+            spendings: roundCost(
+              sum(
+                data.map((d) =>
+                  negateIf(
+                    d.lastMonth.spendings,
+                    d.categoryId === CATEGORY_IDS.fromSavings
+                  )
+                )
+              )
+            ),
+            diff: isSavings
+              ? 0
+              : roundCost(sum(data.map((d) => d.lastMonth.diff))),
           },
           sum: {
-            value: roundCost(sum(data.map((d) => d.sum.value))),
+            value: isSavings
+              ? null
+              : roundCost(
+                  sum(
+                    data.map((d) =>
+                      negateIf(
+                        d.sum.value ?? 0,
+                        d.categoryId === CATEGORY_IDS.fromSavings
+                      )
+                    )
+                  )
+                ),
             subscriptions: subscriptionStore.getSubscriptionsForForecast(
               month,
               year,
@@ -170,8 +209,19 @@ class ForecastStore {
             ),
           },
           thisMonth: {
-            spendings: roundCost(sum(data.map((d) => d.thisMonth.spendings))),
-            diff: roundCost(sum(data.map((d) => d.thisMonth.diff))),
+            spendings: roundCost(
+              sum(
+                data.map((d) =>
+                  negateIf(
+                    d.thisMonth.spendings,
+                    d.categoryId === CATEGORY_IDS.fromSavings
+                  )
+                )
+              )
+            ),
+            diff: isSavings
+              ? 0
+              : roundCost(sum(data.map((d) => d.thisMonth.diff))),
           },
         });
       }
@@ -194,7 +244,7 @@ class ForecastStore {
             forecast.year === year &&
             forecast.category.isIncome === isIncome &&
             forecast.category.isPersonal === isPersonal &&
-            !forecast.category.isSavingSpending
+            !forecast.category.fromSavings
         )
         .map((f) => f.sum)
     );

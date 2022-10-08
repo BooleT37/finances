@@ -125,6 +125,7 @@ const PlanningScreen = observer(function PlanningScreen() {
                       date.year(),
                       date.month(),
                       false,
+                      false,
                       false
                     )}
                     context={{
@@ -134,6 +135,29 @@ const PlanningScreen = observer(function PlanningScreen() {
                       setForecastSum,
                     }}
                     domLayout="autoHeight"
+                  />
+                </div>
+              </div>
+              <div>
+                <Title level={2}>Сбережения</Title>
+                <div className="ag-theme-alpine" style={{ width: 1110 }}>
+                  <AgGridReact
+                    readOnlyEdit
+                    onCellEditRequest={handleCellEditRequest}
+                    columnDefs={columnDefs}
+                    rowData={forecastStore.tableData(
+                      date.year(),
+                      date.month(),
+                      false,
+                      false,
+                      true
+                    )}
+                    domLayout="autoHeight"
+                    context={{
+                      year: date.year(),
+                      month: date.month(),
+                      scrollToRow,
+                    }}
                   />
                 </div>
               </div>
@@ -149,7 +173,8 @@ const PlanningScreen = observer(function PlanningScreen() {
                       date.year(),
                       date.month(),
                       false,
-                      true
+                      true,
+                      false
                     )}
                     context={{
                       year: date.year(),
@@ -171,6 +196,7 @@ const PlanningScreen = observer(function PlanningScreen() {
                       date.year(),
                       date.month(),
                       true,
+                      false,
                       false
                     )}
                     domLayout="autoHeight"

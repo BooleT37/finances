@@ -23,6 +23,10 @@ const CostCellRenderer: React.FC<Props> = ({ value, data, context }) => {
     },
     [context, data.categoryId]
   );
+  if (value.value === null) {
+    return <>-</>;
+  }
+
   return (
     <>
       {costToString(value.value)}

@@ -12,9 +12,10 @@ import {
 class Categories {
   private categories: Category[];
   public expenseCategories: Category[];
-  public nonPersonalExpenseCategories: Category[];
+  public generalExpenseCategories: Category[]; // not personal and not savings
   public personalExpensesCategories: Category[];
   public incomeCategories: Category[];
+  public savingsCategories: Category[];
   public incomeCategoriesNames: string[];
   public options: Option[];
   public expenseOptions: Option[];
@@ -67,12 +68,13 @@ class Categories {
       .filter((c) => c.isIncome)
       .sort((c1, c2) => sortIncomeCategories(c1.shortname, c2.shortname));
 
-    this.nonPersonalExpenseCategories = this.expenseCategories.filter(
-      (c) => !c.isPersonal
+    this.generalExpenseCategories = this.expenseCategories.filter(
+      (c) => !c.isPersonal && !c.isSavings
     );
     this.personalExpensesCategories = this.expenseCategories.filter(
       (c) => c.isPersonal
     );
+    this.savingsCategories = this.expenseCategories.filter((c) => c.isSavings);
     this.incomeCategoriesNames = this.incomeCategories.map((c) => c.name);
     this.options = this.categories.map((c) => c.asOption);
     this.expenseOptions = this.expenseCategories.map((c) => c.asOption);

@@ -8,7 +8,7 @@ import {
   DATE_SERVER_FORMAT,
   MONTH_DATE_FORMAT,
 } from "../constants";
-import Category from "../models/Category";
+import Category, { CATEGORY_IDS } from "../models/Category";
 import Currency from "../models/Currency";
 import Expense, { TableData } from "../models/Expense";
 import Subscription from "../models/Subscription";
@@ -18,7 +18,6 @@ import { ComparisonData } from "../StatisticsScreen/ComparisonChart/models";
 import { DynamicsData } from "../StatisticsScreen/DynamicsChart/models";
 import { DynamicsDataMonth } from "../StatisticsScreen/DynamicsChart/models/dynamicsData";
 import { countUniqueMonths, roundCost } from "../utils";
-import { PersonalExpCategoryIds } from "../utils/constants";
 import costToString from "../utils/costToString";
 import savingSpendingStore from "./savingSpendingStore";
 import subscriptionStore from "./subscriptionStore";
@@ -63,7 +62,7 @@ class ExpenseStore {
         if (tableData.cost && pe && pe.cost !== null) {
           const cost = costToString(pe.cost);
           const author =
-            pe.category.id === PersonalExpCategoryIds.Alexey ? "А" : "Л";
+            pe.category.id === CATEGORY_IDS.personal.Alexey ? "А" : "Л";
           tableData.cost.personalExpStr = `${cost} личных (${author})`;
         }
         return tableData;
@@ -332,7 +331,7 @@ class ExpenseStore {
             expense.date.year() === year &&
             expense.category.isIncome === isIncome &&
             expense.category.isPersonal === isPersonal &&
-            !expense.category.isSavingSpending
+            !expense.category.fromSavings
         )
         .map((expense) => expense.cost ?? 0)
     );

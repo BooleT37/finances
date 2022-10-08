@@ -8,7 +8,7 @@ export interface SubscriptionsItem {
 }
 
 export interface ForecastSum {
-  value: number;
+  value: number | null;
   subscriptions: SubscriptionsItem[];
 }
 

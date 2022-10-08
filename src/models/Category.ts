@@ -1,12 +1,25 @@
 import type { Option } from "../types";
-import {
-  PersonalExpCategoryIds,
-  SAVINGS_CATEGORY_ID,
-} from "../utils/constants";
+
+export enum PersonalExpCategoryIds {
+  Alexey = 0,
+  Lena = 50,
+}
+
+export const CATEGORY_IDS = {
+  personal: {
+    Alexey: PersonalExpCategoryIds.Alexey,
+    Lena: PersonalExpCategoryIds.Lena,
+  },
+  fromSavings: 35,
+  toSavings: 11,
+  total: -1,
+};
 
 export default class Category {
   public readonly isPersonal: boolean;
-  public readonly isSavingSpending: boolean;
+  public readonly fromSavings: boolean;
+  public readonly toSavings: boolean;
+  public readonly isSavings: boolean;
   constructor(
     public readonly id: number,
     public readonly name: string,
@@ -15,10 +28,12 @@ export default class Category {
     public readonly isContinuous = false
   ) {
     this.isPersonal = [
-      PersonalExpCategoryIds.Alexey,
-      PersonalExpCategoryIds.Lena,
+      CATEGORY_IDS.personal.Alexey,
+      CATEGORY_IDS.personal.Lena,
     ].includes(id);
-    this.isSavingSpending = id === SAVINGS_CATEGORY_ID;
+    this.fromSavings = id === CATEGORY_IDS.fromSavings;
+    this.toSavings = id === CATEGORY_IDS.toSavings;
+    this.isSavings = this.fromSavings || this.toSavings;
   }
 
   get asOption(): Option {

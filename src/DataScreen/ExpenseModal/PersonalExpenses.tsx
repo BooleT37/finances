@@ -1,9 +1,9 @@
 import { Divider, Form, FormInstance, Input, Select } from "antd";
 import { observer } from "mobx-react";
 import React from "react";
+import { CATEGORY_IDS } from "../../models/Category";
 import categories from "../../readonlyStores/categories";
 import forecastStore from "../../stores/forecastStore";
-import { PersonalExpCategoryIds } from "../../utils/constants";
 import { FormValues } from "./models";
 
 const { Option } = Select;
@@ -33,8 +33,8 @@ const PersonalExpenses: React.FC<Props> = observer(function PersonalExpenses({
     <>
       <Form.Item name="personalExpCategoryId" label="Чьи личные деньги">
         <Select>
-          <Option value={PersonalExpCategoryIds.Alexey}>Алексей</Option>
-          <Option value={PersonalExpCategoryIds.Lena}>Лена</Option>
+          <Option value={CATEGORY_IDS.personal.Alexey}>Алексей</Option>
+          <Option value={CATEGORY_IDS.personal.Lena}>Лена</Option>
         </Select>
       </Form.Item>
       <Form.Item

@@ -18,8 +18,11 @@ export default function costAggFunc(params: IAggFuncParams): AggCostCol {
     values.reduce((a, c) => (c.isUpcomingSubscription ? a : a + c.value), 0)
   );
   const { categoryId } = params.rowNode.childrenAfterGroup[0].data;
-  const { isIncome, isContinuous, isSavingSpending } =
-    categories.getById(categoryId);
+  const {
+    isIncome,
+    isContinuous,
+    fromSavings: isSavingSpending,
+  } = categories.getById(categoryId);
   const forecast = isSavingSpending
     ? params.context.savingSpendingsForecast
     : params.context.categoriesForecast?.[categoryId];

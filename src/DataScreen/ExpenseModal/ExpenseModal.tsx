@@ -17,6 +17,7 @@ import type { BaseSelectRef } from "rc-select";
 import React from "react";
 import styled from "styled-components";
 import { DATE_FORMAT } from "../../constants";
+import { CATEGORY_IDS } from "../../models/Category";
 import Currency from "../../models/Currency";
 import Expense from "../../models/Expense";
 import categories from "../../readonlyStores/categories";
@@ -25,7 +26,6 @@ import expenseStore from "../../stores/expenseStore";
 import savingSpendingStore from "../../stores/savingSpendingStore";
 import subscriptionStore from "../../stores/subscriptionStore";
 import type { Option } from "../../types";
-import { SAVINGS_CATEGORY_ID } from "../../utils/constants";
 import expenseModalStore from "../expenseModalStore";
 import { FormValues, ValidatedFormValues } from "./models";
 import PersonalExpenses from "./PersonalExpenses";
@@ -330,13 +330,13 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
             ref={firstFieldRef}
           />
         </Form.Item>
-        {categoryId === SAVINGS_CATEGORY_ID && (
+        {categoryId === CATEGORY_IDS.fromSavings && (
           <Form.Item
             name="savingSpendingId"
             label="Событие"
             rules={[
               {
-                required: categoryId === SAVINGS_CATEGORY_ID,
+                required: categoryId === CATEGORY_IDS.fromSavings,
                 message: "Выберите событие",
               },
             ]}
@@ -344,13 +344,13 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
             <Select options={savingSpendingOptions} placeholder="Не указано" />
           </Form.Item>
         )}
-        {categoryId === SAVINGS_CATEGORY_ID && (
+        {categoryId === CATEGORY_IDS.fromSavings && (
           <Form.Item
             name="savingSpendingCategoryId"
             label="Категория события"
             rules={[
               {
-                required: categoryId === SAVINGS_CATEGORY_ID,
+                required: categoryId === CATEGORY_IDS.fromSavings,
                 message: "Выберите категорию",
               },
             ]}
