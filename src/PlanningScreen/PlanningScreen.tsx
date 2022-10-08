@@ -95,6 +95,7 @@ const PlanningScreen = observer(function PlanningScreen() {
           <div>
             <Button
               type="link"
+              size="large"
               icon={<LeftOutlined />}
               onClick={goToPrevMonth}
             />
@@ -104,9 +105,12 @@ const PlanningScreen = observer(function PlanningScreen() {
               onChange={(date) => setDate(date)}
               format={MONTH_DATE_FORMAT}
               allowClear={false}
+              style={{ width: 160 }}
+              size="large"
             />
             <Button
               type="link"
+              size="large"
               icon={<RightOutlined />}
               onClick={goToNextMonth}
             />
@@ -115,7 +119,7 @@ const PlanningScreen = observer(function PlanningScreen() {
             <Space direction="vertical" size="middle">
               <div>
                 <Title level={2}>Расходы</Title>
-                <div className="ag-theme-alpine" style={{ width: 1110 }}>
+                <div className="ag-theme-alpine" style={{ width: 1130 }}>
                   <AgGridReact
                     ref={gridRef}
                     readOnlyEdit
@@ -140,7 +144,7 @@ const PlanningScreen = observer(function PlanningScreen() {
               </div>
               <div>
                 <Title level={2}>Сбережения</Title>
-                <div className="ag-theme-alpine" style={{ width: 1110 }}>
+                <div className="ag-theme-alpine" style={{ width: 1130 }}>
                   <AgGridReact
                     readOnlyEdit
                     onCellEditRequest={handleCellEditRequest}
@@ -163,7 +167,7 @@ const PlanningScreen = observer(function PlanningScreen() {
               </div>
               <div>
                 <Title level={2}>Личные Расходы</Title>
-                <div className="ag-theme-alpine" style={{ width: 1150 }}>
+                <div className="ag-theme-alpine" style={{ width: 1200 }}>
                   <AgGridReact
                     ref={gridRef}
                     readOnlyEdit
@@ -187,7 +191,7 @@ const PlanningScreen = observer(function PlanningScreen() {
               </div>
               <div>
                 <Title level={2}>Доходы</Title>
-                <div className="ag-theme-alpine" style={{ width: 1110 }}>
+                <div className="ag-theme-alpine" style={{ width: 1130 }}>
                   <AgGridReact
                     readOnlyEdit
                     onCellEditRequest={handleCellEditRequest}

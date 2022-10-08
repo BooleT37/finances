@@ -13,8 +13,9 @@ const columnDefs: (ColDef | ColGroupDef)[] = [
   {
     field: "category",
     sort: "asc",
-    width: 220,
+    width: 250,
     headerName: "Категория",
+    tooltipField: "category",
     comparator: (categoryA, _categoryB, nodeA, nodeB) =>
       categoryA === "Всего"
         ? 1
@@ -44,7 +45,7 @@ const columnDefs: (ColDef | ColGroupDef)[] = [
   },
   {
     field: "sum",
-    width: 180,
+    width: 200,
     headerName: "План",
     cellRenderer: CostCellRenderer,
     valueFormatter: (data) => data.value.value,
@@ -60,7 +61,13 @@ const columnDefs: (ColDef | ColGroupDef)[] = [
         (data as ForecastTableItem).categoryId
       ),
   },
-  { field: "comment", width: 200, headerName: "Комментарий", editable: true },
+  {
+    field: "comment",
+    width: 200,
+    headerName: "Комментарий",
+    editable: true,
+    tooltipField: "comment",
+  },
 ];
 
 export default columnDefs;
