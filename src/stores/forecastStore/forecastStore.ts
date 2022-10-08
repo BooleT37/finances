@@ -202,11 +202,13 @@ class ForecastStore {
                     )
                   )
                 ),
-            subscriptions: subscriptionStore.getSubscriptionsForForecast(
-              month,
-              year,
-              null
-            ),
+            subscriptions: isIncome
+              ? []
+              : subscriptionStore.getSubscriptionsForForecast(
+                  month,
+                  year,
+                  null
+                ),
           },
           thisMonth: {
             spendings: roundCost(
