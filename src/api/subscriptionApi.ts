@@ -14,6 +14,7 @@ export interface SubscriptionJson {
   category_id: number;
   period: number;
   first_date: string;
+  active: boolean;
   source_id: number | null;
 }
 
@@ -28,4 +29,8 @@ export const subscriptionApi = {
   >("subscription", "POST"),
   modify: createApiEndpoint<SubscriptionJson, never>("subscription", "PUT"),
   delete: createDeleteApiEndpoint("subscription"),
+  toggle: createApiEndpoint<{ active: boolean }, { id: number }>(
+    "subscription/toggle",
+    "PATCH"
+  ),
 };

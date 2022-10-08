@@ -1,5 +1,6 @@
 import { makeAutoObservable } from "mobx";
 import moment, { Moment } from "moment";
+import { api } from "../api";
 import { costToString } from "../utils";
 import Category from "./Category";
 import Source from "./Source";
@@ -14,6 +15,7 @@ export interface SubscriptionFormValues {
   period: number;
   firstDate: Moment | null;
   source: number | null;
+  active: boolean;
 }
 
 export default class Subscription {
@@ -36,6 +38,7 @@ export default class Subscription {
   category: Category;
   period: number;
   firstDate: Moment;
+  active: boolean;
   source: Source | null;
 
   constructor(
@@ -45,6 +48,7 @@ export default class Subscription {
     category: Category,
     period: number,
     firstDate: Moment,
+    active: boolean,
     source: Source | null = null
   ) {
     makeAutoObservable(this);
@@ -56,6 +60,7 @@ export default class Subscription {
     this.period = period;
     this.firstDate = firstDate;
     this.source = source;
+    this.active = active;
   }
 
   get costString(): string {
@@ -81,7 +86,14 @@ export default class Subscription {
       period: this.period,
       firstDate: this.firstDate,
       source: this.source?.id ?? null,
+      active: this.active,
     };
+  }
+
+  async setActive(active: boolean) {
+    this.active = active;
+
+    return api.subscription.toggle({ active }, { id: this.id });
   }
 
   isInMonth(month: number, year: number): boolean {

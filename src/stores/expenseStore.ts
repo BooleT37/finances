@@ -344,8 +344,8 @@ class ExpenseStore {
     category?: Category
   ): SubscriptionForPeriod[] {
     const allSubscriptions = category
-      ? subscriptionStore.byCategory[category.name] ?? []
-      : subscriptionStore.subscriptions;
+      ? subscriptionStore.activeByCategory[category.name] ?? []
+      : subscriptionStore.activeSubscriptions;
     let subscriptionsForPeriod = allSubscriptions
       .map((subscription): SubscriptionForPeriod | null => {
         const firstDate = subscription.firstDateInInterval(startDate, endDate);

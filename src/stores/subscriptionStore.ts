@@ -33,6 +33,7 @@ class SubscriptionStore {
           categories.getById(e.category_id),
           e.period,
           moment(e.first_date),
+          e.active,
           e.source_id === null ? null : sources.getById(e.source_id)
         )
     );
@@ -82,8 +83,16 @@ class SubscriptionStore {
     return found;
   }
 
+  get activeSubscriptions() {
+    return this.subscriptions.filter((s) => s.active);
+  }
+
   get byCategory(): Record<string, Subscription[]> {
     return groupBy(this.subscriptions, "category.name");
+  }
+
+  get activeByCategory(): Record<string, Subscription[]> {
+    return groupBy(this.activeSubscriptions, "category.name");
   }
 
   async add(subscription: Subscription): Promise<void> {
@@ -95,6 +104,7 @@ class SubscriptionStore {
       category_id: subscription.category.id,
       period: subscription.period,
       first_date: subscription.firstDate.format(DATE_SERVER_FORMAT),
+      active: true,
       source_id: subscription.source?.id ?? null,
     });
     subscription.id = id;
@@ -114,6 +124,7 @@ class SubscriptionStore {
         category_id: subscription.category.id,
         period: subscription.period,
         first_date: subscription.firstDate.format(DATE_SERVER_FORMAT),
+        active: subscription.active,
         source_id: subscription.source?.id ?? null,
       });
     } else {

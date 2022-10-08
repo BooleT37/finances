@@ -28,6 +28,7 @@ function formValuesToSubscription(
     categories.getById(values.categoryId),
     values.period,
     values.firstDate,
+    values.active,
     values.source !== null ? sources.getById(values.source) : null
   );
 }
@@ -42,6 +43,7 @@ const INITIAL_VALUES: FormValues = {
   period: 1,
   firstDate: today,
   source: null,
+  active: true,
 };
 
 interface Props {

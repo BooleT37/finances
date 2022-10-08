@@ -1,3 +1,4 @@
+import { Space, Switch } from "antd";
 import { observer } from "mobx-react";
 import React from "react";
 import { DATE_FORMAT } from "../../constants";
@@ -21,14 +22,19 @@ const SubscriptionsList: React.FC<Props> = observer(function SubscriptionsList({
           <SubscriptionCategoryName level={3}>
             {categoryName}
           </SubscriptionCategoryName>
-          <ul>
-            {subscriptions[categoryName].map((subscription) => (
-              <li key={subscription.id}>
+          {subscriptions[categoryName].map((subscription) => (
+            <div key={subscription.id}>
+              <Space>
+                <Switch
+                  checked={subscription.active}
+                  onChange={(checked) => subscription.setActive(checked)}
+                />
                 <SubscriptionItem
                   id={subscription.id}
                   name={subscription.name}
                   costString={subscription.costString}
                   nextDate={subscription.nextDate.format(DATE_FORMAT)}
+                  active={subscription.active}
                   onEdit={(subscriptionId) => {
                     onEditClick(subscriptionId);
                   }}
@@ -36,9 +42,9 @@ const SubscriptionsList: React.FC<Props> = observer(function SubscriptionsList({
                     subscriptionStore.delete(subscriptionId);
                   }}
                 />
-              </li>
-            ))}
-          </ul>
+              </Space>
+            </div>
+          ))}
         </div>
       ))}
     </div>
