@@ -146,7 +146,7 @@ class SubscriptionStore {
     year: number,
     category: Category | null
   ): SubscriptionsItem[] {
-    return this.subscriptions
+    return this.activeSubscriptions
       .filter(
         (subscription) =>
           (!category || subscription.category.id === category.id) &&
