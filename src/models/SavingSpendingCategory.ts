@@ -4,6 +4,7 @@ import { api } from "../api";
 import { RecordType } from "../SavingSpendingsScreen/SavingSpendingCard";
 import expenseStore from "../stores/expenseStore";
 import type { Option } from "../types";
+import { roundCost } from "../utils";
 import { isTempId } from "../utils/tempId";
 
 export default class SavingSpendingCategory {
@@ -31,12 +32,14 @@ export default class SavingSpendingCategory {
   }
 
   get expenses() {
-    return sum(
-      expenseStore.expenses
-        .filter(
-          (e) => e.savingSpending && e.savingSpending.category.id === this.id
-        )
-        .map((e) => e.cost ?? 0)
+    return roundCost(
+      sum(
+        expenseStore.expenses
+          .filter(
+            (e) => e.savingSpending && e.savingSpending.category.id === this.id
+          )
+          .map((e) => e.cost ?? 0)
+      )
     );
   }
 

@@ -6,7 +6,7 @@ import { observer } from "mobx-react";
 import { FC } from "react";
 import styled from "styled-components";
 import SavingSpending from "../models/SavingSpending";
-import { costToString } from "../utils";
+import { costToString, roundCost } from "../utils";
 
 interface Props {
   spending: SavingSpending;
@@ -94,10 +94,14 @@ const SavingSpendingCard: React.FC<Props> = observer(
                 <Table.Summary.Row>
                   <Table.Summary.Cell index={0}>Всего:</Table.Summary.Cell>
                   <Table.Summary.Cell index={1}>
-                    {costToString(sum(pageData.map((r) => r.forecast)))}
+                    {costToString(
+                      roundCost(sum(pageData.map((r) => r.forecast)))
+                    )}
                   </Table.Summary.Cell>
                   <Table.Summary.Cell index={2}>
-                    {costToString(sum(pageData.map((r) => r.expenses)))}
+                    {costToString(
+                      roundCost(sum(pageData.map((r) => r.expenses)))
+                    )}
                   </Table.Summary.Cell>
                 </Table.Summary.Row>
               </>
