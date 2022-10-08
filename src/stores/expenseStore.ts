@@ -271,7 +271,7 @@ class ExpenseStore {
     const interim = from.clone();
     while (to > interim || interim.format("M") === to.format("M")) {
       const month = interim.format(MONTH_DATE_FORMAT);
-      if (dict[month] !== undefined) {
+      if (dict[month] === undefined) {
         dict[month] = {
           date: interim.clone(),
         } as MonthEntry;
