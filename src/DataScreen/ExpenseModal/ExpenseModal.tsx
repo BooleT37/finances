@@ -111,6 +111,17 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
       .validateFields()
       .then(
         action(async (values) => {
+          if (
+            values.savingSpendingId !== null &&
+            values.savingSpendingId !== undefined
+          ) {
+            const { categories } = savingSpendingStore.getById(
+              values.savingSpendingId
+            );
+            if (categories.length === 1) {
+              values.savingSpendingCategoryId = categories[0].id;
+            }
+          }
           form.resetFields();
           form.setFieldsValue({ source: values.source });
           if (!hasPersonalExp) {
@@ -221,7 +232,14 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
     value: s.subscription.id,
   }));
 
-  const handleValuesChange = (changedValues: Partial<FormValues>) => {
+  // console.log(form.getFieldsValue(true));
+
+  const handleValuesChange = (
+    changedValues: Partial<FormValues>,
+    values: FormValues
+  ) => {
+    // console.log(changedValues);
+    // console.log(values);
     if (
       changedValues.subscription !== null &&
       changedValues.subscription !== undefined
@@ -244,6 +262,26 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
         source: subscription.source?.id,
       });
     }
+    runInAction(() => {
+      if (
+        changedValues.savingSpendingId !== null &&
+        changedValues.savingSpendingId !== undefined
+      ) {
+        const { categories } = savingSpendingStore.getById(
+          changedValues.savingSpendingId
+        );
+        form.setFieldsValue({
+          savingSpendingCategoryId:
+            categories.length === 1 ? categories[0].id : null,
+        });
+        // TODO why the hell the first category doesn't get auto inserted??
+      }
+    });
+    if (changedValues.savingSpendingId === null) {
+      form.setFieldsValue({
+        savingSpendingCategoryId: null,
+      });
+    }
   };
 
   return (
@@ -259,7 +297,11 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
       width={540}
       footer={[
         expenseModalStore.lastExpense && (
-          <Button type="link" onClick={handleInsertPreviousClick}>
+          <Button
+            key="insertLast"
+            type="link"
+            onClick={handleInsertPreviousClick}
+          >
             Подставить предыдущий
           </Button>
         ),
@@ -344,28 +386,26 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
             <Select options={savingSpendingOptions} placeholder="Не указано" />
           </Form.Item>
         )}
-        {categoryId === CATEGORY_IDS.fromSavings && (
-          <Form.Item
-            name="savingSpendingCategoryId"
-            label="Категория события"
-            rules={[
-              {
-                required: categoryId === CATEGORY_IDS.fromSavings,
-                message: "Выберите категорию",
-              },
-            ]}
-            extra={
-              savingSpendingId === null ? "Сначала выберите событие" : undefined
-            }
-          >
-            <Select
-              disabled={savingSpendingId === null}
-              options={savingSpendingCategoryOptions}
-              placeholder="Выберите категорию"
-              ref={firstFieldRef}
-            />
-          </Form.Item>
-        )}
+        {categoryId === CATEGORY_IDS.fromSavings &&
+          savingSpendingCategoryOptions.length > 1 && (
+            <Form.Item
+              name="savingSpendingCategoryId"
+              label="Категория события"
+              rules={[
+                {
+                  required: categoryId === CATEGORY_IDS.fromSavings,
+                  message: "Выберите категорию",
+                },
+              ]}
+            >
+              <Select
+                disabled={savingSpendingId === null}
+                options={savingSpendingCategoryOptions}
+                placeholder="Выберите категорию"
+                ref={firstFieldRef}
+              />
+            </Form.Item>
+          )}
         {subscriptionOptions.length > 0 && (
           <Form.Item name="subscription" label="Подписка">
             <Select

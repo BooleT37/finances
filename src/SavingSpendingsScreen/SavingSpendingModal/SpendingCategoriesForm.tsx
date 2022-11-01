@@ -23,7 +23,17 @@ interface Props {
 const SpendingCategoryForm: React.FC<Props> = ({ onFinish, formRef }) => {
   return (
     <Form
-      initialValues={{ name: "", categories: [] }}
+      initialValues={{
+        name: "",
+        categories: [
+          {
+            id: generateTempId(),
+            name: "",
+            forecast: 0,
+            comment: "",
+          },
+        ],
+      }}
       form={formRef}
       name="spending_categories_form"
       onFinish={onFinish}
@@ -44,23 +54,34 @@ const SpendingCategoryForm: React.FC<Props> = ({ onFinish, formRef }) => {
                 style={{ display: "flex", marginBottom: 8 }}
                 align="start"
               >
-                <Form.Item
-                  {...restField}
-                  name={[name, "name"]}
-                  rules={[{ required: true, message: "Введите имя" }]}
-                >
-                  <Input placeholder="Категория" />
-                </Form.Item>
+                {fields.length > 1 && (
+                  <Form.Item
+                    {...restField}
+                    name={[name, "name"]}
+                    rules={[{ required: true, message: "Введите имя" }]}
+                  >
+                    <Input placeholder="Категория" />
+                  </Form.Item>
+                )}
                 <Form.Item {...restField} name={[name, "forecast"]}>
-                  <InputNumber placeholder="План" addonBefore="€" />
+                  <InputNumber
+                    placeholder="План"
+                    addonBefore="€"
+                    style={{ width: 130 }}
+                  />
                 </Form.Item>
                 <Form.Item {...restField} name={[name, "comment"]}>
-                  <Input placeholder="Комментарий" />
+                  <Input
+                    placeholder="Комментарий"
+                    style={{ width: fields.length > 1 ? 160 : 335 }}
+                  />
                 </Form.Item>
-                <Button
-                  type="link"
-                  icon={<MinusCircleOutlined onClick={() => remove(name)} />}
-                />
+                {fields.length > 1 && (
+                  <Button
+                    type="link"
+                    icon={<MinusCircleOutlined onClick={() => remove(name)} />}
+                  />
+                )}
               </Space>
             ))}
             <Form.Item>

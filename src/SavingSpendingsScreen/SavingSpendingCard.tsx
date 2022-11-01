@@ -21,12 +21,7 @@ export interface RecordType {
   expenses: number;
 }
 
-const tableColumns: ColumnType<RecordType>[] = [
-  {
-    title: "",
-    dataIndex: "name",
-    key: "name",
-  },
+const tableColumnsForSingleCategory: ColumnType<RecordType>[] = [
   {
     title: "План",
     dataIndex: "forecast",
@@ -39,6 +34,15 @@ const tableColumns: ColumnType<RecordType>[] = [
     key: "expenses",
     render: costToString,
   },
+];
+
+const tableColumns: ColumnType<RecordType>[] = [
+  {
+    title: "",
+    dataIndex: "name",
+    key: "name",
+  },
+  ...tableColumnsForSingleCategory,
 ];
 
 const TableStyled = styled(Table)`
@@ -80,13 +84,17 @@ const SavingSpendingCard: React.FC<Props> = observer(
     return (
       <Card title={title}>
         <TableStyled<FC<TableProps<RecordType>>>
-          columns={tableColumns}
+          columns={
+            spending.categories.length > 1
+              ? tableColumns
+              : tableColumnsForSingleCategory
+          }
           dataSource={spending.categories.map((c) => c.asTableRecord)}
           pagination={false}
           rowKey="id"
           size="small"
           summary={(pageData) => {
-            if (pageData.length === 0) {
+            if (pageData.length < 2) {
               return null;
             }
             return (
