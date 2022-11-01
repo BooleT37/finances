@@ -1,16 +1,30 @@
+import sum from "lodash/sum";
 import { makeAutoObservable, observable, runInAction } from "mobx";
+import moment, { Moment } from "moment";
 import { api } from "../api";
 import { SavingSpendingJson } from "../api/savingSpendingApi";
 import { SavingSpendingCategoryJson } from "../api/savingSpendingCategoryApi";
+import { SAVINGS_DATE_LS_KEY, SAVINGS_LS_KEY } from "../constants";
+import { CATEGORY_IDS } from "../models/Category";
 import SavingSpending from "../models/SavingSpending";
 import SavingSpendingCategory from "../models/SavingSpendingCategory";
 import { Option } from "../types";
+import expenseStore from "./expenseStore";
 
 class SavingSpendingStore {
   savingSpendings = observable.array<SavingSpending>();
+  initialSavings: number;
+  initialSavingsDate: Moment | null;
 
   constructor() {
     makeAutoObservable(this);
+
+    this.initialSavings = parseFloat(
+      localStorage.getItem(SAVINGS_LS_KEY) ?? "0"
+    );
+    this.initialSavingsDate = localStorage[SAVINGS_DATE_LS_KEY]
+      ? moment(localStorage.getItem(SAVINGS_DATE_LS_KEY))
+      : null;
   }
 
   fromJson(
@@ -114,6 +128,45 @@ class SavingSpendingStore {
 
   categoriesAsOptions(id: number): Option[] {
     return this.getById(id).categories.map((c) => c.asOption);
+  }
+
+  get currentSpendings(): number | null {
+    if (!this.initialSavingsDate) {
+      return null;
+    }
+
+    const toSavingsExpenses =
+      CATEGORY_IDS.toSavings in expenseStore.expensesByCategoryId
+        ? expenseStore.expensesByCategoryId[CATEGORY_IDS.toSavings]
+        : [];
+
+    const fromSavingsExpenses =
+      CATEGORY_IDS.fromSavings in expenseStore.expensesByCategoryId
+        ? expenseStore.expensesByCategoryId[CATEGORY_IDS.fromSavings]
+        : [];
+
+    return (
+      sum(
+        toSavingsExpenses
+          .concat(fromSavingsExpenses)
+          .filter((expense) =>
+            expense.date.isSameOrAfter(this.initialSavingsDate, "date")
+          )
+          .map((expense) =>
+            expense.category.id === CATEGORY_IDS.fromSavings
+              ? -(expense.cost ?? 0)
+              : expense.cost
+          )
+      ) + this.initialSavings
+    );
+  }
+
+  setInitialSavings(savings: number) {
+    this.initialSavings = savings;
+  }
+
+  setInitialSavingsDate(date: Moment) {
+    this.initialSavingsDate = date;
   }
 }
 

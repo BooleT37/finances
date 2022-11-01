@@ -1,11 +1,13 @@
 import { ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Card, Col, Modal, Row, Tooltip, Typography } from "antd";
+import isNil from "lodash/isNil";
 import { runInAction } from "mobx";
 import { observer } from "mobx-react";
 import { useState } from "react";
 import styled from "styled-components";
 import SiteContent from "../SiteContent";
 import savingSpendingStore from "../stores/savingSpendingStore";
+import { costToString } from "../utils";
 import WhiteHeader from "../WhiteHeader";
 import SavingSpendingCard from "./SavingSpendingCard";
 import SavingSpendingModal from "./SavingSpendingModal";
@@ -24,9 +26,18 @@ const AddEventCard = styled(Card)`
   text-align: center;
 `;
 
+const CurrentSpendings = styled.div`
+  position: absolute;
+  right: 20px;
+  top: 0;
+  font-size: 18px;
+  font-weight: 500;
+`;
+
 const SavingSpendingsScreen: React.FC = observer(
   function SavingSpendingsScreen() {
-    const spendings = savingSpendingStore.savingSpendings;
+    const { savingSpendings: spendings, currentSpendings } =
+      savingSpendingStore;
 
     const [modalVisible, setModalVisible] = useState(false);
     const [editedSpendingId, setEditedSpendingId] = useState<number>(-1);
@@ -34,6 +45,11 @@ const SavingSpendingsScreen: React.FC = observer(
       <>
         <WhiteHeader>
           <Title>Траты из сбережений</Title>
+          {!isNil(currentSpendings) && (
+            <CurrentSpendings>
+              Текущие сбережения: {costToString(currentSpendings)}
+            </CurrentSpendings>
+          )}
         </WhiteHeader>
         <ContentStyled>
           <Row gutter={16}>
