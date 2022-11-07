@@ -96,6 +96,7 @@ class SubscriptionStore {
   }
 
   async add(subscription: Subscription): Promise<void> {
+    subscription.active = true;
     this.subscriptions.push(subscription);
     const { id } = await api.subscription.add({
       name: subscription.name,
@@ -104,7 +105,7 @@ class SubscriptionStore {
       category_id: subscription.category.id,
       period: subscription.period,
       first_date: subscription.firstDate.format(DATE_SERVER_FORMAT),
-      active: true,
+      active: subscription.active,
       source_id: subscription.source?.id ?? null,
     });
     subscription.id = id;
