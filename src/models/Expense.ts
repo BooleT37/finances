@@ -68,7 +68,9 @@ export default class Expense {
   get tableDataName(): string {
     const name = this.name || "";
     if (this.savingSpending !== null) {
-      const savingSpendingInfo = `${this.savingSpending.spending.name} - ${this.savingSpending.category.name}`;
+      let savingSpendingInfo = this.savingSpending.category.name
+        ? `${this.savingSpending.spending.name} - ${this.savingSpending.category.name}`
+        : this.savingSpending.spending.name;
       if (name) {
         return `${savingSpendingInfo} (${name})`;
       }

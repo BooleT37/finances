@@ -96,6 +96,7 @@ export default class SavingSpending {
     return {
       value: this.id,
       label: this.name,
+      disabled: this.completed,
     };
   }
 

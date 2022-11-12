@@ -8,7 +8,7 @@ import {
   Modal,
   Radio,
   Select,
-  Space
+  Space,
 } from "antd";
 import { action, reaction, runInAction } from "mobx";
 import { observer, useLocalObservable } from "mobx-react";
@@ -198,7 +198,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
   }, []);
 
   const savingSpendingOptions = React.useMemo(() => {
-    const options = savingSpendingStore.activeAsOptions.slice();
+    const options = savingSpendingStore.asOptions.slice();
     options.unshift({ value: null, label: "Нет события" });
     return options;
   }, []);
