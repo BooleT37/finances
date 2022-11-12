@@ -1,4 +1,5 @@
 import { makeAutoObservable } from "mobx";
+import { api } from "../api";
 import type { Option } from "../types";
 import { isTempId } from "../utils/tempId";
 import SavingSpendingCategory from "./SavingSpendingCategory";
@@ -96,5 +97,11 @@ export default class SavingSpending {
       value: this.id,
       label: this.name,
     };
+  }
+
+  async toggle(completed: boolean) {
+    this.completed = completed;
+
+    api.savingSpending.toggle({ completed }, { id: this.id });
   }
 }

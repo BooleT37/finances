@@ -1,5 +1,5 @@
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { Button, Card, Col, Row, Table, Tooltip } from "antd";
+import { Button, Card, Col, Row, Switch, Table, Tooltip } from "antd";
 import { ColumnType, TableProps } from "antd/lib/table";
 import { sum } from "lodash";
 import { observer } from "mobx-react";
@@ -65,6 +65,14 @@ const SavingSpendingCard: React.FC<Props> = observer(
     const title = (
       <Row>
         <Col flex="auto">{spending.name}</Col>
+        <Col flex="0">
+          <Tooltip title="Активно">
+            <Switch
+              checked={!spending.completed}
+              onChange={(checked) => spending.toggle(!checked)}
+            />
+          </Tooltip>
+        </Col>
         <Col flex="0">
           <Tooltip title="Редактировать событие">
             <Button type="link" icon={<EditOutlined />} onClick={onEditClick} />

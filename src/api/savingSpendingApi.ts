@@ -23,4 +23,8 @@ export const savingSpendingApi = {
   >("saving-spending", "POST"),
   edit: createApiEndpoint<SavingSpendingJson, never>("saving-spending", "PUT"),
   delete: createDeleteApiEndpoint("saving-spending"),
+  toggle: createApiEndpoint<{ completed: boolean }, { id: number }>(
+    "saving-spending/toggle",
+    "PATCH"
+  ),
 };

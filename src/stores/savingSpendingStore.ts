@@ -122,8 +122,10 @@ class SavingSpendingStore {
     });
   }
 
-  get asOptions(): Option[] {
-    return this.savingSpendings.map((s) => s.asOption);
+  get activeAsOptions(): Option[] {
+    return this.savingSpendings
+      .filter((s) => !s.completed)
+      .map((s) => s.asOption);
   }
 
   categoriesAsOptions(id: number): Option[] {
