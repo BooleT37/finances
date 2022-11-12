@@ -196,10 +196,16 @@ class ExpenseStore {
     granularity: "month" | "quarter" | "year"
   ): ComparisonData {
     const expensesFrom = this.expenses.filter(
-      (e) => !e.category.isIncome && e.date.isSame(from, granularity)
+      (e) =>
+        !e.category.isIncome &&
+        !e.category.toSavings &&
+        e.date.isSame(from, granularity)
     );
     const expensesTo = this.expenses.filter(
-      (e) => !e.category.isIncome && e.date.isSame(to, granularity)
+      (e) =>
+        !e.category.isIncome &&
+        !e.category.toSavings &&
+        e.date.isSame(to, granularity)
     );
     const map: Record<string, { from: number; to: number }> = {};
     expensesFrom.forEach((e) => {
