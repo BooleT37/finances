@@ -15,7 +15,6 @@ export interface SubscriptionFormValues {
   period: number;
   firstDate: Moment | null;
   source: number | null;
-  active: boolean;
 }
 
 export default class Subscription {
@@ -86,7 +85,6 @@ export default class Subscription {
       period: this.period,
       firstDate: this.firstDate,
       source: this.source?.id ?? null,
-      active: this.active,
     };
   }
 

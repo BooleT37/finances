@@ -4,7 +4,7 @@ import moment, { Moment } from "moment";
 import React from "react";
 import { DATE_FORMAT } from "../../constants";
 import Subscription, {
-  SubscriptionFormValues as FormValues,
+  SubscriptionFormValues as FormValues
 } from "../../models/Subscription";
 import categories from "../../readonlyStores/categories";
 import sources from "../../readonlyStores/sources";
@@ -19,7 +19,8 @@ interface ValidatedFormValues extends Omit<FormValues, "date" | "categoryId"> {
 
 function formValuesToSubscription(
   id: number | null,
-  values: ValidatedFormValues
+  values: ValidatedFormValues,
+  active: boolean,
 ): Subscription {
   return new Subscription(
     id ?? NEW_SUBSCRIPTION_ID,
@@ -28,7 +29,7 @@ function formValuesToSubscription(
     categories.getById(values.categoryId),
     values.period,
     values.firstDate,
-    values.active,
+    active,
     values.source !== null ? sources.getById(values.source) : null
   );
 }
@@ -43,7 +44,6 @@ const INITIAL_VALUES: FormValues = {
   period: 1,
   firstDate: today,
   source: null,
-  active: true,
 };
 
 interface Props {
@@ -60,6 +60,7 @@ const SubscriptionModal: React.FC<Props> = function SubscriptionModal({
 }) {
   const [form] = Form.useForm<FormValues>();
   const firstFieldRef = React.useRef<InputRef>(null);
+  const [active, setActive] = React.useState(true);
 
   const handleSubmit = () => {
     form
@@ -68,7 +69,8 @@ const SubscriptionModal: React.FC<Props> = function SubscriptionModal({
         runInAction(async () => {
           const subscription = formValuesToSubscription(
             subscriptionId,
-            values as ValidatedFormValues
+            values as ValidatedFormValues,
+            active,
           );
           if (subscriptionId === null) {
             await subscriptionStore.add(subscription);
@@ -87,10 +89,13 @@ const SubscriptionModal: React.FC<Props> = function SubscriptionModal({
     if (visible) {
       if (subscriptionId === null) {
         form.setFieldsValue(INITIAL_VALUES);
+        setActive(true);
       } else {
         form.setFieldsValue(
           subscriptionStore.getFormValuesByIdOrThrow(subscriptionId)
         );
+        const subscription = subscriptionStore.getByIdOrThrow(subscriptionId);
+        setActive(subscription.active);
       }
       setTimeout(() => {
         firstFieldRef.current?.focus();
