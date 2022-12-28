@@ -106,7 +106,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
     [endDate, startDate, lastSource]
   );
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     form
       .validateFields()
       .then(
@@ -128,7 +128,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
             values.personalExpCategoryId = null;
             values.personalExpSpent = "0";
           }
-          const expense = insertExpense(values as ValidatedFormValues);
+          const expense = await insertExpense(values as ValidatedFormValues);
           if (addMore.value) {
             expenseModalStore.lastExpenseId = expense.id;
             expenseModalStore.expenseId = null;

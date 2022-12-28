@@ -79,10 +79,10 @@ class ExpenseStore {
     return Math.max(...this.expenses.map((e) => e.id)) + 1;
   }
 
-  *add(expense: Expense): Generator<Promise<Response>> {
+  async add(expense: Expense): Promise<Response> {
     expense.id = this.nextId();
     this.expenses.push(expense);
-    yield api.expense.add({
+    return api.expense.add({
       id: expense.id,
       name: expense.name,
       cost: expense.cost,
@@ -98,11 +98,11 @@ class ExpenseStore {
     });
   }
 
-  *modify(expense: Expense, then?: () => void): Generator<Promise<Response>> {
+  async modify(expense: Expense, then?: () => void): Promise<Response> {
     const foundIndex = this.expenses.findIndex((e) => e.id === expense.id);
     if (foundIndex !== -1) {
       this.expenses[foundIndex] = expense;
-      yield api.expense
+      return api.expense
         .modify({
           id: expense.id,
           name: expense.name,
@@ -126,14 +126,14 @@ class ExpenseStore {
     }
   }
 
-  *delete(id: number): Generator<Promise<Response>> {
+  async delete(id: number): Promise<void> {
     const foundIndex = this.expenses.findIndex((e) => e.id === id);
     if (foundIndex === -1) {
       return;
     }
     const personalExpenseId = this.expenses[foundIndex].personalExpense?.id;
     this.expenses.splice(foundIndex, 1);
-    yield api.expense.delete(id);
+    await api.expense.delete(id);
     if (personalExpenseId !== undefined) {
       this.delete(personalExpenseId);
     }

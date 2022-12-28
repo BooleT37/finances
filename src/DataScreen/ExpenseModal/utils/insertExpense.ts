@@ -7,7 +7,9 @@ import expenseModalStore from "../../expenseModalStore";
 import { ValidatedFormValues } from "../models";
 import generatePersonalExpenseName from "./generatePersonalExpenseName";
 
-export default function insertExpense(values: ValidatedFormValues): Expense {
+export default async function insertExpense(
+  values: ValidatedFormValues
+): Promise<Expense> {
   const newExpense = new Expense(
     -1,
     parseFloat(values.cost),
@@ -78,7 +80,7 @@ export default function insertExpense(values: ValidatedFormValues): Expense {
           null,
           null
         );
-        expenseStore.add(personalExpense);
+        await expenseStore.add(personalExpense);
         newExpense.personalExpense = personalExpense;
         newExpense.cost = (newExpense.cost ?? 0) - (personalExpense.cost ?? 0);
       }

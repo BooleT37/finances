@@ -9,9 +9,10 @@ import { Button, Checkbox, DatePicker, Input, Space, Typography } from "antd";
 import { action } from "mobx";
 import { observer } from "mobx-react";
 import moment, { Moment } from "moment";
-import React from "react";
+import React, { useCallback } from "react";
 import styled from "styled-components";
 import { DATE_FORMAT, MONTH_DATE_FORMAT } from "../constants";
+import Expense, { TableData } from "../models/Expense";
 import SiteContent from "../SiteContent";
 import expenseStore from "../stores/expenseStore";
 import forecastStore from "../stores/forecastStore";
@@ -148,6 +149,25 @@ const DataScreen = observer(function DataScreen() {
     today.month() === rangeStart.month() &&
     today.year() === rangeStart.year();
 
+  const handleModalSubmit = useCallback(
+    (expense: Expense) => {
+      expandCategory(expense.category.name);
+      setTimeout(() => {
+        if (!gridRef.current) {
+          return;
+        }
+        const { api } = gridRef.current;
+        const nodeToFlash = api.getRowNode(expense.id.toString());
+        if (nodeToFlash) {
+          api.flashCells({
+            rowNodes: [nodeToFlash],
+          });
+        }
+      });
+    },
+    [expandCategory]
+  );
+
   return (
     <>
       <WhiteHeader className="site-layout-background">
@@ -236,6 +256,7 @@ const DataScreen = observer(function DataScreen() {
                       : undefined
                   }
                   columnDefs={columnDefs}
+                  getRowId={({ data }) => (data as TableData).id.toString()}
                   context={{
                     expandCategory,
                     categoriesForecast: isRangePicker
@@ -269,9 +290,7 @@ const DataScreen = observer(function DataScreen() {
       <ExpenseModal
         startDate={rangeStart}
         endDate={rangeEnd}
-        onSubmit={(e) => {
-          expandCategory(e.category.name);
-        }}
+        onSubmit={handleModalSubmit}
       />
     </>
   );
