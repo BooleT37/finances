@@ -1,7 +1,9 @@
-import { Input, Space, Typography } from "antd";
+import { InfoCircleOutlined } from "@ant-design/icons";
+import { Col, Row, Tooltip, Typography } from "antd";
 import moment from "moment";
 import React, { useEffect } from "react";
 import styled from "styled-components";
+import { CostInput } from "../components/CostInput";
 import {
   DATE_FORMAT,
   DATE_SERVER_FORMAT,
@@ -16,8 +18,12 @@ import WhiteHeader from "../WhiteHeader";
 
 const { Title } = Typography;
 
-const PeSumInput = styled(Input)`
-  width: 300px;
+const Wrapper = styled.div`
+  width: 540px;
+`;
+
+const Info = styled.div`
+  color: #777;
 `;
 
 const today = moment();
@@ -31,9 +37,9 @@ const SettingsScreen: React.FC = () => {
   const [savings, setSavings] = React.useState(() => {
     const lsValue = localStorage.getItem(SAVINGS_LS_KEY);
     if (!lsValue) {
-      return 0;
+      return "0";
     }
-    return parseFloat(lsValue);
+    return lsValue;
   });
   const [savingsDate, setSavingsDate] = React.useState(() => {
     const lsValue = localStorage.getItem(SAVINGS_DATE_LS_KEY);
@@ -43,8 +49,8 @@ const SettingsScreen: React.FC = () => {
     return moment(lsValue);
   });
 
-  const handleSavingsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSavings(parseFloat(e.target.value));
+  const handleSavingsChange = (value: string) => {
+    setSavings(value);
     setSavingsDate(today);
   };
 
@@ -54,7 +60,7 @@ const SettingsScreen: React.FC = () => {
 
   useEffect(() => {
     localStorage.setItem(SAVINGS_LS_KEY, String(savings));
-    savingSpendingStore.setInitialSavings(savings);
+    savingSpendingStore.setInitialSavings(parseFloat(savings));
   }, [savings]);
 
   useEffect(() => {
@@ -73,23 +79,34 @@ const SettingsScreen: React.FC = () => {
         <Title>Настройки</Title>
       </WhiteHeader>
       <SiteContent className="site-layout-background">
-        <Space direction="vertical">
-          <PeSumInput
-            type="number"
-            addonBefore="Персональные расходы/мес (€)"
-            value={peSum}
-            onChange={(e) => setPeSum(e.target.value)}
-          />
-          <Input
-            type="number"
-            addonBefore="Сбережения (€)"
-            value={savings}
-            onChange={handleSavingsChange}
-            addonAfter={
-              savingsDate && `Изменено ${savingsDate.format(DATE_FORMAT)}`
-            }
-          />
-        </Space>
+        <Wrapper>
+          <Row align="middle" style={{ padding: "8px 0" }}>
+            <Col span={9}>Персональные расходы/мес</Col>
+            <Col>
+              <CostInput value={peSum} onChange={(e) => setPeSum(e)} />
+            </Col>
+          </Row>
+          <Row align="middle" style={{ padding: "8px 0" }}>
+            <Col span={9}>Сбережения</Col>
+            <Col span={6}>
+              <CostInput value={savings} onChange={handleSavingsChange} />
+            </Col>
+            <Col>
+              {savingsDate && (
+                <Info>
+                  <Tooltip
+                    title={`Текущая сумма сбережений отображается на странице "Траты из сбережений".
+                  Она рассчитывается на основе расходов с категориями "В сбережения" и "Из сбережений", сделанных после начальной даты`}
+                  >
+                    <InfoCircleOutlined />
+                  </Tooltip>
+                  &nbsp;Изменено&nbsp;
+                  {savingsDate.format(DATE_FORMAT)}
+                </Info>
+              )}
+            </Col>
+          </Row>
+        </Wrapper>
       </SiteContent>
     </>
   );

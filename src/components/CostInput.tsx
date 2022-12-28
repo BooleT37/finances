@@ -2,7 +2,7 @@ import { InputNumber, InputNumberProps } from "antd";
 import React from "react";
 
 // eslint-disable-next-line mobx/missing-observer
-export const CostInput: React.FC<InputNumberProps> = (props) => (
+export const CostInput: React.FC<InputNumberProps<string>> = (props) => (
   <InputNumber
     placeholder="План"
     addonAfter="€"
