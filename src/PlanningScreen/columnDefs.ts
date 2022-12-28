@@ -38,12 +38,6 @@ const columnDefs: (ColDef | ColGroupDef)[] = [
     cellRenderer: MonthCellRenderer,
   },
   {
-    field: "thisMonth",
-    width: 160,
-    headerName: "Факт",
-    cellRenderer: MonthCellRenderer,
-  },
-  {
     field: "sum",
     width: 200,
     headerName: "План",
@@ -60,6 +54,12 @@ const columnDefs: (ColDef | ColGroupDef)[] = [
       ![CATEGORY_IDS.total, CATEGORY_IDS.fromSavings].includes(
         (data as ForecastTableItem).categoryId
       ),
+  },
+  {
+    field: "thisMonth",
+    width: 160,
+    headerName: "Факт",
+    cellRenderer: MonthCellRenderer,
   },
   {
     field: "comment",
