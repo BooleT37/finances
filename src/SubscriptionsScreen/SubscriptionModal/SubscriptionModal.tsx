@@ -95,8 +95,10 @@ const SubscriptionModal: React.FC<Props> = function SubscriptionModal({
         form.setFieldsValue(
           subscriptionStore.getFormValuesByIdOrThrow(subscriptionId)
         );
-        const subscription = subscriptionStore.getByIdOrThrow(subscriptionId);
-        setActive(subscription.active);
+        runInAction(() => {
+          const subscription = subscriptionStore.getByIdOrThrow(subscriptionId);
+          setActive(subscription.active);
+        });
       }
       setTimeout(() => {
         firstFieldRef.current?.focus();
