@@ -31,20 +31,24 @@ const SubscriptionsItem: React.FC<Props> = function SubscriptionsItem(props) {
       <Tooltip title="Следующая дата списания">
         <SubscriptionDate>{props.nextDate}</SubscriptionDate>
       </Tooltip>
-      <Button
-        type="text"
-        icon={<EditOutlined />}
-        onClick={() => {
-          props.onEdit(props.id);
-        }}
-      />
-      <Button
-        type="text"
-        icon={<DeleteOutlined />}
-        onClick={() => {
-          props.onDelete(props.id);
-        }}
-      />
+      <Tooltip title="Редактировать">
+        <Button
+          type="text"
+          icon={<EditOutlined />}
+          onClick={() => {
+            props.onEdit(props.id);
+          }}
+        />
+      </Tooltip>
+      <Tooltip title="Удалить">
+        <Button
+          type="text"
+          icon={<DeleteOutlined />}
+          onClick={() => {
+            props.onDelete(props.id);
+          }}
+        />
+      </Tooltip>
     </Container>
   );
 };

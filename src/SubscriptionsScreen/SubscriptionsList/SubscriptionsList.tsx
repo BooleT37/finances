@@ -1,4 +1,4 @@
-import { Space, Switch } from "antd";
+import { Space, Switch, Tooltip } from "antd";
 import { observer } from "mobx-react";
 import React from "react";
 import { DATE_FORMAT } from "../../constants";
@@ -25,10 +25,15 @@ const SubscriptionsList: React.FC<Props> = observer(function SubscriptionsList({
           {subscriptions[categoryName].map((subscription) => (
             <div key={subscription.id}>
               <Space>
-                <Switch
-                  checked={subscription.active}
-                  onChange={(checked) => subscription.setActive(checked)}
-                />
+                <Tooltip
+                  placement="bottom"
+                  title={subscription.active ? "Активная" : "Отключенная"}
+                >
+                  <Switch
+                    checked={subscription.active}
+                    onChange={(checked) => subscription.setActive(checked)}
+                  />
+                </Tooltip>
                 <SubscriptionItem
                   id={subscription.id}
                   name={subscription.name}
