@@ -66,7 +66,7 @@ const SavingSpendingCard: React.FC<Props> = observer(
       <Row>
         <Col flex="auto">{spending.name}</Col>
         <Col flex="0">
-          <Tooltip title="Активно">
+          <Tooltip title={spending.completed ? "Завершено" : "Активно"}>
             <Switch
               checked={!spending.completed}
               onChange={(checked) => spending.toggle(!checked)}
