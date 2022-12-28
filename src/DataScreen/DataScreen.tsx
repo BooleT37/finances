@@ -163,7 +163,7 @@ const DataScreen = observer(function DataScreen() {
             rowNodes: [nodeToFlash],
           });
         }
-      });
+      }, 100);
     },
     [expandCategory]
   );
