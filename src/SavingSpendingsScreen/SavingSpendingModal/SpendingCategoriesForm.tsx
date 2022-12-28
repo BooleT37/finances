@@ -1,5 +1,6 @@
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Form, FormInstance, Input, InputNumber, Space } from "antd";
+import { Button, Form, FormInstance, Input, Space } from "antd";
+import { CostInput } from "../../components/CostInput";
 import { generateTempId } from "../../utils/tempId";
 
 interface CategoryFormValues {
@@ -64,11 +65,7 @@ const SpendingCategoryForm: React.FC<Props> = ({ onFinish, formRef }) => {
                   </Form.Item>
                 )}
                 <Form.Item {...restField} name={[name, "forecast"]}>
-                  <InputNumber
-                    placeholder="План"
-                    addonBefore="€"
-                    style={{ width: 130 }}
-                  />
+                  <CostInput placeholder="План" />
                 </Form.Item>
                 <Form.Item {...restField} name={[name, "comment"]}>
                   <Input
