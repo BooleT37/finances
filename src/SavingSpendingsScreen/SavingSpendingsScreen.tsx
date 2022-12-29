@@ -1,9 +1,14 @@
-import { ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  ExclamationCircleOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 import { Button, Card, Col, Modal, Row, Tooltip, Typography } from "antd";
 import isNil from "lodash/isNil";
 import { runInAction } from "mobx";
 import { observer } from "mobx-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import SiteContent from "../SiteContent";
 import savingSpendingStore from "../stores/savingSpendingStore";
@@ -48,6 +53,12 @@ const SavingSpendingsScreen: React.FC = observer(
           {!isNil(currentSpendings) && (
             <CurrentSpendings>
               Текущие сбережения: {costToString(currentSpendings)}
+              &nbsp;
+              <Tooltip title="Редактировать">
+                <Link to="/screens/settings">
+                  <EditOutlined />
+                </Link>
+              </Tooltip>
             </CurrentSpendings>
           )}
         </WhiteHeader>

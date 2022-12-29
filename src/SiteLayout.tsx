@@ -11,7 +11,7 @@ import { ItemType } from "antd/lib/menu/hooks/useItems";
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 
-const { Content, Footer, Sider } = Layout;
+const { Content, Sider } = Layout;
 
 function getItem(
   label: string,
