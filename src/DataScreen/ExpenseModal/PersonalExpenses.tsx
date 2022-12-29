@@ -32,7 +32,11 @@ const PersonalExpenses: React.FC<Props> = observer(function PersonalExpenses({
 
   return (
     <>
-      <Form.Item name="personalExpCategoryId" label="Чьи личные деньги">
+      <Form.Item
+        name="personalExpCategoryId"
+        label="Чьи личные деньги"
+        rules={[{ required: true, message: "Выберите, чьи деньги" }]}
+      >
         <Select style={{ width: 130 }}>
           <Option value={CATEGORY_IDS.personal.Alexey}>Алексей</Option>
           <Option value={CATEGORY_IDS.personal.Lena}>Лена</Option>
@@ -42,6 +46,7 @@ const PersonalExpenses: React.FC<Props> = observer(function PersonalExpenses({
         name="personalExpSpent"
         label="Сумма личных денег"
         extra={extra}
+        rules={[{ required: true, message: "Введите сумму" }]}
       >
         <CostInput status={exceeds ? "warning" : ""} />
       </Form.Item>
