@@ -178,14 +178,6 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
     }
   );
 
-  const disabledDate = (date: Moment) => {
-    return (
-      (startDate && date.isBefore(startDate)) ||
-      (endDate && date.isAfter(endDate)) ||
-      false
-    );
-  };
-
   const handleInsertPreviousClick = () => {
     if (expenseModalStore.lastExpense) {
       form.setFieldsValue(expenseToFormValues(expenseModalStore.lastExpense));
@@ -438,11 +430,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
           label="Дата"
           rules={[{ required: true, message: "Введите дату" }]}
         >
-          <DatePicker
-            disabledDate={disabledDate}
-            format={DATE_FORMAT}
-            allowClear={false}
-          />
+          <DatePicker format={DATE_FORMAT} allowClear={false} />
         </Form.Item>
         <Form.Item name="name" label="Коментарий">
           <Input />
