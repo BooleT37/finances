@@ -5,7 +5,15 @@ import {
   SwapOutlined,
 } from "@ant-design/icons";
 import { AgGridReact } from "ag-grid-react";
-import { Button, Checkbox, DatePicker, Input, Space, Typography } from "antd";
+import {
+  Button,
+  Checkbox,
+  DatePicker,
+  Input,
+  Space,
+  Tooltip,
+  Typography,
+} from "antd";
 import { action } from "mobx";
 import { observer } from "mobx-react";
 import moment, { Moment } from "moment";
@@ -195,11 +203,13 @@ const DataScreen = observer(function DataScreen() {
                   />
                 ) : (
                   <div>
-                    <Button
-                      type="text"
-                      icon={<LeftOutlined />}
-                      onClick={goToPrevMonth}
-                    />
+                    <Tooltip title="Предыдущий месяц">
+                      <Button
+                        type="text"
+                        icon={<LeftOutlined />}
+                        onClick={goToPrevMonth}
+                      />
+                    </Tooltip>
                     <DatePicker
                       value={rangeStart}
                       picker="month"
@@ -207,11 +217,13 @@ const DataScreen = observer(function DataScreen() {
                       format={MONTH_DATE_FORMAT}
                       allowClear={false}
                     />
-                    <Button
-                      type="text"
-                      icon={<RightOutlined />}
-                      onClick={goToNextMonth}
-                    />
+                    <Tooltip title="Следующий месяц">
+                      <Button
+                        type="text"
+                        icon={<RightOutlined />}
+                        onClick={goToNextMonth}
+                      />
+                    </Tooltip>
                   </div>
                 )}
                 <Button

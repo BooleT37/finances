@@ -1,7 +1,7 @@
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import type { CellEditRequestEvent, RowNode } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
-import { Button, DatePicker, Space, Typography } from "antd";
+import { Button, DatePicker, Space, Tooltip, Typography } from "antd";
 import { action } from "mobx";
 import { observer } from "mobx-react";
 import moment, { Moment } from "moment";
@@ -93,12 +93,14 @@ const PlanningScreen = observer(function PlanningScreen() {
       <SiteContent className="site-layout-background">
         <Space direction="vertical" size="middle">
           <div>
-            <Button
-              type="text"
-              size="large"
-              icon={<LeftOutlined />}
-              onClick={goToPrevMonth}
-            />
+            <Tooltip title="Предыдущий месяц">
+              <Button
+                type="text"
+                size="large"
+                icon={<LeftOutlined />}
+                onClick={goToPrevMonth}
+              />
+            </Tooltip>
             <DatePicker
               value={date}
               picker="month"
@@ -108,12 +110,14 @@ const PlanningScreen = observer(function PlanningScreen() {
               style={{ width: 160 }}
               size="large"
             />
-            <Button
-              type="text"
-              size="large"
-              icon={<RightOutlined />}
-              onClick={goToNextMonth}
-            />
+            <Tooltip title="Следующий месяц">
+              <Button
+                type="text"
+                size="large"
+                icon={<RightOutlined />}
+                onClick={goToNextMonth}
+              />
+            </Tooltip>
           </div>
           {date && (
             <Space direction="vertical" size="middle">
