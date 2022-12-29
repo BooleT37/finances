@@ -1,8 +1,8 @@
-import { Divider, Form, FormInstance, Select } from "antd";
-import { observer } from "mobx-react";
-import React from "react";
+import { Divider, Form, FormInstance, Select, Space } from "antd";
+import Link from "antd/lib/typography/Link";
+import React, { useCallback } from "react";
 import { CostInput } from "../../components/CostInput";
-import { CATEGORY_IDS } from "../../models/Category";
+import { CATEGORY_IDS, PersonalExpCategoryIds } from "../../models/Category";
 import categories from "../../readonlyStores/categories";
 import forecastStore from "../../stores/forecastStore";
 import { FormValues } from "./models";
@@ -11,11 +11,11 @@ const { Option } = Select;
 
 interface Props {
   form: FormInstance<FormValues>;
+  onTransferAll(categoryId: PersonalExpCategoryIds): void;
 }
 
-const PersonalExpenses: React.FC<Props> = observer(function PersonalExpenses({
-  form,
-}) {
+// eslint-disable-next-line mobx/missing-observer
+const PersonalExpenses: React.FC<Props> = ({ form, onTransferAll }) => {
   const spent = Form.useWatch("personalExpSpent", form);
   const categoryId = Form.useWatch("personalExpCategoryId", form);
   const date = Form.useWatch("date", form);
@@ -29,6 +29,12 @@ const PersonalExpenses: React.FC<Props> = observer(function PersonalExpenses({
       : undefined;
   const extra = forecastSum !== undefined ? `Макс: ${forecastSum}` : null;
   const exceeds = forecastSum !== undefined && parseFloat(spent) > forecastSum;
+
+  const handleTransferAllClick = useCallback(() => {
+    if (categoryId !== null) {
+      onTransferAll(categoryId);
+    }
+  }, [categoryId, onTransferAll]);
 
   return (
     <>
@@ -48,11 +54,16 @@ const PersonalExpenses: React.FC<Props> = observer(function PersonalExpenses({
         extra={extra}
         rules={[{ required: true, message: "Введите сумму" }]}
       >
-        <CostInput status={exceeds ? "warning" : ""} />
+        <Space>
+          <CostInput status={exceeds ? "warning" : ""} />
+          <Link disabled={categoryId === null} onClick={handleTransferAllClick}>
+            Перенести все
+          </Link>
+        </Space>
       </Form.Item>
       <Divider />
     </>
   );
-});
+};
 
 export default PersonalExpenses;
