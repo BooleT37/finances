@@ -152,18 +152,21 @@ const DataScreen = observer(function DataScreen() {
   const handleModalSubmit = useCallback(
     (expense: Expense) => {
       expandCategory(expense.category.name);
-      setTimeout(() => {
-        if (!gridRef.current) {
-          return;
-        }
-        const { api } = gridRef.current;
-        const nodeToFlash = api.getRowNode(expense.id.toString());
-        if (nodeToFlash) {
-          api.flashCells({
-            rowNodes: [nodeToFlash],
-          });
-        }
-      }, 100);
+      setTimeout(
+        action(() => {
+          if (!gridRef.current) {
+            return;
+          }
+          const { api } = gridRef.current;
+          const nodeToFlash = api.getRowNode(expense.id.toString());
+          if (nodeToFlash) {
+            api.flashCells({
+              rowNodes: [nodeToFlash],
+            });
+          }
+        }),
+        100
+      );
     },
     [expandCategory]
   );

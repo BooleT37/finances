@@ -129,15 +129,16 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
             values.personalExpSpent = "0";
           }
           const expense = await insertExpense(values as ValidatedFormValues);
-          if (addMore.value) {
-            expenseModalStore.lastExpenseId = expense.id;
-            expenseModalStore.expenseId = null;
-            form.setFieldsValue({ date: values.date });
-          } else {
-            expenseModalStore.close(values.source);
-          }
-          onSubmit(expense);
-          return expense;
+          runInAction(() => {
+            if (addMore.value) {
+              expenseModalStore.lastExpenseId = expense.id;
+              expenseModalStore.expenseId = null;
+              form.setFieldsValue({ date: values.date });
+            } else {
+              expenseModalStore.close(values.source);
+            }
+            onSubmit(expense);
+          });
         })
       )
       .catch((info) => {
@@ -234,12 +235,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
 
   // console.log(form.getFieldsValue(true));
 
-  const handleValuesChange = (
-    changedValues: Partial<FormValues>,
-    values: FormValues
-  ) => {
-    // console.log(changedValues);
-    // console.log(values);
+  const handleValuesChange = (changedValues: Partial<FormValues>) => {
     if (
       changedValues.subscription !== null &&
       changedValues.subscription !== undefined
