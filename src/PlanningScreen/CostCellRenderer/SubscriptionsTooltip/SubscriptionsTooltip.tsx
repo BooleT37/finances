@@ -21,23 +21,30 @@ const SubscriptionsTooltip: React.FC<Props> = ({ items, onClick }) => {
     onClick(total);
   }, [onClick, total]);
 
-  const tooltipText = React.useMemo(
-    () => (
-      <>
-        {costToString(total)} из подписок:
-        <List>
-          {items.map((item) => (
-            <li key={item.name}>
-              {costToString(item.cost)}
-              {"\u00A0"}
-              {item.name}
-            </li>
-          ))}
-        </List>
-      </>
-    ),
-    [items, total]
-  );
+  const tooltipText = React.useMemo(() => {
+    if (items.length === 1) {
+      return (
+        <>
+          {costToString(total)} из подписок ({items[0].name})
+        </>
+      );
+    } else {
+      return (
+        <>
+          {costToString(total)} из подписок:
+          <List>
+            {items.map((item) => (
+              <li key={item.name}>
+                {costToString(item.cost)}
+                {"\u00A0"}
+                {item.name}
+              </li>
+            ))}
+          </List>
+        </>
+      );
+    }
+  }, [items, total]);
 
   return (
     <Tooltip title={tooltipText}>
