@@ -6,6 +6,7 @@ import { action } from "mobx";
 import { observer } from "mobx-react";
 import moment, { Moment } from "moment";
 import React, { useCallback } from "react";
+import { AG_GRID_LOCALE_RU } from "../agGridLocale.ru";
 import { MONTH_DATE_FORMAT } from "../constants";
 import categories from "../readonlyStores/categories";
 import SiteContent from "../SiteContent";
@@ -143,6 +144,7 @@ const PlanningScreen = observer(function PlanningScreen() {
                       setForecastSum,
                     }}
                     domLayout="autoHeight"
+                    localeText={AG_GRID_LOCALE_RU}
                   />
                 </div>
               </div>
@@ -166,6 +168,7 @@ const PlanningScreen = observer(function PlanningScreen() {
                       month: date.month(),
                       scrollToRow,
                     }}
+                    localeText={AG_GRID_LOCALE_RU}
                   />
                 </div>
               </div>
@@ -190,6 +193,7 @@ const PlanningScreen = observer(function PlanningScreen() {
                       scrollToRow,
                     }}
                     domLayout="autoHeight"
+                    localeText={AG_GRID_LOCALE_RU}
                   />
                 </div>
               </div>
@@ -213,6 +217,7 @@ const PlanningScreen = observer(function PlanningScreen() {
                       month: date.month(),
                       scrollToRow,
                     }}
+                    localeText={AG_GRID_LOCALE_RU}
                   />
                 </div>
               </div>

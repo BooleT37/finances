@@ -19,6 +19,7 @@ import { observer } from "mobx-react";
 import moment, { Moment } from "moment";
 import React, { useCallback } from "react";
 import styled from "styled-components";
+import { AG_GRID_LOCALE_RU } from "../agGridLocale.ru";
 import { DATE_FORMAT, MONTH_DATE_FORMAT } from "../constants";
 import Expense, { TableData } from "../models/Expense";
 import SiteContent from "../SiteContent";
@@ -270,6 +271,9 @@ const DataScreen = observer(function DataScreen() {
                       ? "data-row-upcoming-subscription"
                       : undefined
                   }
+                  defaultColDef={{
+                    menuTabs: ["generalMenuTab"],
+                  }}
                   columnDefs={columnDefs}
                   getRowId={({ data }) => (data as TableData).id.toString()}
                   context={{
@@ -296,6 +300,7 @@ const DataScreen = observer(function DataScreen() {
                   suppressAggFuncInHeader
                   autoGroupColumnDef={autoGroupColumnDef}
                   domLayout="autoHeight"
+                  localeText={AG_GRID_LOCALE_RU}
                 />
               </div>
             )}
