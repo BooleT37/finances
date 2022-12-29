@@ -1,5 +1,6 @@
 import {
   ClockCircleOutlined,
+  InfoCircleOutlined,
   LeftOutlined,
   PlusOutlined,
   RightOutlined,
@@ -145,7 +146,16 @@ const DataScreen = observer(function DataScreen() {
     });
   };
 
+  const { boundaryDates } = expenseStore;
+
+  const setRangeAcrossAllTime = useCallback(() => {
+    setRangeStart(boundaryDates[0]);
+    setRangeEnd(boundaryDates[1]);
+  }, [boundaryDates]);
+
   const handleSearch = (value: string) => {
+    setIsRangePicker(true);
+    setRangeAcrossAllTime();
     setSearch(value);
     if (value) {
       setTimeout(() => {
@@ -181,13 +191,6 @@ const DataScreen = observer(function DataScreen() {
     [expandCategory]
   );
 
-  const { boundaryDates } = expenseStore;
-
-  const handleAcrossAllTimeClick = useCallback(() => {
-    setRangeStart(boundaryDates[0]);
-    setRangeEnd(boundaryDates[1]);
-  }, [boundaryDates]);
-
   const handleDateTypeButtonClick = useCallback(() => {
     if (isRangePicker && rangeEnd) {
       setRangeEnd(
@@ -206,6 +209,20 @@ const DataScreen = observer(function DataScreen() {
       <SiteContent className="site-layout-background">
         <ContentWrapper>
           <SearchStyled
+            addonBefore={
+              <Tooltip
+                placement="bottom"
+                title={`
+                  Поиск ведется по полю "Имя".
+                  Поиск всегда идет среди трат за все время.
+                  Некоторый исскуственно добавленный текст,
+                  который тоже отображается в поле "Имя"
+                  (например имя и категория траты из сбережений),
+                  в поиске не учитываются`}
+              >
+                <InfoCircleOutlined />
+              </Tooltip>
+            }
             placeholder="Найти..."
             onSearch={handleSearch}
             allowClear={true}
@@ -268,7 +285,7 @@ const DataScreen = observer(function DataScreen() {
                   <Button
                     icon={<ClockCircleOutlined />}
                     type="link"
-                    onClick={handleAcrossAllTimeClick}
+                    onClick={setRangeAcrossAllTime}
                   >
                     За все время
                   </Button>
