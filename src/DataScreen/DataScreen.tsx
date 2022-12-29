@@ -1,4 +1,5 @@
 import {
+  ClockCircleOutlined,
   LeftOutlined,
   PlusOutlined,
   RightOutlined,
@@ -180,6 +181,23 @@ const DataScreen = observer(function DataScreen() {
     [expandCategory]
   );
 
+  const { boundaryDates } = expenseStore;
+
+  const handleAcrossAllTimeClick = useCallback(() => {
+    setRangeStart(boundaryDates[0]);
+    setRangeEnd(boundaryDates[1]);
+  }, [boundaryDates]);
+
+  const handleDateTypeButtonClick = useCallback(() => {
+    if (isRangePicker && rangeEnd) {
+      setRangeEnd(
+        rangeEnd.clone().add(1, "month").set("date", 1).subtract(1, "day")
+      );
+      setRangeStart(rangeEnd.clone().set("date", 1));
+    }
+    setIsRangePicker((value) => !value);
+  }, [isRangePicker, rangeEnd]);
+
   return (
     <>
       <WhiteHeader className="site-layout-background">
@@ -236,17 +254,26 @@ const DataScreen = observer(function DataScreen() {
                 </Button>
               </Space>
               <br />
-              <DateTypeButton
-                icon={<SwapOutlined />}
-                type="link"
-                onClick={() => {
-                  setIsRangePicker((value) => !value);
-                }}
-              >
-                {isRangePicker
-                  ? "Выбрать только месяц"
-                  : "Выбрать точный период"}
-              </DateTypeButton>
+              <Space>
+                <DateTypeButton
+                  icon={<SwapOutlined />}
+                  type="link"
+                  onClick={handleDateTypeButtonClick}
+                >
+                  {isRangePicker
+                    ? "Выбрать только месяц"
+                    : "Выбрать точный период"}
+                </DateTypeButton>
+                {isRangePicker && (
+                  <Button
+                    icon={<ClockCircleOutlined />}
+                    type="link"
+                    onClick={handleAcrossAllTimeClick}
+                  >
+                    За все время
+                  </Button>
+                )}
+              </Space>
             </div>
             <div>
               <Checkbox

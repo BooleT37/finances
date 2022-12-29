@@ -438,6 +438,14 @@ class ExpenseStore {
         .map((expense) => expense.savingSpending.category.forecast)
     );
   }
+
+  get boundaryDates(): [Moment, Moment] {
+    const sorted = this.expenses
+      .slice()
+      .sort((e1, e2) => e1.date.valueOf() - e2.date.valueOf());
+
+    return [sorted[0].date, sorted[sorted.length - 1].date];
+  }
 }
 
 const expenseStore = new ExpenseStore();
