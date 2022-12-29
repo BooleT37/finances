@@ -256,7 +256,7 @@ const DataScreen = observer(function DataScreen() {
               </Checkbox>
             </div>
             {rangeStart && rangeEnd && (
-              <div className="ag-theme-alpine" style={{ width: 900 }}>
+              <div className="ag-theme-alpine" style={{ width: 950 }}>
                 <AgGridStyled
                   ref={gridRef}
                   rowData={expenseStore.tableData(
