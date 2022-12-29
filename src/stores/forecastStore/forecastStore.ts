@@ -144,6 +144,7 @@ class ForecastStore {
                   roundCost(lastMonthForecast - lastMonthSpendings),
                   isIncome || toSavings
                 ),
+            isIncome: forecast.category.isIncome,
           },
           thisMonth: {
             spendings: thisMonthSpendings,
@@ -153,6 +154,7 @@ class ForecastStore {
                   roundCost(forecast.sum - thisMonthSpendings),
                   isIncome || toSavings
                 ),
+            isIncome: forecast.category.isIncome,
           },
           sum: {
             value: forecast.category.fromSavings ? null : forecast.sum,
@@ -188,6 +190,7 @@ class ForecastStore {
             diff: isSavings
               ? 0
               : roundCost(sum(data.map((d) => d.lastMonth.diff))),
+            isIncome: false,
           },
           sum: {
             value: isSavings
@@ -224,6 +227,7 @@ class ForecastStore {
             diff: isSavings
               ? 0
               : roundCost(sum(data.map((d) => d.thisMonth.diff))),
+            isIncome: false,
           },
         });
       }

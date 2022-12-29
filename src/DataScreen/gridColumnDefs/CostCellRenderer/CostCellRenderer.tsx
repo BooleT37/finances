@@ -1,10 +1,10 @@
 import React from "react";
+import TotalCostCellView from "../../../components/TotalCostCellView";
 import { CostCol } from "../../../models/Expense";
 import { costToString, roundCost } from "../../../utils";
 import { AggCostCol } from "../../models";
 import { isAggCostCol } from "../utils";
 import CostCellView from "./CostCellView";
-import CostGroupCellView from "./CostGroupCellView";
 
 interface Props {
   value: CostCol | AggCostCol | undefined;
@@ -34,7 +34,7 @@ const CostCellRenderer: React.FC<Props> = ({
   if (col.isIncome) {
     if (col.diff >= 0) {
       return (
-        <CostGroupCellView
+        <TotalCostCellView
           cost={costString}
           suffix={`-${diffSum}`}
           color="red"
@@ -43,7 +43,7 @@ const CostCellRenderer: React.FC<Props> = ({
       );
     }
     return (
-      <CostGroupCellView
+      <TotalCostCellView
         cost={costString}
         suffix={`+${diffSum}`}
         color="green"
@@ -67,7 +67,7 @@ const CostCellRenderer: React.FC<Props> = ({
       : undefined;
 
     return (
-      <CostGroupCellView
+      <TotalCostCellView
         cost={costString}
         suffix={`+${diffSum}`}
         color={color}
@@ -81,7 +81,7 @@ const CostCellRenderer: React.FC<Props> = ({
   const offset = Math.max(col.diff / col.value + 1, 0);
 
   return (
-    <CostGroupCellView
+    <TotalCostCellView
       cost={costString}
       suffix={`-${diffSum}`}
       color="red"

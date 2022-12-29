@@ -25,7 +25,7 @@ const Green = styled(Diff)`
 `;
 
 // eslint-disable-next-line mobx/missing-observer
-const MonthCellRenderer: React.FC<Props> = ({ value: col }) => {
+const LastMonthCellRenderer: React.FC<Props> = ({ value: col }) => {
   return (
     <>
       <WithOffset offset={col.diff ? 3 : 0}>
@@ -44,4 +44,4 @@ const MonthCellRenderer: React.FC<Props> = ({ value: col }) => {
   );
 };
 
-export default MonthCellRenderer;
+export default LastMonthCellRenderer;

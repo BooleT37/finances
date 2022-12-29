@@ -4,7 +4,8 @@ import { sortAllCategories } from "../readonlyStores/categories/categoriesOrder"
 import { ForecastTableItem } from "../stores/forecastStore/types";
 import { costToString } from "../utils";
 import CostCellRenderer from "./CostCellRenderer/CostCellRenderer";
-import MonthCellRenderer from "./MonthCellRenderer";
+import LastMonthCellRenderer from "./LastMonthCellRenderer";
+import ThisMonthCellRenderer from "./ThisMonthCellRenderer";
 
 const costValueFormatter = ({ value }: { value: number }): string =>
   costToString(value);
@@ -35,7 +36,7 @@ const columnDefs: (ColDef | ColGroupDef)[] = [
     field: "lastMonth",
     width: 160,
     headerName: "Прошлый месяц",
-    cellRenderer: MonthCellRenderer,
+    cellRenderer: LastMonthCellRenderer,
   },
   {
     field: "sum",
@@ -59,7 +60,7 @@ const columnDefs: (ColDef | ColGroupDef)[] = [
     field: "thisMonth",
     width: 160,
     headerName: "Факт",
-    cellRenderer: MonthCellRenderer,
+    cellRenderer: ThisMonthCellRenderer,
   },
   {
     field: "comment",

@@ -1,6 +1,7 @@
 export interface MonthSpendings {
   spendings: number;
   diff: number;
+  isIncome: boolean;
 }
 export interface SubscriptionsItem {
   cost: number;
