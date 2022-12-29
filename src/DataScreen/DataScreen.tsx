@@ -196,7 +196,7 @@ const DataScreen = observer(function DataScreen() {
                 ) : (
                   <div>
                     <Button
-                      type="link"
+                      type="text"
                       icon={<LeftOutlined />}
                       onClick={goToPrevMonth}
                     />
@@ -208,7 +208,7 @@ const DataScreen = observer(function DataScreen() {
                       allowClear={false}
                     />
                     <Button
-                      type="link"
+                      type="text"
                       icon={<RightOutlined />}
                       onClick={goToNextMonth}
                     />
