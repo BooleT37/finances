@@ -94,7 +94,7 @@ const PlanningScreen = observer(function PlanningScreen() {
         <Space direction="vertical" size="middle">
           <div>
             <Button
-              type="link"
+              type="text"
               size="large"
               icon={<LeftOutlined />}
               onClick={goToPrevMonth}
@@ -109,7 +109,7 @@ const PlanningScreen = observer(function PlanningScreen() {
               size="large"
             />
             <Button
-              type="link"
+              type="text"
               size="large"
               icon={<RightOutlined />}
               onClick={goToNextMonth}
