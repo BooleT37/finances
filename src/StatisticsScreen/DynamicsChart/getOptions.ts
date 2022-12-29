@@ -1,4 +1,8 @@
-import { AgChartOptions } from "ag-charts-community";
+import {
+  AgCartesianSeriesTooltipRendererParams,
+  AgChartOptions,
+} from "ag-charts-community";
+import { costToString } from "../../utils";
 import { DynamicsData } from "./models";
 import { palette } from "./palette";
 
@@ -19,6 +23,14 @@ const getOptions = (
         dimOpacity: 0.2,
         strokeWidth: 4,
       },
+    },
+    tooltip: {
+      renderer: ({
+        xValue,
+        yValue,
+      }: AgCartesianSeriesTooltipRendererParams) => ({
+        content: `${xValue}: ${costToString(yValue)}`,
+      }),
     },
   })),
   legend: {
