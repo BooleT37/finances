@@ -274,12 +274,21 @@ class ExpenseStore {
     });
 
     const interim = from.clone();
+    const allCategoriesIds =
+      categoriesIds.length === 0
+        ? categories.getAll().map((c) => c.id)
+        : categoriesIds;
     while (to > interim || interim.format("M") === to.format("M")) {
       const month = interim.format(MONTH_DATE_FORMAT);
       if (dict[month] === undefined) {
         dict[month] = {
           date: interim.clone(),
         } as MonthEntry;
+      }
+      for (let categoryId of allCategoriesIds) {
+        if (dict[month][categoryId] === undefined) {
+          dict[month][categoryId] = 0;
+        }
       }
       interim.add(1, "month");
     }
