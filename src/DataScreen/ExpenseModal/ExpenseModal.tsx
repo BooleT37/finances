@@ -16,6 +16,7 @@ import moment, { Moment } from "moment";
 import type { BaseSelectRef } from "rc-select";
 import React from "react";
 import styled from "styled-components";
+import { CostInput } from "../../components/CostInput";
 import { DATE_FORMAT } from "../../constants";
 import { CATEGORY_IDS } from "../../models/Category";
 import Currency from "../../models/Currency";
@@ -357,6 +358,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
                 : categories.expenseOptions
             }
             placeholder="Выберите категорию"
+            style={{ width: 250 }}
             ref={firstFieldRef}
           />
         </Form.Item>
@@ -371,7 +373,11 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
               },
             ]}
           >
-            <Select options={savingSpendingOptions} placeholder="Не указано" />
+            <Select
+              options={savingSpendingOptions}
+              placeholder="Не указано"
+              style={{ width: 250 }}
+            />
           </Form.Item>
         )}
         {categoryId === CATEGORY_IDS.fromSavings &&
@@ -390,6 +396,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
                 disabled={savingSpendingId === null}
                 options={savingSpendingCategoryOptions}
                 placeholder="Выберите категорию"
+                style={{ width: 250 }}
                 ref={firstFieldRef}
               />
             </Form.Item>
@@ -404,6 +411,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
                 } as Option,
               ].concat(subscriptionOptions)}
               placeholder="Не указана"
+              style={{ width: 250 }}
             />
           </Form.Item>
         )}
@@ -412,7 +420,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
           label="Сумма"
           rules={[{ required: true, message: "Введите сумму" }]}
         >
-          <Input />
+          <CostInput />
         </Form.Item>
         {!isIncome.value && (
           <Divider orientation="center">
@@ -436,7 +444,11 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
           <Input />
         </Form.Item>
         <Form.Item name="source" label="Источник" extra={sourceExtra}>
-          <Select options={sourcesOptions} placeholder="Не указано" />
+          <Select
+            options={sourcesOptions}
+            placeholder="Не указано"
+            style={{ width: 150 }}
+          />
         </Form.Item>
       </Form>
     </ModalStyled>

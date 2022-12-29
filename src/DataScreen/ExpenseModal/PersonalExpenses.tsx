@@ -1,6 +1,7 @@
-import { Divider, Form, FormInstance, Input, Select } from "antd";
+import { Divider, Form, FormInstance, Select } from "antd";
 import { observer } from "mobx-react";
 import React from "react";
+import { CostInput } from "../../components/CostInput";
 import { CATEGORY_IDS } from "../../models/Category";
 import categories from "../../readonlyStores/categories";
 import forecastStore from "../../stores/forecastStore";
@@ -32,7 +33,7 @@ const PersonalExpenses: React.FC<Props> = observer(function PersonalExpenses({
   return (
     <>
       <Form.Item name="personalExpCategoryId" label="Чьи личные деньги">
-        <Select>
+        <Select style={{ width: 130 }}>
           <Option value={CATEGORY_IDS.personal.Alexey}>Алексей</Option>
           <Option value={CATEGORY_IDS.personal.Lena}>Лена</Option>
         </Select>
@@ -42,7 +43,7 @@ const PersonalExpenses: React.FC<Props> = observer(function PersonalExpenses({
         label="Сумма личных денег"
         extra={extra}
       >
-        <Input status={exceeds ? "warning" : ""} />
+        <CostInput status={exceeds ? "warning" : ""} />
       </Form.Item>
       <Divider />
     </>
