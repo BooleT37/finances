@@ -1,9 +1,9 @@
-import React from "react";
+import { Tooltip, Typography } from "antd";
 import { observer } from "mobx-react";
+import React from "react";
+import expenseStore from "../stores/expenseStore";
 import forecastStore from "../stores/forecastStore";
 import { costToString, roundCost } from "../utils";
-import expenseStore from "../stores/expenseStore";
-import { Tooltip, Typography } from "antd";
 
 const { Title } = Typography;
 
@@ -20,18 +20,18 @@ const SurplusData: React.FC<Props> = observer(function SurplusData({
     <div>
       <Title level={4}>Разница в этом месяце:</Title>
       <div>
-        <Tooltip title="Планируемые доходы минус планируемые расходы. Личные траты не учитываются">
+        <Tooltip title="Планируемые доходы минус планируемые расходы">
           По плану: &nbsp;
         </Tooltip>
         {costToString(
           roundCost(
-            forecastStore.totalForMonth(year, month, true, false) -
-              forecastStore.totalForMonth(year, month, false, false)
+            forecastStore.totalForMonth(year, month, true, true) -
+              forecastStore.totalForMonth(year, month, false, true)
           )
         )}
       </div>
       <div>
-        <Tooltip title="Фактические доходы минус фактические расходы. Личные траты не учитываются">
+        <Tooltip title="Фактические доходы минус фактические расходы">
           Факт: &nbsp;
         </Tooltip>
         {costToString(
