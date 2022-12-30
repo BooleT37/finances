@@ -88,7 +88,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
     value: false,
   }));
   const [hasPersonalExp, setHasPersonalExp] = React.useState(false);
-  const { lastSource } = expenseModalStore;
+  const { lastSource, isNewExpense } = expenseModalStore;
 
   const INITIAL_VALUES: FormValues = React.useMemo(
     () => ({
@@ -334,7 +334,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
           Отмена
         </Button>,
         <Button key="submit" type="primary" onClick={handleSubmit}>
-          Добавить
+          {isNewExpense ? "Добавить" : "Сохранить"}
         </Button>,
       ]}
     >
