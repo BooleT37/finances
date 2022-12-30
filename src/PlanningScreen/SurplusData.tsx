@@ -25,8 +25,8 @@ const SurplusData: React.FC<Props> = observer(function SurplusData({
         </Tooltip>
         {costToString(
           roundCost(
-            forecastStore.totalForMonth(year, month, true, true) -
-              forecastStore.totalForMonth(year, month, false, true)
+            forecastStore.totalForMonth(year, month, true) -
+              forecastStore.totalForMonth(year, month, false)
           )
         )}
       </div>
@@ -36,8 +36,8 @@ const SurplusData: React.FC<Props> = observer(function SurplusData({
         </Tooltip>
         {costToString(
           roundCost(
-            expenseStore.totalForMonth(year, month, true, false) -
-              expenseStore.totalForMonth(year, month, false, false)
+            expenseStore.totalForMonth(year, month, true) -
+              expenseStore.totalForMonth(year, month, false)
           )
         )}
       </div>

@@ -236,12 +236,7 @@ class ForecastStore {
     }
   );
 
-  totalForMonth(
-    year: number,
-    month: number,
-    isIncome: boolean,
-    isPersonal: boolean
-  ) {
+  totalForMonth(year: number, month: number, isIncome: boolean) {
     return sum(
       this.forecasts
         .filter(
@@ -249,7 +244,6 @@ class ForecastStore {
             forecast.month === month &&
             forecast.year === year &&
             forecast.category.isIncome === isIncome &&
-            forecast.category.isPersonal === isPersonal &&
             !forecast.category.fromSavings
         )
         .map((f) => f.sum)
