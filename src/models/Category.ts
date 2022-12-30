@@ -12,6 +12,7 @@ export const CATEGORY_IDS = {
   },
   fromSavings: 35,
   toSavings: 11,
+  rent: 14,
   total: -1,
 };
 

@@ -1,7 +1,7 @@
 import { makeAutoObservable } from "mobx";
 import moment, { Moment } from "moment";
 import { api } from "../api";
-import { costToString } from "../utils";
+import { costToString, roundCost } from "../utils";
 import Category from "./Category";
 import Source from "./Source";
 
@@ -86,6 +86,10 @@ export default class Subscription {
       firstDate: this.firstDate,
       source: this.source?.id ?? null,
     };
+  }
+
+  get costPerMonth(): number {
+    return roundCost(this.cost / this.period);
   }
 
   async setActive(active: boolean) {

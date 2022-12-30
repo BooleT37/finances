@@ -1,5 +1,6 @@
 import { groupBy, sum } from "lodash";
 import { makeAutoObservable, toJS } from "mobx";
+import { computedFn } from "mobx-utils";
 import moment, { Moment } from "moment";
 import { api } from "../api";
 import { ExpenseJson } from "../api/expenseApi";
@@ -37,6 +38,15 @@ class ExpenseStore {
   get expensesByCategoryId(): Record<string, Expense[]> {
     return groupBy(this.expenses, "category.id");
   }
+
+  expensesByCategoryIdForYear = computedFn(
+    (year: number): Record<string, Expense[]> => {
+      return groupBy(
+        this.expenses.filter((e) => e.date.year() === year),
+        "category.id"
+      );
+    }
+  );
 
   getById(id: number): Expense | undefined {
     return this.expenses.find((e) => e.id === id);
