@@ -25,6 +25,7 @@ const App = function App({ children }: React.PropsWithChildren<{}>) {
     (async () => {
       const [
         categories,
+        subcategories,
         sources,
         expenses,
         forecasts,
@@ -33,6 +34,7 @@ const App = function App({ children }: React.PropsWithChildren<{}>) {
         savingSpendingsCategories,
       ] = await Promise.all([
         await api.category.getAll(),
+        await api.subcategory.getAll(),
         await api.source.getAll(),
         await api.expense.getAll(),
         await api.forecast.getAll(),
@@ -40,7 +42,7 @@ const App = function App({ children }: React.PropsWithChildren<{}>) {
         await api.savingSpending.getAll(),
         await api.savingSpendingCategory.getAll(),
       ]);
-      categoriesManager.fromJson(categories);
+      categoriesManager.fromJson(categories, subcategories);
       sourcesManager.set(sources);
       subscriptionStore.fromJson(subscriptions);
       savingsSpendingStore.fromJson(savingSpendings, savingSpendingsCategories);

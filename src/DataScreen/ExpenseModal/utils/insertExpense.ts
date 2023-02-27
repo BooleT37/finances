@@ -10,11 +10,13 @@ import generatePersonalExpenseName from "./generatePersonalExpenseName";
 export default async function insertExpense(
   values: ValidatedFormValues
 ): Promise<Expense> {
+  const category = categories.getById(values.category);
   const newExpense = new Expense(
     -1,
     parseFloat(values.cost),
     values.date!,
-    categories.getById(values.category),
+    category,
+    values.subcategory === null ? null : category.findSubcategoryById(values.subcategory),
     values.name,
     null,
     values.source !== null ? sources.getById(values.source) : null,
@@ -50,11 +52,13 @@ export default async function insertExpense(
           newExpense.personalExpense = modifyingPe;
           newExpense.cost = (newExpense.cost ?? 0) - (modifyingPe.cost ?? 0);
         } else {
+          const category = categories.getById(values.personalExpCategoryId)
           const personalExpense = new Expense(
             modifyingPe.id,
             parseFloat(values.personalExpSpent),
             modifyingPe.date,
-            categories.getById(values.personalExpCategoryId),
+            category,
+            values.subcategory === null ? null : category.findSubcategoryById(values.subcategory),
             generatePersonalExpenseName({
               category: categories.getById(values.category).name,
               name: values.name,
@@ -68,11 +72,13 @@ export default async function insertExpense(
             (newExpense.cost ?? 0) - (personalExpense.cost ?? 0);
         }
       } else {
+        const category = categories.getById(values.personalExpCategoryId)
         const personalExpense = new Expense(
           -1,
           parseFloat(values.personalExpSpent),
           values.date!,
-          categories.getById(values.personalExpCategoryId),
+          category,
+          values.subcategory === null ? null : category.findSubcategoryById(values.subcategory),
           generatePersonalExpenseName({
             category: categories.getById(values.category).name,
             name: values.name,
@@ -98,11 +104,13 @@ export default async function insertExpense(
     }
   } else {
     if (values.personalExpCategoryId !== null) {
+      const category = categories.getById(values.personalExpCategoryId);
       const personalExpense = new Expense(
         -1,
         parseFloat(values.personalExpSpent),
         values.date!,
-        categories.getById(values.personalExpCategoryId),
+        category,
+        values.subcategory === null ? null : category.findSubcategoryById(values.subcategory),
         generatePersonalExpenseName({
           category: categories.getById(values.category).name,
           name: values.name,

@@ -5,6 +5,7 @@ import Category from "./Category";
 import SavingSpending from "./SavingSpending";
 import SavingSpendingCategory from "./SavingSpendingCategory";
 import Source from "./Source";
+import Subcategory from "./Subcategory";
 import Subscription from "./Subscription";
 
 export interface CostCol {
@@ -31,6 +32,7 @@ export default class Expense {
   cost: number | null;
   date: Moment;
   category: Category;
+  subcategory: Subcategory | null;
   personalExpense: Expense | null;
   source: Source | null;
   subscription: Subscription | null;
@@ -44,6 +46,7 @@ export default class Expense {
     cost: number | null,
     date: Moment,
     category: Category,
+    subcategory: Subcategory | null,
     name?: string,
     personalExpense: Expense | null = null,
     source: Source | null = null,
@@ -58,6 +61,7 @@ export default class Expense {
     this.cost = cost;
     this.date = date;
     this.category = category;
+    this.subcategory = subcategory;
     this.personalExpense = personalExpense;
     this.name = name;
     this.source = source;

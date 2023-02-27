@@ -7,7 +7,7 @@ import { ExpenseJson } from "../api/expenseApi";
 import {
   DATE_FORMAT,
   DATE_SERVER_FORMAT,
-  MONTH_DATE_FORMAT,
+  MONTH_DATE_FORMAT
 } from "../constants";
 import Category, { CATEGORY_IDS } from "../models/Category";
 import Currency from "../models/Currency";
@@ -99,6 +99,7 @@ class ExpenseStore {
       currency: Currency.Eur,
       date: expense.date.format(DATE_SERVER_FORMAT),
       category_id: expense.category.id,
+      subcategory_id: expense.subcategory?.id ?? null,
       personal_expense_id: expense.personalExpense?.id ?? null,
       source_id: expense.source?.id ?? null,
       subscription_id: expense.subscription?.id ?? null,
@@ -120,6 +121,7 @@ class ExpenseStore {
           currency: Currency.Eur,
           date: expense.date.format(DATE_SERVER_FORMAT),
           category_id: expense.category.id,
+          subcategory_id: expense.subcategory?.id ?? null,
           personal_expense_id: expense.personalExpense?.id ?? null,
           source_id: expense.source?.id ?? null,
           subscription_id: expense.subscription?.id ?? null,
@@ -176,12 +178,14 @@ class ExpenseStore {
 
   fromJson(json: ExpenseJson[]) {
     this.expenses = json.map(
-      (e) =>
-        new Expense(
+      (e) => {
+        const category = categories.getById(e.category_id);
+        return new Expense(
           e.id,
           e.cost,
           moment(e.date),
-          categories.getById(e.category_id),
+          category,
+          e.subcategory_id === null ? null : category.findSubcategoryById(e.subcategory_id),
           e.name,
           null,
           e.source_id === null ? null : sources.getById(e.source_id),
@@ -192,6 +196,7 @@ class ExpenseStore {
             ? null
             : this.getSavingSpendingByCategoryId(e.saving_spending_category_id)
         )
+      }
     );
     this.fillPersonalExpenses(json);
   }

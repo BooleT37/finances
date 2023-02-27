@@ -2,7 +2,7 @@ import Currency from "../models/Currency";
 import {
   createApiEndpoint,
   createDeleteApiEndpoint,
-  createGetApiEndpoint,
+  createGetApiEndpoint
 } from "./createApiEndpoint";
 
 export interface ExpenseJson {
@@ -12,6 +12,7 @@ export interface ExpenseJson {
   currency: Currency;
   date: string;
   category_id: number;
+  subcategory_id: number | null;
   personal_expense_id: number | null;
   source_id: number | null;
   subscription_id: number | null;

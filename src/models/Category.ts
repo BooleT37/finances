@@ -1,4 +1,5 @@
 import type { Option } from "../types";
+import Subcategory from "./Subcategory";
 
 export enum PersonalExpCategoryIds {
   Alexey = 0,
@@ -26,7 +27,8 @@ export default class Category {
     public readonly name: string,
     public readonly shortname: string,
     public readonly isIncome = false,
-    public readonly isContinuous = false
+    public readonly isContinuous = false,
+    public readonly subcategories: Subcategory[],
   ) {
     this.isPersonal = [
       CATEGORY_IDS.personal.Alexey,
@@ -42,5 +44,13 @@ export default class Category {
       value: this.id,
       label: this.name,
     };
+  }
+
+  findSubcategoryById(id: number) {
+    const found = this.subcategories.find(s => s.id === id);
+    if (!found) {
+      throw new Error(`Can't find subcategory by id ${id}`);
+    }
+    return found;
   }
 }

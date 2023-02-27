@@ -8,7 +8,7 @@ import {
   Modal,
   Radio,
   Select,
-  Space,
+  Space
 } from "antd";
 import { action, reaction, runInAction } from "mobx";
 import { observer, useLocalObservable } from "mobx-react";
@@ -39,6 +39,7 @@ function expenseToFormValues(expense: Expense): FormValues {
       ? String((expense.personalExpense.cost ?? 0) + (expense.cost ?? 0))
       : String(expense.cost),
     category: expense.category.id || null,
+    subcategory: expense.subcategory?.id ?? null,
     name: expense.name || "",
     personalExpCategoryId: expense.personalExpense?.category.id ?? null,
     personalExpSpent: String(expense.personalExpense?.cost ?? ""),
@@ -96,6 +97,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
       subscription: null,
       currency: Currency.Eur,
       category: null,
+      subcategory: null,
       name: "",
       personalExpCategoryId: null,
       personalExpSpent: "",
@@ -241,7 +243,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
       );
       if (!subscriptionData) {
         throw new Error(
-          `Couldn't fin subscription with id ${changedValues.subscription}`
+          `Couldn't find subscription with id ${changedValues.subscription}`
         );
       }
       form.setFieldsValue({
@@ -380,6 +382,21 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
             ref={firstFieldRef}
           />
         </Form.Item>
+        {
+          currentCategory && currentCategory.subcategories.length > 0 && (
+          <Form.Item
+            name="subcategory"
+            label="Подкатегория"
+          >
+            <Select
+              options={
+                [{ value: null, label: "Нет подкатегории" } as Option].concat(currentCategory.subcategories.map(s => s.asOption))
+              }
+              placeholder="Выберите подкатегорию"
+              style={{ width: 250 }}
+            />
+          </Form.Item>
+        )}
         {categoryId === CATEGORY_IDS.fromSavings && (
           <Form.Item
             name="savingSpendingId"

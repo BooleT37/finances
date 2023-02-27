@@ -1,10 +1,12 @@
 import { CategoryJson } from "../../api/categoryApi";
+import { SubcategoryJson } from "../../api/subcategoryApi";
 import Category from "../../models/Category";
+import Subcategory from "../../models/Subcategory";
 import type { Option } from "../../types";
 import {
   sortAllCategories,
   sortExpenseCategories,
-  sortIncomeCategories,
+  sortIncomeCategories
 } from "./categoriesOrder";
 
 // The categories are NOT mutable!
@@ -49,11 +51,13 @@ class Categories {
     return category;
   }
 
-  fromJson(json: CategoryJson[]) {
+  fromJson(json: CategoryJson[], subcategories: SubcategoryJson[]) {
     this.categories = json
       .map(
-        (c) =>
-          new Category(c.id, c.name, c.shortname, c.is_income, c.is_continuous)
+        (c) => {
+          const subcategoriesModels = subcategories.filter(s => s.category_id === c.id).map(s => new Subcategory(s.id, s.name))
+          return new Category(c.id, c.name, c.shortname, c.is_income, c.is_continuous, subcategoriesModels)
+        }
       )
       .sort((c1, c2) => sortAllCategories(c1.shortname, c2.shortname));
     this.calculateDerivations();
