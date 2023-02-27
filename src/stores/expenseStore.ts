@@ -415,6 +415,7 @@ class ExpenseStore {
       category: subscription.category.name,
       categoryId: subscription.category.id,
       categoryShortname: subscription.category.shortname,
+      subcategory: "",
       cost: {
         value: subscription.cost,
         isSubscription: true,
