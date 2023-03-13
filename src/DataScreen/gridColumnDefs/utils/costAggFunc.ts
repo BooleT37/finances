@@ -6,7 +6,7 @@ import { AggCostCol } from "../../models";
 
 export default function costAggFunc(params: IAggFuncParams): AggCostCol {
   const values: CostCol[] = params.values;
-  if (values.length === 0 || !params.rowNode.childrenAfterGroup?.[0].data) {
+  if (values.length === 0 || !params.rowNode.allLeafChildren?.[0].data) {
     return {
       value: 0,
       diff: null,
@@ -17,7 +17,7 @@ export default function costAggFunc(params: IAggFuncParams): AggCostCol {
   const value = roundCost(
     values.reduce((a, c) => (c.isUpcomingSubscription ? a : a + c.value), 0)
   );
-  const { categoryId } = params.rowNode.childrenAfterGroup[0].data;
+  const { categoryId } = params.rowNode.allLeafChildren[0].data;
   const {
     isIncome,
     isContinuous,

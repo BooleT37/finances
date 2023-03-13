@@ -301,7 +301,7 @@ const DataScreen = observer(function DataScreen() {
               </Checkbox>
             </div>
             {rangeStart && rangeEnd && (
-              <div className="ag-theme-alpine" style={{ width: 950 }}>
+              <div className="ag-theme-alpine" style={{ width: 800 }}>
                 <AgGridStyled
                   ref={gridRef}
                   rowData={expenseStore.tableData(
@@ -339,8 +339,8 @@ const DataScreen = observer(function DataScreen() {
                         rangeStart.month()
                       ),
                   }}
+                  isGroupOpenByDefault={({ field }) => field === "subcategory"}
                   getRowStyle={getRowStyle}
-                  groupIncludeFooter
                   suppressAggFuncInHeader
                   autoGroupColumnDef={autoGroupColumnDef}
                   domLayout="autoHeight"

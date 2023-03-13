@@ -23,7 +23,7 @@ export interface TableData {
   category: string;
   categoryId: number;
   categoryShortname: string;
-  subcategory: string;
+  subcategory?: string;
   isUpcomingSubscription: boolean;
 }
 
@@ -97,7 +97,7 @@ export default class Expense {
             }
           : null,
       category: this.category.name,
-      subcategory: this.subcategory?.name ?? "",
+      subcategory: this.subcategory?.name ?? undefined,
       date: this.date.format(DATE_FORMAT),
       categoryId: this.category.id,
       categoryShortname: this.category.shortname,

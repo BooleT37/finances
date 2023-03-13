@@ -19,6 +19,7 @@ const columnDefs: GridOptions["columnDefs"] = [
     field: "name",
     width: 200,
     headerName: "Имя",
+    hide: true,
     resizable: true,
     tooltipField: "name",
   },
@@ -32,6 +33,12 @@ const columnDefs: GridOptions["columnDefs"] = [
       nodeA.group && nodeB.group
         ? sortAllCategoriesByName(nodeA.key ?? "", nodeB.key ?? "")
         : 0,
+  },
+  {
+    field: "subcategory",
+    rowGroup: true,
+    hide: true,
+    headerName: "Подкатегория",
   },
   {
     field: "edit",
