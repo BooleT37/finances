@@ -32,7 +32,7 @@ interface Props {
 }
 
 // eslint-disable-next-line mobx/missing-observer
-const CostGroupCellView: React.FC<Props> = (props) => {
+const TotalCostCellView: React.FC<Props> = (props) => {
   const { cost, suffix, color, title, barOffset = 0, barWidth } = props;
 
   return (
@@ -48,4 +48,4 @@ const CostGroupCellView: React.FC<Props> = (props) => {
   );
 };
 
-export default CostGroupCellView;
+export default TotalCostCellView;
