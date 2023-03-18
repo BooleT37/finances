@@ -8,7 +8,7 @@ import {
   Modal,
   Radio,
   Select,
-  Space
+  Space,
 } from "antd";
 import { action, reaction, runInAction } from "mobx";
 import { observer, useLocalObservable } from "mobx-react";
@@ -382,16 +382,12 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
             ref={firstFieldRef}
           />
         </Form.Item>
-        {
-          currentCategory && currentCategory.subcategories.length > 0 && (
-          <Form.Item
-            name="subcategory"
-            label="Подкатегория"
-          >
+        {currentCategory && currentCategory.subcategories.length > 0 && (
+          <Form.Item name="subcategory" label="Подкатегория">
             <Select
-              options={
-                [{ value: null, label: "Нет подкатегории" } as Option].concat(currentCategory.subcategories.map(s => s.asOption))
-              }
+              options={[
+                { value: null, label: "Нет подкатегории" } as Option,
+              ].concat(currentCategory.subcategories.map((s) => s.asOption))}
               placeholder="Выберите подкатегорию"
               style={{ width: 250 }}
             />
