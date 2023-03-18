@@ -38,7 +38,7 @@ function expenseToFormValues(expense: Expense): FormValues {
     cost: expense.personalExpense
       ? String((expense.personalExpense.cost ?? 0) + (expense.cost ?? 0))
       : String(expense.cost),
-    category: expense.category.id || null,
+    category: expense.category.id ?? null,
     subcategory: expense.subcategory?.id ?? null,
     name: expense.name || "",
     personalExpCategoryId: expense.personalExpense?.category.id ?? null,
@@ -262,7 +262,6 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
           savingSpendingCategoryId:
             categories.length === 1 ? categories[0].id : null,
         });
-        // TODO why the hell the first category doesn't get auto inserted??
       }
     });
     if (changedValues.savingSpendingId === null) {
