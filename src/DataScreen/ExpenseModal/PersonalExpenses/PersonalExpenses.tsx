@@ -1,11 +1,10 @@
 import { Divider, Form, FormInstance, Select, Space } from "antd";
 import Link from "antd/lib/typography/Link";
 import React, { useCallback } from "react";
-import { CostInput } from "../../components/CostInput";
-import { CATEGORY_IDS, PersonalExpCategoryIds } from "../../models/Category";
-import categories from "../../readonlyStores/categories";
-import forecastStore from "../../stores/forecastStore";
-import { FormValues } from "./models";
+import { CostInput } from "../../../components/CostInput";
+import { CATEGORY_IDS, PersonalExpCategoryIds } from "../../../models/Category";
+import { FormValues } from "../models";
+import { useForecastSum } from "./useForecastSum";
 
 const { Option } = Select;
 
@@ -19,14 +18,8 @@ const PersonalExpenses: React.FC<Props> = ({ form, onTransferAll }) => {
   const spent = Form.useWatch("personalExpSpent", form);
   const categoryId = Form.useWatch("personalExpCategoryId", form);
   const date = Form.useWatch("date", form);
-  const forecastSum =
-    date && categoryId !== null
-      ? forecastStore.find(
-          date.year(),
-          date.month(),
-          categories.getById(categoryId)
-        )?.sum
-      : undefined;
+  const forecastSum = useForecastSum(date, categoryId);
+
   const extra = forecastSum !== undefined ? `Макс: ${forecastSum}` : null;
   const exceeds = forecastSum !== undefined && parseFloat(spent) > forecastSum;
 
