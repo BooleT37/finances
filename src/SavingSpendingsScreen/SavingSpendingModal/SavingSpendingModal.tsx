@@ -1,8 +1,8 @@
-import { Form, Modal } from "antd";
 import { runInAction } from "mobx";
-import { useEffect } from "react";
+import { observer } from "mobx-react";
+import CostsListModal from "../../components/CostsListModal";
+import { FormValues } from "../../components/CostsListModal/CostsListForm";
 import savingSpendingStore from "../../stores/savingSpendingStore";
-import SpendingCategoriesForm, { FormValues } from "./SpendingCategoriesForm";
 import { saveSavingSpending } from "./utils/saveSavingSpending";
 
 interface Props {
@@ -11,60 +11,52 @@ interface Props {
   onClose(): void;
 }
 
-// eslint-disable-next-line mobx/missing-observer
-const SavingSpendingModal: React.FC<Props> = ({
-  visible,
-  editedSpendingId,
-  onClose,
-}) => {
-  const [form] = Form.useForm<FormValues>();
-  const handleOk = () => {
-    form.submit();
-  };
+const SavingSpendingModal: React.FC<Props> = observer(
+  function SavingSpendingModal({ visible, editedSpendingId, onClose }) {
+    const editedSpending =
+      editedSpendingId === -1
+        ? null
+        : savingSpendingStore.getById(editedSpendingId);
 
-  const editedSpending =
-    editedSpendingId === -1
-      ? null
-      : savingSpendingStore.getById(editedSpendingId);
+    const handleFinish = (values: FormValues) => {
+      runInAction(() => {
+        saveSavingSpending(editedSpendingId, values);
+      });
+      onClose();
+    };
 
-  const handleFinish = (values: FormValues) => {
-    runInAction(() => {
-      saveSavingSpending(editedSpendingId, values);
-    });
-    onClose();
-  };
-
-  useEffect(() => {
-    if (visible) {
-      if (editedSpending === null) {
-        form.resetFields();
-      } else {
-        runInAction(() => {
-          form.setFieldsValue({
+    const editingValue: FormValues | undefined =
+      editedSpending === null
+        ? undefined
+        : {
             name: editedSpending.name,
-            categories: editedSpending.categories.map((c) => ({
+            costs: editedSpending.categories.map((c) => ({
               comment: c.comment,
-              forecast: c.forecast,
+              sum: c.forecast,
               name: c.name,
               id: c.id,
             })),
-          });
-        });
-      }
-    }
-  });
+          };
 
-  return (
-    <Modal
-      title={editedSpending ? "Редактирование события" : "Добавление события"}
-      visible={visible}
-      onCancel={onClose}
-      okText={editedSpending ? "Сохранить" : "Добавить"}
-      onOk={handleOk}
-    >
-      <SpendingCategoriesForm formRef={form} onFinish={handleFinish} />
-    </Modal>
-  );
-};
+    return (
+      <CostsListModal
+        title={{
+          editing: "Редактирование события",
+          adding: "Добавление события",
+        }}
+        name={{
+          placeholder: "Событие",
+        }}
+        visible={visible}
+        includeComment
+        sumPlaceholder="План"
+        hideNameForSingleRow
+        editingValue={editingValue}
+        onClose={onClose}
+        onFinish={handleFinish}
+      />
+    );
+  }
+);
 
 export default SavingSpendingModal;
