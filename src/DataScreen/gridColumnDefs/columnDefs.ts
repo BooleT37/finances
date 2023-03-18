@@ -30,7 +30,10 @@ const columnDefs: GridOptions["columnDefs"] = [
     headerName: "Категория",
     sort: "asc",
     comparator: (_categoryA, _categoryB, nodeA, nodeB) =>
-      nodeA.group && nodeA.key === "category" && nodeB.group && nodeB.key === "category"
+      nodeA.group &&
+      nodeA.key === "category" &&
+      nodeB.group &&
+      nodeB.key === "category"
         ? sortAllCategoriesByName(nodeA.key ?? "", nodeB.key ?? "")
         : 0,
   },
