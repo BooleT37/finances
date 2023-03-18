@@ -115,10 +115,7 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
       .then(
         action(async (values) => {
           // auto set the first saving spending category if it's the only one
-          if (
-            values.savingSpendingId !== null &&
-            values.savingSpendingId !== undefined
-          ) {
+          if (values.savingSpendingId !== null) {
             const { categories } = savingSpendingStore.getById(
               values.savingSpendingId
             );
@@ -293,6 +290,12 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
     [currentCategory, form]
   );
 
+  const subcategories = currentCategory
+    ? [{ value: null, label: "Нет подкатегории" } as Option].concat(
+        currentCategory.subcategories.map((s) => s.asOption)
+      )
+    : [];
+
   return (
     <ModalStyled
       visible={expenseModalStore.visible}
@@ -382,35 +385,36 @@ const ExpenseModal: React.FC<Props> = observer(function ExpenseModal({
             ref={firstFieldRef}
           />
         </Form.Item>
-        {currentCategory && currentCategory.subcategories.length > 0 && (
-          <Form.Item name="subcategory" label="Подкатегория">
-            <Select
-              options={[
-                { value: null, label: "Нет подкатегории" } as Option,
-              ].concat(currentCategory.subcategories.map((s) => s.asOption))}
-              placeholder="Выберите подкатегорию"
-              style={{ width: 250 }}
-            />
-          </Form.Item>
-        )}
-        {categoryId === CATEGORY_IDS.fromSavings && (
-          <Form.Item
-            name="savingSpendingId"
-            label="Событие"
-            rules={[
-              {
-                required: categoryId === CATEGORY_IDS.fromSavings,
-                message: "Выберите событие",
-              },
-            ]}
-          >
-            <Select
-              options={savingSpendingOptions}
-              placeholder="Не указано"
-              style={{ width: 250 }}
-            />
-          </Form.Item>
-        )}
+        <Form.Item
+          hidden={
+            !currentCategory || currentCategory.subcategories.length === 0
+          }
+          name="subcategory"
+          label="Подкатегория"
+        >
+          <Select
+            options={subcategories}
+            placeholder="Выберите подкатегорию"
+            style={{ width: 250 }}
+          />
+        </Form.Item>
+        <Form.Item
+          name="savingSpendingId"
+          label="Событие"
+          hidden={categoryId !== CATEGORY_IDS.fromSavings}
+          rules={[
+            {
+              required: categoryId === CATEGORY_IDS.fromSavings,
+              message: "Выберите событие",
+            },
+          ]}
+        >
+          <Select
+            options={savingSpendingOptions}
+            placeholder="Не указано"
+            style={{ width: 250 }}
+          />
+        </Form.Item>
         {categoryId === CATEGORY_IDS.fromSavings &&
           savingSpendingCategoryOptions.length > 1 && (
             <Form.Item

@@ -16,7 +16,7 @@ export default async function insertExpense(
     parseFloat(values.cost),
     values.date!,
     category,
-    values.subcategory === null || values.subcategory === undefined
+    values.subcategory === null
       ? null
       : category.findSubcategoryById(values.subcategory),
     values.name,
@@ -60,7 +60,7 @@ export default async function insertExpense(
             parseFloat(values.personalExpSpent),
             modifyingPe.date,
             category,
-            values.subcategory === null || values.subcategory === undefined
+            values.subcategory === null
               ? null
               : category.findSubcategoryById(values.subcategory),
             generatePersonalExpenseName({
@@ -82,7 +82,7 @@ export default async function insertExpense(
           parseFloat(values.personalExpSpent),
           values.date!,
           category,
-          values.subcategory === null || values.subcategory === undefined
+          values.subcategory === null
             ? null
             : category.findSubcategoryById(values.subcategory),
           generatePersonalExpenseName({
@@ -116,7 +116,7 @@ export default async function insertExpense(
         parseFloat(values.personalExpSpent),
         values.date!,
         category,
-        values.subcategory === null || values.subcategory === undefined
+        values.subcategory === null
           ? null
           : category.findSubcategoryById(values.subcategory),
         generatePersonalExpenseName({
