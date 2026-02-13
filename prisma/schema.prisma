@@ -1,0 +1,174 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String           @id @default(cuid())
+  name           String?
+  email          String?          @unique
+  emailVerified  DateTime?
+  image          String?
+  setupDone      Boolean          @default(false)
+  settings       UserSetting?
+  Category       Category[]
+  Source         Source[]
+  SavingSpending SavingSpending[]
+  Subscription   Subscription[]
+  Expense        Expense[]
+  Forecast       Forecast[]
+}
+
+model Subcategory {
+  id                Int                @id @default(autoincrement())
+  name              String
+  category          Category?          @relation(fields: [categoryId], references: [id])
+  categoryId        Int?
+  expenses          Expense[]
+  expenseComponents ExpenseComponent[]
+  forecasts         Forecast[]
+  subscriptions     Subscription[]
+}
+
+enum CategoryType {
+  FROM_SAVINGS
+  TO_SAVINGS
+}
+
+model Category {
+  id                Int                @id @default(autoincrement())
+  name              String
+  isIncome          Boolean            @default(false)
+  isContinuous      Boolean            @default(false)
+  shortname         String             @db.VarChar(16)
+  icon              String?
+  type              CategoryType?
+  expenses          Expense[]
+  subcategories     Subcategory[]
+  Subscriptions     Subscription[]
+  forecast          Forecast[]
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String
+  expenseComponents ExpenseComponent[]
+
+  @@unique([name, userId])
+}
+
+enum ExpensesParser {
+  VIVID
+}
+
+model Source {
+  id            Int            @id @default(autoincrement())
+  name          String
+  parser        ExpensesParser?
+  subscriptions Subscription[]
+  expenses      Expense[]
+  user          User           @relation(fields: [userId], references: [id])
+  userId        String
+}
+
+model SavingSpending {
+  id         Int                      @id @default(autoincrement())
+  name       String
+  completed  Boolean
+  categories SavingSpendingCategory[]
+  user       User                     @relation(fields: [userId], references: [id])
+  userId     String
+}
+
+model SavingSpendingCategory {
+  id               Int             @id @default(autoincrement())
+  name             String
+  forecast         Decimal         @db.Decimal(9, 2)
+  comment          String
+  savingSpending   SavingSpending? @relation(fields: [savingSpendingId], references: [id], onDelete: Cascade)
+  savingSpendingId Int?
+  expenses         Expense[]
+}
+
+model Subscription {
+  id            Int          @id @default(autoincrement())
+  name          String
+  cost          Decimal      @db.Decimal(9, 2)
+  category      Category     @relation(fields: [categoryId], references: [id])
+  period        Int          @db.SmallInt
+  firstDate     DateTime     @db.Date
+  source        Source?      @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+  active        Boolean
+  categoryId    Int
+  subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
+  subcategoryId Int?
+  sourceId      Int?
+  Expenses      Expense[]
+  user          User         @relation(fields: [userId], references: [id], onDelete: Restrict)
+  userId        String
+}
+
+model Expense {
+  id                       Int                     @id @default(autoincrement())
+  name                     String
+  cost                     Decimal                 @db.Decimal(9, 2)
+  date                     DateTime                @db.Date
+  actualDate               DateTime?               @db.Date
+  category                 Category                @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  categoryId               Int
+  subcategory              Subcategory?            @relation(fields: [subcategoryId], references: [id])
+  source                   Source?                 @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+  sourceId                 Int?
+  subscription             Subscription?           @relation(fields: [subscriptionId], references: [id])
+  subscriptionId           Int?
+  savingSpendingCategory   SavingSpendingCategory? @relation(fields: [savingSpendingCategoryId], references: [id])
+  savingSpendingCategoryId Int?
+  subcategoryId            Int?
+  components               ExpenseComponent[]
+  peHash                   String?
+  user                     User                    @relation(fields: [userId], references: [id])
+  userId                   String
+}
+
+model ExpenseComponent {
+  id            Int          @id @default(autoincrement())
+  name          String
+  cost          Decimal      @db.Decimal(9, 2)
+  category      Category     @relation(fields: [categoryId], references: [id])
+  categoryId    Int
+  sucategory    Subcategory? @relation(fields: [subcategoryId], references: [id])
+  subcategoryId Int?
+  expense       Expense      @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  expenseId     Int
+
+  @@map("ExpenseComponent")
+}
+
+model Forecast {
+  id            Int          @id @default(autoincrement())
+  category      Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId    Int
+  subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
+  subcategoryId Int?
+  month         Int          @db.SmallInt
+  year          Int          @db.SmallInt
+  sum           Decimal      @default(0) @db.Decimal(9, 2)
+  comment       String       @default("")
+  user          User         @relation(fields: [userId], references: [id])
+  userId        String
+
+  @@unique([categoryId, subcategoryId, month, year, userId])
+}
+
+model UserSetting {
+  id                     Int       @id @default(autoincrement())
+  pePerMonth             Decimal?  @db.Decimal(9, 2)
+  savings                Decimal?  @db.Decimal(9, 2)
+  savingsDate            DateTime? @db.Date
+  User                   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                 String    @unique
+  incomeCategoriesOrder  Int[]     @default([])
+  expenseCategoriesOrder Int[]     @default([])
+  sourcesOrder           Int[]     @default([])
+}

@@ -1,0 +1,15 @@
+node_modules
+dist
+.output
+.vinxi
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+
+# Prisma
+src/generated/
+
+# TanStack Router
+src/routeTree.gen.ts
