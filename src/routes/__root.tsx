@@ -1,4 +1,4 @@
-import { MantineProvider, createTheme } from '@mantine/core'
+import { MantineProvider, createTheme, Group, Box } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 import {
   Outlet,
@@ -7,6 +7,9 @@ import {
   createRootRoute,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+import { I18nextProvider } from 'react-i18next'
+import { LanguageSwitcher } from '~/components/LanguageSwitcher'
+import i18n from '~/i18n'
 import '@mantine/core/styles.css'
 import '@mantine/dates/styles.css'
 import '@mantine/notifications/styles.css'
@@ -26,7 +29,7 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="ru">
       <head>
         <HeadContent />
       </head>
@@ -41,11 +44,18 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   return (
     <RootDocument>
-      <MantineProvider theme={theme}>
-        <Notifications />
-        <Outlet />
-        <TanStackRouterDevtools />
-      </MantineProvider>
+      <I18nextProvider i18n={i18n}>
+        <MantineProvider theme={theme}>
+          <Notifications />
+          <Box p="sm">
+            <Group justify="flex-end">
+              <LanguageSwitcher />
+            </Group>
+          </Box>
+          <Outlet />
+          <TanStackRouterDevtools />
+        </MantineProvider>
+      </I18nextProvider>
     </RootDocument>
   )
 }
