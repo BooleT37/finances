@@ -21,6 +21,7 @@
     "@prisma/client": "^6.4.1",
     "@tanstack/react-query": "^5.62.3",
     "@tanstack/react-router": "^1.112.0",
+    "@tanstack/react-router-devtools": "^1.159.5",
     "@tanstack/react-start": "^1.112.0",
     "@trpc/client": "^11.0.0-rc.700",
     "@trpc/react-query": "^11.0.0-rc.700",
@@ -42,6 +43,7 @@
     "postcss-simple-vars": "^7.0.1",
     "prisma": "^6.4.1",
     "typescript": "^5.7.0",
-    "vite": "^7.0.0"
+    "vite": "^7.0.0",
+    "vite-tsconfig-paths": "^6.1.1"
   }
 }

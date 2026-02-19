@@ -6,6 +6,7 @@ import {
   Scripts,
   createRootRoute,
 } from '@tanstack/react-router'
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import '@mantine/core/styles.css'
 import '@mantine/dates/styles.css'
 import '@mantine/notifications/styles.css'
@@ -43,6 +44,7 @@ function RootComponent() {
       <MantineProvider theme={theme}>
         <Notifications />
         <Outlet />
+        <TanStackRouterDevtools />
       </MantineProvider>
     </RootDocument>
   )

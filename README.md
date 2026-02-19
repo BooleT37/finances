@@ -5,7 +5,7 @@ A personal finances tool for logging income and expenses from different sources,
 ## Tech Stack
 
 - **Framework**: [TanStack Start](https://tanstack.com/start/latest) (full-stack React)
-- **Deployment**: Cloudflare Workers
-- **API**: tRPC
+- **Deployment**: Vercel
+- **API**: Server functions
 - **ORM**: Prisma
 - **Database**: PostgreSQL

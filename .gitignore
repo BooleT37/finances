@@ -8,8 +8,8 @@ dist
 *.log
 .DS_Store
 
+# IDE
+.history/
+
 # Prisma
 src/generated/
-
-# TanStack Router
-src/routeTree.gen.ts
