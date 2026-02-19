@@ -2,6 +2,7 @@ node_modules
 dist
 .output
 .vinxi
+.nitro
 .env
 .env.local
 .env.*.local
