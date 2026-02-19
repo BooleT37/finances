@@ -74,7 +74,7 @@ To auto-fix lint and formatting issues:
 npm run lint:fix && npm run format
 ```
 
-Pre-commit hooks (Husky + lint-staged) run automatically on `git commit` — ESLint fix + Prettier write on staged `src/**/*.{ts,tsx}` files, then a full `tsc --noEmit`.
+Pre-commit hooks (Husky + lint-staged) run automatically on `git commit` — ESLint check + Prettier check on staged `src/**/*.{ts,tsx}` files, then a full `tsc --noEmit`. The commit is blocked if any check fails.
 
 ## Notes
 
