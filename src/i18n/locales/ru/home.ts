@@ -2,6 +2,6 @@ const home = {
   title: 'Финансы',
   subtitle:
     'Личный финансовый инструмент — ведение записей, бюджетирование, отслеживание и статистика.',
-} as const
+} as const;
 
-export default home
+export default home;

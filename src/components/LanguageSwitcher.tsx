@@ -1,8 +1,8 @@
-import { SegmentedControl } from '@mantine/core'
-import { useTranslation } from 'react-i18next'
+import { SegmentedControl } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
 export function LanguageSwitcher() {
-  const { i18n } = useTranslation()
+  const { i18n } = useTranslation();
 
   return (
     <SegmentedControl
@@ -14,5 +14,5 @@ export function LanguageSwitcher() {
         { label: 'EN', value: 'en' },
       ]}
     />
-  )
+  );
 }

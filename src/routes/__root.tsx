@@ -1,20 +1,20 @@
-import { MantineProvider, createTheme, Group, Box } from '@mantine/core'
-import { Notifications } from '@mantine/notifications'
+import { MantineProvider, createTheme, Group, Box } from '@mantine/core';
+import { Notifications } from '@mantine/notifications';
 import {
   Outlet,
   HeadContent,
   Scripts,
   createRootRoute,
-} from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-import { I18nextProvider } from 'react-i18next'
-import { LanguageSwitcher } from '~/components/LanguageSwitcher'
-import i18n from '~/i18n'
-import '@mantine/core/styles.css'
-import '@mantine/dates/styles.css'
-import '@mantine/notifications/styles.css'
+} from '@tanstack/react-router';
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { I18nextProvider } from 'react-i18next';
+import { LanguageSwitcher } from '~/components/LanguageSwitcher';
+import i18n from '~/i18n';
+import '@mantine/core/styles.css';
+import '@mantine/dates/styles.css';
+import '@mantine/notifications/styles.css';
 
-const theme = createTheme({})
+const theme = createTheme({});
 
 export const Route = createRootRoute({
   head: () => ({
@@ -25,7 +25,7 @@ export const Route = createRootRoute({
     ],
   }),
   component: RootComponent,
-})
+});
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
@@ -38,7 +38,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <Scripts />
       </body>
     </html>
-  )
+  );
 }
 
 function RootComponent() {
@@ -57,5 +57,5 @@ function RootComponent() {
         </MantineProvider>
       </I18nextProvider>
     </RootDocument>
-  )
+  );
 }

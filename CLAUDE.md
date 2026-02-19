@@ -60,6 +60,22 @@ npm run build
 npm run typecheck
 ```
 
+## Code Quality
+
+After making any code changes, run the following checks:
+
+```bash
+npm run typecheck && npm run lint && npm run format:check
+```
+
+To auto-fix lint and formatting issues:
+
+```bash
+npm run lint:fix && npm run format
+```
+
+Pre-commit hooks (Husky + lint-staged) run automatically on `git commit` — ESLint fix + Prettier write on staged `src/**/*.{ts,tsx}` files, then a full `tsc --noEmit`.
+
 ## Notes
 
 - Router uses `getRouter()` async function export (TanStack Start v1.x requirement)
