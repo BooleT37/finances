@@ -44,6 +44,9 @@ Detailed framework-specific documentation is split into separate files:
 - **[Installation](docs/tanstack-router-installation.md)** - Installation and setup instructions
 - **[Setup & Architecture](docs/tanstack-router-setup.md)** - Project setup and architectural patterns
 
+### Testing
+- **[Testing](docs/testing.md)** - Playwright E2E setup, writing tests, Mantine interaction patterns, MCP server
+
 ## Development
 
 ```bash
