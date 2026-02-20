@@ -6,6 +6,7 @@ export function LanguageSwitcher() {
 
   return (
     <SegmentedControl
+      aria-label="Language switcher"
       size="xs"
       value={i18n.language}
       onChange={(lang) => i18n.changeLanguage(lang)}

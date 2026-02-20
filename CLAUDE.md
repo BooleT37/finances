@@ -76,6 +76,22 @@ npm run lint:fix && npm run format
 
 Pre-commit hooks (Husky + lint-staged) run automatically on `git commit` — ESLint check + Prettier check on staged `src/**/*.{ts,tsx}` files, then a full `tsc --noEmit`. The commit is blocked if any check fails.
 
+## Testing
+
+Run E2E tests (starts dev server automatically):
+
+```bash
+npm test
+```
+
+Open interactive test UI:
+
+```bash
+npm run test:ui
+```
+
+After making UI changes, run `npm test` to verify nothing broke. The Playwright MCP server is configured in `.mcp.json` — Claude can also use it to interactively inspect the app in a real browser.
+
 ## Notes
 
 - Router uses `getRouter()` async function export (TanStack Start v1.x requirement)

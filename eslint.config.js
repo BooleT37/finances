@@ -29,6 +29,7 @@ export default defineConfig(
       '.vinxi/**',
       'src/routeTree.gen.ts',
       'src/generated/**',
+      'e2e/**',
       '*.cjs',
     ],
   },

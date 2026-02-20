@@ -14,3 +14,10 @@ dist
 
 # Prisma
 src/generated/
+
+# Playwright
+playwright-report/
+blob-report/
+test-results/
+playwright/.cache/
+playwright/.auth/
