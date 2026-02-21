@@ -9,8 +9,32 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TransactionsRouteImport } from './routes/transactions'
+import { Route as StatisticsRouteImport } from './routes/statistics'
+import { Route as SavingsSpendingsRouteImport } from './routes/savings-spendings'
+import { Route as PlanningRouteImport } from './routes/planning'
 import { Route as IndexRouteImport } from './routes/index'
 
+const TransactionsRoute = TransactionsRouteImport.update({
+  id: '/transactions',
+  path: '/transactions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StatisticsRoute = StatisticsRouteImport.update({
+  id: '/statistics',
+  path: '/statistics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SavingsSpendingsRoute = SavingsSpendingsRouteImport.update({
+  id: '/savings-spendings',
+  path: '/savings-spendings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlanningRoute = PlanningRouteImport.update({
+  id: '/planning',
+  path: '/planning',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +43,83 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/planning': typeof PlanningRoute
+  '/savings-spendings': typeof SavingsSpendingsRoute
+  '/statistics': typeof StatisticsRoute
+  '/transactions': typeof TransactionsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/planning': typeof PlanningRoute
+  '/savings-spendings': typeof SavingsSpendingsRoute
+  '/statistics': typeof StatisticsRoute
+  '/transactions': typeof TransactionsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/planning': typeof PlanningRoute
+  '/savings-spendings': typeof SavingsSpendingsRoute
+  '/statistics': typeof StatisticsRoute
+  '/transactions': typeof TransactionsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/planning'
+    | '/savings-spendings'
+    | '/statistics'
+    | '/transactions'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/planning' | '/savings-spendings' | '/statistics' | '/transactions'
+  id:
+    | '__root__'
+    | '/'
+    | '/planning'
+    | '/savings-spendings'
+    | '/statistics'
+    | '/transactions'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PlanningRoute: typeof PlanningRoute
+  SavingsSpendingsRoute: typeof SavingsSpendingsRoute
+  StatisticsRoute: typeof StatisticsRoute
+  TransactionsRoute: typeof TransactionsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/transactions': {
+      id: '/transactions'
+      path: '/transactions'
+      fullPath: '/transactions'
+      preLoaderRoute: typeof TransactionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/statistics': {
+      id: '/statistics'
+      path: '/statistics'
+      fullPath: '/statistics'
+      preLoaderRoute: typeof StatisticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/savings-spendings': {
+      id: '/savings-spendings'
+      path: '/savings-spendings'
+      fullPath: '/savings-spendings'
+      preLoaderRoute: typeof SavingsSpendingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/planning': {
+      id: '/planning'
+      path: '/planning'
+      fullPath: '/planning'
+      preLoaderRoute: typeof PlanningRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,6 +132,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PlanningRoute: PlanningRoute,
+  SavingsSpendingsRoute: SavingsSpendingsRoute,
+  StatisticsRoute: StatisticsRoute,
+  TransactionsRoute: TransactionsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

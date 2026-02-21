@@ -1,18 +1,21 @@
-import { MantineProvider, createTheme, Group, Box } from '@mantine/core';
-import { Notifications } from '@mantine/notifications';
-import {
-  Outlet,
-  HeadContent,
-  Scripts,
-  createRootRoute,
-} from '@tanstack/react-router';
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
-import { I18nextProvider } from 'react-i18next';
-import { LanguageSwitcher } from '~/components/LanguageSwitcher';
-import i18n from '~/i18n';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
+
+import { AppShell, createTheme, MantineProvider } from '@mantine/core';
+import { Notifications } from '@mantine/notifications';
+import {
+  createRootRoute,
+  HeadContent,
+  Outlet,
+  Scripts,
+} from '@tanstack/react-router';
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { I18nextProvider } from 'react-i18next';
+
+import { AppHeader } from '~/components/AppHeader';
+import { AppNav } from '~/components/AppNav';
+import i18n from '~/i18n';
 
 const theme = createTheme({});
 
@@ -47,12 +50,18 @@ function RootComponent() {
       <I18nextProvider i18n={i18n}>
         <MantineProvider theme={theme}>
           <Notifications />
-          <Box p="sm">
-            <Group justify="flex-end">
-              <LanguageSwitcher />
-            </Group>
-          </Box>
-          <Outlet />
+          <AppShell
+            header={{ height: 80 }}
+            navbar={{ width: 200, breakpoint: 'sm' }}
+          >
+            <AppHeader />
+            <AppShell.Navbar>
+              <AppNav />
+            </AppShell.Navbar>
+            <AppShell.Main>
+              <Outlet />
+            </AppShell.Main>
+          </AppShell>
           <TanStackRouterDevtools />
         </MantineProvider>
       </I18nextProvider>
