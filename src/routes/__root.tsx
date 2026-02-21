@@ -14,8 +14,8 @@ import {
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { I18nextProvider } from 'react-i18next';
 
-import { AppHeader } from '~/components/AppHeader';
-import { AppNav } from '~/components/AppNav';
+import { AppHeader } from '~/features/nav/components/AppHeader';
+import { AppNav } from '~/features/nav/components/AppNav';
 import i18n from '~/lib/i18n';
 import { trpc, trpcClient } from '~/lib/trpc/client';
 

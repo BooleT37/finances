@@ -13,33 +13,7 @@ A personal finance management application built with modern web technologies.
 
 ## Project Structure
 
-Follows [bulletproof-react](docs/project-structure.md) conventions.
-
-```
-finances/
-├── src/
-│   ├── components/      # Shared UI components (AppHeader, AppNav, MonthNavigator, LanguageSwitcher)
-│   ├── features/        # Feature modules (see docs/project-structure.md)
-│   │   └── transactions/
-│   │       ├── api.ts       # createServerFn handlers (colocated per TanStack Start docs)
-│   │       └── queries.ts   # React Query key factories for this feature
-│   ├── lib/             # Libraries preconfigured for the app
-│   │   ├── i18n/        # react-i18next setup + locale files
-│   │   └── trpc/        # tRPC React client
-│   ├── routes/          # File-based routes (TanStack Router)
-│   │   ├── __root.tsx   # Root layout: AppShell, providers
-│   │   └── index.tsx    # Redirects to /transactions
-│   ├── server/          # Shared server infrastructure (TanStack Start convention)
-│   │   ├── db.ts        # Prisma client singleton
-│   │   ├── routers/     # tRPC routers
-│   │   └── trpc.ts      # tRPC server init
-│   ├── stores/          # Global Jotai atom stores
-│   ├── router.tsx       # Router configuration with getRouter()
-│   └── routeTree.gen.ts # Auto-generated route tree (do not edit)
-├── docs/                # Detailed documentation (see below)
-├── prisma/              # Database schema and migrations
-└── vite.config.ts       # Vite configuration
-```
+See **[docs/project-structure.md](docs/project-structure.md)** for the full layout, feature folder conventions, i18n pattern, and import rules.
 
 ## Configuration
 

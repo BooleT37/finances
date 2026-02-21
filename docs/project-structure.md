@@ -1,5 +1,51 @@
 # 🗄️ Project Structure
 
+## This project's layout
+
+```
+finances/
+├── src/
+│   ├── components/      # Shared UI components (generic, reusable across features)
+│   ├── features/        # Feature modules — see feature structure below
+│   ├── lib/
+│   │   ├── i18n/        # react-i18next init; merges i18nResources from all features
+│   │   └── trpc/        # tRPC React client
+│   ├── routes/          # File-based routes (TanStack Router)
+│   │   ├── __root.tsx   # Root layout: AppShell, providers
+│   │   └── index.tsx    # Redirects to default route
+│   ├── server/          # Shared server infrastructure (TanStack Start convention)
+│   │   ├── db.ts        # Prisma client singleton
+│   │   ├── routers/     # tRPC routers
+│   │   └── trpc.ts      # tRPC server init
+│   ├── stores/          # Global Jotai atom stores
+│   ├── router.tsx       # Router config with getRouter()
+│   └── routeTree.gen.ts # Auto-generated (do not edit)
+├── docs/
+├── prisma/
+└── vite.config.ts
+```
+
+## Feature folder structure
+
+Each feature lives under `src/features/{feature}/` and includes only the files it needs:
+
+```
+src/features/{feature}/
+├── api.ts          # createServerFn handlers (TanStack Start — see note below)
+├── components/     # Feature-specific React components
+├── hooks/          # Feature-specific hooks
+├── i18n.ts         # Exports i18nResources = { en: { ns: data }, ru: { ns: data } }
+├── locales/        # Translations colocated with the feature
+│   ├── en/{namespace}.json
+│   └── ru/{namespace}.json
+├── queries.ts      # React Query key factories (@lukemorales/query-key-factory)
+├── stores/         # Feature-specific Jotai atoms
+├── types/          # TypeScript types
+└── utils/          # Utility functions
+```
+
+---
+
 credit: https://github.com/alan2207/bulletproof-react/
 
 Most of the code lives in the `src` folder and looks something like this:
@@ -63,6 +109,20 @@ NOTE: You don't need all of these folders for every feature. Only include the on
 TanStack Start's `createServerFn` handlers can live anywhere in the codebase — including inside `features/`. The framework uses a Vite plugin to extract server-only code at build time, so physical file location doesn't affect the client/server boundary. See [TanStack Start docs](https://tanstack.com/start/latest/docs/framework/react/guide/server-functions#advanced-topics).
 
 In this project, `features/<name>/api.ts` holds `createServerFn` handlers for that feature. The shared server infrastructure (Prisma singleton, tRPC init) stays in `src/server/`.
+
+### i18n: feature-colocated translations (Option B)
+
+Each feature that has translations exports an `i18nResources` object from its `i18n.ts`:
+
+```ts
+// src/features/{feature}/i18n.ts
+export const i18nResources = {
+  en: { namespace: enData },
+  ru: { namespace: ruData },
+} as const;
+```
+
+`src/lib/i18n/index.ts` imports and spreads them all into the master `resources` object passed to `i18n.init()`. TypeScript infers all namespace types automatically via `as const` + `(typeof resources)['ru']` — no manual type maintenance needed.
 
 In some cases it might be more practical to keep all API calls outside of the features folders in a dedicated `api` folder where all API calls are defined. This can be useful if you have a lot of shared API calls between features.
 

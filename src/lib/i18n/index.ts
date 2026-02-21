@@ -1,20 +1,14 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
+import { i18nResources as navResources } from '~/features/nav/i18n';
+
 import homeEn from './locales/en/home.json';
-import navEn from './locales/en/nav.json';
 import homeRu from './locales/ru/home.json';
-import navRu from './locales/ru/nav.json';
 
 export const resources = {
-  en: {
-    home: homeEn,
-    nav: navEn,
-  },
-  ru: {
-    home: homeRu,
-    nav: navRu,
-  },
+  en: { home: homeEn, ...navResources.en },
+  ru: { home: homeRu, ...navResources.ru },
 } as const;
 
 declare module 'i18next' {
