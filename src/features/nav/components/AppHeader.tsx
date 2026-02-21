@@ -3,7 +3,7 @@ import { useRouterState } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 import { LanguageSwitcher } from '~/components/LanguageSwitcher';
-import { MonthNavigator } from '~/components/MonthNavigator';
+import { MonthNavigator } from '~/features/nav/components/MonthNavigator';
 
 export function AppHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
