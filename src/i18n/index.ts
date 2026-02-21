@@ -2,8 +2,8 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 import homeEn from './locales/en/home.json';
-import homeRu from './locales/ru/home.json';
 import navEn from './locales/en/nav.json';
+import homeRu from './locales/ru/home.json';
 import navRu from './locales/ru/nav.json';
 
 export const resources = {
