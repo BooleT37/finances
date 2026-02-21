@@ -13,16 +13,29 @@ A personal finance management application built with modern web technologies.
 
 ## Project Structure
 
+Follows [bulletproof-react](docs/project-structure.md) conventions.
+
 ```
 finances/
 ├── src/
-│   ├── routes/          # File-based routes
-│   │   ├── __root.tsx   # Root layout with MantineProvider
-│   │   └── index.tsx    # Home page (/)
+│   ├── components/      # Shared UI components (AppHeader, AppNav, MonthNavigator, LanguageSwitcher)
+│   ├── lib/             # Libraries preconfigured for the app
+│   │   ├── i18n/        # react-i18next setup + locale files
+│   │   └── trpc/        # tRPC React client
+│   ├── queries/         # Shared React Query key factories
+│   ├── routes/          # File-based routes (TanStack Router)
+│   │   ├── __root.tsx   # Root layout: AppShell, providers
+│   │   └── index.tsx    # Redirects to /transactions
+│   ├── server/          # Server-only code (TanStack Start convention)
+│   │   ├── db.ts        # Prisma client singleton
+│   │   ├── functions/   # createServerFn handlers
+│   │   ├── routers/     # tRPC routers
+│   │   └── trpc.ts      # tRPC server init
+│   ├── stores/          # Global Jotai atom stores
 │   ├── router.tsx       # Router configuration with getRouter()
 │   └── routeTree.gen.ts # Auto-generated route tree (do not edit)
 ├── docs/                # Detailed documentation (see below)
-├── prisma/              # Database schema
+├── prisma/              # Database schema and migrations
 └── vite.config.ts       # Vite configuration
 ```
 
@@ -38,13 +51,19 @@ finances/
 Detailed framework-specific documentation is split into separate files:
 
 ### TanStack Router Documentation
+
 - **[API Reference](docs/tanstack-router-api.md)** - Complete API reference for TanStack Router types, hooks, and components
 - **[Guide](docs/tanstack-router-guide.md)** - Comprehensive guide covering all Router features
 - **[Routing](docs/tanstack-router-routing.md)** - File-based routing, dynamic routes, and route configuration
 - **[Installation](docs/tanstack-router-installation.md)** - Installation and setup instructions
 - **[Setup & Architecture](docs/tanstack-router-setup.md)** - Project setup and architectural patterns
 
+### Project Structure
+
+- **[Project Structure](docs/project-structure.md)** - Bulletproof-react conventions, feature folder layout, import rules
+
 ### Testing
+
 - **[Testing](docs/testing.md)** - Playwright E2E setup, writing tests, Mantine interaction patterns, MCP server
 
 ## Development

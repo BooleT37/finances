@@ -21,7 +21,7 @@ import dayjs from 'dayjs';
 import { useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
-import { selectedMonthAtom, viewModeAtom } from '~/store/month';
+import { selectedMonthAtom, viewModeAtom } from '~/stores/month';
 
 function formatCurrentMonth(): string {
   const now = new Date();
