@@ -2,10 +2,10 @@ import { createServerFn } from '@tanstack/react-start';
 
 import { prisma } from '~/server/db';
 
-export const fetchExpensesByYear = createServerFn({ method: 'GET' })
+export const fetchTransactionsByYear = createServerFn({ method: 'GET' })
   .inputValidator((year: number) => year)
   .handler(async ({ data: year }) => {
-    const expenses = await prisma.expense.findMany({
+    const transactions = await prisma.expense.findMany({
       where: {
         date: {
           gte: new Date(`${year}-01-01`),
@@ -14,5 +14,5 @@ export const fetchExpensesByYear = createServerFn({ method: 'GET' })
       },
       orderBy: { date: 'asc' },
     });
-    return expenses.map((e) => ({ ...e, cost: e.cost.toString() }));
+    return transactions.map((t) => ({ ...t, cost: t.cost.toString() }));
   });
