@@ -1,0 +1,11 @@
+{
+  "appName": "Finances",
+  "transactions": "Transactions",
+  "planning": "Planning",
+  "savings": "Savings",
+  "statistics": "Statistics",
+  "thisMonth": "This month",
+  "thisYear": "This year",
+  "yearView": "Year view",
+  "monthView": "Month view"
+}

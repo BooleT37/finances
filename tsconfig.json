@@ -9,6 +9,7 @@
     "skipLibCheck": true,
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "types": ["node", "vite/client"],
+    "resolveJsonModule": true,
     "paths": {
       "~/*": ["./src/*"]
     }

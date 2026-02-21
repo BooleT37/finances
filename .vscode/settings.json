@@ -1,4 +1,9 @@
 {
   "spellright.language": ["en", "de", "ru"],
-  "spellright.documentTypes": ["markdown", "latex", "plaintext"]
+  "spellright.documentTypes": ["markdown", "latex", "plaintext"],
+  "i18n-ally.localesPaths": ["src/i18n/locales"],
+  "i18n-ally.namespace": true,
+  "i18n-ally.defaultNamespace": "home",
+  "i18n-ally.pathMatcher": "{locale}/{namespace}.json",
+  "i18n-ally.enabledFrameworks": ["react-i18next"]
 }

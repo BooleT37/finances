@@ -1,15 +1,19 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-import homeEn from './locales/en/home';
-import homeRu from './locales/ru/home';
+import homeEn from './locales/en/home.json';
+import homeRu from './locales/ru/home.json';
+import navEn from './locales/en/nav.json';
+import navRu from './locales/ru/nav.json';
 
 export const resources = {
   en: {
     home: homeEn,
+    nav: navEn,
   },
   ru: {
     home: homeRu,
+    nav: navRu,
   },
 } as const;
 
