@@ -1,4 +1,10 @@
 import { NavLink, Stack } from '@mantine/core';
+import {
+  IconBuildingBank,
+  IconCalendar,
+  IconChartLine,
+  IconTable,
+} from '@tabler/icons-react';
 import { Link, useRouterState } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
@@ -7,10 +13,22 @@ export function AppNav() {
   const { t } = useTranslation('nav');
 
   const items = [
-    { to: '/transactions', label: t('transactions') },
-    { to: '/planning', label: t('planning') },
-    { to: '/savings-spendings', label: t('savings') },
-    { to: '/statistics', label: t('statistics') },
+    {
+      to: '/transactions',
+      label: t('transactions'),
+      icon: <IconTable size={18} />,
+    },
+    { to: '/planning', label: t('planning'), icon: <IconCalendar size={18} /> },
+    {
+      to: '/savings-spendings',
+      label: t('savings'),
+      icon: <IconBuildingBank size={18} />,
+    },
+    {
+      to: '/statistics',
+      label: t('statistics'),
+      icon: <IconChartLine size={18} />,
+    },
   ];
 
   return (
@@ -21,6 +39,7 @@ export function AppNav() {
           component={Link}
           to={item.to}
           label={item.label}
+          leftSection={item.icon}
           active={pathname === item.to}
         />
       ))}
