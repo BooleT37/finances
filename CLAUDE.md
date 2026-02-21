@@ -19,16 +19,18 @@ Follows [bulletproof-react](docs/project-structure.md) conventions.
 finances/
 ├── src/
 │   ├── components/      # Shared UI components (AppHeader, AppNav, MonthNavigator, LanguageSwitcher)
+│   ├── features/        # Feature modules (see docs/project-structure.md)
+│   │   └── transactions/
+│   │       ├── api.ts       # createServerFn handlers (colocated per TanStack Start docs)
+│   │       └── queries.ts   # React Query key factories for this feature
 │   ├── lib/             # Libraries preconfigured for the app
 │   │   ├── i18n/        # react-i18next setup + locale files
 │   │   └── trpc/        # tRPC React client
-│   ├── queries/         # Shared React Query key factories
 │   ├── routes/          # File-based routes (TanStack Router)
 │   │   ├── __root.tsx   # Root layout: AppShell, providers
 │   │   └── index.tsx    # Redirects to /transactions
-│   ├── server/          # Server-only code (TanStack Start convention)
+│   ├── server/          # Shared server infrastructure (TanStack Start convention)
 │   │   ├── db.ts        # Prisma client singleton
-│   │   ├── functions/   # createServerFn handlers
 │   │   ├── routers/     # tRPC routers
 │   │   └── trpc.ts      # tRPC server init
 │   ├── stores/          # Global Jotai atom stores

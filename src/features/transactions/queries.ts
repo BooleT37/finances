@@ -1,7 +1,7 @@
 import { createQueryKeys } from '@lukemorales/query-key-factory';
 import Decimal from 'decimal.js';
 
-import { fetchTransactionsByYear } from '~/server/functions/transactions';
+import { fetchTransactionsByYear } from '~/features/transactions/api';
 
 export const transactionsKeys = createQueryKeys('transactions', {
   byYear: (year: number) => ({
