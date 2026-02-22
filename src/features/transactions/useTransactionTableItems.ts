@@ -2,7 +2,11 @@ import { useQuery } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 
 import { transactionsKeys } from '~/features/transactions/queries';
-import { selectedMonthAtom, viewModeAtom } from '~/stores/month';
+import {
+  selectedMonthAtom,
+  selectedYearAtom,
+  viewModeAtom,
+} from '~/stores/month';
 
 import type { TransactionTableItem } from './transactionTableItem';
 
@@ -20,8 +24,8 @@ function formatComponentName(
 
 export function useTransactionTableItems(): TransactionTableItem[] | undefined {
   const selectedMonth = useAtomValue(selectedMonthAtom); // 'YYYY-MM'
+  const year = useAtomValue(selectedYearAtom);
   const viewMode = useAtomValue(viewModeAtom); // 'month' | 'year'
-  const year = parseInt(selectedMonth.slice(0, 4), 10);
 
   const { data: transactions } = useQuery(transactionsKeys.byYear(year));
 

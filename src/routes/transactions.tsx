@@ -1,18 +1,17 @@
 import { Text } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { useAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 
 import { transactionsKeys } from '~/features/transactions/queries';
-import { selectedMonthAtom } from '~/stores/month';
+import { selectedYearAtom } from '~/stores/month';
 
 export const Route = createFileRoute('/transactions')({
   component: TransactionsPage,
 });
 
 function TransactionsPage() {
-  const [selectedMonth] = useAtom(selectedMonthAtom);
-  const year = parseInt(selectedMonth.slice(0, 4), 10);
+  const year = useAtomValue(selectedYearAtom);
   const { data, isLoading, error } = useQuery(transactionsKeys.byYear(year));
 
   if (isLoading) return <Text>Loading...</Text>;

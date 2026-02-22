@@ -18,10 +18,14 @@ import {
   IconSwitch2,
 } from '@tabler/icons-react';
 import dayjs from 'dayjs';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
-import { selectedMonthAtom, viewModeAtom } from '~/stores/month';
+import {
+  selectedMonthAtom,
+  selectedYearAtom,
+  viewModeAtom,
+} from '~/stores/month';
 
 function formatCurrentMonth(): string {
   const now = new Date();
@@ -51,9 +55,9 @@ export function MonthNavigator({ showYearToggle }: MonthNavigatorProps) {
     useDisclosure(false);
   const { t, i18n } = useTranslation('nav');
 
+  const selectedYear = useAtomValue(selectedYearAtom);
   const nowMonth = formatCurrentMonth();
   const nowYear = new Date().getFullYear();
-  const selectedYear = parseInt(selectedMonth.slice(0, 4));
 
   const isCurrentPeriod =
     viewMode === 'month'
