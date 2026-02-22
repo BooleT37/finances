@@ -1,14 +1,15 @@
 import { createQueryKeys } from '@lukemorales/query-key-factory';
-import Decimal from 'decimal.js';
 
 import { fetchTransactionsByYear } from '~/features/transactions/api';
+
+import { transactionWithRelationsSchema } from './schema';
 
 export const transactionsKeys = createQueryKeys('transactions', {
   byYear: (year: number) => ({
     queryKey: [year],
     queryFn: async () => {
-      const transactions = await fetchTransactionsByYear({ data: year });
-      return transactions.map((t) => ({ ...t, cost: new Decimal(t.cost) }));
+      const rows = await fetchTransactionsByYear({ data: year });
+      return rows.map((t) => transactionWithRelationsSchema.decode(t));
     },
   }),
 });

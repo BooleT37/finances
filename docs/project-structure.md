@@ -17,6 +17,8 @@ finances/
 │   │   ├── db.ts        # Prisma client singleton
 │   │   ├── routers/     # tRPC routers
 │   │   └── trpc.ts      # tRPC server init
+│   ├── shared/          # Shared utilities with no feature dependencies
+│   │   └── codecs.ts    # Zod codecs for common wire↔client transforms (Decimal, Date)
 │   ├── stores/          # Global Jotai atom stores
 │   ├── router.tsx       # Router config with getRouter()
 │   └── routeTree.gen.ts # Auto-generated (do not edit)
@@ -32,6 +34,7 @@ Each feature lives under `src/features/{feature}/` and includes only the files i
 ```
 src/features/{feature}/
 ├── api.ts          # createServerFn handlers (TanStack Start — see note below)
+├── schema.ts       # Zod schemas with codec properties for wire↔client types
 ├── components/     # Feature-specific React components
 ├── hooks/          # Feature-specific hooks
 ├── i18n.ts         # Exports i18nResources = { en: { ns: data }, ru: { ns: data } }
@@ -123,6 +126,41 @@ export const i18nResources = {
 ```
 
 `src/lib/i18n/index.ts` imports and spreads them all into the master `resources` object passed to `i18n.init()`. TypeScript infers all namespace types automatically via `as const` + `(typeof resources)['ru']` — no manual type maintenance needed.
+
+### Zod schemas: encode/decode with codecs
+
+Each feature that transfers data between server and client defines a `schema.ts` using Zod codec properties for bidirectional type-safe serialization:
+
+```
+Prisma result ──[schema.encode()]──▶ wire JSON ──[schema.decode()]──▶ client type
+     api.ts handler                                queries.ts queryFn
+```
+
+- **Schema field names must match Prisma model field names** — this allows passing Prisma results directly to `schema.encode()` with zero manual mapping. `encode()` strips extra Prisma fields (`userId`, etc.) automatically.
+- `z.input<typeof schema>` = **wire type** — plain JSON (strings for Decimal/Date)
+- `z.output<typeof schema>` = **client type** — rich objects (decimal.js `Decimal`, `Date`)
+- Shared codecs (`decimalCodec`, `datetimeCodec`) live in `src/shared/codecs.ts` — features import them as codec properties inside `z.object()`
+- Cross-feature schema imports are allowed (e.g. `transactions/schema.ts` imports `categories/schema.ts`) since schemas are pure type definitions with no side effects
+- The handler calls `schema.encode(prismaResult)` directly — no intermediate mapping unless really nessessary
+- The queryFn calls `schema.decode(wireData)` — returns typed client objects
+
+```ts
+// src/features/{feature}/schema.ts
+import { decimalCodec } from '~/shared/codecs';
+import { categorySchema } from '~/features/categories/schema';
+
+export const itemSchema = z.object({
+  id: z.number(),
+  cost: decimalCodec, // wire: string ↔ client: Decimal
+  category: categorySchema, // composed from another feature's schema
+});
+
+// api.ts — handler
+return items.map((item) => itemSchema.encode(item));
+
+// queries.ts — queryFn
+return rows.map((row) => itemSchema.decode(row));
+```
 
 In some cases it might be more practical to keep all API calls outside of the features folders in a dedicated `api` folder where all API calls are defined. This can be useful if you have a lot of shared API calls between features.
 

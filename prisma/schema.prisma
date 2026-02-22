@@ -136,7 +136,7 @@ model ExpenseComponent {
   cost          Decimal      @db.Decimal(9, 2)
   category      Category     @relation(fields: [categoryId], references: [id])
   categoryId    Int
-  sucategory    Subcategory? @relation(fields: [subcategoryId], references: [id])
+  subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
   subcategoryId Int?
   expense       Expense      @relation(fields: [expenseId], references: [id], onDelete: Cascade)
   expenseId     Int

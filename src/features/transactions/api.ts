@@ -2,6 +2,8 @@ import { createServerFn } from '@tanstack/react-start';
 
 import { prisma } from '~/server/db';
 
+import { transactionWithRelationsSchema } from './schema';
+
 export const fetchTransactionsByYear = createServerFn({ method: 'GET' })
   .inputValidator((year: number) => year)
   .handler(async ({ data: year }) => {
@@ -13,6 +15,13 @@ export const fetchTransactionsByYear = createServerFn({ method: 'GET' })
         },
       },
       orderBy: { date: 'asc' },
+      include: {
+        category: true,
+        subcategory: true,
+        source: true,
+        components: { include: { category: true, subcategory: true } },
+      },
     });
-    return transactions.map((t) => ({ ...t, cost: t.cost.toString() }));
+
+    return transactions.map((t) => transactionWithRelationsSchema.encode(t));
   });
