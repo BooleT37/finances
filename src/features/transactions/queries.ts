@@ -1,9 +1,10 @@
 import { createQueryKeys } from '@lukemorales/query-key-factory';
 import { queryOptions } from '@tanstack/react-query';
+import { indexBy, prop } from 'ramda';
 
 import { fetchTransactionsByYear } from '~/features/transactions/api';
 
-import { transactionWithRelationsSchema } from './schema';
+import { transactionWithComponentsSchema } from './schema';
 
 const transactionsKeys = createQueryKeys('transactions', {
   byYear: (year: number) => ({
@@ -16,7 +17,7 @@ export const getTransactionsQueryOptions = (year: number) => {
     ...transactionsKeys.byYear(year),
     queryFn: async () => {
       const rows = await fetchTransactionsByYear({ data: year });
-      return rows.map((t) => transactionWithRelationsSchema.decode(t));
+      return rows.map((t) => transactionWithComponentsSchema.decode(t));
     },
   });
 };
@@ -24,13 +25,6 @@ export const getTransactionsQueryOptions = (year: number) => {
 export const getTransactionsMapByYear = (year: number) => {
   return queryOptions({
     ...getTransactionsQueryOptions(year),
-    select: (data) => {
-      const map = new Map<
-        string,
-        ReturnType<typeof transactionWithRelationsSchema.decode>
-      >();
-      data.forEach((t) => map.set(t.id.toString(), t));
-      return map;
-    },
+    select: indexBy(prop('id')),
   });
 };

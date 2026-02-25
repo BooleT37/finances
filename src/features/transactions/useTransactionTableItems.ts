@@ -1,7 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 
+import {
+  getCategoryMapQueryOptions,
+  getSubcategoryMapQueryOptions,
+} from '~/features/categories/queries';
+import { getSourceMapQueryOptions } from '~/features/sources/queries';
 import { getTransactionsQueryOptions } from '~/features/transactions/queries';
+import { getOrThrow } from '~/shared/getOrThrow';
 import {
   selectedMonthAtom,
   selectedYearAtom,
@@ -28,8 +34,12 @@ export function useTransactionTableItems(): TransactionTableItem[] | undefined {
   const viewMode = useAtomValue(viewModeAtom); // 'month' | 'year'
 
   const { data: transactions } = useQuery(getTransactionsQueryOptions(year));
+  const { data: categoryMap } = useQuery(getCategoryMapQueryOptions());
+  const { data: subcategoryMap } = useQuery(getSubcategoryMapQueryOptions());
+  const { data: sourceMap } = useQuery(getSourceMapQueryOptions());
 
-  if (!transactions) return undefined;
+  if (!transactions || !categoryMap || !subcategoryMap || !sourceMap)
+    return undefined;
 
   const filtered =
     viewMode === 'month'
@@ -38,52 +48,67 @@ export function useTransactionTableItems(): TransactionTableItem[] | undefined {
         )
       : transactions;
 
-  const transactionRows: TransactionTableItem[] = filtered.map((t) => ({
-    id: t.id,
-    name: t.name,
-    cost: {
-      value: t.cost, // Decimal from decimalCodec
-      isSubscription: t.subscriptionId !== null,
-      costWithComponents: t.components.length > 0 ? t.cost : undefined,
-    },
-    date: t.date.toISOString(), // Date → ISO string
-    category: t.category.name,
-    categoryId: t.categoryId,
-    categoryShortname: t.category.shortname,
-    categoryIcon: t.category.icon,
-    subcategory: t.subcategory?.name ?? null,
-    subcategoryId: t.subcategoryId,
-    source: t.source?.name ?? '',
-    isUpcomingSubscription: false,
-    expenseId: null,
-    isIncome: t.category.isIncome,
-    isContinuous: t.category.isContinuous,
-  }));
+  const transactionRows: TransactionTableItem[] = filtered.map((t) => {
+    const category = getOrThrow(categoryMap, t.categoryId, 'Category');
+    const subcategory = t.subcategoryId
+      ? getOrThrow(subcategoryMap, t.subcategoryId, 'Subcategory')
+      : null;
+    const source = t.sourceId
+      ? getOrThrow(sourceMap, t.sourceId, 'Source')
+      : null;
 
-  const componentRows: TransactionTableItem[] = filtered.flatMap((t) =>
-    t.components.map((c) => ({
+    return {
+      id: t.id,
+      name: t.name,
+      cost: {
+        value: t.cost,
+        isSubscription: t.subscriptionId !== null,
+        costWithComponents: t.components.length > 0 ? t.cost : undefined,
+      },
+      date: t.date.toISOString(),
+      category: category.name,
+      categoryId: t.categoryId,
+      categoryShortname: category.shortname,
+      categoryIcon: category.icon,
+      subcategory: subcategory?.name ?? null,
+      subcategoryId: t.subcategoryId,
+      source: source?.name ?? '',
+      isUpcomingSubscription: false,
+      expenseId: null,
+      isIncome: category.isIncome,
+      isContinuous: category.isContinuous,
+    };
+  });
+
+  const componentRows: TransactionTableItem[] = filtered.flatMap((t) => {
+    const parentCategory = getOrThrow(categoryMap, t.categoryId, 'Category');
+    const source = t.sourceId
+      ? getOrThrow(sourceMap, t.sourceId, 'Source')
+      : null;
+
+    return t.components.map((c) => ({
       id: c.id,
       name: formatComponentName(c.name, t.name),
       cost: {
-        value: c.cost, // Decimal from decimalCodec
+        value: c.cost,
         isSubscription: false,
         isUpcomingSubscription: false,
         parentExpenseName: t.name,
       },
-      date: t.date.toISOString(), // inherited from parent
+      date: t.date.toISOString(),
       category: c.category.name,
       categoryId: c.categoryId,
-      categoryShortname: t.category.shortname, // inherited from parent (per original)
+      categoryShortname: parentCategory.shortname,
       categoryIcon: c.category.icon,
       subcategory: c.subcategory?.name ?? null,
       subcategoryId: c.subcategoryId,
-      source: t.source?.name ?? '', // inherited from parent
+      source: source?.name ?? '',
       isUpcomingSubscription: false,
       expenseId: t.id,
       isIncome: c.category.isIncome,
       isContinuous: c.category.isContinuous,
-    })),
-  );
+    }));
+  });
 
   return [...transactionRows, ...componentRows];
 }

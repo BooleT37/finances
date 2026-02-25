@@ -4,7 +4,6 @@ import {
   categorySchema,
   subcategorySchema,
 } from '~/features/categories/schema';
-import { sourceSchema } from '~/features/sources/schema';
 import { datetimeCodec, decimalCodec } from '~/shared/codecs';
 
 // ── TransactionComponent ──────────────────────────────────────────────────────
@@ -44,16 +43,13 @@ export const transactionSchema = z.object({
   subscriptionId: z.number().nullable(),
 });
 
-export const transactionWithRelationsSchema = transactionSchema.extend({
-  category: categorySchema,
-  subcategory: subcategorySchema.nullable(),
-  source: sourceSchema.nullable(),
+export const transactionWithComponentsSchema = transactionSchema.extend({
   components: z.array(transactionComponentWithRelationsSchema),
 });
 
-export type TransactionWithRelationsWire = z.input<
-  typeof transactionWithRelationsSchema
+export type TransactionWithComponentsWire = z.input<
+  typeof transactionWithComponentsSchema
 >;
-export type TransactionWithRelations = z.output<
-  typeof transactionWithRelationsSchema
+export type TransactionWithComponents = z.output<
+  typeof transactionWithComponentsSchema
 >;
