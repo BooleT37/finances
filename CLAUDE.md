@@ -95,3 +95,4 @@ After making UI changes, run `npm test` to verify nothing broke. The Playwright 
 - Router uses `getRouter()` async function export (TanStack Start v1.x requirement)
 - All route files must export using `createFileRoute()` or `createRootRoute()`
 - Run `npm run dev` to auto-generate routeTree.gen.ts when routes change
+- **Dates**: Use [dayjs](https://day.js.org/) for all date handling — never native `Date`. The `datetimeCodec` in `src/shared/codecs.ts` decodes ISO strings to `dayjs.Dayjs` objects. Prisma `where` clauses are the only exception (Prisma requires native `Date`).

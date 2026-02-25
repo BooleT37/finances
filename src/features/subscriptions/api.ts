@@ -1,4 +1,5 @@
 import { createServerFn } from '@tanstack/react-start';
+import dayjs from 'dayjs';
 
 import { prisma } from '~/server/db';
 
@@ -9,6 +10,8 @@ export const fetchAllSubscriptions = createServerFn({ method: 'GET' }).handler(
     const subscriptions = await prisma.subscription.findMany({
       orderBy: { name: 'asc' },
     });
-    return subscriptions.map((s) => subscriptionSchema.encode(s));
+    return subscriptions.map((s) =>
+      subscriptionSchema.encode({ ...s, firstDate: dayjs(s.firstDate) }),
+    );
   },
 );

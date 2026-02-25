@@ -43,9 +43,7 @@ export function useTransactionTableItems(): TransactionTableItem[] | undefined {
 
   const filtered =
     viewMode === 'month'
-      ? transactions.filter(
-          (t) => t.date.toISOString().slice(0, 7) === selectedMonth,
-        )
+      ? transactions.filter((t) => t.date.format('YYYY-MM') === selectedMonth)
       : transactions;
 
   const transactionRows: TransactionTableItem[] = filtered.map((t) => {

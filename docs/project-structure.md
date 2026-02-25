@@ -173,12 +173,12 @@ Prisma result ──[schema.encode()]──▶ wire JSON ──[schema.decode()]
      api.ts handler                                queries.ts queryFn
 ```
 
-- **Schema field names must match Prisma model field names** — this allows passing Prisma results directly to `schema.encode()` with zero manual mapping. `encode()` strips extra Prisma fields (`userId`, etc.) automatically.
+- **Schema field names must match Prisma model field names** — this allows passing Prisma results directly to `schema.encode()` with almost zero manual mapping. Exception: we use dayjs on the client, but prisma returns Date objects, so we need to explicitly map those. `encode()` strips extra Prisma fields (`userId`, etc.) automatically.
 - `z.input<typeof schema>` = **wire type** — plain JSON (strings for Decimal/Date)
 - `z.output<typeof schema>` = **client type** — rich objects (decimal.js `Decimal`, `Date`)
 - Shared codecs (`decimalCodec`, `datetimeCodec`) live in `src/shared/codecs.ts` — features import them as codec properties inside `z.object()`
 - Cross-feature schema imports are allowed (e.g. `transactions/schema.ts` imports `categories/schema.ts`) since schemas are pure type definitions with no side effects
-- The handler calls `schema.encode(prismaResult)` directly — no intermediate mapping unless really nessessary
+- The handler calls `schema.encode(prismaResult)` directly — no intermediate mapping unless really nessessary (e.g. for date fields).
 - The queryFn calls `schema.decode(wireData)` — returns typed client objects
 
 ```ts

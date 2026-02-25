@@ -27,11 +27,6 @@ import {
   viewModeAtom,
 } from '~/stores/month';
 
-function formatCurrentMonth(): string {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-}
-
 function formatLabel(
   monthStr: string,
   lang: string,
@@ -56,8 +51,9 @@ export function MonthNavigator({ showYearToggle }: MonthNavigatorProps) {
   const { t, i18n } = useTranslation('nav');
 
   const selectedYear = useAtomValue(selectedYearAtom);
-  const nowMonth = formatCurrentMonth();
-  const nowYear = new Date().getFullYear();
+  const now = dayjs();
+  const nowMonth = now.format('YYYY-MM');
+  const nowYear = now.year();
 
   const isCurrentPeriod =
     viewMode === 'month'

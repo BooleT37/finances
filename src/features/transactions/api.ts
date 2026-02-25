@@ -1,4 +1,5 @@
 import { createServerFn } from '@tanstack/react-start';
+import dayjs from 'dayjs';
 
 import { prisma } from '~/server/db';
 
@@ -20,5 +21,11 @@ export const fetchTransactionsByYear = createServerFn({ method: 'GET' })
       },
     });
 
-    return transactions.map((t) => transactionWithComponentsSchema.encode(t));
+    return transactions.map((t) =>
+      transactionWithComponentsSchema.encode({
+        ...t,
+        date: dayjs(t.date),
+        actualDate: t.actualDate ? dayjs(t.actualDate) : null,
+      }),
+    );
   });
