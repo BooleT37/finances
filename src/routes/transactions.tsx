@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useAtomValue } from 'jotai';
 
-import { transactionsKeys } from '~/features/transactions/queries';
+import { getTransactionsQueryOptions } from '~/features/transactions/queries';
 import { selectedYearAtom } from '~/stores/month';
 
 export const Route = createFileRoute('/transactions')({
@@ -12,7 +12,9 @@ export const Route = createFileRoute('/transactions')({
 
 function TransactionsPage() {
   const year = useAtomValue(selectedYearAtom);
-  const { data, isLoading, error } = useQuery(transactionsKeys.byYear(year));
+  const { data, isLoading, error } = useQuery(
+    getTransactionsQueryOptions(year),
+  );
 
   if (isLoading) return <Text>Loading...</Text>;
   if (error) return <Text c="red">{String(error)}</Text>;

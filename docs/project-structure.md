@@ -41,7 +41,7 @@ src/features/{feature}/
 ├── locales/        # Translations colocated with the feature
 │   ├── en/{namespace}.json
 │   └── ru/{namespace}.json
-├── queries.ts      # React Query key factories (@lukemorales/query-key-factory)
+├── queries.ts      # React Query keys + query options (see pattern below)
 ├── stores/         # Feature-specific Jotai atoms
 ├── types/          # TypeScript types
 └── utils/          # Utility functions
@@ -126,6 +126,43 @@ export const i18nResources = {
 ```
 
 `src/lib/i18n/index.ts` imports and spreads them all into the master `resources` object passed to `i18n.init()`. TypeScript infers all namespace types automatically via `as const` + `(typeof resources)['ru']` — no manual type maintenance needed.
+
+### React Query: keys vs query options
+
+Each feature's `queries.ts` separates **keys** from **query options**:
+
+- `createQueryKeys` (from `@lukemorales/query-key-factory`) defines only the key structure — no `queryFn` inside it.
+- `queryOptions` (from `@tanstack/react-query`) wraps the key + `queryFn` + any other options. This gives the returned `queryKey` a `dataTag`, so `getQueryData`/`setQueryData` infer the data type automatically.
+- Derived queries (e.g. a `Map` view of the same data) spread the base query options and add a `select`.
+
+**Always import query options (not raw keys) when calling `useQuery`, `getQueryData`, etc.** The raw keys are an internal detail of the file.
+
+```ts
+// src/features/{feature}/queries.ts
+import { createQueryKeys } from '@lukemorales/query-key-factory';
+import { queryOptions } from '@tanstack/react-query';
+
+// 1. Keys only — no queryFn
+const featureKeys = createQueryKeys('feature', {
+  byYear: (year: number) => ({ queryKey: [year] }),
+});
+
+// 2. Query options — wraps key + queryFn
+export const getFeatureQueryOptions = (year: number) =>
+  queryOptions({
+    ...featureKeys.byYear(year),
+    queryFn: async () => { /* fetch + decode */ },
+  });
+
+// 3. Derived query — spreads base + adds select
+export const getFeatureMapByYear = (year: number) =>
+  queryOptions({
+    ...getFeatureQueryOptions(year),
+    select: (data) => new Map(data.map((d) => [d.id, d])),
+  });
+```
+
+Why not put `queryFn` inside `createQueryKeys`? The library doesn't attach a `dataTag` to the query key ([discussion](https://github.com/lukemorales/query-key-factory/discussions/31)), so `queryClient.getQueryData(key)` returns `unknown`. Wrapping with `queryOptions` fixes this.
 
 ### Zod schemas: encode/decode with codecs
 
