@@ -11,7 +11,7 @@ import { datetimeCodec, decimalCodec } from '~/shared/codecs';
 export const transactionComponentSchema = z.object({
   id: z.number(),
   name: z.string(),
-  cost: decimalCodec, // wire: string  ↔  client: Decimal
+  cost: decimalCodec,
   categoryId: z.number(),
   subcategoryId: z.number().nullable(),
 });
@@ -34,8 +34,8 @@ export type TransactionComponentWithRelations = z.output<
 export const transactionSchema = z.object({
   id: z.number(),
   name: z.string(),
-  cost: decimalCodec, // wire: string  ↔  client: Decimal
-  date: datetimeCodec, // wire: ISO string  ↔  client: Date
+  cost: decimalCodec,
+  date: datetimeCodec,
   actualDate: datetimeCodec.nullable(),
   categoryId: z.number(),
   subcategoryId: z.number().nullable(),

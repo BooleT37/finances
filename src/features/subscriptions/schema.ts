@@ -5,9 +5,9 @@ import { datetimeCodec, decimalCodec } from '~/shared/codecs';
 export const subscriptionSchema = z.object({
   id: z.number(),
   name: z.string(),
-  cost: decimalCodec, // wire: string  ↔  client: Decimal
+  cost: decimalCodec,
   period: z.number(),
-  firstDate: datetimeCodec, // wire: ISO string  ↔  client: Date
+  firstDate: datetimeCodec,
   active: z.boolean(),
   categoryId: z.number(),
   subcategoryId: z.number().nullable(),
