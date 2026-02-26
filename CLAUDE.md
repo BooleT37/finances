@@ -90,6 +90,23 @@ npm run test:ui
 
 After making UI changes, run `npm test` to verify nothing broke. The Playwright MCP server is configured in `.mcp.json` — Claude can also use it to interactively inspect the app in a real browser.
 
+## Translations (i18n)
+
+Uses **react-i18next** with feature-colocated translations. Each feature owns its namespace:
+
+1. Create `src/features/{feature}/locales/en/{feature}.json` and `ru/{feature}.json`
+2. Export from `src/features/{feature}/i18n.ts`:
+   ```ts
+   import en from './locales/en/{feature}.json';
+   import ru from './locales/ru/{feature}.json';
+   export const i18nResources = { en: { {feature}: en }, ru: { {feature}: ru } } as const;
+   ```
+3. Register in `src/lib/i18n/index.ts` — spread into the `resources` object
+4. Add the locales path to `.vscode/settings.json` → `i18n-ally.localesPaths`
+5. Use in components: `const { t } = useTranslation('{feature}');`
+
+Types are inferred automatically via `as const` — no manual type maintenance needed. See [docs/project-structure.md](docs/project-structure.md) for the full pattern.
+
 ## Notes
 
 - Router uses `getRouter()` async function export (TanStack Start v1.x requirement)
