@@ -1,10 +1,13 @@
 import type Decimal from 'decimal.js';
 
+export const UPCOMING_SUBSCRIPTION_ID = -1;
+
 /** Mirrors CostCol from finances-t3/src/features/expense/Expense.ts */
 export interface CostCol {
   value: Decimal;
   isSubscription?: boolean; // true for subscription expenses
-  isUpcomingSubscription?: boolean; // reserved — not yet used
+  isUpcomingSubscription?: boolean;
+  isIncome?: boolean;
   parentExpenseName?: string; // set on transaction component rows
   costWithComponents?: Decimal; // set on parent rows that have components
 }
@@ -22,7 +25,7 @@ export interface TransactionTableItem {
   subcategory: string | null; // subcategory.name, or null
   subcategoryId: number | null;
   source: string; // source.name, or '' when source is null
-  isUpcomingSubscription: boolean; // always false — reserved for future use
+  isUpcomingSubscription: boolean;
   expenseId: number | null; // null for regular rows; parent id for components
   isIncome: boolean;
   isContinuous: boolean;
