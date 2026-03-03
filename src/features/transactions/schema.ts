@@ -1,9 +1,5 @@
 import { z } from 'zod';
 
-import {
-  categorySchema,
-  subcategorySchema,
-} from '~/features/categories/schema';
 import { datetimeCodec, decimalCodec } from '~/shared/codecs';
 
 // ── TransactionComponent ──────────────────────────────────────────────────────
@@ -15,19 +11,10 @@ export const transactionComponentSchema = z.object({
   categoryId: z.number(),
   subcategoryId: z.number().nullable(),
 });
-
-export const transactionComponentWithRelationsSchema =
-  transactionComponentSchema.extend({
-    category: categorySchema,
-    subcategory: subcategorySchema.nullable(),
-  });
-
-export type TransactionComponentWithRelationsWire = z.input<
-  typeof transactionComponentWithRelationsSchema
+export type TransactionComponentWire = z.input<
+  typeof transactionComponentSchema
 >;
-export type TransactionComponentWithRelations = z.output<
-  typeof transactionComponentWithRelationsSchema
->;
+export type TransactionComponent = z.output<typeof transactionComponentSchema>;
 
 // ── Transaction ───────────────────────────────────────────────────────────────
 
@@ -41,15 +28,12 @@ export const transactionSchema = z.object({
   subcategoryId: z.number().nullable(),
   sourceId: z.number().nullable(),
   subscriptionId: z.number().nullable(),
+  savingSpendingCategoryId: z.number().nullable(),
 });
 
 export const transactionWithComponentsSchema = transactionSchema.extend({
-  components: z.array(transactionComponentWithRelationsSchema),
+  components: z.array(transactionComponentSchema),
 });
 
-export type TransactionWithComponentsWire = z.input<
-  typeof transactionWithComponentsSchema
->;
-export type TransactionWithComponents = z.output<
-  typeof transactionWithComponentsSchema
->;
+export type TransactionWire = z.input<typeof transactionWithComponentsSchema>;
+export type Transaction = z.output<typeof transactionWithComponentsSchema>;

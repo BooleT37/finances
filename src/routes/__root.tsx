@@ -1,8 +1,11 @@
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
+import 'mantine-react-table/styles.css';
+import 'dayjs/locale/ru';
 
 import { AppShell, createTheme, MantineProvider } from '@mantine/core';
+import { DatesProvider } from '@mantine/dates';
 import { Notifications } from '@mantine/notifications';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
@@ -12,14 +15,16 @@ import {
   Scripts,
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
-import { I18nextProvider } from 'react-i18next';
+import { I18nextProvider, useTranslation } from 'react-i18next';
 
 import { AppHeader } from '~/features/nav/components/AppHeader';
 import { AppNav } from '~/features/nav/components/AppNav';
 import i18n from '~/lib/i18n';
 import { trpc, trpcClient } from '~/lib/trpc/client';
 
-const theme = createTheme({});
+const theme = createTheme({
+  cursorType: 'pointer',
+});
 const queryClient = new QueryClient();
 
 export const Route = createRootRoute({
@@ -27,23 +32,51 @@ export const Route = createRootRoute({
     meta: [
       { charSet: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'Finances' },
     ],
+    links: [{ rel: 'icon', href: '/favicon.ico' }],
   }),
   component: RootComponent,
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const { t, i18n: i18nInstance } = useTranslation('nav');
   return (
-    <html lang="ru">
+    <html lang={i18nInstance.language}>
       <head>
         <HeadContent />
+        <title>{t('appName')}</title>
       </head>
       <body>
         {children}
         <Scripts />
       </body>
     </html>
+  );
+}
+
+function AppContent() {
+  const { i18n: i18nInstance } = useTranslation();
+
+  return (
+    <DatesProvider settings={{ locale: i18nInstance.language }}>
+      <Notifications />
+      <AppShell
+        header={{ height: 60 }}
+        navbar={{ width: 200, breakpoint: 'sm' }}
+        padding={{ base: 10, sm: 15, lg: 'md' }}
+      >
+        <AppShell.Header>
+          <AppHeader />
+        </AppShell.Header>
+        <AppShell.Navbar>
+          <AppNav />
+        </AppShell.Navbar>
+        <AppShell.Main>
+          <Outlet />
+        </AppShell.Main>
+      </AppShell>
+      <TanStackRouterDevtools />
+    </DatesProvider>
   );
 }
 
@@ -54,20 +87,7 @@ function RootComponent() {
         <RootDocument>
           <I18nextProvider i18n={i18n}>
             <MantineProvider theme={theme}>
-              <Notifications />
-              <AppShell
-                header={{ height: 80 }}
-                navbar={{ width: 200, breakpoint: 'sm' }}
-              >
-                <AppHeader />
-                <AppShell.Navbar>
-                  <AppNav />
-                </AppShell.Navbar>
-                <AppShell.Main>
-                  <Outlet />
-                </AppShell.Main>
-              </AppShell>
-              <TanStackRouterDevtools />
+              <AppContent />
             </MantineProvider>
           </I18nextProvider>
         </RootDocument>

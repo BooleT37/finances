@@ -1,11 +1,9 @@
 {
-  "appName": "Finances",
-  "transactions": "Transactions",
+  "appName": "Personal Finances",
+  "backToCurrentMonth": "Back to current month",
   "planning": "Planning",
   "savings": "Savings",
   "statistics": "Statistics",
-  "thisMonth": "This month",
   "thisYear": "This year",
-  "yearView": "Year view",
-  "monthView": "Month view"
+  "transactions": "Transactions"
 }

@@ -36,12 +36,13 @@ src/features/{feature}/
 ├── api.ts          # createServerFn handlers (TanStack Start — see note below)
 ├── schema.ts       # Zod schemas with codec properties for wire↔client types
 ├── components/     # Feature-specific React components
+├── facets/         # Derived query options — one file per logical getter (see pattern below)
 ├── hooks/          # Feature-specific hooks
 ├── i18n.ts         # Exports i18nResources = { en: { ns: data }, ru: { ns: data } }
 ├── locales/        # Translations colocated with the feature
 │   ├── en/{namespace}.json
 │   └── ru/{namespace}.json
-├── queries.ts      # React Query keys + query options (see pattern below)
+├── queries.ts      # React Query keys + base query options (see pattern below)
 ├── stores/         # Feature-specific Jotai atoms
 ├── types/          # TypeScript types
 └── utils/          # Utility functions
@@ -133,8 +134,6 @@ Each feature's `queries.ts` separates **keys** from **query options**:
 
 - `createQueryKeys` (from `@lukemorales/query-key-factory`) defines only the key structure — no `queryFn` inside it.
 - `queryOptions` (from `@tanstack/react-query`) wraps the key + `queryFn` + any other options. This gives the returned `queryKey` a `dataTag`, so `getQueryData`/`setQueryData` infer the data type automatically.
-- Derived queries (e.g. a `Map` view of the same data) spread the base query options and add a `select`.
-
 **Always import query options (not raw keys) when calling `useQuery`, `getQueryData`, etc.** The raw keys are an internal detail of the file.
 
 ```ts
@@ -153,16 +152,29 @@ export const getFeatureQueryOptions = (year: number) =>
     ...featureKeys.byYear(year),
     queryFn: async () => { /* fetch + decode */ },
   });
-
-// 3. Derived query — spreads base + adds select
-export const getFeatureMapByYear = (year: number) =>
-  queryOptions({
-    ...getFeatureQueryOptions(year),
-    select: (data) => new Map(data.map((d) => [d.id, d])),
-  });
 ```
 
 Why not put `queryFn` inside `createQueryKeys`? The library doesn't attach a `dataTag` to the query key ([discussion](https://github.com/lukemorales/query-key-factory/discussions/31)), so `queryClient.getQueryData(key)` returns `unknown`. Wrapping with `queryOptions` fixes this.
+
+### Facets: derived query options
+
+Derived queries live in `facets/` — one file per logical getter function. Each facet spreads the base query options from `queries.ts` and adds a `select` transform (or other derivation logic). This keeps `queries.ts` focused on data fetching and key management, while facets handle reshaping.
+
+```ts
+// src/features/{feature}/facets/featureMap.ts
+import { queryOptions } from '@tanstack/react-query';
+import { indexBy, prop } from 'ramda';
+
+import { getFeatureQueryOptions } from '../queries';
+
+export const getFeatureMapQueryOptions = () =>
+  queryOptions({
+    ...getFeatureQueryOptions(),
+    select: indexBy(prop('id')),
+  });
+```
+
+File naming follows the derivation purpose (e.g. `categoryMap.ts`, `subcategoryMap.ts`, `transactionMap.ts`). One file per function unless functions are logically connected.
 
 ### Zod schemas: encode/decode with codecs
 

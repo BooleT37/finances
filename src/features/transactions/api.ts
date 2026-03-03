@@ -17,7 +17,7 @@ export const fetchTransactionsByYear = createServerFn({ method: 'GET' })
       },
       orderBy: { date: 'asc' },
       include: {
-        components: { include: { category: true, subcategory: true } },
+        components: true,
       },
     });
 

@@ -1,5 +1,3 @@
-import 'dayjs/locale/ru';
-
 import {
   ActionIcon,
   Anchor,
@@ -15,15 +13,14 @@ import {
   IconCalendarEvent,
   IconChevronLeft,
   IconChevronRight,
-  IconSwitch2,
 } from '@tabler/icons-react';
 import dayjs from 'dayjs';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
 import {
   selectedMonthAtom,
-  selectedYearAtom,
+  transactionSearchAtom,
   viewModeAtom,
 } from '~/stores/month';
 
@@ -39,26 +36,17 @@ function formatLabel(
   return formatted.charAt(0).toUpperCase() + formatted.slice(1);
 }
 
-interface MonthNavigatorProps {
-  showYearToggle: boolean;
-}
-
-export function MonthNavigator({ showYearToggle }: MonthNavigatorProps) {
+export function MonthNavigator() {
   const [selectedMonth, setMonth] = useAtom(selectedMonthAtom);
   const [viewMode, setViewMode] = useAtom(viewModeAtom);
+  const setSearch = useSetAtom(transactionSearchAtom);
   const [pickerOpened, { toggle: togglePicker, close: closePicker }] =
     useDisclosure(false);
   const { t, i18n } = useTranslation('nav');
 
-  const selectedYear = useAtomValue(selectedYearAtom);
   const now = dayjs();
   const nowMonth = now.format('YYYY-MM');
-  const nowYear = now.year();
-
-  const isCurrentPeriod =
-    viewMode === 'month'
-      ? selectedMonth === nowMonth
-      : selectedYear === nowYear;
+  const isCurrentMonth = selectedMonth === nowMonth;
 
   const label = formatLabel(selectedMonth, i18n.language, viewMode);
 
@@ -72,8 +60,6 @@ export function MonthNavigator({ showYearToggle }: MonthNavigatorProps) {
     setMonth(dayjs(selectedMonth).add(1, unit).format('YYYY-MM'));
   };
 
-  const goToNow = () => setMonth(nowMonth);
-
   const handlePickerChange = (date: Date | null) => {
     if (date) {
       setMonth(dayjs(date).format('YYYY-MM'));
@@ -83,6 +69,8 @@ export function MonthNavigator({ showYearToggle }: MonthNavigatorProps) {
 
   // Mantine date pickers work with Date objects
   const pickerValue = dayjs(selectedMonth).toDate();
+
+  const showCurrentMonthButton = viewMode !== 'month' || !isCurrentMonth;
 
   return (
     <Stack gap={2} align="center">
@@ -135,27 +123,22 @@ export function MonthNavigator({ showYearToggle }: MonthNavigatorProps) {
       </Group>
 
       <Group gap="xs" justify="center">
-        {!isCurrentPeriod && (
-          <Anchor size="xs" component="button" type="button" onClick={goToNow}>
-            <Flex gap={4} align="center">
-              <IconCalendarEvent size={16} />
-              {viewMode === 'month' ? t('thisMonth') : t('thisYear')}
-            </Flex>
-          </Anchor>
-        )}
-        {showYearToggle && (
-          <Anchor
-            size="xs"
-            component="button"
-            type="button"
-            onClick={() => setViewMode(viewMode === 'month' ? 'year' : 'month')}
-          >
-            <Flex gap={4} align="center">
-              <IconSwitch2 size={16} />
-              {viewMode === 'month' ? t('yearView') : t('monthView')}
-            </Flex>
-          </Anchor>
-        )}
+        <Anchor
+          size="xs"
+          component="button"
+          type="button"
+          style={{ visibility: showCurrentMonthButton ? 'visible' : 'hidden' }}
+          onClick={() => {
+            setViewMode('month');
+            setMonth(nowMonth);
+            setSearch('');
+          }}
+        >
+          <Flex gap={4} align="center">
+            <IconCalendarEvent size={16} />
+            {t('backToCurrentMonth')}
+          </Flex>
+        </Anchor>
       </Group>
     </Stack>
   );

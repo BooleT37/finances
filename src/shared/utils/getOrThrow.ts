@@ -15,3 +15,19 @@ export function getOrThrow<T>(
   }
   return value;
 }
+
+/**
+ * Find an item in an array by id, throwing if not found.
+ * Useful for reference data where a missing item is a data integrity error.
+ */
+export function findByIdOrThrow<T extends { id: number }>(
+  items: T[],
+  id: number,
+  label?: string,
+): T {
+  const value = items.find((item) => item.id === id);
+  if (value === undefined) {
+    throw new Error(`${label ?? 'Item'} with id ${id} not found`);
+  }
+  return value;
+}

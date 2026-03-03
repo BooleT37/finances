@@ -1,6 +1,6 @@
 import type Decimal from 'decimal.js';
 
-import { decimalSum } from '~/shared/decimalSum';
+import { decimalSum } from '~/shared/utils/decimalSum';
 
 export function costWithoutComponents(
   cost: Decimal,

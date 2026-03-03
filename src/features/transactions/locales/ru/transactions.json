@@ -3,5 +3,30 @@
   "import": "Импорт",
   "searchPlaceholder": "Найти...",
   "upcomingSubscriptions": "Предстоящие подписки",
-  "groupBySubcategories": "Сгруппировать по подкатегориям"
+  "groupBySubcategories": "Сгруппировать по подкатегориям",
+  "costIncludingComponents": "Стоимость включая все составляющие",
+  "subscription": "Подписка",
+  "upcomingSubscription": "Предстоящая подписка",
+  "componentWithParent": "{{componentName}} (составляющая \"{{parentName}}\")",
+  "componentOfExpense": "Составляющая \"{{name}}\"",
+  "componentOfExpenseTooltip": "Составляющая расхода \"{{name}}\"",
+  "componentOfExpenseTooltipNoName": "Составляющая расхода",
+  "columns": {
+    "name": "Имя",
+    "noSubcategory": "<без подкатегории>",
+    "type": "Тип",
+    "subcategory": "Подкатегория",
+    "cost": "Сумма",
+    "date": "Дата",
+    "source": "Источник",
+    "category": "Категория"
+  },
+  "groupingValues": {
+    "income": "Доход",
+    "expense": "Расход"
+  },
+  "forecast": {
+    "plan": "План: {{value}}",
+    "exceededBy": "Превышение на {{value}}"
+  }
 }

@@ -17,7 +17,7 @@ export interface TransactionTableItem {
   id: number;
   name: string;
   cost: CostCol | null;
-  date: string; // ISO string, e.g. '2026-02-15T...'
+  date: string; // formatted with DATE_FORMAT, e.g. '15.02.2026'
   category: string; // category.name
   categoryId: number;
   categoryShortname: string;

@@ -1,11 +1,9 @@
 {
-  "appName": "Финансы",
-  "transactions": "Транзакции",
+  "appName": "Личные финансы",
+  "backToCurrentMonth": "К текущему месяцу",
   "planning": "Планирование",
   "savings": "Накопления",
   "statistics": "Статистика",
-  "thisMonth": "Этот месяц",
   "thisYear": "Этот год",
-  "yearView": "Только год",
-  "monthView": "По месяцам"
+  "transactions": "Транзакции"
 }

@@ -6,10 +6,14 @@ import { z } from 'zod';
 export const dayjsSchema = z.custom<dayjs.Dayjs>((v) => dayjs.isDayjs(v));
 
 /** Wire: decimal string  ↔  Client: decimal.js Decimal */
-export const decimalCodec = z.codec(z.string(), z.instanceof(Decimal), {
-  decode: (s) => new Decimal(s),
-  encode: (d) => d.toString(),
-});
+export const decimalCodec = z.codec(
+  z.string(),
+  z.custom<Decimal>((v) => Decimal.isDecimal(v)),
+  {
+    decode: (s) => new Decimal(s),
+    encode: (d) => d.toString(),
+  },
+);
 
 /** Wire: ISO datetime string  ↔  Client: dayjs */
 export const datetimeCodec = z.codec(z.string(), dayjsSchema, {

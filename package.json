@@ -13,6 +13,7 @@
     "db:studio": "prisma studio",
     "prepare": "husky",
     "typecheck": "tsc --noEmit",
+    "types:watch": "tsc --noEmit -w",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",

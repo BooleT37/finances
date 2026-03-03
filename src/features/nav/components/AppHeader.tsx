@@ -1,4 +1,4 @@
-import { AppShell, Group, Text } from '@mantine/core';
+import { Group, Text } from '@mantine/core';
 import { useRouterState } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
@@ -11,19 +11,16 @@ export function AppHeader() {
 
   const showNavigator =
     pathname === '/transactions' || pathname === '/planning';
-  const showYearToggle = pathname === '/transactions';
 
   return (
-    <AppShell.Header>
-      <Group h="100%" px="md" justify="space-between" align="center">
-        <Text fw={700} size="lg">
-          {t('appName')}
-        </Text>
+    <Group h="100%" px="md" justify="space-between" align="center">
+      <Text fw={700} size="lg">
+        {t('appName')}
+      </Text>
 
-        {showNavigator && <MonthNavigator showYearToggle={showYearToggle} />}
+      {showNavigator && <MonthNavigator />}
 
-        <LanguageSwitcher />
-      </Group>
-    </AppShell.Header>
+      <LanguageSwitcher />
+    </Group>
   );
 }

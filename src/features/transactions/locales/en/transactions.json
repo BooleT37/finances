@@ -3,5 +3,30 @@
   "import": "Import",
   "searchPlaceholder": "Search...",
   "upcomingSubscriptions": "Upcoming subscriptions",
-  "groupBySubcategories": "Group by subcategories"
+  "groupBySubcategories": "Group by subcategories",
+  "costIncludingComponents": "Cost including all components",
+  "subscription": "Subscription",
+  "upcomingSubscription": "Upcoming subscription",
+  "componentWithParent": "{{componentName}} (part of \"{{parentName}}\")",
+  "componentOfExpense": "Part of \"{{name}}\"",
+  "componentOfExpenseTooltip": "Component of \"{{name}}\"",
+  "componentOfExpenseTooltipNoName": "Component of expense",
+  "columns": {
+    "name": "Name",
+    "noSubcategory": "<no subcategory>",
+    "type": "Type",
+    "subcategory": "Subcategory",
+    "cost": "Cost",
+    "date": "Date",
+    "source": "Source",
+    "category": "Category"
+  },
+  "groupingValues": {
+    "income": "Income",
+    "expense": "Expense"
+  },
+  "forecast": {
+    "plan": "Plan: {{value}}",
+    "exceededBy": "Exceeded by {{value}}"
+  }
 }
