@@ -5,10 +5,5 @@ import { defineConfig } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
-  plugins: [
-    tsconfigPaths(),
-    tanstackStart(),
-    nitro({ rollupConfig: { external: ['@prisma/client', '.prisma/client'] } }),
-    viteReact(),
-  ],
+  plugins: [tsconfigPaths(), tanstackStart(), nitro(), viteReact()],
 });
