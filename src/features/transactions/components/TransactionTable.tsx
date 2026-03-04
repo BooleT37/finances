@@ -68,7 +68,7 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
         { id: 'categoryId', desc: false },
         { id: 'subcategoryId', desc: false },
       ],
-      density: 'xs',
+      // density: 'xs',
       columnVisibility: { subcategoryId: false },
     },
     state: {
@@ -161,6 +161,7 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
       style: {
         color: row.original.isUpcomingSubscription ? 'darkgray' : undefined,
         background: getRowBgColor(row.depth),
+        padding: '8px',
       },
     }),
   });
