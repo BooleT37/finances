@@ -96,7 +96,10 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
           </Group>
         ),
         Cell: ({ row, table: t2 }) => (
-          <div
+          <Group
+            align="center"
+            gap="xs"
+            wrap="nowrap"
             className={transactionNameCellClassName}
             data-category-id={
               row.getIsGrouped() ? undefined : row.original.categoryId
@@ -133,7 +136,7 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
                 {row.original.name}
               </span>
             )}
-          </div>
+          </Group>
         ),
         GroupedCell: ({ row }) => row.original.name,
         size: 200,

@@ -6,6 +6,10 @@ import { useTranslation } from 'react-i18next';
 
 import { getCategoryMapQueryOptions } from '~/features/categories/facets/categoryMap';
 import type { Category } from '~/features/categories/schema';
+import {
+  getSavingSpendingByCategoryIdQueryOptions,
+  type SavingSpendingLookup,
+} from '~/features/savingSpendings/facets/savingSpendingByCategoryId';
 import { getSourceMapQueryOptions } from '~/features/sources/facets/sourceMap';
 import type { Source } from '~/features/sources/schema';
 import type { AvailableSubscription } from '~/features/subscriptions/useAvailableSubscriptions';
@@ -28,39 +32,58 @@ import {
 
 type CategoryMap = Record<string, Category>;
 type SourceMap = Record<string, Source>;
+type SavingSpendingMap = Record<number, SavingSpendingLookup>;
 
 // #region Mapping functions
 
+function tableDataName(
+  tx: Transaction,
+  savingSpendingMap: SavingSpendingMap,
+): string {
+  if (tx.savingSpendingCategoryId !== null) {
+    const lookup = savingSpendingMap[tx.savingSpendingCategoryId];
+    if (lookup) {
+      const savingSpendingInfo = lookup.category.name
+        ? `${lookup.spending.name} - ${lookup.category.name}`
+        : lookup.spending.name;
+      return tx.name
+        ? `${savingSpendingInfo} (${tx.name})`
+        : savingSpendingInfo;
+    }
+  }
+  return tx.name;
+}
+
 function mapTransaction(
-  t: Transaction,
+  tx: Transaction,
   categoryMap: CategoryMap,
   sourceMap: SourceMap,
+  savingSpendingMap: SavingSpendingMap,
 ): TransactionTableItem {
-  const category = getOrThrow(categoryMap, t.categoryId, 'Category');
+  const category = getOrThrow(categoryMap, tx.categoryId, 'Category');
   const subcategory =
-    t.subcategoryId !== null
-      ? findByIdOrThrow(category.subcategories, t.subcategoryId, 'Subcategory')
+    tx.subcategoryId !== null
+      ? findByIdOrThrow(category.subcategories, tx.subcategoryId, 'Subcategory')
       : null;
-  const source = t.sourceId
-    ? getOrThrow(sourceMap, t.sourceId, 'Source')
-    : null;
+  const source =
+    tx.sourceId !== null ? getOrThrow(sourceMap, tx.sourceId, 'Source') : null;
 
   return {
-    id: t.id,
-    name: t.name,
+    id: tx.id,
+    name: tableDataName(tx, savingSpendingMap),
     cost: {
-      value: costWithoutComponents(t.cost, t.components),
-      isSubscription: t.subscriptionId !== null,
+      value: costWithoutComponents(tx.cost, tx.components),
+      isSubscription: tx.subscriptionId !== null,
       isIncome: category.isIncome,
-      costWithComponents: t.components.length > 0 ? t.cost : undefined,
+      costWithComponents: tx.components.length > 0 ? tx.cost : undefined,
     },
-    date: t.date.format(DATE_FORMAT),
+    date: tx.date.format(DATE_FORMAT),
     category: category.name,
-    categoryId: t.categoryId,
+    categoryId: tx.categoryId,
     categoryShortname: category.shortname,
     categoryIcon: category.icon,
     subcategory: subcategory?.name ?? null,
-    subcategoryId: t.subcategoryId,
+    subcategoryId: tx.subcategoryId,
     source: source?.name ?? '',
     isUpcomingSubscription: false,
     expenseId: null,
@@ -79,9 +102,8 @@ function mapSubscription(
     s.subcategoryId !== null
       ? findByIdOrThrow(category.subcategories, s.subcategoryId, 'Subcategory')
       : null;
-  const source = s.sourceId
-    ? getOrThrow(sourceMap, s.sourceId, 'Source')
-    : null;
+  const source =
+    s.sourceId !== null ? getOrThrow(sourceMap, s.sourceId, 'Source') : null;
 
   return {
     id: UPCOMING_SUBSCRIPTION_ID,
@@ -108,20 +130,20 @@ function mapSubscription(
 }
 
 function useMapComponents() {
-  const { t: i18n } = useTranslation('transactions');
+  const { t } = useTranslation('transactions');
 
   return useCallback(
     (
-      t: Transaction,
+      tx: Transaction,
       categoryMap: CategoryMap,
       sourceMap: SourceMap,
     ): TransactionTableItem[] => {
-      const parentCategory = getOrThrow(categoryMap, t.categoryId, 'Category');
-      const source = t.sourceId
-        ? getOrThrow(sourceMap, t.sourceId, 'Source')
+      const parentCategory = getOrThrow(categoryMap, tx.categoryId, 'Category');
+      const source = tx.sourceId
+        ? getOrThrow(sourceMap, tx.sourceId, 'Source')
         : null;
 
-      return t.components.map((c) => {
+      return tx.components.map((c) => {
         const category = getOrThrow(categoryMap, c.categoryId, 'Category');
         const subcategory =
           c.subcategoryId !== null
@@ -133,15 +155,15 @@ function useMapComponents() {
             : null;
 
         let name: string;
-        if (c.name && t.name) {
-          name = i18n('componentWithParent', {
+        if (c.name && tx.name) {
+          name = t('componentWithParent', {
             componentName: c.name,
-            parentName: t.name,
+            parentName: tx.name,
           });
         } else if (c.name) {
           name = c.name;
-        } else if (t.name) {
-          name = i18n('componentOfExpense', { name: t.name });
+        } else if (tx.name) {
+          name = t('componentOfExpense', { name: tx.name });
         } else {
           name = '';
         }
@@ -154,9 +176,9 @@ function useMapComponents() {
             isSubscription: false,
             isUpcomingSubscription: false,
             isIncome: category.isIncome,
-            parentExpenseName: t.name,
+            parentExpenseName: tx.name,
           },
-          date: t.date.format(DATE_FORMAT),
+          date: tx.date.format(DATE_FORMAT),
           category: category.name,
           categoryId: c.categoryId,
           categoryShortname: parentCategory.shortname,
@@ -165,13 +187,13 @@ function useMapComponents() {
           subcategoryId: c.subcategoryId,
           source: source?.name ?? '',
           isUpcomingSubscription: false,
-          expenseId: t.id,
+          expenseId: tx.id,
           isIncome: category.isIncome,
           isContinuous: category.isContinuous,
         };
       });
     },
-    [i18n],
+    [t],
   );
 }
 
@@ -204,24 +226,33 @@ export function useTransactionTableItems({
   const { data: transactions } = useQuery(getTransactionsQueryOptions(year));
   const { data: categoryMap } = useQuery(getCategoryMapQueryOptions());
   const { data: sourceMap } = useQuery(getSourceMapQueryOptions());
+  const { data: savingSpendingMap } = useQuery(
+    getSavingSpendingByCategoryIdQueryOptions(),
+  );
   const availableSubscriptions = useAvailableSubscriptions(
     rangeStart,
     rangeEnd,
   );
 
-  if (!transactions || !categoryMap || !sourceMap || !availableSubscriptions)
+  if (
+    !transactions ||
+    !categoryMap ||
+    !sourceMap ||
+    !savingSpendingMap ||
+    !availableSubscriptions
+  )
     return undefined;
 
   const search = searchString.toLowerCase();
 
   const filtered = transactions.filter(
-    (t) =>
-      (viewMode !== 'month' || t.date.format('YYYY-MM') === selectedMonth) &&
-      (!search || t.name.toLowerCase().includes(search)),
+    (tx) =>
+      (viewMode !== 'month' || tx.date.format('YYYY-MM') === selectedMonth) &&
+      (!search || tx.name.toLowerCase().includes(search)),
   );
 
-  const transactionRows = filtered.map((t) =>
-    mapTransaction(t, categoryMap, sourceMap),
+  const transactionRows = filtered.map((tx) =>
+    mapTransaction(tx, categoryMap, sourceMap, savingSpendingMap),
   );
 
   const subscriptionRows = showUpcoming
@@ -232,8 +263,8 @@ export function useTransactionTableItems({
         .map((a) => mapSubscription(a, categoryMap, sourceMap))
     : [];
 
-  const componentRows = filtered.flatMap((t) =>
-    mapComponents(t, categoryMap, sourceMap),
+  const componentRows = filtered.flatMap((tx) =>
+    mapComponents(tx, categoryMap, sourceMap),
   );
 
   return [...transactionRows, ...subscriptionRows, ...componentRows];

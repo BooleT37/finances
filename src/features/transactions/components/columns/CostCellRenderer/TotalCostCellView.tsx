@@ -1,4 +1,4 @@
-import { Tooltip } from '@mantine/core';
+import { Group, Tooltip } from '@mantine/core';
 import type { ReactNode } from 'react';
 
 interface Props {
@@ -20,12 +20,14 @@ export function TotalCostCellView({
 }: Props) {
   return (
     <div>
-      <div>
-        {cost}&nbsp;
+      <Group wrap="nowrap" gap={4}>
+        <div style={{ whiteSpace: 'nowrap' }}>{cost}</div>
         <Tooltip label={tooltip}>
-          <span style={{ fontSize: 12, color }}>{suffix}</span>
+          <span style={{ fontSize: 12, color, whiteSpace: 'nowrap' }}>
+            {suffix}
+          </span>
         </Tooltip>
-      </div>
+      </Group>
       <div
         style={{
           position: 'relative',

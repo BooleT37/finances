@@ -3,6 +3,7 @@ import type Decimal from 'decimal.js';
 import { useAtomValue } from 'jotai';
 import { useCallback } from 'react';
 
+import { getCategoryMapQueryOptions } from '~/features/categories/facets/categoryMap';
 import type { Category } from '~/features/categories/schema';
 import { getCategoryForecastsQueryOptions } from '~/features/forecasts/facets/categoryForecasts';
 import { getSubcategoryForecastsQueryOptions } from '~/features/forecasts/facets/subcategoryForecasts';
@@ -12,6 +13,7 @@ import { getRestForecastSum } from '~/features/forecasts/utils/getRestForecastSu
 import { getSavingSpendingByCategoryIdQueryOptions } from '~/features/savingSpendings/facets/savingSpendingByCategoryId';
 import { getTransactionsQueryOptions } from '~/features/transactions/queries';
 import { decimalSum } from '~/shared/utils/decimalSum';
+import { getOrThrow } from '~/shared/utils/getOrThrow';
 import { selectedYearAtom } from '~/stores/month';
 
 interface Params {
@@ -37,10 +39,11 @@ export function useGetCostForecast() {
     getSavingSpendingByCategoryIdQueryOptions(),
   );
   const { data: transactions } = useQuery(getTransactionsQueryOptions(year));
+  const { data: categoryMap } = useQuery(getCategoryMapQueryOptions());
 
   return useCallback(
     (params: Params): Decimal | undefined => {
-      if (!categoryForecasts) {
+      if (!categoryForecasts || !categoryMap) {
         return undefined;
       }
 
@@ -50,12 +53,19 @@ export function useGetCostForecast() {
         subcategoryId,
         isSubcategoryRow,
         month,
+        isIncome,
       } = params;
 
       if (categoryId === undefined) {
         return decimalSum(
           ...categoryForecasts
-            .filter((f) => f.month === month && f.year === params.year)
+            .filter(
+              (f) =>
+                f.month === month &&
+                f.year === params.year &&
+                getOrThrow(categoryMap, f.categoryId, 'Category').isIncome ===
+                  isIncome,
+            )
             .map((f) => f.sum),
         );
       }
@@ -104,6 +114,7 @@ export function useGetCostForecast() {
       subcategoryForecasts,
       savingSpendingByCategoryId,
       transactions,
+      categoryMap,
     ],
   );
 }

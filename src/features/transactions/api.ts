@@ -2,6 +2,7 @@ import { createServerFn } from '@tanstack/react-start';
 import dayjs from 'dayjs';
 
 import { prisma } from '~/server/db';
+import { adaptCost } from '~/shared/utils/adaptCost';
 
 import { transactionWithComponentsSchema } from './schema';
 
@@ -17,15 +18,21 @@ export const fetchTransactionsByYear = createServerFn({ method: 'GET' })
       },
       orderBy: { date: 'asc' },
       include: {
-        components: true,
+        category: true,
+        components: { include: { category: true } },
       },
     });
 
-    return transactions.map((t) =>
+    return transactions.map((tx) =>
       transactionWithComponentsSchema.encode({
-        ...t,
-        date: dayjs(t.date),
-        actualDate: t.actualDate ? dayjs(t.actualDate) : null,
+        ...tx,
+        cost: adaptCost(tx.cost, tx.category.isIncome),
+        date: dayjs(tx.date),
+        actualDate: tx.actualDate ? dayjs(tx.actualDate) : null,
+        components: tx.components.map((c) => ({
+          ...c,
+          cost: adaptCost(c.cost, c.category.isIncome),
+        })),
       }),
     );
   });
