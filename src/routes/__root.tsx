@@ -41,7 +41,7 @@ export const Route = createRootRoute({
 function RootDocument({ children }: { children: React.ReactNode }) {
   const { t, i18n: i18nInstance } = useTranslation('nav');
   return (
-    <html lang={i18nInstance.language}>
+    <html lang={i18nInstance.language} data-mantine-color-scheme="light">
       <head>
         <HeadContent />
         <title>{t('appName')}</title>
@@ -86,7 +86,7 @@ function RootComponent() {
       <QueryClientProvider client={queryClient}>
         <RootDocument>
           <I18nextProvider i18n={i18n}>
-            <MantineProvider theme={theme}>
+            <MantineProvider defaultColorScheme="light" theme={theme}>
               <AppContent />
             </MantineProvider>
           </I18nextProvider>
