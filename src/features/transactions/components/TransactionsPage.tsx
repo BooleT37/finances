@@ -8,7 +8,7 @@ import {
   TextInput,
   Tooltip,
 } from '@mantine/core';
-import { IconFileImport, IconPlus } from '@tabler/icons-react';
+import { IconFileImport, IconPlus, IconSearch } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAtom, useSetAtom } from 'jotai';
 import { useState } from 'react';
@@ -74,6 +74,7 @@ export function TransactionsPage() {
           />
         </Group>
         <TextInput
+          leftSection={<IconSearch size={16} />}
           placeholder={t('searchPlaceholder')}
           value={search}
           onChange={(e) => {
