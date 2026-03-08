@@ -13,6 +13,7 @@ import { selectedYearAtom } from '~/stores/month';
 import { getTransactionsMapByYear } from '../../facets/transactionMap';
 import {
   getAddTransactionMutationOptions,
+  getDeleteTransactionMutationOptions,
   getUpdateTransactionMutationOptions,
 } from '../../queries';
 import { confirmUnsavedChanges } from './confirmUnsavedChanges';
@@ -108,6 +109,23 @@ export const TransactionSidebarMolecule = molecule(() => {
     ),
   );
 
+  const deleteMutationAtom = atomWithMutation((get) =>
+    getDeleteTransactionMutationOptions(
+      get(queryClientAtom),
+      get(selectedYearAtom),
+    ),
+  );
+
+  const deleteTransactionAtom = atom(null, (get, set, id: number) => {
+    get(deleteMutationAtom).mutate(id, {
+      onSuccess: () => {
+        if (get(editingIdAtom) === id) {
+          set(closeAtom);
+        }
+      },
+    });
+  });
+
   const insertTransactionAtom = atom(
     null,
     async (get, _set, values: ValidatedTransactionFormValues) => {
@@ -165,5 +183,6 @@ export const TransactionSidebarMolecule = molecule(() => {
     openAtom,
     closeAtom,
     insertTransactionAtom,
+    deleteTransactionAtom,
   };
 });

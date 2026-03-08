@@ -7,6 +7,7 @@ import {
 
 import {
   createTransaction,
+  deleteTransaction,
   fetchTransactionsByYear,
   updateTransaction,
 } from '~/features/transactions/api';
@@ -46,6 +47,22 @@ export const getUpdateTransactionMutationOptions = (
       queryClient.setQueryData(
         getTransactionsQueryOptions(year).queryKey,
         (old) => old?.map((tx) => (tx.id === updatedTx.id ? updatedTx : tx)),
+      );
+    },
+  });
+
+export const getDeleteTransactionMutationOptions = (
+  queryClient: QueryClient,
+  year: number,
+) =>
+  mutationOptions({
+    mutationFn: async (id: number) => {
+      await deleteTransaction({ data: id });
+    },
+    onSuccess: (_data, id) => {
+      queryClient.setQueryData(
+        getTransactionsQueryOptions(year).queryKey,
+        (old) => old?.filter((tx) => tx.id !== id),
       );
     },
   });

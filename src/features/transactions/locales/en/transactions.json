@@ -1,5 +1,11 @@
 {
   "add": "Add",
+  "delete": {
+    "cancel": "Cancel",
+    "confirm": "Delete",
+    "confirmMessage": "Delete \"{{name}}\"?",
+    "confirmTitle": "Delete transaction"
+  },
   "columns": {
     "category": "Category",
     "cost": "Cost",

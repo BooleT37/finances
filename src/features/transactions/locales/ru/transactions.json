@@ -1,5 +1,11 @@
 {
   "add": "Добавить",
+  "delete": {
+    "cancel": "Отмена",
+    "confirm": "Удалить",
+    "confirmMessage": "Удалить «{{name}}»?",
+    "confirmTitle": "Удалить транзакцию"
+  },
   "columns": {
     "category": "Категория",
     "cost": "Сумма",

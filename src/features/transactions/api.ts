@@ -96,6 +96,12 @@ export const createTransaction = createServerFn({ method: 'POST' })
     });
   });
 
+export const deleteTransaction = createServerFn({ method: 'POST' })
+  .inputValidator((id: number) => id)
+  .handler(async ({ data: id }) => {
+    await prisma.expense.delete({ where: { id } });
+  });
+
 export const updateTransaction = createServerFn({ method: 'POST' })
   .inputValidator((input: UpdateTransactionInput) =>
     updateTransactionSchema.parse(input),

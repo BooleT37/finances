@@ -1,7 +1,9 @@
 import { ActionIcon, Group } from '@mantine/core';
+import { openConfirmModal } from '@mantine/modals';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { useMolecule } from 'bunshi/react';
 import { useSetAtom } from 'jotai';
+import { useTranslation } from 'react-i18next';
 
 import { TransactionSidebarMolecule } from '../TransactionSidebar/transactionSidebarMolecule';
 
@@ -11,16 +13,30 @@ interface Props {
   name: string;
 }
 
-export function RowActions({ id }: Props) {
-  const { openAtom } = useMolecule(TransactionSidebarMolecule);
+export function RowActions({ id, name }: Props) {
+  const { openAtom, deleteTransactionAtom } = useMolecule(
+    TransactionSidebarMolecule,
+  );
   const open = useSetAtom(openAtom);
+  const deleteTx = useSetAtom(deleteTransactionAtom);
+  const { t } = useTranslation('transactions');
+
+  const handleDelete = () => {
+    openConfirmModal({
+      title: t('delete.confirmTitle'),
+      children: t('delete.confirmMessage', { name }),
+      labels: { confirm: t('delete.confirm'), cancel: t('delete.cancel') },
+      confirmProps: { color: 'red' },
+      onConfirm: () => void deleteTx(id),
+    });
+  };
 
   return (
     <Group gap={4}>
       <ActionIcon variant="subtle" onClick={() => open(id)}>
         <IconEdit size={16} />
       </ActionIcon>
-      <ActionIcon variant="subtle" color="red" disabled>
+      <ActionIcon variant="subtle" color="red" onClick={handleDelete}>
         <IconTrash size={16} />
       </ActionIcon>
     </Group>
