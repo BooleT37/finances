@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import dayjs from 'dayjs';
 import { useAtomValue } from 'jotai';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,8 +11,8 @@ import {
 } from '~/features/savingSpendings/facets/savingSpendingByCategoryId';
 import { getSourceMapQueryOptions } from '~/features/sources/facets/sourceMap';
 import type { Source } from '~/features/sources/schema';
-import type { AvailableSubscription } from '~/features/subscriptions/useAvailableSubscriptions';
-import { useAvailableSubscriptions } from '~/features/subscriptions/useAvailableSubscriptions';
+import type { AvailableSubscription } from '~/features/subscriptions/facets/availableSubscriptions';
+import { useAvailableSubscriptions } from '~/features/subscriptions/facets/availableSubscriptions';
 import { getTransactionsQueryOptions } from '~/features/transactions/queries';
 import { DATE_FORMAT } from '~/shared/constants';
 import { findByIdOrThrow, getOrThrow } from '~/shared/utils/getOrThrow';
@@ -215,24 +214,13 @@ export function useTransactionTableItems({
   const year = useAtomValue(selectedYearAtom);
   const viewMode = useAtomValue(viewModeAtom); // 'month' | 'year'
 
-  const monthStart = dayjs(selectedMonth);
-  const rangeStart =
-    viewMode === 'month'
-      ? monthStart.startOf('month')
-      : monthStart.startOf('year');
-  const rangeEnd =
-    viewMode === 'month' ? monthStart.endOf('month') : monthStart.endOf('year');
-
   const { data: transactions } = useQuery(getTransactionsQueryOptions(year));
   const { data: categoryMap } = useQuery(getCategoryMapQueryOptions());
   const { data: sourceMap } = useQuery(getSourceMapQueryOptions());
   const { data: savingSpendingMap } = useQuery(
     getSavingSpendingByCategoryIdQueryOptions(),
   );
-  const availableSubscriptions = useAvailableSubscriptions(
-    rangeStart,
-    rangeEnd,
-  );
+  const availableSubscriptions = useAvailableSubscriptions();
 
   if (
     !transactions ||

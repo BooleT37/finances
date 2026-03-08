@@ -10,6 +10,7 @@ import {
 } from '@mantine/core';
 import { IconFileImport, IconPlus, IconSearch } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
+import { useMolecule } from 'bunshi/react';
 import { useAtom, useSetAtom } from 'jotai';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,11 +20,16 @@ import { transactionSearchAtom, viewModeAtom } from '~/stores/month';
 
 import { useTransactionTableItems } from '../useTransactionTableItems';
 import { ImportModal } from './ImportModal';
-import { TransactionModal } from './TransactionModal';
-import { TransactionTable } from './TransactionTable';
+import { TransactionSidebar } from './TransactionSidebar/TransactionSidebar';
+import { TransactionSidebarMolecule } from './TransactionSidebar/transactionSidebarMolecule';
+import { TransactionTable } from './TransactionsTable/TransactionsTable';
+
+const sidebarWidth = 300;
 
 export function TransactionsPage() {
   const { t } = useTranslation('transactions');
+  const { openAtom } = useMolecule(TransactionSidebarMolecule);
+  const openSidebar = useSetAtom(openAtom);
   const setViewMode = useSetAtom(viewModeAtom);
   const [search, setSearch] = useAtom(transactionSearchAtom);
   const [showUpcoming, setShowUpcoming] = useState(false);
@@ -38,15 +44,12 @@ export function TransactionsPage() {
   );
 
   return (
-    <Stack>
+    <Stack h="100%" style={{ flex: 1, marginRight: sidebarWidth }}>
       <Group justify="space-between">
         <Group gap="sm">
           <Button
             leftSection={<IconPlus size={16} />}
-            onClick={() => {
-              /* TODO: transactionModal.open(null) */
-            }}
-            disabled
+            onClick={() => openSidebar(null)}
           >
             {t('add')}
           </Button>
@@ -86,7 +89,7 @@ export function TransactionsPage() {
           }}
         />
       </Group>
-      {/* 
+      {/*
           // we need to fetch all the orders from user settings
           // before we render the table, otherwise ordering won't work */}
       {userSettingsLoaded ? (
@@ -98,8 +101,7 @@ export function TransactionsPage() {
         <Loader />
       )}
 
-      {/* TODO: modals render nothing for now */}
-      <TransactionModal />
+      <TransactionSidebar width={sidebarWidth} />
       <ImportModal />
     </Stack>
   );

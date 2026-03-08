@@ -3,9 +3,11 @@ import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
 import 'mantine-react-table/styles.css';
 import 'dayjs/locale/ru';
+import '~/lib/dayjs';
 
 import { AppShell, createTheme, MantineProvider } from '@mantine/core';
 import { DatesProvider } from '@mantine/dates';
+import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
@@ -15,6 +17,8 @@ import {
   Scripts,
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { useHydrateAtoms } from 'jotai/utils';
+import { queryClientAtom } from 'jotai-tanstack-query';
 import { I18nextProvider, useTranslation } from 'react-i18next';
 
 import { AppHeader } from '~/features/nav/components/AppHeader';
@@ -80,17 +84,26 @@ function AppContent() {
   );
 }
 
+function HydrateAtoms({ children }: { children: React.ReactNode }) {
+  useHydrateAtoms([[queryClientAtom, queryClient]]);
+  return <>{children}</>;
+}
+
 function RootComponent() {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <RootDocument>
-          <I18nextProvider i18n={i18n}>
-            <MantineProvider defaultColorScheme="light" theme={theme}>
-              <AppContent />
-            </MantineProvider>
-          </I18nextProvider>
-        </RootDocument>
+        <HydrateAtoms>
+          <RootDocument>
+            <I18nextProvider i18n={i18n}>
+              <MantineProvider defaultColorScheme="light" theme={theme}>
+                <ModalsProvider>
+                  <AppContent />
+                </ModalsProvider>
+              </MantineProvider>
+            </I18nextProvider>
+          </RootDocument>
+        </HydrateAtoms>
       </QueryClientProvider>
     </trpc.Provider>
   );

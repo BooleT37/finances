@@ -37,3 +37,41 @@ export const transactionWithComponentsSchema = transactionSchema.extend({
 
 export type TransactionWire = z.input<typeof transactionWithComponentsSchema>;
 export type Transaction = z.output<typeof transactionWithComponentsSchema>;
+
+// ── NewTransaction (create input) ─────────────────────────────────────────────
+
+export const newTransactionComponentSchema = z.object({
+  name: z.string(),
+  cost: z.string(),
+  categoryId: z.number(),
+  subcategoryId: z.number().nullable().optional(),
+});
+
+export const updateTransactionComponentSchema =
+  newTransactionComponentSchema.extend({
+    id: z.number().optional(),
+  });
+
+export const newTransactionSchema = z.object({
+  name: z.string(),
+  cost: z.string(),
+  date: z.string(),
+  actualDate: z.string().nullable().optional(),
+  categoryId: z.number(),
+  subcategoryId: z.number().nullable().optional(),
+  sourceId: z.number().nullable().optional(),
+  subscriptionId: z.number().nullable().optional(),
+  savingSpendingCategoryId: z.number().nullable().optional(),
+  components: z.array(newTransactionComponentSchema).optional(),
+});
+
+export type NewTransactionInput = z.infer<typeof newTransactionSchema>;
+
+// ── UpdateTransaction (update input) ──────────────────────────────────────────
+
+export const updateTransactionSchema = newTransactionSchema.extend({
+  id: z.number(),
+  components: z.array(updateTransactionComponentSchema).optional(),
+});
+
+export type UpdateTransactionInput = z.infer<typeof updateTransactionSchema>;

@@ -5,12 +5,20 @@ import {
   IconChartLine,
   IconTable,
 } from '@tabler/icons-react';
-import { Link, useRouterState } from '@tanstack/react-router';
+import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
+import { useMolecule } from 'bunshi/react';
+import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
+
+import { confirmUnsavedChanges } from '~/features/transactions/components/TransactionSidebar/confirmUnsavedChanges';
+import { TransactionSidebarMolecule } from '~/features/transactions/components/TransactionSidebar/transactionSidebarMolecule';
 
 export function AppNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { t } = useTranslation('nav');
+  const navigate = useNavigate();
+  const { formRefAtom } = useMolecule(TransactionSidebarMolecule);
+  const formRef = useAtomValue(formRefAtom);
 
   const items = [
     {
@@ -41,6 +49,11 @@ export function AppNav() {
           label={item.label}
           leftSection={item.icon}
           active={pathname === item.to}
+          onClick={(e: React.MouseEvent) => {
+            if (!formRef?.isDirty()) return;
+            e.preventDefault();
+            confirmUnsavedChanges(() => void navigate({ to: item.to }));
+          }}
         />
       ))}
     </Stack>

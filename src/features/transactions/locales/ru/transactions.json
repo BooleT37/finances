@@ -1,32 +1,60 @@
 {
   "add": "Добавить",
-  "import": "Импорт",
-  "searchPlaceholder": "Найти...",
-  "upcomingSubscriptions": "Предстоящие подписки",
-  "groupBySubcategories": "Сгруппировать по подкатегориям",
-  "costIncludingComponents": "Стоимость включая все составляющие",
-  "subscription": "Подписка",
-  "upcomingSubscription": "Предстоящая подписка",
-  "componentWithParent": "{{componentName}} (составляющая \"{{parentName}}\")",
+  "columns": {
+    "category": "Категория",
+    "cost": "Сумма",
+    "date": "Дата",
+    "name": "Имя",
+    "noSubcategory": "<без подкатегории>",
+    "source": "Источник",
+    "subcategory": "Подкатегория",
+    "type": "Тип"
+  },
   "componentOfExpense": "Составляющая \"{{name}}\"",
   "componentOfExpenseTooltip": "Составляющая расхода \"{{name}}\"",
   "componentOfExpenseTooltipNoName": "Составляющая расхода",
-  "columns": {
-    "name": "Имя",
-    "noSubcategory": "<без подкатегории>",
-    "type": "Тип",
-    "subcategory": "Подкатегория",
-    "cost": "Сумма",
-    "date": "Дата",
-    "source": "Источник",
-    "category": "Категория"
-  },
-  "groupingValues": {
-    "income": "Доход",
-    "expense": "Расход"
-  },
+  "componentWithParent": "{{componentName}} (составляющая \"{{parentName}}\")",
+  "costIncludingComponents": "Стоимость включая все составляющие",
   "forecast": {
-    "plan": "План: {{value}}",
-    "exceededBy": "Превышение на {{value}}"
-  }
+    "exceededBy": "Превышение на {{value}}",
+    "plan": "План: {{value}}"
+  },
+  "form": {
+    "actualDate": "Реальная дата",
+    "actualDateDescription": "Дата, под которой трата записана в банковском приложении. Учитывается только в подсказке «последние траты» под источником.",
+    "actualDateDiffers": "Реальная дата отличается",
+    "amount": "Сумма (€)",
+    "category": "Категория",
+    "comment": "Комментарий",
+    "date": "Дата",
+    "errors": {
+      "actualDateSameAsDate": "Реальная дата должна отличаться",
+      "categoryRequired": "Выберите категорию",
+      "dateRequired": "Введите дату",
+      "invalidAmount": "Введите корректную сумму"
+    },
+    "sameDate": "Реальная дата не отличается",
+    "type": {
+      "expense": "Расход",
+      "fromSavings": "Из сбережений",
+      "income": "Доход",
+      "label": "Тип"
+    },
+    "add": "Добавить",
+    "save": "Сохранить",
+    "source": "Источник",
+    "sourceLastEntry": "Последняя запись: {{date}}",
+    "subcategory": "Подкатегория",
+    "subscription": "Подписка"
+  },
+  "groupBySubcategories": "Сгруппировать по подкатегориям",
+  "groupingValues": {
+    "expense": "Расход",
+    "income": "Доход"
+  },
+  "import": "Импорт",
+  "searchPlaceholder": "Найти...",
+  "subscription": "Подписка",
+  "upcomingSubscription": "Предстоящая подписка",
+  "upcomingSubscriptions": "Предстоящие подписки"
 }

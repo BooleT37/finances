@@ -1,6 +1,6 @@
 import { costToString } from '~/shared/utils/costToString';
 
-import type { CostCol } from '../../../transactionTableItem';
+import type { CostCol } from '../../../../transactionTableItem';
 import { CostCellView } from './CostCellView';
 
 interface CostCellRendererProps {

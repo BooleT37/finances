@@ -1,32 +1,60 @@
 {
   "add": "Add",
-  "import": "Import",
-  "searchPlaceholder": "Search...",
-  "upcomingSubscriptions": "Upcoming subscriptions",
-  "groupBySubcategories": "Group by subcategories",
-  "costIncludingComponents": "Cost including all components",
-  "subscription": "Subscription",
-  "upcomingSubscription": "Upcoming subscription",
-  "componentWithParent": "{{componentName}} (part of \"{{parentName}}\")",
+  "columns": {
+    "category": "Category",
+    "cost": "Cost",
+    "date": "Date",
+    "name": "Name",
+    "noSubcategory": "<no subcategory>",
+    "source": "Source",
+    "subcategory": "Subcategory",
+    "type": "Type"
+  },
   "componentOfExpense": "Part of \"{{name}}\"",
   "componentOfExpenseTooltip": "Component of \"{{name}}\"",
   "componentOfExpenseTooltipNoName": "Component of expense",
-  "columns": {
-    "name": "Name",
-    "noSubcategory": "<no subcategory>",
-    "type": "Type",
-    "subcategory": "Subcategory",
-    "cost": "Cost",
-    "date": "Date",
-    "source": "Source",
-    "category": "Category"
-  },
-  "groupingValues": {
-    "income": "Income",
-    "expense": "Expense"
-  },
+  "componentWithParent": "{{componentName}} (part of \"{{parentName}}\")",
+  "costIncludingComponents": "Cost including all components",
   "forecast": {
-    "plan": "Plan: {{value}}",
-    "exceededBy": "Exceeded by {{value}}"
-  }
+    "exceededBy": "Exceeded by {{value}}",
+    "plan": "Plan: {{value}}"
+  },
+  "form": {
+    "actualDate": "Actual date",
+    "actualDateDescription": "The date as shown in your bank app. Only used in the \"recent transactions\" hint shown under the source field.",
+    "actualDateDiffers": "Actual date differs",
+    "amount": "Amount (€)",
+    "category": "Category",
+    "comment": "Comment",
+    "date": "Date",
+    "errors": {
+      "actualDateSameAsDate": "Actual date must differ from date",
+      "categoryRequired": "Select a category",
+      "dateRequired": "Enter a date",
+      "invalidAmount": "Enter a valid amount"
+    },
+    "sameDate": "Same date",
+    "type": {
+      "expense": "Expense",
+      "fromSavings": "From savings",
+      "income": "Income",
+      "label": "Type"
+    },
+    "add": "Add",
+    "save": "Save",
+    "source": "Source",
+    "sourceLastEntry": "Last entry: {{date}}",
+    "subcategory": "Subcategory",
+    "subscription": "Subscription"
+  },
+  "groupBySubcategories": "Group by subcategories",
+  "groupingValues": {
+    "expense": "Expense",
+    "income": "Income"
+  },
+  "import": "Import",
+  "searchPlaceholder": "Search...",
+  "subscription": "Subscription",
+  "upcomingSubscription": "Upcoming subscription",
+  "upcomingSubscriptions": "Upcoming subscriptions"
 }

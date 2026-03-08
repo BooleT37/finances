@@ -2,7 +2,7 @@ import { createMRTColumnHelper } from 'mantine-react-table';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { TransactionTableItem } from '../../transactionTableItem';
+import type { TransactionTableItem } from '../../../transactionTableItem';
 import { CostAggregatedCellRenderer } from './CostCellRenderer/CostAggregatedCellRenderer';
 import { CostCellRenderer } from './CostCellRenderer/CostCellRenderer';
 import { getPassedDaysRatio } from './utils/getPassedDaysRatio';

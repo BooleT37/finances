@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import type { Dayjs } from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 import { useAtomValue } from 'jotai';
 
 import { getTransactionsQueryOptions } from '~/features/transactions/queries';
-import { selectedYearAtom } from '~/stores/month';
+import { selectedMonthAtom, selectedYearAtom } from '~/stores/month';
 
-import { getSubscriptionsQueryOptions } from './queries';
-import type { Subscription } from './schema';
+import { getSubscriptionsQueryOptions } from '../queries';
+import type { Subscription } from '../schema';
 
 export interface AvailableSubscription {
   subscription: Subscription;
@@ -30,9 +30,12 @@ function firstDateInInterval(
 }
 
 export function useAvailableSubscriptions(
-  rangeStart: Dayjs,
-  rangeEnd: Dayjs,
+  categoryId?: number,
+  editingId?: number | null,
 ): AvailableSubscription[] | undefined {
+  const selectedMonth = useAtomValue(selectedMonthAtom);
+  const rangeStart = dayjs(selectedMonth).startOf('month');
+  const rangeEnd = dayjs(selectedMonth).endOf('month');
   const year = useAtomValue(selectedYearAtom);
   const { data: subscriptions } = useQuery(getSubscriptionsQueryOptions());
   const { data: transactions } = useQuery(getTransactionsQueryOptions(year));
@@ -44,6 +47,7 @@ export function useAvailableSubscriptions(
       .filter(
         (t) =>
           t.subscriptionId !== null &&
+          t.id !== editingId &&
           !t.date.isBefore(rangeStart, 'day') &&
           !t.date.isAfter(rangeEnd, 'day'),
       )
@@ -52,6 +56,7 @@ export function useAvailableSubscriptions(
 
   return subscriptions
     .filter((s) => s.active)
+    .filter((s) => categoryId === undefined || s.categoryId === categoryId)
     .map((subscription): AvailableSubscription | null => {
       const date = firstDateInInterval(
         subscription.firstDate,

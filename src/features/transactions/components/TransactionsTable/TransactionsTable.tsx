@@ -8,7 +8,7 @@ import {
 } from 'mantine-react-table';
 // important to import cjs file directly: https://github.com/KevinVandy/mantine-react-table/issues/390#issuecomment-2348339328
 import { MRT_Localization_RU } from 'mantine-react-table/locales/ru/index.cjs';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { NameWithOptionalIcon } from '~/features/categories/components/NameWithOptionalIcon';
@@ -22,8 +22,9 @@ import {
   viewModeAtom,
 } from '~/stores/month';
 
-import type { TransactionTableItem } from '../transactionTableItem';
+import type { TransactionTableItem } from '../../transactionTableItem';
 import { useTransactionTableColumns } from './columns/useTransactionTableColumns';
+import { flashEffectAtom, flashStateAtom } from './flashTransaction';
 import { RowActions } from './RowActions';
 
 export const transactionNameCellClassName = 'transaction-name-cell';
@@ -51,6 +52,8 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
   const sortAllCategoriesById = useSortAllCategoriesById();
   const sortSubcategories = useSortSubcategories();
 
+  const { id: flashId, fading } = useAtomValue(flashStateAtom);
+
   const table = useMantineReactTable({
     columns,
     data: items ?? [],
@@ -68,7 +71,7 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
         { id: 'categoryId', desc: false },
         { id: 'subcategoryId', desc: false },
       ],
-      // density: 'xs',
+      density: 'xs',
       columnVisibility: { subcategoryId: false },
     },
     state: {
@@ -83,6 +86,7 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
         <RowActions
           id={row.original.id}
           parentExpenseId={row.original.expenseId}
+          name={row.original.name}
         />
       );
     },
@@ -160,14 +164,26 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
           : 0,
     },
     localization: MRT_Localization_RU,
-    mantineTableBodyCellProps: ({ row }) => ({
-      style: {
-        color: row.original.isUpcomingSubscription ? 'darkgray' : undefined,
-        background: getRowBgColor(row.depth),
-        padding: '8px',
-      },
-    }),
+    mantineTableBodyCellProps: ({ row }) => {
+      const isFlashing = !row.getIsGrouped() && row.original.id === flashId;
+      return {
+        style: {
+          color: row.original.isUpcomingSubscription ? 'darkgray' : undefined,
+          background: isFlashing
+            ? fading
+              ? 'transparent'
+              : '#fffde7'
+            : getRowBgColor(row.depth),
+          transition:
+            isFlashing && fading ? 'background 1.5s ease-out' : undefined,
+          padding: '8px',
+        },
+      };
+    },
   });
+
+  const flashEffect = useMemo(() => flashEffectAtom(table), [table]);
+  useAtomValue(flashEffect);
 
   useEffect(() => {
     if (groupBySubcategories) {
