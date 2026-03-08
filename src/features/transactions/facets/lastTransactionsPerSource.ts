@@ -10,11 +10,15 @@ export function useLastTransactionsPerSource(
   const { data: currentYear } = useQuery(getTransactionsQueryOptions(year));
   const { data: prevYear } = useQuery(getTransactionsQueryOptions(year - 1));
 
-  if (currentYear === undefined || prevYear === undefined) return undefined;
+  if (currentYear === undefined || prevYear === undefined) {
+    return undefined;
+  }
 
   const bySource = new Map<number, Transaction[]>();
   for (const tx of [...currentYear, ...prevYear]) {
-    if (tx.sourceId === null) continue;
+    if (tx.sourceId === null) {
+      continue;
+    }
     const list = bySource.get(tx.sourceId) ?? [];
     list.push(tx);
     bySource.set(tx.sourceId, list);
@@ -24,7 +28,9 @@ export function useLastTransactionsPerSource(
   for (const [sourceId, txs] of bySource) {
     const effectiveDates = txs.map((tx) => tx.actualDate ?? tx.date);
     const lastDate = dayjs.max(effectiveDates);
-    if (!lastDate) continue;
+    if (!lastDate) {
+      continue;
+    }
     result[sourceId] = txs.filter((tx) =>
       (tx.actualDate ?? tx.date).isSame(lastDate, 'day'),
     );

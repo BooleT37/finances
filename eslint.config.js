@@ -26,6 +26,11 @@ export default defineConfig(
   },
   prettierConfig,
   {
+    rules: {
+      curly: ['error', 'all'],
+    },
+  },
+  {
     languageOptions: {
       parserOptions: {
         project: true,

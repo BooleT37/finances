@@ -50,7 +50,9 @@ export function AppNav() {
           leftSection={item.icon}
           active={pathname === item.to}
           onClick={(e: React.MouseEvent) => {
-            if (!formRef?.isDirty()) return;
+            if (!formRef?.isDirty()) {
+              return;
+            }
             e.preventDefault();
             confirmUnsavedChanges(() => void navigate({ to: item.to }));
           }}

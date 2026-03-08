@@ -83,7 +83,9 @@ export function TransactionSidebarForm() {
   );
 
   const [transactionType, setTransactionType] = useState(() => {
-    if (!currentTransaction) return 'expense';
+    if (!currentTransaction) {
+      return 'expense';
+    }
     const cat = getOrThrow(
       categoryMap,
       currentTransaction.categoryId,
@@ -106,7 +108,9 @@ export function TransactionSidebarForm() {
     validate: {
       date: isNotEmpty(t('form.errors.dateRequired')),
       actualDate: (v, values) => {
-        if (!actualDateShown || !v || !values.date) return null;
+        if (!actualDateShown || !v || !values.date) {
+          return null;
+        }
         return v.toDateString() === values.date.toDateString()
           ? t('form.errors.actualDateSameAsDate')
           : null;
@@ -123,7 +127,9 @@ export function TransactionSidebarForm() {
 
   useEffect(() => {
     const handler = (e: BeforeUnloadEvent) => {
-      if (form.isDirty()) e.preventDefault();
+      if (form.isDirty()) {
+        e.preventDefault();
+      }
     };
     window.addEventListener('beforeunload', handler);
     return () => window.removeEventListener('beforeunload', handler);
@@ -135,7 +141,9 @@ export function TransactionSidebarForm() {
   );
 
   const selectedCategory = useMemo(() => {
-    if (form.values.category === null) return undefined;
+    if (form.values.category === null) {
+      return undefined;
+    }
     return getOrThrow(categoryMap, Number(form.values.category), 'Category');
   }, [categoryMap, form.values.category]);
 
@@ -169,7 +177,9 @@ export function TransactionSidebarForm() {
 
   const autofillSubscriptionFields = useCallback(
     (subscriptionId: string) => {
-      if (!availableSubscriptions) return;
+      if (!availableSubscriptions) {
+        return;
+      }
       const sub = findByIdOrThrow(
         availableSubscriptions.map((s) => s.subscription),
         Number(subscriptionId),

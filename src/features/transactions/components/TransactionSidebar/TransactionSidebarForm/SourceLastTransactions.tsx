@@ -21,7 +21,9 @@ export function SourceLastTransactions({ sourceId }: Props) {
   const { data: categoryMap = {} } = useQuery(getCategoryMapQueryOptions());
 
   const txs = lastTransactionsPerSource?.[sourceId] ?? [];
-  if (txs.length === 0) return null;
+  if (txs.length === 0) {
+    return null;
+  }
 
   const lastDate = txs[0].actualDate ?? txs[0].date;
 

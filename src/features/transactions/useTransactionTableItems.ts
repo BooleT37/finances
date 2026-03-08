@@ -228,8 +228,9 @@ export function useTransactionTableItems({
     !sourceMap ||
     !savingSpendingMap ||
     !availableSubscriptions
-  )
+  ) {
     return undefined;
+  }
 
   const search = searchString.toLowerCase();
 

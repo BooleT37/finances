@@ -17,7 +17,9 @@ function scrollToRow(
   id: number,
 ) {
   const container = table.refs.tableContainerRef.current;
-  if (!container) return;
+  if (!container) {
+    return;
+  }
   const flatRows = table.getRowModel().rows;
   const rowIndex = flatRows.findIndex(
     (r) => !r.getIsGrouped() && r.original.id === id,
@@ -49,7 +51,9 @@ export const flashEffectAtom = (
 ) =>
   atomEffect((get, set) => {
     const tx = get(insertedTransactionAtom);
-    if (!tx) return;
+    if (!tx) {
+      return;
+    }
     expandCategoryRow(table, tx.categoryId);
     set(flashStateAtom, { id: tx.id, fading: false });
     setTimeout(() => scrollToRow(table, tx.id), 50);

@@ -42,7 +42,9 @@ export const TransactionSidebarMolecule = molecule(() => {
   const currentTransactionAtom = atom((get) => {
     const id = get(editingIdAtom);
     const result = get(transactionsMapAtom);
-    if (id == null || !result.data) return null;
+    if (id == null || !result.data) {
+      return null;
+    }
     return result.data[id] ?? null;
   });
 

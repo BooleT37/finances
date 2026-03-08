@@ -61,8 +61,12 @@ export const useSortSubcategories = () => {
       subcategory1Id: number | null,
       subcategory2Id: number | null,
     ) => {
-      if (subcategory1Id === null) return 1;
-      if (subcategory2Id === null) return -1;
+      if (subcategory1Id === null) {
+        return 1;
+      }
+      if (subcategory2Id === null) {
+        return -1;
+      }
       const subcategories = categoryMap?.[categoryId]?.subcategories ?? [];
       const order = subcategories.map((s) => s.id);
       if (!order.includes(subcategory1Id)) {

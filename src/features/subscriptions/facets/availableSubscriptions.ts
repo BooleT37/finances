@@ -40,7 +40,9 @@ export function useAvailableSubscriptions(
   const { data: subscriptions } = useQuery(getSubscriptionsQueryOptions());
   const { data: transactions } = useQuery(getTransactionsQueryOptions(year));
 
-  if (!subscriptions || !transactions) return undefined;
+  if (!subscriptions || !transactions) {
+    return undefined;
+  }
 
   const paidSubscriptionIds = new Set(
     transactions
