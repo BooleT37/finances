@@ -11,10 +11,6 @@ A personal finance management application built with modern web technologies.
 - **Database**: [Prisma](https://www.prisma.io/) - Next-generation ORM
 - **Build Tool**: [Vite](https://vitejs.dev/) - Fast build tool with HMR
 
-## Project Structure
-
-See **[docs/project-structure.md](docs/project-structure.md)** for the full layout, feature folder conventions, i18n pattern, and import rules.
-
 ## Configuration
 
 - **Path Aliases**: `~/*` maps to `./src/*` (configured in tsconfig.json + vite-tsconfig-paths)
@@ -60,7 +56,7 @@ npm run typecheck
 
 ## Code Quality
 
-After making any code changes, run the following checks:
+**Always run these checks after every code change before considering a task done:**
 
 ```bash
 npm run typecheck && npm run lint && npm run format:check
@@ -107,12 +103,20 @@ Uses **react-i18next** with feature-colocated translations. Each feature owns it
 
 Types are inferred automatically via `as const` — no manual type maintenance needed. See [docs/project-structure.md](docs/project-structure.md) for the full pattern.
 
+## Authentication
+
+**Not yet implemented.** The `Expense` (and other) Prisma models have a required `userId` field, but no auth system is in place yet. Current workarounds:
+
+- Read queries (e.g. `fetchTransactionsByYear`) do not filter by `userId` — they return all records.
+- Write mutations (e.g. `createTransaction`) use `prisma.user.findFirstOrThrow()` as a placeholder and mark the call with `// TODO: replace with actual user from auth`.
+
+When auth is added, all server functions will need to resolve the current user from the session and apply `where: { userId }` filters.
+
 ## Notes
 
-- Router uses `getRouter()` async function export (TanStack Start v1.x requirement)
-- All route files must export using `createFileRoute()` or `createRootRoute()`
 - Run `npm run dev` to auto-generate routeTree.gen.ts when routes change
 - **Dates**: Use [dayjs](https://day.js.org/) for all date handling — never native `Date`. The `datetimeCodec` in `src/shared/codecs.ts` decodes ISO strings to `dayjs.Dayjs` objects. Prisma `where` clauses are the only exception (Prisma requires native `Date`).
 - **Variable naming**: Never use `t` as a shorthand for a transaction — `t` is reserved for the i18n translation function from `useTranslation`. Use `tx` or the full name `transaction` instead.
 - **Entity map lookups**: Always use `getOrThrow(map, key, 'Label')` from `~/shared/utils/getOrThrow` when reading from an entity map (e.g. `categoryMap`, `sourceMap`). Never use optional chaining (`map?.[key]`) — a missing key is a data integrity error and should throw, not silently return `undefined`.
 - **Cost sign convention**: All `cost`/`sum` fields are sent from the API as **negative for expense categories** (`isIncome === false`) and **positive for income categories**. Negation happens in each feature's `api.ts` handler using `adaptCost` from `~/shared/utils/adaptCost`. The category must be included in the Prisma query (via `include: { category: true }`) to access `isIncome`, but only `categoryId` is exposed to the client (the `category` object is stripped by `schema.encode()`).
+  - **Transactions and forecasts** can carry both positive and negative costs. Display rule: expense costs always shown with `"-"`, income costs without. The user may input either sign in a form field, but it is corrected the latest before DB write based on `category.isIncome`. Never call `.abs()` when populating form fields from API data — keep the sign as received.
