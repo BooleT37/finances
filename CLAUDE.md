@@ -34,6 +34,17 @@ Detailed framework-specific documentation is split into separate files:
 
 - **[Project Structure](docs/project-structure.md)** - Bulletproof-react conventions, feature folder layout, import rules
 
+### Feature Documentation
+
+Each feature has a dedicated documentation file at `src/features/{feature}/{FEATURE}.md` describing its domain concepts, business rules, and known limitations. Read the relevant feature doc(s) before implementing significant new UI or writing tests for that feature:
+
+- [Transactions](src/features/transactions/TRANSACTIONS.md)
+- [Forecasts](src/features/forecasts/FORECASTS.md)
+- [Categories](src/features/categories/CATEGORIES.md)
+- [Sources](src/features/sources/SOURCES.md)
+- [Subscriptions](src/features/subscriptions/SUBSCRIPTIONS.md)
+- [Saving Spendings](src/features/savingSpendings/SAVING_SPENDINGS.md)
+
 ### Testing
 
 - **[Testing](docs/testing.md)** - Playwright E2E setup, writing tests, Mantine interaction patterns, MCP server
