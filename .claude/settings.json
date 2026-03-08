@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(npm run lint)",
-      "Bash(npm run format:check)"
+      "Bash(npm run format:check)",
+      "Bash(npm run lint -- --fix src/features/transactions/components/TransactionSidebar/TransactionSidebarForm.tsx)",
+      "Read(//Users/alekseylevin/projects/finances-t3/**)"
     ]
   }
 }

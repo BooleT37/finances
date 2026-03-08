@@ -1,6 +1,6 @@
 {
   "spellright.language": ["en", "de", "ru"],
-  "spellright.documentTypes": ["markdown", "latex", "plaintext"],
+  "spellright.documentTypes": ["markdown", "latex", "plaintext", "typescript"],
   "i18n-ally.localesPaths": [
     "src/lib/i18n/locales",
     "src/features/nav/locales",
