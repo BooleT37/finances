@@ -37,7 +37,9 @@
       "actualDateSameAsDate": "Реальная дата должна отличаться",
       "categoryRequired": "Выберите категорию",
       "dateRequired": "Введите дату",
-      "invalidAmount": "Введите корректную сумму"
+      "invalidAmount": "Введите корректную сумму",
+      "savingSpendingCategoryRequired": "Выберите категорию",
+      "savingSpendingRequired": "Выберите событие"
     },
     "sameDate": "Реальная дата не отличается",
     "type": {
@@ -48,6 +50,8 @@
     },
     "add": "Добавить",
     "save": "Сохранить",
+    "savingSpending": "Событие",
+    "savingSpendingCategory": "Категория",
     "source": "Источник",
     "sourceLastEntry": "Последняя запись: {{date}}",
     "subcategory": "Подкатегория",

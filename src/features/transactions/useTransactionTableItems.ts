@@ -5,10 +5,12 @@ import { useTranslation } from 'react-i18next';
 
 import { getCategoryMapQueryOptions } from '~/features/categories/facets/categoryMap';
 import type { Category } from '~/features/categories/schema';
-import {
-  getSavingSpendingByCategoryIdQueryOptions,
-  type SavingSpendingLookup,
-} from '~/features/savingSpendings/facets/savingSpendingByCategoryId';
+import { getSavingSpendingCategoryMapQueryOptions } from '~/features/savingSpendings/facets/savingSpendingCategoryMap';
+import { getSavingSpendingMapQueryOptions } from '~/features/savingSpendings/facets/savingSpendingMap';
+import type {
+  SavingSpending,
+  SavingSpendingCategory,
+} from '~/features/savingSpendings/schema';
 import { getSourceMapQueryOptions } from '~/features/sources/facets/sourceMap';
 import type { Source } from '~/features/sources/schema';
 import type { AvailableSubscription } from '~/features/subscriptions/facets/availableSubscriptions';
@@ -31,20 +33,31 @@ import {
 
 type CategoryMap = Record<string, Category>;
 type SourceMap = Record<string, Source>;
-type SavingSpendingMap = Record<number, SavingSpendingLookup>;
+type SavingSpendingMap = Record<string, SavingSpending>;
+type SavingSpendingCategoryMap = Record<string, SavingSpendingCategory>;
 
 // #region Mapping functions
 
 function tableDataName(
   tx: Transaction,
+  savingSpendingCategoryMap: SavingSpendingCategoryMap,
   savingSpendingMap: SavingSpendingMap,
 ): string {
   if (tx.savingSpendingCategoryId !== null) {
-    const lookup = savingSpendingMap[tx.savingSpendingCategoryId];
-    if (lookup) {
-      const savingSpendingInfo = lookup.category.name
-        ? `${lookup.spending.name} - ${lookup.category.name}`
-        : lookup.spending.name;
+    const cat = getOrThrow(
+      savingSpendingCategoryMap,
+      tx.savingSpendingCategoryId,
+      'SavingSpendingCategory',
+    );
+    if (cat.savingSpendingId !== null) {
+      const spending = getOrThrow(
+        savingSpendingMap,
+        cat.savingSpendingId,
+        'SavingSpending',
+      );
+      const savingSpendingInfo = cat.name
+        ? `${spending.name} - ${cat.name}`
+        : spending.name;
       return tx.name
         ? `${savingSpendingInfo} (${tx.name})`
         : savingSpendingInfo;
@@ -57,6 +70,7 @@ function mapTransaction(
   tx: Transaction,
   categoryMap: CategoryMap,
   sourceMap: SourceMap,
+  savingSpendingCategoryMap: SavingSpendingCategoryMap,
   savingSpendingMap: SavingSpendingMap,
 ): TransactionTableItem {
   const category = getOrThrow(categoryMap, tx.categoryId, 'Category');
@@ -69,7 +83,7 @@ function mapTransaction(
 
   return {
     id: tx.id,
-    name: tableDataName(tx, savingSpendingMap),
+    name: tableDataName(tx, savingSpendingCategoryMap, savingSpendingMap),
     cost: {
       value: costWithoutComponents(tx.cost, tx.components),
       isSubscription: tx.subscriptionId !== null,
@@ -217,8 +231,11 @@ export function useTransactionTableItems({
   const { data: transactions } = useQuery(getTransactionsQueryOptions(year));
   const { data: categoryMap } = useQuery(getCategoryMapQueryOptions());
   const { data: sourceMap } = useQuery(getSourceMapQueryOptions());
+  const { data: savingSpendingCategoryMap } = useQuery(
+    getSavingSpendingCategoryMapQueryOptions(),
+  );
   const { data: savingSpendingMap } = useQuery(
-    getSavingSpendingByCategoryIdQueryOptions(),
+    getSavingSpendingMapQueryOptions(),
   );
   const availableSubscriptions = useAvailableSubscriptions();
 
@@ -226,6 +243,7 @@ export function useTransactionTableItems({
     !transactions ||
     !categoryMap ||
     !sourceMap ||
+    !savingSpendingCategoryMap ||
     !savingSpendingMap ||
     !availableSubscriptions
   ) {
@@ -241,7 +259,13 @@ export function useTransactionTableItems({
   );
 
   const transactionRows = filtered.map((tx) =>
-    mapTransaction(tx, categoryMap, sourceMap, savingSpendingMap),
+    mapTransaction(
+      tx,
+      categoryMap,
+      sourceMap,
+      savingSpendingCategoryMap,
+      savingSpendingMap,
+    ),
   );
 
   const subscriptionRows = showUpcoming

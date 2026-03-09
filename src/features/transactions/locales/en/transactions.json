@@ -37,7 +37,9 @@
       "actualDateSameAsDate": "Actual date must differ from date",
       "categoryRequired": "Select a category",
       "dateRequired": "Enter a date",
-      "invalidAmount": "Enter a valid amount"
+      "invalidAmount": "Enter a valid amount",
+      "savingSpendingCategoryRequired": "Select a category",
+      "savingSpendingRequired": "Select a saving event"
     },
     "sameDate": "Same date",
     "type": {
@@ -48,6 +50,8 @@
     },
     "add": "Add",
     "save": "Save",
+    "savingSpending": "Saving event",
+    "savingSpendingCategory": "Category",
     "source": "Source",
     "sourceLastEntry": "Last entry: {{date}}",
     "subcategory": "Subcategory",

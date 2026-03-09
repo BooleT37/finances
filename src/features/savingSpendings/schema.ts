@@ -7,6 +7,7 @@ export const savingSpendingCategorySchema = z.object({
   name: z.string(),
   forecast: decimalCodec,
   comment: z.string(),
+  savingSpendingId: z.number().nullable(),
 });
 
 export type SavingSpendingCategoryWire = z.input<

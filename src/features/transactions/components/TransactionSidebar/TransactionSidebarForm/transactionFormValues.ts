@@ -1,5 +1,3 @@
-// ── Component data (used for the component list in the form) ──────────────────
-
 export interface TransactionComponentData {
   id?: number; // undefined for new (unsaved) components
   name: string;
@@ -8,7 +6,7 @@ export interface TransactionComponentData {
   subcategoryId: number | null;
 }
 
-// ── Form values ───────────────────────────────────────────────────────────────
+export type TransactionType = 'expense' | 'income' | 'fromSavings';
 
 export interface TransactionFormValues {
   cost: string;
@@ -20,9 +18,9 @@ export interface TransactionFormValues {
   source: string | null;
   subscription: string | null;
   savingSpendingCategoryId: string | null;
+  savingSpendingId: string | null;
+  transactionType: TransactionType;
 }
-
-// ── Validated form values (required fields narrowed to non-null) ──────────────
 
 export interface ValidatedTransactionFormValues extends Omit<
   TransactionFormValues,

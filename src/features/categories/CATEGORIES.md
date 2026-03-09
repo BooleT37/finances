@@ -26,13 +26,13 @@ A **continuous** category is one with many small, evenly spread expenses through
 
 ## Special Categories
 
-There are two categories with custom business logic:
+There are two categories with custom business logic. We identify them by the `type` field:
 
-### `FROM_SAVINGS`
+### type === `FROM_SAVINGS`
 
 Indicates that an expense was paid from savings, not from the regular monthly budget. It may optionally be linked to a specific saving event. Expenses in this category are **excluded from monthly total calculations**. This category is also **omitted from the forecasts UI** — we never plan for savings expenses.
 
-### `TO_SAVINGS`
+### type === `TO_SAVINGS`
 
 Indicates money transferred into savings. It may have subcategories for separate saving purposes (e.g. vacation fund, emergency fund). In the forecasts table, it is displayed in a dedicated **savings group**. Otherwise, it behaves like any other category.
 

@@ -10,7 +10,7 @@ import { getSubcategoryForecastsQueryOptions } from '~/features/forecasts/facets
 import { findCategoryForecast } from '~/features/forecasts/utils/findCategoryForecast';
 import { findSubcategoryForecast } from '~/features/forecasts/utils/findSubcategoryForecast';
 import { getRestForecastSum } from '~/features/forecasts/utils/getRestForecastSum';
-import { getSavingSpendingByCategoryIdQueryOptions } from '~/features/savingSpendings/facets/savingSpendingByCategoryId';
+import { getSavingSpendingCategoryMapQueryOptions } from '~/features/savingSpendings/facets/savingSpendingCategoryMap';
 import { getTransactionsQueryOptions } from '~/features/transactions/queries';
 import { decimalSum } from '~/shared/utils/decimalSum';
 import { getOrThrow } from '~/shared/utils/getOrThrow';
@@ -35,8 +35,8 @@ export function useGetCostForecast() {
   const { data: subcategoryForecasts } = useQuery(
     getSubcategoryForecastsQueryOptions(year),
   );
-  const { data: savingSpendingByCategoryId } = useQuery(
-    getSavingSpendingByCategoryIdQueryOptions(),
+  const { data: savingSpendingCategoryMap } = useQuery(
+    getSavingSpendingCategoryMapQueryOptions(),
   );
   const { data: transactions } = useQuery(getTransactionsQueryOptions(year));
   const { data: categoryMap } = useQuery(getCategoryMapQueryOptions());
@@ -71,19 +71,22 @@ export function useGetCostForecast() {
       }
 
       if (categoryType === 'FROM_SAVINGS') {
-        if (!savingSpendingByCategoryId || !transactions) {
+        if (!savingSpendingCategoryMap || !transactions) {
           return undefined;
         }
-        const forecasts = transactions
-          .filter(
-            (t) =>
-              t.savingSpendingCategoryId !== null &&
-              t.date.month() === month &&
-              t.date.year() === params.year,
-          )
-          .map((t) => savingSpendingByCategoryId[t.savingSpendingCategoryId!])
-          .filter(Boolean)
-          .map((lookup) => lookup.category.forecast);
+        const forecasts = transactions.flatMap((tx) =>
+          tx.savingSpendingCategoryId !== null &&
+          tx.date.month() === month &&
+          tx.date.year() === params.year
+            ? [
+                getOrThrow(
+                  savingSpendingCategoryMap,
+                  tx.savingSpendingCategoryId,
+                  'SavingSpendingCategory',
+                ).forecast,
+              ]
+            : [],
+        );
         return decimalSum(...forecasts);
       }
 
@@ -112,7 +115,7 @@ export function useGetCostForecast() {
     [
       categoryForecasts,
       subcategoryForecasts,
-      savingSpendingByCategoryId,
+      savingSpendingCategoryMap,
       transactions,
       categoryMap,
     ],
