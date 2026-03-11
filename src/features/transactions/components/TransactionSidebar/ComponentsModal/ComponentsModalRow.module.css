@@ -1,0 +1,19 @@
+@keyframes highlight-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.highlighted::after {
+  content: '';
+  position: absolute;
+  inset: -8px -12px;
+  border-radius: 10px;
+  border: 3px solid var(--mantine-color-blue-5);
+  pointer-events: none;
+  animation: highlight-fade-out 1s linear 2s 1 forwards;
+  z-index: 1000;
+}

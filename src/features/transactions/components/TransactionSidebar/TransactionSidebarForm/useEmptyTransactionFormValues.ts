@@ -12,6 +12,7 @@ export function useEmptyTransactionFormValues(): TransactionFormValues {
 
   return useMemo(
     (): TransactionFormValues => ({
+      components: [],
       cost: '',
       name: '',
       date: dayjs(selectedMonth).isSame(getToday(), 'month')

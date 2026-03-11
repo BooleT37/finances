@@ -9,6 +9,7 @@ export interface TransactionComponentData {
 export type TransactionType = 'expense' | 'income' | 'fromSavings';
 
 export interface TransactionFormValues {
+  components: TransactionComponentData[];
   cost: string;
   name: string;
   date: Date | null;

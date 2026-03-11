@@ -39,6 +39,8 @@ A transaction may be split into **components**. In this case, the transaction's 
 
 Example: an expense of 100 EUR in the "Food" category with a 30 EUR "Dog" component → 70 EUR is counted toward "Food", 30 EUR toward "Dog".
 
+Components must always have a different category or subcategory from the parent transaction. We consciously ignore use cases where a component shares the same category + subcategory as its parent — they are rare in practice, and excluding them keeps the calculation logic simpler: it allows us to always exclude component costs from the parent's category/subcategory totals.
+
 ## Import Deduplication
 
 Each transaction has a **`peHash`** (parsed expense hash) used to detect whether it was already imported via the "Import" feature, preventing duplicates.

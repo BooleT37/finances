@@ -4,11 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import {
-  getExpenseCategoriesQueryOptions,
-  getIncomeCategoriesQueryOptions,
-} from '~/features/categories/facets/categoriesByType';
 import { getCategoryMapQueryOptions } from '~/features/categories/facets/categoryMap';
+import { getCategoriesQueryOptions } from '~/features/categories/queries';
 import { getOrThrow } from '~/shared/utils/getOrThrow';
 
 import type { TransactionFormValues } from '../transactionFormValues';
@@ -21,17 +18,12 @@ export function CategoryFields({ form }: Props) {
   const { t } = useTranslation('transactions');
 
   const { data: categoryMap = {} } = useQuery(getCategoryMapQueryOptions());
-  const { data: expenseCategories = [] } = useQuery(
-    getExpenseCategoriesQueryOptions(),
-  );
-  const { data: incomeCategories = [] } = useQuery(
-    getIncomeCategoriesQueryOptions(),
-  );
+  const { data: allCategories = [] } = useQuery(getCategoriesQueryOptions());
 
   const categories =
     form.values.transactionType === 'income'
-      ? incomeCategories
-      : expenseCategories.filter((c) => c.type !== 'FROM_SAVINGS');
+      ? allCategories.filter((c) => c.isIncome)
+      : allCategories.filter((c) => !c.isIncome && c.type !== 'FROM_SAVINGS');
 
   const categoryOptions = useMemo(
     () => categories.map((c) => ({ value: String(c.id), label: c.name })),

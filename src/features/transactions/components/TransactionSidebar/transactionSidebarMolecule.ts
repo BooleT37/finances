@@ -18,7 +18,6 @@ import {
 } from '../../queries';
 import { confirmUnsavedChanges } from './confirmUnsavedChanges';
 import type {
-  TransactionComponentData,
   TransactionFormValues,
   ValidatedTransactionFormValues,
 } from './TransactionSidebarForm/transactionFormValues';
@@ -49,7 +48,9 @@ export const TransactionSidebarMolecule = molecule(() => {
   });
 
   // ── Form state ────────────────────────────────────────────────────────────
-  const currentComponentsAtom = atom<TransactionComponentData[]>([]);
+  const componentsModalOpenAtom = atom(false);
+
+  const highlightedComponentIdAtom = atom<number | null>(null);
 
   const actualDateShownAtom = atom(false);
 
@@ -59,24 +60,25 @@ export const TransactionSidebarMolecule = molecule(() => {
   );
 
   // ── Actions ───────────────────────────────────────────────────────────────
+  function doOpenForComponent(
+    get: Getter,
+    set: Setter,
+    parentId: number,
+    componentId: number,
+  ) {
+    doOpen(get, set, parentId);
+    set(componentsModalOpenAtom, true);
+    set(highlightedComponentIdAtom, componentId);
+    setTimeout(() => set(highlightedComponentIdAtom, null), 3500);
+  }
+
   function doOpen(get: Getter, set: Setter, id: number | null) {
     set(editingIdAtom, id);
 
     if (id !== null) {
       const tx = get(transactionsMapAtom).data?.[id] ?? null;
-      set(
-        currentComponentsAtom,
-        tx?.components.map((c) => ({
-          id: c.id,
-          name: c.name,
-          cost: c.cost.toString(),
-          categoryId: c.categoryId,
-          subcategoryId: c.subcategoryId,
-        })) ?? [],
-      );
       set(actualDateShownAtom, tx?.actualDate != null);
     } else {
-      set(currentComponentsAtom, []);
       set(actualDateShownAtom, false);
     }
   }
@@ -90,9 +92,28 @@ export const TransactionSidebarMolecule = molecule(() => {
     doOpen(get, set, id);
   });
 
+  const openForComponentAtom = atom(
+    null,
+    (
+      get,
+      set,
+      { parentId, componentId }: { parentId: number; componentId: number },
+    ) => {
+      const formRef = get(formRefAtom);
+      if (formRef?.isDirty()) {
+        confirmUnsavedChanges(() =>
+          doOpenForComponent(get, set, parentId, componentId),
+        );
+        return;
+      }
+      doOpenForComponent(get, set, parentId, componentId);
+    },
+  );
+
   const closeAtom = atom(null, (_get, set) => {
     set(editingIdAtom, undefined);
-    set(currentComponentsAtom, []);
+    set(componentsModalOpenAtom, false);
+    set(highlightedComponentIdAtom, null);
     set(actualDateShownAtom, false);
   });
 
@@ -128,11 +149,11 @@ export const TransactionSidebarMolecule = molecule(() => {
     });
   });
 
-  const insertTransactionAtom = atom(
+  const saveTransactionAtom = atom(
     null,
     async (get, _set, values: ValidatedTransactionFormValues) => {
       const editingId = get(editingIdAtom);
-      const components = get(currentComponentsAtom);
+      const components = values.components;
 
       const componentInputs =
         components.length > 0
@@ -179,12 +200,14 @@ export const TransactionSidebarMolecule = molecule(() => {
     isOpenAtom,
     isNewTransactionAtom,
     currentTransactionAtom,
-    currentComponentsAtom,
+    componentsModalOpenAtom,
     actualDateShownAtom,
     formRefAtom,
     openAtom,
+    openForComponentAtom,
+    highlightedComponentIdAtom,
     closeAtom,
-    insertTransactionAtom,
+    saveTransactionAtom,
     deleteTransactionAtom,
   };
 });

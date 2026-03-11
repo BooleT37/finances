@@ -13,11 +13,12 @@ interface Props {
   name: string;
 }
 
-export function RowActions({ id, name }: Props) {
-  const { openAtom, deleteTransactionAtom } = useMolecule(
+export function RowActions({ id, parentExpenseId, name }: Props) {
+  const { openAtom, openForComponentAtom, deleteTransactionAtom } = useMolecule(
     TransactionSidebarMolecule,
   );
   const open = useSetAtom(openAtom);
+  const openForComponent = useSetAtom(openForComponentAtom);
   const deleteTx = useSetAtom(deleteTransactionAtom);
   const { t } = useTranslation('transactions');
 
@@ -33,7 +34,14 @@ export function RowActions({ id, name }: Props) {
 
   return (
     <Group gap={4}>
-      <ActionIcon variant="subtle" onClick={() => open(id)}>
+      <ActionIcon
+        variant="subtle"
+        onClick={() =>
+          parentExpenseId !== null
+            ? openForComponent({ parentId: parentExpenseId, componentId: id })
+            : open(id)
+        }
+      >
         <IconEdit size={16} />
       </ActionIcon>
       <ActionIcon variant="subtle" color="red" onClick={handleDelete}>

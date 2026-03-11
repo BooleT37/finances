@@ -14,6 +14,7 @@ import { TransactionSidebarMolecule } from '../transactionSidebarMolecule';
 import { ActualDateField } from './fields/ActualDateField';
 import { useActualDateValidator } from './fields/ActualDateField.validator';
 import { CategoryFields } from './fields/CategoryFields';
+import { CostField } from './fields/CostField/CostField';
 import { SavingSpendingFields } from './fields/SavingSpendingFields';
 import { SourceField } from './fields/SourceField/SourceField';
 import { SubscriptionField } from './fields/SubscriptionField';
@@ -32,13 +33,13 @@ export function TransactionSidebarForm() {
     editingIdAtom,
     currentTransactionAtom,
     formRefAtom,
-    insertTransactionAtom,
+    saveTransactionAtom,
     closeAtom,
   } = useMolecule(TransactionSidebarMolecule);
 
   const editingId = useAtomValue(editingIdAtom);
   const currentTransaction = useAtomValue(currentTransactionAtom);
-  const insertTransaction = useSetAtom(insertTransactionAtom);
+  const saveTransaction = useSetAtom(saveTransactionAtom);
   const close = useSetAtom(closeAtom);
   const setInsertedTransaction = useSetAtom(insertedTransactionAtom);
   const setFormRef = useSetAtom(formRefAtom);
@@ -98,20 +99,6 @@ export function TransactionSidebarForm() {
     return () => window.removeEventListener('beforeunload', handler);
   }, [form]);
 
-  // When editing a fromSavings transaction, re-apply savingSpendingId once maps load
-  // (handles the case where maps weren't cached at initialValues time)
-  useEffect(() => {
-    if (!currentTransaction) {
-      return;
-    }
-    const values = transactionToFormValues(currentTransaction);
-    if (values.savingSpendingId !== null) {
-      form.setFieldValue('savingSpendingId', values.savingSpendingId);
-    }
-    // form intentionally omitted from deps (stable ref, matches pattern in this file)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentTransaction, transactionToFormValues]);
-
   const handleSubmit = form.onSubmit(
     async (values) => {
       const submittedValues: ValidatedTransactionFormValues = {
@@ -126,7 +113,7 @@ export function TransactionSidebarForm() {
       } else {
         submittedValues.savingSpendingCategoryId = null;
       }
-      const tx = await insertTransaction(submittedValues);
+      const tx = await saveTransaction(submittedValues);
       setInsertedTransaction(tx);
       form.reset();
       close();
@@ -160,17 +147,13 @@ export function TransactionSidebarForm() {
           </>
         )}
 
-        <TextInput
-          label={t('form.amount')}
-          required
-          {...form.getInputProps('cost')}
-        />
+        <CostField form={form} />
 
         <TextInput label={t('form.comment')} {...form.getInputProps('name')} />
 
         <SourceField form={form} />
 
-        <Button type="submit" mt="sm" /* disabled={!form.isDirty()} */>
+        <Button type="submit" mt="sm" disabled={!form.isDirty()}>
           {editingId === null ? t('form.add') : t('form.save')}
         </Button>
       </Stack>

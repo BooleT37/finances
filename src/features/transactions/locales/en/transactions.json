@@ -16,6 +16,22 @@
     "subcategory": "Subcategory",
     "type": "Type"
   },
+  "components": {
+    "addComponent": "Add component",
+    "categorySameAsParent": "Category must differ from parent transaction",
+    "categoryNotFound": "No categories found",
+    "categoryRequired": "Select a category",
+    "costRequired": "Enter an amount",
+    "editButton": "Edit components",
+    "hint": {
+      "item": "{{cost}} from {{category}}",
+      "ofWhich": "Of which {{cost}} from \"{{category}}\"",
+      "ofWhichMultiple": "Of which:",
+      "remainder": "(remainder: {{value}})"
+    },
+    "modalTitle": "Components",
+    "remaining": "Remaining: {{value}}"
+  },
   "componentOfExpense": "Part of \"{{name}}\"",
   "componentOfExpenseTooltip": "Component of \"{{name}}\"",
   "componentOfExpenseTooltipNoName": "Component of expense",

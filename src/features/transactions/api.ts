@@ -109,60 +109,65 @@ export const updateTransaction = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const { id, components, ...fields } = data;
 
-    const tx = await prisma.expense.update({
-      where: { id },
-      data: {
-        name: fields.name,
-        cost: new Decimal(fields.cost).abs(),
-        date: new Date(fields.date),
-        categoryId: fields.categoryId,
-        actualDate:
-          fields.actualDate !== undefined
-            ? fields.actualDate
-              ? new Date(fields.actualDate)
-              : null
-            : undefined,
-        subcategoryId: fields.subcategoryId,
-        sourceId: fields.sourceId,
-        subscriptionId: fields.subscriptionId,
-        savingSpendingCategoryId: fields.savingSpendingCategoryId,
-        ...(components !== undefined && {
-          components: {
-            createMany: {
-              data: components
-                .filter((c) => c.id === undefined)
+    const tx = await prisma.$transaction(async (db) => {
+      if (components !== undefined) {
+        const keptIds = components
+          .filter((c) => c.id !== undefined)
+          .map((c) => c.id!);
+
+        await db.expenseComponent.deleteMany({
+          where: { expenseId: id, id: { notIn: keptIds } },
+        });
+      }
+
+      return db.expense.update({
+        where: { id },
+        data: {
+          name: fields.name,
+          cost: new Decimal(fields.cost).abs(),
+          date: new Date(fields.date),
+          categoryId: fields.categoryId,
+          actualDate:
+            fields.actualDate !== undefined
+              ? fields.actualDate
+                ? new Date(fields.actualDate)
+                : null
+              : undefined,
+          subcategoryId: fields.subcategoryId,
+          sourceId: fields.sourceId,
+          subscriptionId: fields.subscriptionId,
+          savingSpendingCategoryId: fields.savingSpendingCategoryId,
+          ...(components !== undefined && {
+            components: {
+              createMany: {
+                data: components
+                  .filter((c) => c.id === undefined)
+                  .map((c) => ({
+                    name: c.name,
+                    cost: new Decimal(c.cost).abs(),
+                    categoryId: c.categoryId,
+                    subcategoryId: c.subcategoryId ?? null,
+                  })),
+              },
+              update: components
+                .filter((c) => c.id !== undefined)
                 .map((c) => ({
-                  name: c.name,
-                  cost: new Decimal(c.cost).abs(),
-                  categoryId: c.categoryId,
-                  subcategoryId: c.subcategoryId ?? null,
+                  where: { id: c.id },
+                  data: {
+                    name: c.name,
+                    cost: new Decimal(c.cost).abs(),
+                    categoryId: c.categoryId,
+                    subcategoryId: c.subcategoryId ?? null,
+                  },
                 })),
             },
-            update: components
-              .filter((c) => c.id !== undefined)
-              .map((c) => ({
-                where: { id: c.id },
-                data: {
-                  name: c.name,
-                  cost: new Decimal(c.cost).abs(),
-                  categoryId: c.categoryId,
-                  subcategoryId: c.subcategoryId ?? null,
-                },
-              })),
-            deleteMany: {
-              id: {
-                notIn: components
-                  .filter((c) => c.id !== undefined)
-                  .map((c) => c.id!),
-              },
-            },
-          },
-        }),
-      },
-      include: {
-        category: true,
-        components: { include: { category: true } },
-      },
+          }),
+        },
+        include: {
+          category: true,
+          components: { include: { category: true } },
+        },
+      });
     });
 
     return transactionWithComponentsSchema.encode({

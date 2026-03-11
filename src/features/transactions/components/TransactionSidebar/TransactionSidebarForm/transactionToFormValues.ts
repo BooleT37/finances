@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
 import { getCategoryMapQueryOptions } from '~/features/categories/facets/categoryMap';
@@ -14,8 +14,8 @@ import type {
 export function useTransactionToFormValues(): (
   tx: Transaction,
 ) => TransactionFormValues {
-  const { data: categoryMap = {} } = useQuery(getCategoryMapQueryOptions());
-  const { data: savingSpendingCategoryMap } = useQuery(
+  const { data: categoryMap } = useSuspenseQuery(getCategoryMapQueryOptions());
+  const { data: savingSpendingCategoryMap } = useSuspenseQuery(
     getSavingSpendingCategoryMapQueryOptions(),
   );
 
@@ -29,7 +29,7 @@ export function useTransactionToFormValues(): (
             ? 'income'
             : 'expense';
       const spendingCat =
-        tx.savingSpendingCategoryId !== null && savingSpendingCategoryMap
+        tx.savingSpendingCategoryId !== null
           ? getOrThrow(
               savingSpendingCategoryMap,
               tx.savingSpendingCategoryId,
@@ -41,6 +41,13 @@ export function useTransactionToFormValues(): (
           ? String(spendingCat.savingSpendingId)
           : null;
       return {
+        components: tx.components.map((c) => ({
+          id: c.id,
+          name: c.name,
+          cost: c.cost.toString(),
+          categoryId: c.categoryId,
+          subcategoryId: c.subcategoryId,
+        })),
         cost: tx.cost.toString(),
         name: tx.name,
         date: tx.date.toDate(),

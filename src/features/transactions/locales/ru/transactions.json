@@ -16,6 +16,22 @@
     "subcategory": "Подкатегория",
     "type": "Тип"
   },
+  "components": {
+    "addComponent": "Добавить составляющую",
+    "categorySameAsParent": "Категория должна отличаться от родительской транзакции",
+    "categoryNotFound": "Категории не найдены",
+    "categoryRequired": "Выберите категорию",
+    "costRequired": "Введите сумму",
+    "editButton": "Редактировать составляющие",
+    "hint": {
+      "item": "{{cost}} из {{category}}",
+      "ofWhich": "Из них {{cost}} из «{{category}}»",
+      "ofWhichMultiple": "Из них:",
+      "remainder": "(остаток: {{value}})"
+    },
+    "modalTitle": "Составляющие",
+    "remaining": "Остаток: {{value}}"
+  },
   "componentOfExpense": "Составляющая \"{{name}}\"",
   "componentOfExpenseTooltip": "Составляющая расхода \"{{name}}\"",
   "componentOfExpenseTooltipNoName": "Составляющая расхода",
