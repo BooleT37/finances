@@ -1,5 +1,4 @@
 import { ActionIcon, TextInput } from '@mantine/core';
-import type { UseFormReturnType } from '@mantine/form';
 import { IconList } from '@tabler/icons-react';
 import { useMolecule } from 'bunshi/react';
 import Decimal from 'decimal.js';
@@ -8,13 +7,13 @@ import { useTranslation } from 'react-i18next';
 
 import { ComponentsModal } from '../../../ComponentsModal/ComponentsModal';
 import { TransactionSidebarMolecule } from '../../../transactionSidebarMolecule';
-import type { TransactionFormValues } from '../../transactionFormValues';
+import type { TransactionFormType } from '../../transactionFormValues';
 import { ComponentsHint } from './ComponentsHint';
 
 const costRegex = /^-?\d+(?:\.\d+)?$/;
 
 interface Props {
-  form: UseFormReturnType<TransactionFormValues>;
+  form: TransactionFormType;
 }
 
 export function CostField({ form }: Props) {

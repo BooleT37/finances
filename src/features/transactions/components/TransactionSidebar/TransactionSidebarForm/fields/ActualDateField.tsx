@@ -1,5 +1,4 @@
 import { Anchor, Stack } from '@mantine/core';
-import type { UseFormReturnType } from '@mantine/form';
 import { useMolecule } from 'bunshi/react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
@@ -8,10 +7,10 @@ import { DatePickerWithTodayInput } from '~/shared/components/DatePickerWithToda
 import { TextWithTooltipIcon } from '~/shared/components/TextWithTooltipIcon';
 
 import { TransactionSidebarMolecule } from '../../transactionSidebarMolecule';
-import type { TransactionFormValues } from '../transactionFormValues';
+import type { TransactionFormType } from '../transactionFormValues';
 
 interface Props {
-  form: UseFormReturnType<TransactionFormValues>;
+  form: TransactionFormType;
 }
 
 export function ActualDateField({ form }: Props) {

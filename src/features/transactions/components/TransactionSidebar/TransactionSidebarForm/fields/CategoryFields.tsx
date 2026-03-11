@@ -1,5 +1,4 @@
 import { Select } from '@mantine/core';
-import type { UseFormReturnType } from '@mantine/form';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,10 +7,10 @@ import { getCategoryMapQueryOptions } from '~/features/categories/facets/categor
 import { getCategoriesQueryOptions } from '~/features/categories/queries';
 import { getOrThrow } from '~/shared/utils/getOrThrow';
 
-import type { TransactionFormValues } from '../transactionFormValues';
+import type { TransactionFormType } from '../transactionFormValues';
 
 interface Props {
-  form: UseFormReturnType<TransactionFormValues>;
+  form: TransactionFormType;
 }
 
 export function CategoryFields({ form }: Props) {

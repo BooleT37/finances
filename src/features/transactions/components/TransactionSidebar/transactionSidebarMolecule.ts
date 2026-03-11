@@ -1,4 +1,3 @@
-import type { UseFormReturnType } from '@mantine/form';
 import { molecule } from 'bunshi';
 import type { Getter, Setter } from 'jotai';
 import { atom } from 'jotai';
@@ -18,7 +17,7 @@ import {
 } from '../../queries';
 import { confirmUnsavedChanges } from './confirmUnsavedChanges';
 import type {
-  TransactionFormValues,
+  TransactionFormType,
   ValidatedTransactionFormValues,
 } from './TransactionSidebarForm/transactionFormValues';
 
@@ -55,9 +54,7 @@ export const TransactionSidebarMolecule = molecule(() => {
   const actualDateShownAtom = atom(false);
 
   // ── Form ref (synced from component via useEffect) ────────────────────────
-  const formRefAtom = atom<UseFormReturnType<TransactionFormValues> | null>(
-    null,
-  );
+  const formRefAtom = atom<TransactionFormType | null>(null);
 
   // ── Actions ───────────────────────────────────────────────────────────────
   function doOpenForComponent(

@@ -1,5 +1,4 @@
 import { Select } from '@mantine/core';
-import type { UseFormReturnType } from '@mantine/form';
 import { useMolecule } from 'bunshi/react';
 import { useAtomValue } from 'jotai';
 import { useCallback, useMemo } from 'react';
@@ -9,10 +8,10 @@ import { useAvailableSubscriptions } from '~/features/subscriptions/facets/avail
 import { findByIdOrThrow } from '~/shared/utils/getOrThrow';
 
 import { TransactionSidebarMolecule } from '../../transactionSidebarMolecule';
-import type { TransactionFormValues } from '../transactionFormValues';
+import type { TransactionFormType } from '../transactionFormValues';
 
 interface Props {
-  form: UseFormReturnType<TransactionFormValues>;
+  form: TransactionFormType;
 }
 
 export function SubscriptionField({ form }: Props) {

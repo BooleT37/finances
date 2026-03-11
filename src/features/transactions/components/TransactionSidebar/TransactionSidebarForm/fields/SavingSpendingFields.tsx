@@ -1,5 +1,4 @@
 import { Select } from '@mantine/core';
-import type { UseFormReturnType } from '@mantine/form';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,10 +7,10 @@ import { getSavingSpendingMapQueryOptions } from '~/features/savingSpendings/fac
 import { getSavingSpendingsQueryOptions } from '~/features/savingSpendings/queries';
 import { findByIdOrThrow, getOrThrow } from '~/shared/utils/getOrThrow';
 
-import type { TransactionFormValues } from '../transactionFormValues';
+import type { TransactionFormType } from '../transactionFormValues';
 
 interface Props {
-  form: UseFormReturnType<TransactionFormValues>;
+  form: TransactionFormType;
   initialSavingSpendingId: string | null;
 }
 

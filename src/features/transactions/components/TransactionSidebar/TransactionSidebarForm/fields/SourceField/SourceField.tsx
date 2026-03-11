@@ -1,16 +1,15 @@
 import { Select } from '@mantine/core';
-import type { UseFormReturnType } from '@mantine/form';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getSourcesQueryOptions } from '~/features/sources/queries';
 
-import type { TransactionFormValues } from '../../transactionFormValues';
+import type { TransactionFormType } from '../../transactionFormValues';
 import { SourceLastTransactions } from './SourceLastTransactions';
 
 interface Props {
-  form: UseFormReturnType<TransactionFormValues>;
+  form: TransactionFormType;
 }
 
 export function SourceField({ form }: Props) {

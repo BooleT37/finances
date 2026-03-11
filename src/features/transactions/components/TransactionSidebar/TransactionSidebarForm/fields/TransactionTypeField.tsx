@@ -1,5 +1,4 @@
 import { Input } from '@mantine/core';
-import type { UseFormReturnType } from '@mantine/form';
 import {
   IconMoneybagMinus,
   IconMoneybagPlus,
@@ -11,12 +10,12 @@ import { useTranslation } from 'react-i18next';
 import { SegmentedControlWithIcons } from '~/shared/components/SegmentedControlWithIcons';
 
 import type {
-  TransactionFormValues,
+  TransactionFormType,
   TransactionType,
 } from '../transactionFormValues';
 
 interface Props {
-  form: UseFormReturnType<TransactionFormValues>;
+  form: TransactionFormType;
 }
 
 export function TransactionTypeField({ form }: Props) {

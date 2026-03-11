@@ -66,6 +66,7 @@
     },
     "add": "Добавить",
     "save": "Сохранить",
+    "unsavedChanges": "Исправьте ошибки выше, чтобы сохранить изменения.",
     "savingSpending": "Событие",
     "savingSpendingCategory": "Категория",
     "source": "Источник",

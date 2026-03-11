@@ -1,9 +1,10 @@
-import { Button, Stack, TextInput } from '@mantine/core';
+import { Alert, Button, Stack, TextInput } from '@mantine/core';
 import { isNotEmpty, matches, useForm } from '@mantine/form';
+import { useDebouncedCallback } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';
 import { useMolecule } from 'bunshi/react';
-import { useAtomValue, useSetAtom } from 'jotai';
-import { useEffect, useMemo } from 'react';
+import { useAtomValue, useSetAtom, useStore } from 'jotai';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getFromSavingsCategoryQueryOptions } from '~/features/categories/facets/categoriesByType';
@@ -20,6 +21,7 @@ import { SourceField } from './fields/SourceField/SourceField';
 import { SubscriptionField } from './fields/SubscriptionField';
 import { TransactionTypeField } from './fields/TransactionTypeField';
 import type {
+  TransactionFormTransform,
   TransactionFormValues,
   ValidatedTransactionFormValues,
 } from './transactionFormValues';
@@ -43,9 +45,27 @@ export function TransactionSidebarForm() {
   const close = useSetAtom(closeAtom);
   const setInsertedTransaction = useSetAtom(insertedTransactionAtom);
   const setFormRef = useSetAtom(formRefAtom);
+  const store = useStore();
 
   const { data: fromSavingsCategory } = useQuery(
     getFromSavingsCategoryQueryOptions(),
+  );
+
+  const prepareSubmitValues = useCallback<TransactionFormTransform>(
+    (values) => {
+      const prepared = { ...(values as ValidatedTransactionFormValues) };
+      if (values.transactionType === 'fromSavings') {
+        if (!fromSavingsCategory) {
+          return null;
+        }
+        prepared.category = String(fromSavingsCategory.id);
+        prepared.subscription = null;
+      } else {
+        prepared.savingSpendingCategoryId = null;
+      }
+      return prepared;
+    },
+    [fromSavingsCategory],
   );
 
   const transactionToFormValues = useTransactionToFormValues();
@@ -61,8 +81,39 @@ export function TransactionSidebarForm() {
   const { t } = useTranslation('transactions');
   const validateActualDate = useActualDateValidator();
 
-  const form = useForm<TransactionFormValues>({
+  // Auto-save when editing an existing transaction (600 ms debounce).
+  // Skipped when the form is invalid (e.g. cost is mid-edit like "12.").
+  const debouncedSave = useDebouncedCallback(
+    async (values: TransactionFormValues) => {
+      const f = store.get(formRefAtom);
+      if (editingId == null || !f?.isValid()) {
+        return;
+      }
+      const prepared = f.getTransformedValues();
+      if (!prepared) {
+        return;
+      }
+      await saveTransaction(prepared);
+      f.resetDirty(values);
+    },
+    600,
+  );
+
+  const form = useForm<TransactionFormValues, TransactionFormTransform>({
     initialValues,
+    transformValues: prepareSubmitValues,
+    validateInputOnBlur: true,
+    validateInputOnChange: [
+      'category',
+      'subcategory',
+      'source',
+      'subscription',
+      'savingSpendingId',
+      'savingSpendingCategoryId',
+      'date',
+      'actualDate',
+    ],
+    onValuesChange: debouncedSave,
     validate: (values) => ({
       date: isNotEmpty(t('form.errors.dateRequired'))(values.date),
       actualDate: validateActualDate(values.actualDate, values),
@@ -100,20 +151,11 @@ export function TransactionSidebarForm() {
   }, [form]);
 
   const handleSubmit = form.onSubmit(
-    async (values) => {
-      const submittedValues: ValidatedTransactionFormValues = {
-        ...(values as ValidatedTransactionFormValues),
-      };
-      if (values.transactionType === 'fromSavings') {
-        if (!fromSavingsCategory) {
-          return;
-        }
-        submittedValues.category = String(fromSavingsCategory.id);
-        submittedValues.subscription = null;
-      } else {
-        submittedValues.savingSpendingCategoryId = null;
+    async (prepared) => {
+      if (!prepared) {
+        return;
       }
-      const tx = await saveTransaction(submittedValues);
+      const tx = await saveTransaction(prepared);
       setInsertedTransaction(tx);
       form.reset();
       close();
@@ -158,9 +200,17 @@ export function TransactionSidebarForm() {
           <SourceField form={form} />
         </Stack>
 
-        <Button type="submit" mt="sm" disabled={!form.isDirty()}>
-          {editingId === null ? t('form.add') : t('form.save')}
-        </Button>
+        {editingId !== null && Object.keys(form.errors).length > 0 && (
+          <Alert color="yellow" p="xs">
+            {t('form.unsavedChanges')}
+          </Alert>
+        )}
+
+        {editingId === null && (
+          <Button type="submit" mt="sm" disabled={!form.isDirty()}>
+            {t('form.add')}
+          </Button>
+        )}
       </Stack>
     </form>
   );

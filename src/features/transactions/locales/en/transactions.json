@@ -66,6 +66,7 @@
     },
     "add": "Add",
     "save": "Save",
+    "unsavedChanges": "Fix errors above to save changes.",
     "savingSpending": "Saving event",
     "savingSpendingCategory": "Category",
     "source": "Source",

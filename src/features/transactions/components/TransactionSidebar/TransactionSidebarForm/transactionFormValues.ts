@@ -1,3 +1,5 @@
+import type { UseFormReturnType } from '@mantine/form';
+
 export interface TransactionComponentData {
   id?: number; // undefined for new (unsaved) components
   name: string;
@@ -30,3 +32,12 @@ export interface ValidatedTransactionFormValues extends Omit<
   date: Date;
   category: string;
 }
+
+export type TransactionFormTransform = (
+  values: TransactionFormValues,
+) => ValidatedTransactionFormValues | null;
+
+export type TransactionFormType = UseFormReturnType<
+  TransactionFormValues,
+  TransactionFormTransform
+>;
