@@ -1,11 +1,4 @@
-import {
-  ActionIcon,
-  Box,
-  Loader,
-  Paper,
-  ScrollArea,
-  Title,
-} from '@mantine/core';
+import { ActionIcon, Box, Loader, Paper, Title } from '@mantine/core';
 import { IconX } from '@tabler/icons-react';
 import { useMolecule } from 'bunshi/react';
 import { useAtomValue, useSetAtom } from 'jotai';
@@ -21,7 +14,7 @@ export function TransactionSidebar({ width }: { width: number }) {
       right: 0,
       top: 'var(--app-shell-header-height)',
       bottom: 0,
-      width: width,
+      width,
       transition: 'transform 150ms ease',
     }),
     [width],
@@ -47,6 +40,7 @@ export function TransactionSidebar({ width }: { width: number }) {
           boxShadow: '-4px 0 12px rgba(0,0,0,0.12)',
           borderRadius: 0,
           position: 'relative',
+          overflow: 'scroll',
         }}
       >
         <ActionIcon
@@ -61,11 +55,9 @@ export function TransactionSidebar({ width }: { width: number }) {
         <Title order={4} mb="sm" pr={40}>
           {editingId !== null ? 'Редактировать' : 'Добавить'}
         </Title>
-        <ScrollArea h="100%">
-          <Suspense fallback={<Loader size="sm" />}>
-            <TransactionSidebarForm key={editingId ?? 'new'} />
-          </Suspense>
-        </ScrollArea>
+        <Suspense fallback={<Loader size="sm" />}>
+          <TransactionSidebarForm key={editingId ?? 'new'} />
+        </Suspense>
       </Paper>
     </Box>
   );

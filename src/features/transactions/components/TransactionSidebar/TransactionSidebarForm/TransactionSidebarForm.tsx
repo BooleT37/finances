@@ -125,33 +125,38 @@ export function TransactionSidebarForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <Stack gap="sm">
-        <TransactionTypeField form={form} />
-        <DatePickerWithTodayInput
-          label={t('form.date')}
-          required
-          {...form.getInputProps('date')}
-        />
-
-        <ActualDateField form={form} />
-
-        {form.values.transactionType === 'fromSavings' ? (
-          <SavingSpendingFields
-            form={form}
-            initialSavingSpendingId={initialValues.savingSpendingId}
+      <Stack gap="sm" pr={16}>
+        <Stack gap="sm">
+          <TransactionTypeField form={form} />
+          <DatePickerWithTodayInput
+            label={t('form.date')}
+            required
+            {...form.getInputProps('date')}
           />
-        ) : (
-          <>
-            <CategoryFields form={form} />
-            <SubscriptionField form={form} />
-          </>
-        )}
 
-        <CostField form={form} />
+          <ActualDateField form={form} />
 
-        <TextInput label={t('form.comment')} {...form.getInputProps('name')} />
+          {form.values.transactionType === 'fromSavings' ? (
+            <SavingSpendingFields
+              form={form}
+              initialSavingSpendingId={initialValues.savingSpendingId}
+            />
+          ) : (
+            <>
+              <CategoryFields form={form} />
+              <SubscriptionField form={form} />
+            </>
+          )}
 
-        <SourceField form={form} />
+          <CostField form={form} />
+
+          <TextInput
+            label={t('form.comment')}
+            {...form.getInputProps('name')}
+          />
+
+          <SourceField form={form} />
+        </Stack>
 
         <Button type="submit" mt="sm" disabled={!form.isDirty()}>
           {editingId === null ? t('form.add') : t('form.save')}
