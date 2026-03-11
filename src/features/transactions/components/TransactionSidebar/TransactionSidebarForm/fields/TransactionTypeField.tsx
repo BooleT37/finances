@@ -28,6 +28,7 @@ export function TransactionTypeField({ form }: Props) {
       form.setFieldValue('subcategory', null);
       form.setFieldValue('savingSpendingId', null);
       form.setFieldValue('savingSpendingCategoryId', null);
+      form.validate();
     },
     [form],
   );
