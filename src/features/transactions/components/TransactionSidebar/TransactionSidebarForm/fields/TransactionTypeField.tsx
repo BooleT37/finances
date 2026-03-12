@@ -24,8 +24,6 @@ export function TransactionTypeField({ form }: Props) {
   const handleTypeChange = useCallback(
     (value: string) => {
       form.setFieldValue('transactionType', value as TransactionType);
-      form.setFieldValue('category', null);
-      form.setFieldValue('subcategory', null);
       form.setFieldValue('savingSpendingId', null);
       form.setFieldValue('savingSpendingCategoryId', null);
       form.validate();

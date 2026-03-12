@@ -19,10 +19,15 @@ export function CategoryFields({ form }: Props) {
   const { data: categoryMap = {} } = useQuery(getCategoryMapQueryOptions());
   const { data: allCategories = [] } = useQuery(getCategoriesQueryOptions());
 
-  const categories =
-    form.values.transactionType === 'income'
-      ? allCategories.filter((c) => c.isIncome)
-      : allCategories.filter((c) => !c.isIncome && c.type !== 'FROM_SAVINGS');
+  const isIncome = form.values.transactionType === 'income';
+  const categoryField = isIncome ? 'incomeCategory' : 'expenseCategory';
+  const subcategoryField = isIncome
+    ? 'incomeSubcategory'
+    : 'expenseSubcategory';
+
+  const categories = isIncome
+    ? allCategories.filter((c) => c.isIncome)
+    : allCategories.filter((c) => !c.isIncome && c.type !== 'FROM_SAVINGS');
 
   const categoryOptions = useMemo(
     () => categories.map((c) => ({ value: String(c.id), label: c.name })),
@@ -30,11 +35,12 @@ export function CategoryFields({ form }: Props) {
   );
 
   const selectedCategory = useMemo(() => {
-    if (form.values.category === null) {
+    const value = form.values[categoryField];
+    if (value === null) {
       return undefined;
     }
-    return getOrThrow(categoryMap, Number(form.values.category), 'Category');
-  }, [categoryMap, form.values.category]);
+    return getOrThrow(categoryMap, Number(value), 'Category');
+  }, [categoryMap, categoryField, form.values]);
 
   const subcategoryOptions = useMemo(
     () =>
@@ -51,10 +57,10 @@ export function CategoryFields({ form }: Props) {
         label={t('form.category')}
         required
         data={categoryOptions}
-        {...form.getInputProps('category')}
+        {...form.getInputProps(categoryField)}
         onChange={(v) => {
-          form.setFieldValue('category', v);
-          form.setFieldValue('subcategory', null);
+          form.setFieldValue(categoryField, v);
+          form.setFieldValue(subcategoryField, null);
         }}
         searchable
       />
@@ -62,7 +68,7 @@ export function CategoryFields({ form }: Props) {
         <Select
           label={t('form.subcategory')}
           data={subcategoryOptions}
-          {...form.getInputProps('subcategory')}
+          {...form.getInputProps(subcategoryField)}
           clearable
         />
       )}

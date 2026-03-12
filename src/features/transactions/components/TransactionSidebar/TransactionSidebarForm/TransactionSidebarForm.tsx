@@ -51,19 +51,35 @@ export function TransactionSidebarForm() {
     getFromSavingsCategoryQueryOptions(),
   );
 
-  const prepareSubmitValues = useCallback<TransactionFormTransform>(
+  const transformValues = useCallback<TransactionFormTransform>(
     (values) => {
-      const prepared = { ...(values as ValidatedTransactionFormValues) };
-      if (values.transactionType === 'fromSavings') {
-        if (!fromSavingsCategory) {
-          return null;
-        }
-        prepared.category = String(fromSavingsCategory.id);
-        prepared.subscription = null;
-      } else {
-        prepared.savingSpendingCategoryId = null;
+      const validated = values as ValidatedTransactionFormValues;
+      switch (validated.transactionType) {
+        case 'fromSavings':
+          if (!fromSavingsCategory) {
+            return null;
+          }
+          return {
+            ...validated,
+            category: String(fromSavingsCategory.id),
+            subcategory: null,
+            subscription: null,
+          };
+        case 'income':
+          return {
+            ...validated,
+            category: validated.incomeCategory,
+            subcategory: validated.incomeSubcategory,
+            savingSpendingCategoryId: null,
+          };
+        case 'expense':
+          return {
+            ...validated,
+            category: validated.expenseCategory,
+            subcategory: validated.expenseSubcategory,
+            savingSpendingCategoryId: null,
+          };
       }
-      return prepared;
     },
     [fromSavingsCategory],
   );
@@ -101,11 +117,13 @@ export function TransactionSidebarForm() {
 
   const form = useForm<TransactionFormValues, TransactionFormTransform>({
     initialValues,
-    transformValues: prepareSubmitValues,
+    transformValues,
     validateInputOnBlur: true,
     validateInputOnChange: [
-      'category',
-      'subcategory',
+      'incomeCategory',
+      'incomeSubcategory',
+      'expenseCategory',
+      'expenseSubcategory',
       'source',
       'subscription',
       'savingSpendingId',
@@ -127,11 +145,17 @@ export function TransactionSidebarForm() {
               t('form.errors.savingSpendingCategoryRequired'),
             )(values.savingSpendingCategoryId),
           }
-        : {
-            category: isNotEmpty(t('form.errors.categoryRequired'))(
-              values.category,
-            ),
-          }),
+        : values.transactionType === 'income'
+          ? {
+              incomeCategory: isNotEmpty(t('form.errors.categoryRequired'))(
+                values.incomeCategory,
+              ),
+            }
+          : {
+              expenseCategory: isNotEmpty(t('form.errors.categoryRequired'))(
+                values.expenseCategory,
+              ),
+            }),
     }),
   });
 

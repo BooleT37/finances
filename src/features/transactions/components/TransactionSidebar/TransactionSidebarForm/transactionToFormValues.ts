@@ -52,9 +52,16 @@ export function useTransactionToFormValues(): (
         name: tx.name,
         date: tx.date.toDate(),
         actualDate: tx.actualDate?.toDate() ?? null,
-        category: String(tx.categoryId),
-        subcategory:
-          tx.subcategoryId !== null ? String(tx.subcategoryId) : null,
+        incomeCategory: cat?.isIncome ? String(tx.categoryId) : null,
+        incomeSubcategory:
+          cat?.isIncome && tx.subcategoryId !== null
+            ? String(tx.subcategoryId)
+            : null,
+        expenseCategory: !cat?.isIncome ? String(tx.categoryId) : null,
+        expenseSubcategory:
+          !cat?.isIncome && tx.subcategoryId !== null
+            ? String(tx.subcategoryId)
+            : null,
         source: tx.sourceId !== null ? String(tx.sourceId) : null,
         subscription:
           tx.subscriptionId !== null ? String(tx.subscriptionId) : null,

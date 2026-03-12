@@ -18,7 +18,7 @@ import {
 import { confirmUnsavedChanges } from './confirmUnsavedChanges';
 import type {
   TransactionFormType,
-  ValidatedTransactionFormValues,
+  TransformedTransactionFormValues,
 } from './TransactionSidebarForm/transactionFormValues';
 
 export const TransactionSidebarMolecule = molecule(() => {
@@ -148,7 +148,7 @@ export const TransactionSidebarMolecule = molecule(() => {
 
   const saveTransactionAtom = atom(
     null,
-    async (get, _set, values: ValidatedTransactionFormValues) => {
+    async (get, _set, values: TransformedTransactionFormValues) => {
       const editingId = get(editingIdAtom);
       const components = values.components;
 

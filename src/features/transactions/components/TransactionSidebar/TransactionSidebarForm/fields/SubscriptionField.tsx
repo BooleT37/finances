@@ -20,8 +20,12 @@ export function SubscriptionField({ form }: Props) {
   const { editingIdAtom } = useMolecule(TransactionSidebarMolecule);
   const editingId = useAtomValue(editingIdAtom);
 
+  const activeCategory =
+    form.values.transactionType === 'income'
+      ? form.values.incomeCategory
+      : form.values.expenseCategory;
   const availableSubscriptions = useAvailableSubscriptions(
-    form.values.category !== null ? Number(form.values.category) : undefined,
+    activeCategory !== null ? Number(activeCategory) : undefined,
     editingId,
   );
 

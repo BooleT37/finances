@@ -23,10 +23,18 @@ export function CostField({ form }: Props) {
 
   const isCostValid = costRegex.test(form.values.cost);
   const parentCost = isCostValid ? new Decimal(form.values.cost) : null;
+  const activeCategory =
+    form.values.transactionType === 'income'
+      ? form.values.incomeCategory
+      : form.values.expenseCategory;
+  const activeSubcategory =
+    form.values.transactionType === 'income'
+      ? form.values.incomeSubcategory
+      : form.values.expenseSubcategory;
   const parentCategoryId =
-    form.values.category !== null ? Number(form.values.category) : null;
+    activeCategory !== null ? Number(activeCategory) : null;
   const parentSubcategoryId =
-    form.values.subcategory !== null ? Number(form.values.subcategory) : null;
+    activeSubcategory !== null ? Number(activeSubcategory) : null;
 
   return (
     <>

@@ -19,8 +19,10 @@ export function useEmptyTransactionFormValues(): TransactionFormValues {
         ? getToday().toDate()
         : dayjs(selectedMonth).startOf('month').toDate(),
       actualDate: null,
-      category: null,
-      subcategory: null,
+      incomeCategory: null,
+      incomeSubcategory: null,
+      expenseCategory: null,
+      expenseSubcategory: null,
       source: null,
       subscription: null,
       savingSpendingCategoryId: null,

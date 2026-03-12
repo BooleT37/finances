@@ -16,8 +16,10 @@ export interface TransactionFormValues {
   name: string;
   date: Date | null;
   actualDate: Date | null;
-  category: string | null;
-  subcategory: string | null;
+  incomeCategory: string | null;
+  incomeSubcategory: string | null;
+  expenseCategory: string | null;
+  expenseSubcategory: string | null;
   source: string | null;
   subscription: string | null;
   savingSpendingCategoryId: string | null;
@@ -25,17 +27,47 @@ export interface TransactionFormValues {
   transactionType: TransactionType;
 }
 
-export interface ValidatedTransactionFormValues extends Omit<
+export type ValidatedTransactionFormValues = Omit<
   TransactionFormValues,
-  'date' | 'category'
+  | 'date'
+  | 'incomeCategory'
+  | 'incomeSubcategory'
+  | 'expenseCategory'
+  | 'expenseSubcategory'
+  | 'transactionType'
+> & {
+  date: Date;
+} & (
+    | {
+        transactionType: 'expense';
+        expenseCategory: string;
+        expenseSubcategory: string | null;
+      }
+    | {
+        transactionType: 'income';
+        incomeCategory: string;
+        incomeSubcategory: string | null;
+      }
+    | {
+        transactionType: 'fromSavings';
+      }
+  );
+export interface TransformedTransactionFormValues extends Omit<
+  ValidatedTransactionFormValues,
+  | 'date'
+  | 'expenseCategory'
+  | 'expenseSubcategory'
+  | 'incomeCategory'
+  | 'incomeSubcategory'
 > {
   date: Date;
   category: string;
+  subcategory: string | null;
 }
 
 export type TransactionFormTransform = (
   values: TransactionFormValues,
-) => ValidatedTransactionFormValues | null;
+) => TransformedTransactionFormValues | null;
 
 export type TransactionFormType = UseFormReturnType<
   TransactionFormValues,
