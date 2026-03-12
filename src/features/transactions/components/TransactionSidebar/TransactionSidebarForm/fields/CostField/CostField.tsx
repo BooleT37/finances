@@ -1,4 +1,4 @@
-import { ActionIcon, TextInput } from '@mantine/core';
+import { ActionIcon, Stack, TextInput } from '@mantine/core';
 import { IconList } from '@tabler/icons-react';
 import { useMolecule } from 'bunshi/react';
 import Decimal from 'decimal.js';
@@ -38,28 +38,32 @@ export function CostField({ form }: Props) {
 
   return (
     <>
-      <TextInput
-        label={t('form.amount')}
-        required
-        {...form.getInputProps('cost')}
-        rightSection={
-          form.values.transactionType !== 'fromSavings' ? (
-            <ActionIcon
-              variant="subtle"
-              disabled={!isCostValid}
-              onClick={() => setComponentsModalOpen(true)}
-              title={t('components.editButton')}
-            >
-              <IconList size={16} />
-            </ActionIcon>
-          ) : undefined
-        }
-        rightSectionPointerEvents="all"
-      />
-
-      {parentCost !== null && (
-        <ComponentsHint cost={parentCost} components={form.values.components} />
-      )}
+      <Stack gap={4}>
+        <TextInput
+          label={t('form.amount')}
+          required
+          {...form.getInputProps('cost')}
+          rightSection={
+            form.values.transactionType !== 'fromSavings' ? (
+              <ActionIcon
+                variant="subtle"
+                disabled={!isCostValid}
+                onClick={() => setComponentsModalOpen(true)}
+                title={t('components.editButton')}
+              >
+                <IconList size={16} />
+              </ActionIcon>
+            ) : undefined
+          }
+          rightSectionPointerEvents="all"
+        />
+        {parentCost !== null && (
+          <ComponentsHint
+            cost={parentCost}
+            components={form.values.components}
+          />
+        )}
+      </Stack>
 
       <ComponentsModal
         parentCategoryId={parentCategoryId}

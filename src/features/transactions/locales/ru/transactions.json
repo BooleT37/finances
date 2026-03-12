@@ -1,11 +1,5 @@
 {
   "add": "Добавить",
-  "delete": {
-    "cancel": "Отмена",
-    "confirm": "Удалить",
-    "confirmMessage": "Удалить «{{name}}»?",
-    "confirmTitle": "Удалить транзакцию"
-  },
   "columns": {
     "category": "Категория",
     "cost": "Сумма",
@@ -16,11 +10,14 @@
     "subcategory": "Подкатегория",
     "type": "Тип"
   },
+  "componentOfExpense": "Составляющая \"{{name}}\"",
+  "componentOfExpenseTooltip": "Составляющая расхода \"{{name}}\"",
+  "componentOfExpenseTooltipNoName": "Составляющая расхода",
   "components": {
     "addComponent": "Добавить составляющую",
-    "categorySameAsParent": "Категория должна отличаться от родительской транзакции",
     "categoryNotFound": "Категории не найдены",
     "categoryRequired": "Выберите категорию",
+    "categorySameAsParent": "Категория должна отличаться от родительской транзакции",
     "costRequired": "Введите сумму",
     "editButton": "Редактировать составляющие",
     "hint": {
@@ -32,11 +29,14 @@
     "modalTitle": "Составляющие",
     "remaining": "Остаток: {{value}}"
   },
-  "componentOfExpense": "Составляющая \"{{name}}\"",
-  "componentOfExpenseTooltip": "Составляющая расхода \"{{name}}\"",
-  "componentOfExpenseTooltipNoName": "Составляющая расхода",
   "componentWithParent": "{{componentName}} (составляющая \"{{parentName}}\")",
   "costIncludingComponents": "Стоимость включая все составляющие",
+  "delete": {
+    "cancel": "Отмена",
+    "confirm": "Удалить",
+    "confirmMessage": "Удалить «{{name}}»?",
+    "confirmTitle": "Удалить транзакцию"
+  },
   "forecast": {
     "exceededBy": "Превышение на {{value}}",
     "plan": "План: {{value}}"
@@ -45,6 +45,7 @@
     "actualDate": "Реальная дата",
     "actualDateDescription": "Дата, под которой трата записана в банковском приложении. Учитывается только в подсказке «последние траты» под источником.",
     "actualDateDiffers": "Реальная дата отличается",
+    "add": "Добавить",
     "amount": "Сумма (€)",
     "category": "Категория",
     "comment": "Комментарий",
@@ -58,21 +59,20 @@
       "savingSpendingRequired": "Выберите событие"
     },
     "sameDate": "Реальная дата не отличается",
+    "save": "Сохранить",
+    "savingSpending": "Событие",
+    "savingSpendingCategory": "Категория",
+    "source": "Источник",
+    "sourceLastEntry": "Последние траты: {{date}}",
+    "subcategory": "Подкатегория",
+    "subscription": "Подписка",
     "type": {
       "expense": "Расход",
       "fromSavings": "Из сбережений",
       "income": "Доход",
       "label": "Тип"
     },
-    "add": "Добавить",
-    "save": "Сохранить",
-    "unsavedChanges": "Исправьте ошибки выше, чтобы сохранить изменения.",
-    "savingSpending": "Событие",
-    "savingSpendingCategory": "Категория",
-    "source": "Источник",
-    "sourceLastEntry": "Последняя запись: {{date}}",
-    "subcategory": "Подкатегория",
-    "subscription": "Подписка"
+    "unsavedChanges": "Исправьте ошибки выше, чтобы сохранить изменения."
   },
   "groupBySubcategories": "Сгруппировать по подкатегориям",
   "groupingValues": {

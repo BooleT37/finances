@@ -14,7 +14,7 @@ export function TextWithTooltipIcon({
   return (
     <Group gap={4} align="center">
       {children}
-      <Tooltip label={tooltip}>
+      <Tooltip label={tooltip} multiline w={220}>
         <IconInfoCircle size={14} />
       </Tooltip>
     </Group>
