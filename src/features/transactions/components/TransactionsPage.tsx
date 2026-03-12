@@ -16,7 +16,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getUserSettingsQueryOptions } from '~/features/userSettings/queries';
-import { transactionSearchAtom, viewModeAtom } from '~/stores/month';
+import { transactionSearchAtom } from '~/stores/month';
 
 import { useTransactionTableItems } from '../useTransactionTableItems';
 import { ImportModal } from './ImportModal';
@@ -30,7 +30,6 @@ export function TransactionsPage() {
   const { t } = useTranslation('transactions');
   const { openAtom } = useMolecule(TransactionSidebarMolecule);
   const openSidebar = useSetAtom(openAtom);
-  const setViewMode = useSetAtom(viewModeAtom);
   const [search, setSearch] = useAtom(transactionSearchAtom);
   const [showUpcoming, setShowUpcoming] = useState(false);
   const [groupBySubcategories, setGroupBySubcategories] = useState(false);
@@ -81,11 +80,7 @@ export function TransactionsPage() {
           placeholder={t('searchPlaceholder')}
           value={search}
           onChange={(e) => {
-            const value = e.currentTarget.value;
-            if (value && !search) {
-              setViewMode('year');
-            }
-            setSearch(value);
+            setSearch(e.currentTarget.value);
           }}
         />
       </Group>

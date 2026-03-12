@@ -1,6 +1,9 @@
 {
   "appName": "Personal Finances",
   "backToCurrentMonth": "Back to current month",
+  "backToCurrentYear": "Back to current year",
+  "switchToMonthView": "Switch to month view",
+  "switchToYearView": "Switch to year view",
   "planning": "Planning",
   "savings": "Savings",
   "statistics": "Statistics",

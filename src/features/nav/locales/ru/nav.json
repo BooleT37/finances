@@ -1,6 +1,9 @@
 {
   "appName": "Личные финансы",
   "backToCurrentMonth": "К текущему месяцу",
+  "backToCurrentYear": "К текущему году",
+  "switchToMonthView": "Переключить на месяц",
+  "switchToYearView": "Переключить на год",
   "planning": "Планирование",
   "savings": "Накопления",
   "statistics": "Статистика",

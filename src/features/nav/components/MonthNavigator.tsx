@@ -1,7 +1,7 @@
 import {
   ActionIcon,
-  Anchor,
   Button,
+  Divider,
   Flex,
   Group,
   Popover,
@@ -11,6 +11,8 @@ import { MonthPicker, YearPicker } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
 import {
   IconCalendarEvent,
+  IconCalendarMonth,
+  IconCalendarStats,
   IconChevronLeft,
   IconChevronRight,
 } from '@tabler/icons-react';
@@ -70,76 +72,101 @@ export function MonthNavigator() {
   // Mantine date pickers work with Date objects
   const pickerValue = dayjs(selectedMonth).toDate();
 
-  const showCurrentMonthButton = viewMode !== 'month' || !isCurrentMonth;
+  const nowYear = now.format('YYYY');
+  const isCurrentYear = selectedMonth.slice(0, 4) === nowYear;
+  const showCurrentButton =
+    viewMode === 'month' ? !isCurrentMonth : !isCurrentYear;
+
+  const handleBackToCurrent = () => {
+    setViewMode('month');
+    setMonth(nowMonth);
+    setSearch('');
+    closePicker();
+  };
+
+  const handleToggleView = () => {
+    setViewMode(viewMode === 'month' ? 'year' : 'month');
+  };
 
   return (
-    <Stack gap={2} align="center">
-      <Group gap={4} wrap="nowrap">
-        <ActionIcon
-          variant="subtle"
-          size="md"
-          onClick={goPrev}
-          aria-label="Previous"
-        >
-          <IconChevronLeft size={16} />
-        </ActionIcon>
+    <Group gap={4} wrap="nowrap">
+      <ActionIcon
+        variant="subtle"
+        size="md"
+        onClick={goPrev}
+        aria-label="Previous"
+      >
+        <IconChevronLeft size={16} />
+      </ActionIcon>
 
-        <Popover
-          opened={pickerOpened}
-          onDismiss={closePicker}
-          position="bottom"
-          withArrow
-        >
-          <Popover.Target>
-            <Button
-              variant="white"
-              c="black"
-              onClick={togglePicker}
-              fw={600}
-              miw={160}
-              ta="center"
-              style={{ lineHeight: 1.4 }}
-            >
-              {label}
-            </Button>
-          </Popover.Target>
-          <Popover.Dropdown p={0}>
+      <Popover
+        opened={pickerOpened}
+        onDismiss={closePicker}
+        position="bottom"
+        withArrow
+      >
+        <Popover.Target>
+          <Button
+            variant="white"
+            c="black"
+            onClick={togglePicker}
+            fw={600}
+            miw={160}
+            ta="center"
+            style={{ lineHeight: 1.4 }}
+          >
+            {label}
+          </Button>
+        </Popover.Target>
+        <Popover.Dropdown p={0}>
+          <Stack gap={0}>
             {viewMode === 'month' ? (
               <MonthPicker value={pickerValue} onChange={handlePickerChange} />
             ) : (
               <YearPicker value={pickerValue} onChange={handlePickerChange} />
             )}
-          </Popover.Dropdown>
-        </Popover>
+            <Divider />
+            <Stack gap={4} p="8px 0" align="center">
+              {showCurrentButton && (
+                <Button
+                  variant="white"
+                  size="xs"
+                  onClick={handleBackToCurrent}
+                  w="100%"
+                >
+                  <Flex gap={4} align="center">
+                    <IconCalendarEvent size={14} />
+                    {viewMode === 'month'
+                      ? t('backToCurrentMonth')
+                      : t('backToCurrentYear')}
+                  </Flex>
+                </Button>
+              )}
+              <Button
+                variant="white"
+                size="xs"
+                onClick={handleToggleView}
+                w="100%"
+              >
+                <Flex gap={4} align="center">
+                  {viewMode === 'month' ? (
+                    <IconCalendarStats size={14} />
+                  ) : (
+                    <IconCalendarMonth size={14} />
+                  )}
+                  {viewMode === 'month'
+                    ? t('switchToYearView')
+                    : t('switchToMonthView')}
+                </Flex>
+              </Button>
+            </Stack>
+          </Stack>
+        </Popover.Dropdown>
+      </Popover>
 
-        <ActionIcon
-          variant="subtle"
-          size="md"
-          onClick={goNext}
-          aria-label="Next"
-        >
-          <IconChevronRight size={16} />
-        </ActionIcon>
-      </Group>
-
-      <Group gap="xs" justify="center">
-        <Anchor
-          size="xs"
-          component="button"
-          type="button"
-          style={{ visibility: showCurrentMonthButton ? 'visible' : 'hidden' }}
-          onClick={() => {
-            setViewMode('month');
-            setMonth(nowMonth);
-            setSearch('');
-          }}
-        >
-          <Flex gap={4} align="center">
-            <IconCalendarEvent size={16} />
-            {t('backToCurrentMonth')}
-          </Flex>
-        </Anchor>
-      </Group>
-    </Stack>
+      <ActionIcon variant="subtle" size="md" onClick={goNext} aria-label="Next">
+        <IconChevronRight size={16} />
+      </ActionIcon>
+    </Group>
   );
 }

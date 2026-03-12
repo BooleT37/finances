@@ -65,7 +65,7 @@ function AppContent() {
     <DatesProvider settings={{ locale: i18nInstance.language }}>
       <Notifications />
       <AppShell
-        header={{ height: 60 }}
+        header={{ height: 40 }}
         navbar={{ width: 200, breakpoint: 'sm' }}
         padding={{ base: 10, sm: 15, lg: 'md' }}
       >
