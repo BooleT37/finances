@@ -11,7 +11,7 @@
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
-    "prepare": "husky",
+    "prepare": "prisma generate && husky",
     "typecheck": "tsc --noEmit",
     "types:watch": "tsc --noEmit -w",
     "lint": "eslint src",
