@@ -34,6 +34,7 @@ export function TransactionTypeField({ form }: Props) {
   return (
     <Input.Wrapper label={t('form.type.label')}>
       <SegmentedControlWithIcons
+        aria-label={t('form.type.label')}
         value={form.values.transactionType}
         onChange={handleTypeChange}
         data={[

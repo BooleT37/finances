@@ -33,6 +33,7 @@ export function ActualDateField({ form }: Props) {
           {...form.getInputProps('actualDate')}
         />
         <Anchor
+          component="button"
           size="xs"
           onClick={() => {
             setActualDateShown(false);
@@ -46,7 +47,11 @@ export function ActualDateField({ form }: Props) {
   }
 
   return (
-    <Anchor size="xs" onClick={() => setActualDateShown(true)}>
+    <Anchor
+      component="button"
+      size="xs"
+      onClick={() => setActualDateShown(true)}
+    >
       {t('form.actualDateDiffers')}
     </Anchor>
   );

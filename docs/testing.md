@@ -48,6 +48,17 @@ Add `aria-label` to Mantine components that need to be targeted by `getByLabel()
 <SegmentedControl aria-label="Language switcher" ... />
 ```
 
+## When Tests Are Hard to Write
+
+If writing a test requires brittle workarounds — such as targeting elements by internal CSS class, raw CSS selectors, or positional hacks — pause and consider whether the production code should be improved first.
+
+Common signals:
+- Can't locate a component by label or role (e.g., `Input.Wrapper` label has no `for` association to its inner control)
+- Must use opaque selectors like `form input[value="income"]` instead of `getByRole(..., { name: '...' })`
+- Must reach into internal DOM structure of a UI library component
+
+In these cases, ask the user if they'd like to improve the code instead. Suggest the fix (e.g., "add `aria-label` to this component so it's addressable by role name") before writing the workaround. This keeps both the production code and test code clean.
+
 ## Playwright MCP Server
 
 `.mcp.json` at the project root configures the `@playwright/mcp` server for Claude Code. This allows interactive browser inspection — Claude can navigate pages, take screenshots, and verify UI state in a real browser during development.

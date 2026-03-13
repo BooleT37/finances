@@ -1,11 +1,16 @@
 import { defineConfig, devices } from '@playwright/test';
 
+import { TEST_DB_URL } from './e2e/db/client';
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   reporter: 'html',
+  globalSetup: './e2e/global-setup.ts',
+  globalTeardown: './e2e/global-teardown.ts',
+  workers: 1, // sequential spec files — parallel workers would race to reset the same DB
   use: {
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
@@ -19,6 +24,7 @@ export default defineConfig({
   webServer: {
     command: 'npm run dev',
     url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false, // always fresh — tests must use the test DB, not the dev DB
+    env: { DATABASE_URL: TEST_DB_URL },
   },
 });

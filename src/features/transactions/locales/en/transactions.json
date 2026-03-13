@@ -65,6 +65,7 @@
       "label": "Type"
     },
     "add": "Add",
+    "ariaLabel": "Transaction form",
     "save": "Save",
     "unsavedChanges": "Fix errors above to save changes.",
     "savingSpending": "Saving event",

@@ -190,7 +190,7 @@ export function TransactionSidebarForm() {
   );
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form aria-label={t('form.ariaLabel')} onSubmit={handleSubmit}>
       <Stack gap="sm" pr={16}>
         <Stack gap="sm">
           <TransactionTypeField form={form} />
