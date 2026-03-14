@@ -54,3 +54,5 @@ Each transaction has a **`peHash`** (parsed expense hash) used to detect whether
 - We exclude expenses from aggregation if it's a spending from savings. Currently, we detect that by its category's type "SAVING_SPENDING", not when its savingSpendingCategoryId is defined. In future, we might switch to only care about savingSpendingCategoryId, to have only one source of truth for when exclude the transaction from calculation (and in general, when consider it a spending from savings)
 
 - We don't support subscriptions or components for income transactions yet. But we will in future
+
+- We don't support positive costs and income categories for components yet. Will implement it in future
