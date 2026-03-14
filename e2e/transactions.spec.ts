@@ -1,6 +1,7 @@
 import type { Page } from '@playwright/test';
 
 import { expect, test } from './fixtures';
+import { testPrisma } from './db/client';
 import { transactionNameCellClass } from '../src/features/transactions/components/TransactionsTable/TransactionsTable';
 
 async function selectOption(page: Page, label: string, option: string) {
@@ -40,7 +41,7 @@ async function findTransactionRow(
   return nameCell.locator('xpath=ancestor::tr');
 }
 
-test.describe('Transactions', () => {
+test.describe('Transaction creation', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/transactions');
   });
@@ -166,5 +167,63 @@ test.describe('Transactions', () => {
       name: 'прошлый месяц',
     });
     await expect(row.getByText('-€100.00')).toBeVisible();
+  });
+});
+
+test.describe('Transaction editing', () => {
+  test('edit cost with auto-save, then delete via row action', async ({
+    page,
+    seedData,
+  }) => {
+    await testPrisma.expense.create({
+      data: {
+        name: 'Правка и удаление',
+        cost: -50,
+        date: new Date(),
+        categoryId: seedData.categoryIds.продукты,
+        sourceId: seedData.sourceId,
+        userId: seedData.userId,
+      },
+    });
+    await page.goto('/transactions');
+
+    const row = await findTransactionRow(page, {
+      categoryId: seedData.categoryIds.продукты,
+      name: 'Правка и удаление',
+    });
+
+    await row.getByRole('button', { name: 'Редактировать' }).click();
+
+    const form = page.getByRole('form', { name: 'Форма транзакции' });
+
+    // Verify pre-filled fields match what was saved
+    await expect(form.getByLabel('Сумма (€)')).toHaveValue('-50');
+    await expect(form.getByRole('textbox', { name: 'Категория', exact: true })).toHaveValue(
+      'Продукты',
+    );
+    await expect(form.getByRole('textbox', { name: 'Источник' })).toHaveValue(
+      'Vivid',
+    );
+    await expect(form.getByLabel('Комментарий')).toHaveValue(
+      'Правка и удаление',
+    );
+
+    // Change cost — auto-save fires after debounce; no manual save needed
+    await form.getByLabel('Сумма (€)').fill('75');
+    await expect(row.getByText('-€75.00')).toBeVisible();
+
+    await row.getByRole('button', { name: 'Удалить' }).click();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Удалить' })
+      .click();
+    await page.waitForLoadState('networkidle');
+
+    await expect(
+      page.locator(
+        `.${transactionNameCellClass}[data-testing-category-id="${seedData.categoryIds.продукты}"]`,
+        { hasText: 'Правка и удаление' },
+      ),
+    ).toHaveCount(0);
   });
 });

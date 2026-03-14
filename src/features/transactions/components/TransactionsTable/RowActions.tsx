@@ -36,6 +36,7 @@ export function RowActions({ id, parentExpenseId, name }: Props) {
     <Group gap={4}>
       <ActionIcon
         variant="subtle"
+        aria-label={t('actions.edit')}
         onClick={() =>
           parentExpenseId !== null
             ? openForComponent({ parentId: parentExpenseId, componentId: id })
@@ -44,7 +45,12 @@ export function RowActions({ id, parentExpenseId, name }: Props) {
       >
         <IconEdit size={16} />
       </ActionIcon>
-      <ActionIcon variant="subtle" color="red" onClick={handleDelete}>
+      <ActionIcon
+        variant="subtle"
+        color="red"
+        aria-label={t('actions.delete')}
+        onClick={handleDelete}
+      >
         <IconTrash size={16} />
       </ActionIcon>
     </Group>

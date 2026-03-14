@@ -1,4 +1,8 @@
 {
+  "actions": {
+    "delete": "Delete",
+    "edit": "Edit"
+  },
   "add": "Add",
   "delete": {
     "cancel": "Cancel",
