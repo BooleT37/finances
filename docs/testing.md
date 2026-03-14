@@ -85,6 +85,28 @@ import { transactionNameCellClass } from '~/features/transactions/components/Tra
 
 Avoid importing utility functions (like formatters) from the production codebase into tests — either hardcode the expected value directly, or write a minimal local helper if the logic is non-trivial.
 
+## Component Tests (React Testing Library)
+
+### Mocking Server Functions
+
+When a component fetches data via a TanStack Query query, mock the **server function** that the query calls — not the query options object. Server functions are created with `createServerFn` and live in each feature's `api.ts`.
+
+```ts
+import { fetchAllCategories } from '../src/features/categories/api';
+
+vi.mock('../src/features/categories/api', () => ({
+  fetchAllCategories: vi.fn(),
+}));
+
+beforeEach(() => {
+  vi.mocked(fetchAllCategories).mockResolvedValue([
+    { id: 1, name: 'Продукты', isIncome: false, /* ... */ },
+  ]);
+});
+```
+
+This lets the TanStack Query layer (`queryOptions`, `select` transforms, caching) work normally — only the network boundary is replaced. Never mock `queryOptions` functions directly, as that skips the data-transform logic the component depends on.
+
 ## Playwright MCP Server
 
 `.mcp.json` at the project root configures the `@playwright/mcp` server for Claude Code. This allows interactive browser inspection — Claude can navigate pages, take screenshots, and verify UI state in a real browser during development.

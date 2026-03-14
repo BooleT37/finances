@@ -3,7 +3,11 @@ import dayjs, { type Dayjs } from 'dayjs';
 import { useAtomValue } from 'jotai';
 
 import { getTransactionsQueryOptions } from '~/features/transactions/queries';
-import { selectedMonthAtom, selectedYearAtom } from '~/stores/month';
+import {
+  selectedMonthAtom,
+  selectedYearAtom,
+  viewModeAtom,
+} from '~/stores/month';
 
 import { getSubscriptionsQueryOptions } from '../queries';
 import type { Subscription } from '../schema';
@@ -34,9 +38,11 @@ export function useAvailableSubscriptions(
   editingId?: number | null,
 ): AvailableSubscription[] | undefined {
   const selectedMonth = useAtomValue(selectedMonthAtom);
-  const rangeStart = dayjs(selectedMonth).startOf('month');
-  const rangeEnd = dayjs(selectedMonth).endOf('month');
   const year = useAtomValue(selectedYearAtom);
+  const viewMode = useAtomValue(viewModeAtom);
+  const base = viewMode === 'year' ? dayjs(`${year}-01`) : dayjs(selectedMonth);
+  const rangeStart = base.startOf(viewMode);
+  const rangeEnd = base.endOf(viewMode);
   const { data: subscriptions } = useQuery(getSubscriptionsQueryOptions());
   const { data: transactions } = useQuery(getTransactionsQueryOptions(year));
 
