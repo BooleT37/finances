@@ -107,11 +107,20 @@ export const TransactionSidebarMolecule = molecule(() => {
     },
   );
 
-  const closeAtom = atom(null, (_get, set) => {
+  function doClose(set: Setter) {
     set(editingIdAtom, undefined);
     set(componentsModalOpenAtom, false);
     set(highlightedComponentIdAtom, null);
     set(actualDateShownAtom, false);
+  }
+
+  const closeAtom = atom(null, (get, set) => {
+    const formRef = get(formRefAtom);
+    if (formRef?.isDirty()) {
+      confirmUnsavedChanges(() => doClose(set));
+      return;
+    }
+    doClose(set);
   });
 
   // ── Mutations ─────────────────────────────────────────────────────────────
@@ -140,7 +149,7 @@ export const TransactionSidebarMolecule = molecule(() => {
     get(deleteMutationAtom).mutate(id, {
       onSuccess: () => {
         if (get(editingIdAtom) === id) {
-          set(closeAtom);
+          doClose(set);
         }
       },
     });
