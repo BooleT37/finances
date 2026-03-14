@@ -5,7 +5,8 @@
       "Bash(npm run format:check)",
       "Bash(npm run lint -- --fix src/features/transactions/components/TransactionSidebar/TransactionSidebarForm.tsx)",
       "Read(//Users/alekseylevin/projects/finances-t3/**)",
-      "Bash(npx prettier:*)"
+      "Bash(npx prettier:*)",
+      "Bash(npx playwright:*)"
     ]
   }
 }
