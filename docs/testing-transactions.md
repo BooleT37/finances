@@ -31,7 +31,8 @@ Do not aim for 100% coverage. Prioritise cases where a silent regression would b
 | # | Combined cases | Key assertions |
 |---|----------------|----------------|
 | 4 | Click row → pre-filled sidebar; change cost → auto-save fires; delete via row action | All fields match; new cost appears without manual save; row removed after delete |
-| 5 | Change category (expense↔income); close sidebar with unsaved change | Cost sign flips; confirm dialog appears; dismiss keeps changes; confirm discards |
+| 5a | Change category (expense→income); auto-save fires | Cost sign flips in table row |
+| 5b | Close sidebar while form has a validation error (auto-save skipped) | Confirm dialog appears; dismiss keeps changes; confirm discards |
 
 ### Component tests (RTL)
 

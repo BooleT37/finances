@@ -60,6 +60,24 @@ Add `aria-label` to Mantine components that need to be targeted by `getByLabel()
 <SegmentedControl aria-label="Language switcher" ... />
 ```
 
+## Labelling Icon Buttons
+
+Icon-only buttons (e.g. Mantine `ActionIcon` with just an `<Icon>` child) have no accessible name by default. Always add an `aria-label` via an i18n key so tests can locate them by role and name:
+
+```tsx
+// ✅ locatable — getByRole('button', { name: 'Редактировать' })
+<ActionIcon aria-label={t('actions.edit')} onClick={handleEdit}>
+  <IconEdit size={16} />
+</ActionIcon>
+
+// ❌ not locatable by name — must fall back to .first() / nth(0) or raw CSS
+<ActionIcon onClick={handleEdit}>
+  <IconEdit size={16} />
+</ActionIcon>
+```
+
+**Rule:** if an icon button doesn't already have an `aria-label`, add one before writing the test that targets it. Don't work around a missing label with positional selectors.
+
 ## When Tests Are Hard to Write
 
 If writing a test requires brittle workarounds — such as targeting elements by internal CSS class, raw CSS selectors, or positional hacks — pause and consider whether the production code should be improved first.
@@ -82,8 +100,6 @@ import { transactionNameCellClass } from '../src/features/transactions/component
 // ❌ alias import — not resolved in Playwright
 import { transactionNameCellClass } from '~/features/transactions/components/TransactionsTable/TransactionsTable';
 ```
-
-Avoid importing utility functions (like formatters) from the production codebase into tests — either hardcode the expected value directly, or write a minimal local helper if the logic is non-trivial.
 
 ## Component Tests (React Testing Library)
 

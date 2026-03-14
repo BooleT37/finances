@@ -79,6 +79,9 @@
     },
     "unsavedChanges": "Исправьте ошибки выше, чтобы сохранить изменения."
   },
+  "sidebar": {
+    "close": "Закрыть"
+  },
   "groupBySubcategories": "Сгруппировать по подкатегориям",
   "groupingValues": {
     "expense": "Расход",

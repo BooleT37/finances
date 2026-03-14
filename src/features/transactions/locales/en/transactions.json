@@ -79,6 +79,9 @@
     "subcategory": "Subcategory",
     "subscription": "Subscription"
   },
+  "sidebar": {
+    "close": "Close sidebar"
+  },
   "groupBySubcategories": "Group by subcategories",
   "groupingValues": {
     "expense": "Expense",

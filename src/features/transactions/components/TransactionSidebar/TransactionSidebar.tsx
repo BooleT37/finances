@@ -3,6 +3,7 @@ import { IconX } from '@tabler/icons-react';
 import { useMolecule } from 'bunshi/react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { Suspense, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { TransactionSidebarForm } from './TransactionSidebarForm/TransactionSidebarForm';
 import { TransactionSidebarMolecule } from './transactionSidebarMolecule';
@@ -25,6 +26,7 @@ export function TransactionSidebar({ width }: { width: number }) {
   const isOpen = useAtomValue(isOpenAtom);
   const editingId = useAtomValue(editingIdAtom);
   const close = useSetAtom(closeAtom);
+  const { t } = useTranslation('transactions');
 
   return (
     <Box
@@ -47,6 +49,7 @@ export function TransactionSidebar({ width }: { width: number }) {
           variant="subtle"
           color="gray"
           size="lg"
+          aria-label={t('sidebar.close')}
           style={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}
           onClick={close}
         >

@@ -171,6 +171,99 @@ test.describe('Transaction creation', () => {
 });
 
 test.describe('Transaction editing', () => {
+  test('change type income→expense flips cost sign in table via auto-save', async ({
+    page,
+    seedData,
+  }) => {
+    await testPrisma.expense.create({
+      data: {
+        name: 'Смена типа',
+        cost: 50, // positive income cost
+        date: new Date(),
+        categoryId: seedData.categoryIds.зарплата,
+        userId: seedData.userId,
+      },
+    });
+    await page.goto('/transactions');
+
+    const incomeRow = await findTransactionRow(page, {
+      categoryId: seedData.categoryIds.зарплата,
+      name: 'Смена типа',
+    });
+    await expect(incomeRow.getByText('€50.00')).toBeVisible();
+
+    await incomeRow.getByRole('button', { name: 'Редактировать' }).click();
+
+    // Switch to expense type
+    await page
+      .getByRole('radiogroup', { name: 'Тип' })
+      .locator('input[value="expense"]')
+      .dispatchEvent('click');
+    await selectOption(page, 'Категория', 'Продукты');
+
+    // Auto-save fires and the row moves to the expense section with a negative cost
+    const expenseRow = await findTransactionRow(page, {
+      categoryId: seedData.categoryIds.продукты,
+      name: 'Смена типа',
+    });
+    await expect(expenseRow.getByText('-€50.00')).toBeVisible();
+  });
+
+  test('close sidebar with validation error shows confirm; dismiss keeps changes; confirm discards', async ({
+    page,
+    seedData,
+  }) => {
+    await testPrisma.expense.create({
+      data: {
+        name: 'Несохранённые изменения',
+        cost: -50,
+        date: new Date(),
+        categoryId: seedData.categoryIds.продукты,
+        userId: seedData.userId,
+      },
+    });
+    await page.goto('/transactions');
+
+    const row = await findTransactionRow(page, {
+      categoryId: seedData.categoryIds.продукты,
+      name: 'Несохранённые изменения',
+    });
+    await row.getByRole('button', { name: 'Редактировать' }).click();
+
+    const form = page.getByRole('form', { name: 'Форма транзакции' });
+
+    // Clear the cost to introduce a validation error — auto-save is skipped on
+    // invalid forms, so the "unsaved changes" confirm dialog is the only guard.
+    await form.getByLabel('Сумма (€)').fill('');
+
+    // Close → confirm dialog should appear
+    await page.getByRole('button', { name: 'Закрыть' }).click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+
+    // Dismiss → sidebar stays open, change is preserved
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Отмена' })
+      .click();
+    await expect(form).toBeVisible();
+    await expect(form.getByLabel('Сумма (€)')).toHaveValue('');
+
+    // Close again → confirm dialog
+    await page.getByRole('button', { name: 'Закрыть' }).click();
+
+    // Confirm → sidebar closes, change is discarded
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Продолжить' })
+      .click();
+    // Sidebar slides off-screen via CSS transform (translateX 100%) — use
+    // toBeInViewport rather than toBeVisible, which CSS transforms don't affect.
+    await expect(form).not.toBeInViewport();
+
+    // Table still shows the original cost (discarded change)
+    await expect(row.getByText('-€50.00')).toBeVisible();
+  });
+
   test('edit cost with auto-save, then delete via row action', async ({
     page,
     seedData,
@@ -198,9 +291,9 @@ test.describe('Transaction editing', () => {
 
     // Verify pre-filled fields match what was saved
     await expect(form.getByLabel('Сумма (€)')).toHaveValue('-50');
-    await expect(form.getByRole('textbox', { name: 'Категория', exact: true })).toHaveValue(
-      'Продукты',
-    );
+    await expect(
+      form.getByRole('textbox', { name: 'Категория', exact: true }),
+    ).toHaveValue('Продукты');
     await expect(form.getByRole('textbox', { name: 'Источник' })).toHaveValue(
       'Vivid',
     );
@@ -208,7 +301,6 @@ test.describe('Transaction editing', () => {
       'Правка и удаление',
     );
 
-    // Change cost — auto-save fires after debounce; no manual save needed
     await form.getByLabel('Сумма (€)').fill('75');
     await expect(row.getByText('-€75.00')).toBeVisible();
 
