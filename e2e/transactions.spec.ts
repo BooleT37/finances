@@ -1,51 +1,43 @@
 import type { Page } from '@playwright/test';
 
 import { expect, test } from './fixtures';
+import { transactionNameCellClass } from '../src/features/transactions/components/TransactionsTable/TransactionsTable';
 
-const transactionNameCellClass = 'transaction-name-cell';
+async function selectOption(page: Page, label: string, option: string) {
+  await page.getByRole('textbox', { name: label }).click();
+  await page.getByRole('option', { name: option }).click();
+}
 
 interface VerifyTransactionOptions {
   /** Transaction comment. If omitted, row is located by categoryId alone. */
   name?: string;
   categoryId: number;
   subcategoryId?: number | null;
-  cost: number; // negative for expense, positive for income
-  /** Source name as displayed in the table. If omitted, source is not verified. */
-  sourceName?: string;
 }
 
-async function verifyTransactionInTable(
+/**
+ * Finds transaction row by (optionally) name, and grouping params
+ * if there's no name, we just return the first found row inside the category/subcategory
+ * It should be enough for 99% of test cases. If for whatever reason it's not enough,
+ * tests should use other cells (like cost) to locate the row, and not use this function at all
+ */
+async function findTransactionRow(
   page: Page,
-  { name, categoryId, subcategoryId = null, cost, sourceName }: VerifyTransactionOptions,
+  { name, categoryId, subcategoryId }: VerifyTransactionOptions,
 ) {
-  const formattedCost =
-    cost < 0 ? `-€${Math.abs(cost).toFixed(2)}` : `€${cost.toFixed(2)}`;
-
-  // [data-category-id] selects leaf rows only (grouped rows have the attribute unset).
-  // hasText further narrows when multiple transactions share the same category.
+  const subcategorySelector =
+    subcategoryId != null
+      ? `[data-testing-subcategory-id="${subcategoryId}"]`
+      : '';
   const nameCell = page.locator(
-    `.${transactionNameCellClass}[data-category-id="${categoryId}"]`,
+    // There's no real way to find a row inside a specific group in mantine-react-table,
+    // other than by setting data-attributes on the component side. It is a hack, but it works
+    `.${transactionNameCellClass}[data-testing-category-id="${categoryId}"]${subcategorySelector}`,
     name ? { hasText: name } : undefined,
   );
 
-  await expect(nameCell).toHaveAttribute(
-    'data-category-id',
-    String(categoryId),
-  );
-  if (subcategoryId === null) {
-    await expect(nameCell).not.toHaveAttribute('data-subcategory-id');
-  } else {
-    await expect(nameCell).toHaveAttribute(
-      'data-subcategory-id',
-      String(subcategoryId),
-    );
-  }
-
-  const row = nameCell.locator('xpath=ancestor::tr');
-  await expect(row.getByText(formattedCost)).toBeVisible();
-  if (sourceName !== undefined) {
-    await expect(row.getByText(sourceName)).toBeVisible();
-  }
+  await expect(nameCell).toBeVisible();
+  return nameCell.locator('xpath=ancestor::tr');
 }
 
 test.describe('Transactions', () => {
@@ -53,60 +45,45 @@ test.describe('Transactions', () => {
     await page.goto('/transactions');
   });
 
-  test('create a minimal expense (category + cost only)', async ({
+  // One complex expense covers: negative cost, subcategory attribute, source, and
+  // that actualDate ≠ date does not affect which month the row appears in.
+  test('create an expense with subcategory, source, and a different actualDate', async ({
     page,
     seedData,
   }) => {
+    const form = page.getByRole('form', { name: 'Форма транзакции' });
+
     await page.getByRole('button', { name: 'Добавить' }).click();
-
-    await page.getByRole('textbox', { name: 'Категория' }).click();
-    await page.getByRole('option', { name: 'Продукты' }).click();
-
-    await page.getByLabel('Сумма (€)').fill('50');
-
-    await page.getByRole('textbox', { name: 'Источник' }).click();
-    await page.getByRole('option', { name: 'Vivid' }).click();
-
-    await page
-      .getByRole('form', { name: 'Форма транзакции' })
-      .getByRole('button', { name: 'Добавить' })
-      .click();
-
-    // Sidebar closes on success; table shows the new row
-    await verifyTransactionInTable(page, {
-      categoryId: seedData.categoryIds.продукты,
-      cost: -50,
-      sourceName: 'Vivid',
-    });
-  });
-
-  test('create an expense with subcategory', async ({ page, seedData }) => {
-    await page.getByRole('button', { name: 'Добавить' }).click();
-
-    await page.getByRole('textbox', { name: 'Категория' }).click();
-    await page.getByRole('option', { name: 'Транспорт' }).click();
-
-    await page.getByRole('textbox', { name: 'Подкатегория' }).click();
-    await page.getByRole('option', { name: 'Такси' }).click();
-
+    await selectOption(page, 'Категория', 'Транспорт');
+    await selectOption(page, 'Подкатегория', 'Такси');
     await page.getByLabel('Сумма (€)').fill('30');
+    await selectOption(page, 'Источник', 'Vivid');
 
+    // Set actualDate to previous month — row must still appear in the current month
     await page
-      .getByRole('form', { name: 'Форма транзакции' })
-      .getByRole('button', { name: 'Добавить' })
+      .getByRole('button', { name: 'Реальная дата отличается' })
+      .click();
+    await page.getByLabel('Реальная дата').click();
+    await page.locator('button[data-direction="previous"]').click();
+    await page
+      .locator('button:not([data-direction]):not([data-outside])', {
+        hasText: /^15$/,
+      })
+      .first()
       .click();
 
-    // Leaf row has the correct subcategoryId
-    await verifyTransactionInTable(page, {
+    await form.getByRole('button', { name: 'Добавить' }).click();
+
+    const row = await findTransactionRow(page, {
       categoryId: seedData.categoryIds.транспорт,
       subcategoryId: seedData.subcategoryIds.такси,
-      cost: -30,
     });
+    await expect(row.getByText('-€30.00')).toBeVisible();
+    await expect(row.getByText('Vivid')).toBeVisible();
 
-    // Enable group-by-subcategories; the subcategory group row appears
     await page.getByLabel('Сгруппировать по подкатегориям').click();
     await expect(
-      page.locator(`.${transactionNameCellClass}:not([data-category-id])`, {
+      page.locator(`.${transactionNameCellClass}[data-testing-depth="2"]`, {
         hasText: 'Такси',
       }),
     ).toBeVisible();
@@ -121,9 +98,7 @@ test.describe('Transactions', () => {
       .locator('input[value="income"]')
       .dispatchEvent('click');
 
-    await page.getByRole('textbox', { name: 'Категория' }).click();
-    await page.getByRole('option', { name: 'Зарплата' }).click();
-
+    await selectOption(page, 'Категория', 'Зарплата');
     await page.getByLabel('Сумма (€)').fill('2000');
 
     await page
@@ -131,45 +106,11 @@ test.describe('Transactions', () => {
       .getByRole('button', { name: 'Добавить' })
       .click();
 
-    // Income rows show a positive cost — no minus sign
-    await verifyTransactionInTable(page, {
+    const row = await findTransactionRow(page, {
       categoryId: seedData.categoryIds.зарплата,
-      cost: 2000,
     });
-  });
-
-  test('create an expense with actualDate in a different month', async ({
-    page,
-    seedData,
-  }) => {
-    await page.getByRole('button', { name: 'Добавить' }).click();
-
-    await page.getByRole('textbox', { name: 'Категория' }).click();
-    await page.getByRole('option', { name: 'Продукты' }).click();
-
-    await page.getByLabel('Сумма (€)').fill('75');
-
-    // Reveal the actual date field and pick a date in the previous month
-    await page.getByRole('button', { name: 'Реальная дата отличается' }).click();
-    await page.getByLabel('Реальная дата').click();
-    // Navigate to the previous month in the calendar popup
-    await page.locator('button[data-direction="previous"]').click();
-    // Pick day 15 — safe for all months; exclude [data-outside] (adjacent-month) days
-    await page
-      .locator('button:not([data-direction]):not([data-outside])', { hasText: /^15$/ })
-      .first()
-      .click();
-
-    await page
-      .getByRole('form', { name: 'Форма транзакции' })
-      .getByRole('button', { name: 'Добавить' })
-      .click();
-
-    // Transaction still appears in the current month because 'date' (not actualDate) governs placement
-    await verifyTransactionInTable(page, {
-      categoryId: seedData.categoryIds.продукты,
-      cost: -75,
-    });
+    // Income rows show a positive cost — no minus sign
+    await expect(row.getByText('€2000.00')).toBeVisible();
   });
 
   test('create an expense with date in a previous month', async ({
@@ -180,7 +121,10 @@ test.describe('Transactions', () => {
 
     // Set the date to the previous month (day 15 — safe for all months).
     // Scoped to form because 'Дата' also appears in the table's sort/filter controls.
-    await page.getByRole('form', { name: 'Форма транзакции' }).getByLabel('Дата').click();
+    await page
+      .getByRole('form', { name: 'Форма транзакции' })
+      .getByLabel('Дата')
+      .click();
     await page.locator('button[data-direction="previous"]').click();
     await page
       .locator('button:not([data-direction]):not([data-outside])', {
@@ -189,8 +133,7 @@ test.describe('Transactions', () => {
       .first()
       .click();
 
-    await page.getByRole('textbox', { name: 'Категория' }).click();
-    await page.getByRole('option', { name: 'Продукты' }).click();
+    await selectOption(page, 'Категория', 'Продукты');
 
     await page.getByLabel('Сумма (€)').fill('100');
 
@@ -208,7 +151,7 @@ test.describe('Transactions', () => {
     // Transaction must NOT appear in the current month
     await expect(
       page.locator(
-        `.${transactionNameCellClass}[data-category-id="${seedData.categoryIds.продукты}"]`,
+        `.${transactionNameCellClass}[data-testing-category-id="${seedData.categoryIds.продукты}"]`,
         { hasText: 'прошлый месяц' },
       ),
     ).toHaveCount(0);
@@ -218,10 +161,10 @@ test.describe('Transactions', () => {
     await page.waitForLoadState('networkidle');
 
     // Now the row should be visible
-    await verifyTransactionInTable(page, {
+    const row = await findTransactionRow(page, {
       categoryId: seedData.categoryIds.продукты,
       name: 'прошлый месяц',
-      cost: -100,
     });
+    await expect(row.getByText('-€100.00')).toBeVisible();
   });
 });

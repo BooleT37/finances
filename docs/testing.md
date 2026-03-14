@@ -1,4 +1,16 @@
-# E2E Testing with Playwright
+# Testing
+
+## Test Layers
+
+Three tiers, each with a different cost/confidence tradeoff:
+
+- **E2E (Playwright)** — cover core user flows through the real UI. Slow and consumes CI minutes. Combine cases aggressively: if multiple assertions can flow naturally in a single test without conflicting, put them in one test to minimize DB resets and total runtime.
+- **Component (React Testing Library)** — cover small, self-contained UI components with non-trivial branching logic. Fast and isolated. Keep each case in its own `test`/`it` block for clarity and precise failure attribution.
+- **Unit** — cover pure functions only. Fastest, zero setup cost. Same rule: one case per `test`/`it`.
+
+---
+
+## E2E Testing with Playwright
 
 ## Setup
 
@@ -58,6 +70,20 @@ Common signals:
 - Must reach into internal DOM structure of a UI library component
 
 In these cases, ask the user if they'd like to improve the code instead. Suggest the fix (e.g., "add `aria-label` to this component so it's addressable by role name") before writing the workaround. This keeps both the production code and test code clean.
+
+## Importing from Source
+
+It's fine to import test-specific constants from `src/` (e.g. a CSS class name exported for test targeting). Use **relative** imports — the `~` path alias is not resolved in the test environment:
+
+```ts
+// ✅ relative import — works
+import { transactionNameCellClass } from '../src/features/transactions/components/TransactionsTable/TransactionsTable';
+
+// ❌ alias import — not resolved in Playwright
+import { transactionNameCellClass } from '~/features/transactions/components/TransactionsTable/TransactionsTable';
+```
+
+Avoid importing utility functions (like formatters) from the production codebase into tests — either hardcode the expected value directly, or write a minimal local helper if the logic is non-trivial.
 
 ## Playwright MCP Server
 

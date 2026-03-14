@@ -27,7 +27,7 @@ import { useTransactionTableColumns } from './columns/useTransactionTableColumns
 import { flashEffectAtom, flashStateAtom } from './flashTransaction';
 import { RowActions } from './RowActions';
 
-export const transactionNameCellClassName = 'transaction-name-cell';
+export const transactionNameCellClass = 'transaction-name-cell';
 
 function getRowBgColor(depth: number) {
   if (depth === 0) {
@@ -108,11 +108,12 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
             align="center"
             gap="xs"
             wrap="nowrap"
-            className={transactionNameCellClassName}
-            data-category-id={
+            className={transactionNameCellClass}
+            data-testing-depth={row.depth}
+            data-testing-category-id={
               row.getIsGrouped() ? undefined : row.original.categoryId
             }
-            data-subcategory-id={
+            data-testing-subcategory-id={
               !row.getIsGrouped() && row.original.subcategoryId !== null
                 ? row.original.subcategoryId
                 : undefined
