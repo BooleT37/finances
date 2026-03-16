@@ -81,6 +81,22 @@ npm run lint:fix && npm run format
 
 Pre-commit hooks (Husky + lint-staged) run automatically on `git commit` — ESLint check + Prettier check on staged `src/**/*.{ts,tsx}` files, then a full `tsc --noEmit`. The commit is blocked if any check fails.
 
+## Commits
+
+Use **atomic commits** (one logical change per commit) and **[conventional commits](https://www.conventionalcommits.org/en/v1.0.0/)** format:
+
+```
+<type>[optional scope]: <description>
+```
+
+Common types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `style`, `perf`, `build`, `ci`
+
+Examples:
+- `feat(transactions): add cost sign flip on category change`
+- `fix(forecasts): correct sum negation for income categories`
+- `test(e2e): add unsaved-changes confirm dialog test`
+- `chore: update dependencies`
+
 ## Testing
 
 Run E2E tests (starts dev server automatically):
