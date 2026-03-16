@@ -8,5 +8,18 @@
       "Bash(npx prettier:*)",
       "Bash(npx playwright:*)"
     ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path' | xargs prettier --write"
+          }
+        ]
+      }
+    ]
   }
 }
