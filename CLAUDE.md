@@ -45,10 +45,6 @@ Each feature has a dedicated documentation file at `src/features/{feature}/{FEAT
 - [Subscriptions](src/features/subscriptions/SUBSCRIPTIONS.md)
 - [Saving Spendings](src/features/savingSpendings/SAVING_SPENDINGS.md)
 
-### Testing
-
-- **[Testing](docs/testing.md)** - Playwright E2E setup, writing tests, Mantine interaction patterns, MCP server
-
 ## Development
 
 ```bash
