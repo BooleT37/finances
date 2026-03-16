@@ -24,12 +24,12 @@ import {
   viewModeAtom,
 } from '~/stores/month';
 
-import { costWithoutComponents } from './costWithoutComponents';
-import type { Transaction } from './schema';
+import type { Transaction } from '../../schema';
+import { costWithoutComponents } from '../../utils/costWithoutComponents';
 import {
   type TransactionTableItem,
   UPCOMING_SUBSCRIPTION_ID,
-} from './transactionTableItem';
+} from '../TransactionsTable/TransactionsTable.types';
 
 type CategoryMap = Record<string, Category>;
 type SourceMap = Record<string, Source>;

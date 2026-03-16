@@ -22,10 +22,10 @@ import {
   viewModeAtom,
 } from '~/stores/month';
 
-import type { TransactionTableItem } from '../../transactionTableItem';
 import { useTransactionTableColumns } from './columns/useTransactionTableColumns';
 import { flashEffectAtom, flashStateAtom } from './flashTransaction';
 import { RowActions } from './RowActions';
+import type { TransactionTableItem } from './TransactionsTable.types';
 
 export const transactionNameCellClass = 'transaction-name-cell';
 

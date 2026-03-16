@@ -3,7 +3,7 @@ import { atomEffect } from 'jotai-effect';
 import type { MRT_TableInstance } from 'mantine-react-table';
 
 import type { Transaction } from '../../schema';
-import type { TransactionTableItem } from '../../transactionTableItem';
+import type { TransactionTableItem } from './TransactionsTable.types';
 
 export const insertedTransactionAtom = atom<Transaction | null>(null);
 

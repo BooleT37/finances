@@ -7,7 +7,7 @@ import { getCategoryMapQueryOptions } from '~/features/categories/facets/categor
 import { costToDiffString, costToString } from '~/shared/utils/costToString';
 import { divideWithFallbackToOne } from '~/shared/utils/divideWithFallbackToOne';
 
-import type { CostCol } from '../../../../transactionTableItem';
+import type { CostCol } from '../../TransactionsTable.types';
 import { CostCellView } from './CostCellView';
 import { useGetCostForecast } from './getCostForecast';
 import { TotalCostCellView } from './TotalCostCellView';

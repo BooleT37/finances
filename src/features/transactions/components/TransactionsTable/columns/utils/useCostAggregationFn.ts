@@ -5,7 +5,7 @@ import { useCallback } from 'react';
 import type {
   CostCol,
   TransactionTableItem,
-} from '~/features/transactions/transactionTableItem';
+} from '~/features/transactions/components/TransactionsTable/TransactionsTable.types';
 
 export const useCostAggregationFn = () =>
   useCallback(

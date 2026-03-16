@@ -18,11 +18,11 @@ import { useTranslation } from 'react-i18next';
 import { getUserSettingsQueryOptions } from '~/features/userSettings/queries';
 import { transactionSearchAtom } from '~/stores/month';
 
-import { useTransactionTableItems } from '../useTransactionTableItems';
-import { ImportModal } from './ImportModal';
-import { TransactionSidebar } from './TransactionSidebar/TransactionSidebar';
-import { TransactionSidebarMolecule } from './TransactionSidebar/transactionSidebarMolecule';
-import { TransactionTable } from './TransactionsTable/TransactionsTable';
+import { ImportModal } from '../ImportModal';
+import { TransactionSidebar } from '../TransactionSidebar/TransactionSidebar';
+import { TransactionSidebarMolecule } from '../TransactionSidebar/transactionSidebarMolecule';
+import { TransactionTable } from '../TransactionsTable/TransactionsTable';
+import { useTransactionTableItems } from './useTransactionTableItems';
 
 const sidebarWidth = 300;
 
