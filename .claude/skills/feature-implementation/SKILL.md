@@ -47,7 +47,7 @@ Ask the user to approve the plan before starting implementation.
 
 ## Step 3 — Implementation
 
-Implement the plan commit by commit, in order. Commit only the files relevant to that step. Husky runs code checks like typescript and eslint before each commit, make sure to fix the issues before proceeding further
+Implement the plan commit by commit, in order. Commit only the files relevant to that step. Before every commit: stop and show the user a summary of the changes in the working directory. Wait for explicit approval before committing. Husky runs code checks like typescript and eslint before each commit, make sure to fix the issues before proceeding further.
 
 Do not batch unrelated changes into a single commit. If you discover mid-implementation that the plan needs to change, pause and discuss with the user before continuing.
 
