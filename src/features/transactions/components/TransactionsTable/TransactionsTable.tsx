@@ -16,11 +16,6 @@ import {
   useSortAllCategoriesById,
   useSortSubcategories,
 } from '~/features/categories/facets/categoriesOrder';
-import {
-  selectedMonthNumberAtom,
-  selectedYearAtom,
-  viewModeAtom,
-} from '~/stores/month';
 
 import { useTransactionTableColumns } from './columns/useTransactionTableColumns';
 import { flashEffectAtom, flashStateAtom } from './flashTransaction';
@@ -46,13 +41,7 @@ interface Props {
 
 export function TransactionTable({ items, groupBySubcategories }: Props) {
   const { t } = useTranslation('transactions');
-  const year = useAtomValue(selectedYearAtom);
-  // selectedMonthNumberAtom is 1-based; dayjs months are 0-based
-  const month = useAtomValue(selectedMonthNumberAtom) - 1;
-  const viewMode = useAtomValue(viewModeAtom);
-  const isRangePicker = viewMode === 'year';
-
-  const columns = useTransactionTableColumns({ month, year, isRangePicker });
+  const columns = useTransactionTableColumns();
   const sortAllCategoriesById = useSortAllCategoriesById();
   const sortSubcategories = useSortSubcategories();
 

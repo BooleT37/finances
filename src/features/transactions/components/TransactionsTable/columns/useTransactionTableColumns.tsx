@@ -5,31 +5,13 @@ import { useTranslation } from 'react-i18next';
 import type { TransactionTableItem } from '../TransactionsTable.types';
 import { CostAggregatedCellRenderer } from './CostCellRenderer/CostAggregatedCellRenderer';
 import { CostCellRenderer } from './CostCellRenderer/CostCellRenderer';
-import { getPassedDaysRatio } from './utils/getPassedDaysRatio';
 import { useCostAggregationFn } from './utils/useCostAggregationFn';
 
 const columnHelper = createMRTColumnHelper<TransactionTableItem>();
 
-export const useTransactionTableColumns = ({
-  month,
-  year,
-  isRangePicker,
-}: {
-  month: number;
-  year: number;
-  isRangePicker: boolean;
-}) => {
+export const useTransactionTableColumns = () => {
   const { t } = useTranslation('transactions');
   const costAggregationFn = useCostAggregationFn();
-  const passedDaysRatio = useMemo(
-    () =>
-      getPassedDaysRatio({
-        currentMonth: month,
-        currentYear: year,
-        isRangePicker,
-      }),
-    [month, year, isRangePicker],
-  );
 
   return useMemo(
     () => [
@@ -51,7 +33,6 @@ export const useTransactionTableColumns = ({
         aggregationFn: costAggregationFn,
         AggregatedCell: ({ cell, row }) => (
           <CostAggregatedCellRenderer
-            passedDaysRatio={passedDaysRatio}
             value={cell.getValue()}
             isIncome={row.original.isIncome}
             isContinuous={row.original.isContinuous}
@@ -64,9 +45,6 @@ export const useTransactionTableColumns = ({
             subcategoryId={
               row.getGroupingValue('subcategoryId') as number | undefined
             }
-            isRangePicker={isRangePicker}
-            month={month}
-            year={year}
           />
         ),
         Cell: ({ cell }) => <CostCellRenderer value={cell.getValue()} />,
@@ -86,6 +64,6 @@ export const useTransactionTableColumns = ({
         sortingFn: 'sortCategories' as never,
       }),
     ],
-    [costAggregationFn, isRangePicker, month, passedDaysRatio, t, year],
+    [costAggregationFn, t],
   );
 };

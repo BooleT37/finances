@@ -4,7 +4,6 @@ import { useAtomValue } from 'jotai';
 import { useCallback } from 'react';
 
 import { getCategoryMapQueryOptions } from '~/features/categories/facets/categoryMap';
-import type { Category } from '~/features/categories/schema';
 import { getCategoryForecastsQueryOptions } from '~/features/forecasts/facets/categoryForecasts';
 import { getSubcategoryForecastsQueryOptions } from '~/features/forecasts/facets/subcategoryForecasts';
 import { findCategoryForecast } from '~/features/forecasts/utils/findCategoryForecast';
@@ -18,7 +17,6 @@ import { selectedYearAtom } from '~/stores/month';
 
 interface Params {
   categoryId: number | undefined;
-  categoryType: Category['type'];
   subcategoryId: number | undefined;
   isSubcategoryRow: boolean;
   month: number;
@@ -47,28 +45,30 @@ export function useGetCostForecast() {
         return undefined;
       }
 
-      const {
-        categoryId,
-        categoryType,
-        subcategoryId,
-        isSubcategoryRow,
-        month,
-        isIncome,
-      } = params;
+      const { categoryId, subcategoryId, isSubcategoryRow, month, isIncome } =
+        params;
 
       if (categoryId === undefined) {
         return decimalSum(
           ...categoryForecasts
-            .filter(
-              (f) =>
+            .filter((f) => {
+              const category = getOrThrow(
+                categoryMap,
+                f.categoryId,
+                'Category',
+              );
+              return (
                 f.month === month &&
                 f.year === params.year &&
-                getOrThrow(categoryMap, f.categoryId, 'Category').isIncome ===
-                  isIncome,
-            )
+                category.isIncome === isIncome &&
+                category.type !== 'FROM_SAVINGS'
+              );
+            })
             .map((f) => f.sum),
         );
       }
+
+      const categoryType = getOrThrow(categoryMap, categoryId, 'Category').type;
 
       if (categoryType === 'FROM_SAVINGS') {
         if (!savingSpendingCategoryMap || !transactions) {

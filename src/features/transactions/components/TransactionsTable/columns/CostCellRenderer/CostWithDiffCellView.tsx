@@ -10,7 +10,7 @@ interface Props {
   tooltip?: ReactNode;
 }
 
-export function TotalCostCellView({
+export function CostWithDiffCellView({
   cost,
   suffix,
   color,
