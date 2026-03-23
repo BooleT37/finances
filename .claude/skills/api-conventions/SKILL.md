@@ -40,6 +40,42 @@ export const getFeatureMapQueryOptions = () =>
 
 File naming does not double the exported function name exactly and instead follows the derivation purpose (e.g. `categoryMap.ts`, `subcategoryMap.ts`, `transactionMap.ts`). One file per function unless functions are logically connected.
 
+## Zod codecs: how encode/decode work
+
+`z.codec(inputSchema, outputSchema, { decode, encode })` creates a bidirectional transformation between a wire type and a client type. It is used as a **field value** inside `z.object()`:
+
+```ts
+const decimalCodec = z.codec(z.string(), z.custom<Decimal>(...), {
+  decode: (s) => new Decimal(s),   // wire → client
+  encode: (d) => d.toString(),     // client → wire
+});
+```
+
+**All Zod schemas have `.decode()` and `.encode()` methods** — not just schemas that contain codec fields. For a plain `z.object()` with no codec fields, `.decode()` behaves identically to `.parse()` (validates and returns the input unchanged), and `.encode()` is a no-op. This is why `categorySchema.decode(c)` works even though `categorySchema` has no codec fields — it's equivalent to `categorySchema.parse(c)`.
+
+When an object schema contains one or more codec fields, `.decode()` and `.encode()` recursively apply the codec transforms to those fields, leaving non-codec fields unchanged. So:
+
+```ts
+const schema = z.object({ id: z.number(), cost: decimalCodec });
+
+schema.decode({ id: 1, cost: "9.99" })   // → { id: 1, cost: Decimal("9.99") }
+schema.encode({ id: 1, cost: Decimal("9.99") }) // → { id: 1, cost: "9.99" }
+```
+
+**Type safety:** unlike `.parse()` which accepts `unknown`, `.decode()` and `.encode()` accept **strongly-typed inputs**:
+- `.decode()` accepts `z.input<typeof schema>` (the wire type)
+- `.encode()` accepts `z.output<typeof schema>` (the client type)
+
+This catches mismatches at compile time.
+
+**`z.input` vs `z.output`:**
+- For schemas **with** codec fields: `z.input` = wire type (e.g. `{ cost: string }`), `z.output` = client type (e.g. `{ cost: Decimal }`) — they diverge
+- For schemas **without** codec fields: `z.input` and `z.output` are identical
+
+**Testing note:** when mocking a server function that returns wire data, the mock value should match `z.input<typeof schema>` (the wire format). The `queryFn` then calls `.decode()` on it to produce the client type. For schemas without codec fields (like `categorySchema`), wire and client types are the same, so you can pass plain objects directly.
+
+---
+
 ## Zod schemas: encode/decode with codecs
 
 Each feature that transfers data between server and client defines a `schema.ts` using Zod codec properties for bidirectional type-safe serialization:

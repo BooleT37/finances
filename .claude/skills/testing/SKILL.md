@@ -125,9 +125,28 @@ vi.mock('../src/features/categories/api', () => ({
 
 beforeEach(() => {
   vi.mocked(fetchAllCategories).mockResolvedValue([
-    { id: 1, name: 'Продукты', isIncome: false, /* ... */ },
+    { id: 1, name: 'Продукты', isIncome: false /* ... */ },
   ]);
 });
 ```
 
 This lets the TanStack Query layer (`queryOptions`, `select` transforms, caching) work normally — only the network boundary is replaced. Never mock `queryOptions` functions directly, as that skips the data-transform logic the component depends on.
+
+Always use a **factory function** in `vi.mock` (not auto-mock) for server functions created with `createServerFn`, as auto-mock may not handle their shape correctly:
+
+```ts
+// ✅ explicit factory — reliable
+vi.mock('~/features/categories/api', () => ({
+  fetchAllCategories: vi.fn(),
+}));
+
+// ❌ auto-mock — may silently fail to intercept createServerFn calls
+vi.mock('~/features/categories/api');
+```
+
+### Language and entity names in tests
+
+The app is configured with Russian as the default locale. Always:
+
+- **Assert against Russian translations**, not English. Check `src/features/{feature}/locales/ru/{feature}.json` for the exact strings.
+- **Use Russian names for mocked entities** (categories, sources, etc.) — e.g. `'Продукты'` not `'Food'`. This is closer to production, and catches bugs where a component accidentally renders a key instead of a translated value.
