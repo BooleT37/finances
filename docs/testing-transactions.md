@@ -16,7 +16,7 @@ Do not aim for 100% coverage. Prioritise cases where a silent regression would b
 
 ## Transactions
 
-### E2E (`e2e/transactions.spec.ts`)
+### E2E (`e2e/transactions.spec.ts`) ✅
 
 #### Create transaction
 
@@ -36,7 +36,7 @@ Do not aim for 100% coverage. Prioritise cases where a silent regression would b
 
 ### Component tests (RTL)
 
-#### `useCostAggregatedCell` (to be extracted from `CostAggregatedCellRenderer`)
+#### `useCostAggregatedCell` (to be extracted from `CostAggregatedCellRenderer`) ⬜
 
 `CostAggregatedCellRenderer` contains significant business logic (forecast comparison, bar width/offset, `exceedingForecast`, color, tooltip) that is currently untested. The plan:
 
@@ -59,7 +59,7 @@ Do not aim for 100% coverage. Prioritise cases where a silent regression would b
 
 ## Components
 
-### E2E
+### E2E ⬜
 
 | # | Combined cases | Key assertions |
 |---|----------------|----------------|
@@ -69,7 +69,7 @@ Do not aim for 100% coverage. Prioritise cases where a silent regression would b
 
 ### Component tests (RTL)
 
-#### `ComponentsHint` (`TransactionSidebarForm/fields/CostField/ComponentsHint.tsx`)
+#### `ComponentsHint` (`TransactionSidebarForm/fields/CostField/ComponentsHint.tsx`) ✅ [`ComponentsHint.test.tsx`](../src/features/transactions/components/TransactionSidebar/TransactionSidebarForm/fields/CostField/ComponentsHint.test.tsx)
 
 > Requires mocking `fetchAllCategories` (the server function) to provide category data — see the Component Tests mocking convention in `docs/testing.md`. The sign of the parent `cost` prop is irrelevant — the component uses `cost.abs()` for the remainder, so an income parent and an expense parent with the same magnitude produce the same output. The sign of each component's cost is determined by its category's `isIncome` flag (expense → negative, income → positive).
 
@@ -84,7 +84,7 @@ Do not aim for 100% coverage. Prioritise cases where a silent regression would b
 
 ### Unit tests
 
-#### `costWithoutComponents` (`costWithoutComponents.ts`)
+#### `costWithoutComponents` (`costWithoutComponents.ts`) ✅ [`costWithoutComponents.test.ts`](../src/features/transactions/utils/costWithoutComponents.test.ts)
 
 | # | Case |
 |---|------|
@@ -98,7 +98,7 @@ Do not aim for 100% coverage. Prioritise cases where a silent regression would b
 
 ## Subscriptions
 
-### E2E
+### E2E ⬜
 
 | # | Combined cases | Key assertions |
 |---|----------------|----------------|
@@ -108,7 +108,7 @@ Do not aim for 100% coverage. Prioritise cases where a silent regression would b
 
 ### Component tests (RTL)
 
-#### `useAvailableSubscriptions` (`subscriptions/facets/availableSubscriptions.ts`)
+#### `useAvailableSubscriptions` (`subscriptions/facets/availableSubscriptions.ts`) ⬜
 
 > Requires mocking `fetchAllSubscriptions` and `fetchTransactionsByYear` server functions and providing Jotai atom values via a test wrapper. Use `renderHook`.
 
@@ -127,7 +127,7 @@ Do not aim for 100% coverage. Prioritise cases where a silent regression would b
 
 ### Component tests (RTL)
 
-#### `SourceLastTransactions` (`TransactionSidebarForm/fields/SourceField/SourceLastTransactions.tsx`)
+#### `SourceLastTransactions` (`TransactionSidebarForm/fields/SourceField/SourceLastTransactions.tsx`) ✅ [`SourceLastTransactions.test.tsx`](../src/features/transactions/components/TransactionSidebar/TransactionSidebarForm/fields/SourceField/SourceLastTransactions.test.tsx)
 
 > Requires mocking `fetchTransactionsByYear` and `fetchAllCategories` server functions. Provide `selectedYearAtom` via a Jotai atom wrapper.
 
@@ -149,7 +149,7 @@ Seed requirements:
 - **Event B** — active, multiple categories (e.g. "Flight", "Accommodation")
 - **Event C** — completed
 
-### E2E (`e2e/transactions.spec.ts`)
+### E2E (`e2e/transactions.spec.ts`) ⬜
 
 #### Creating a from-savings transaction
 
