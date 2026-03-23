@@ -12,3 +12,5 @@ tsconfig
 bunshi
 networkidle
 radiogroup
+dom
+vitest
