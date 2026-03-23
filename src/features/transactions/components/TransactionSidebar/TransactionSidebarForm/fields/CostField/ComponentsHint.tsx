@@ -62,7 +62,7 @@ export function ComponentsHint({ cost, components }: Props) {
 
   if (components.length === 1 && componentLabels[0]) {
     return (
-      <Text size="xs" c="dimmed">
+      <Text span size="xs" c="dimmed">
         {t('components.hint.ofWhich', {
           cost: costToString(componentLabels[0].cost),
           category: componentLabels[0].category,
@@ -76,7 +76,7 @@ export function ComponentsHint({ cost, components }: Props) {
     .minus(decimalSum(...componentLabels.map((c) => c.cost)));
 
   return (
-    <Text size="xs" c="dimmed">
+    <Text span size="xs" c="dimmed">
       {t('components.hint.ofWhichMultiple')}
       <ul style={{ margin: '2px 0 0', paddingLeft: '1.2em' }}>
         {componentLabels.map((item, i) => (
