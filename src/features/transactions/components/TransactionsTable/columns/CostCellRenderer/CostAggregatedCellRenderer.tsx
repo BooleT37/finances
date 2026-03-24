@@ -1,25 +1,31 @@
 import { Stack } from '@mantine/core';
 import { Decimal } from 'decimal.js';
+import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
-import { costToString } from '~/shared/utils/costToString';
+import { costToDiffString, costToString } from '~/shared/utils/costToString';
+import {
+  selectedMonth0BasedAtom,
+  selectedYearAtom,
+  viewModeAtom,
+} from '~/stores/month';
 
-import type { CostCol } from '../../TransactionsTable.types';
+import type { CostColValue } from '../../TransactionsTable.types';
 import { CostCellView } from './CostCellView';
 import { CostWithDiffCellView } from './CostWithDiffCellView';
+import { getCostAggregatedCell } from './getCostAggregatedCell';
 import {
   type GetCostForecastParams,
   useGetCostForecast,
 } from './getCostForecast';
-import { useCostAggregatedCell } from './useCostAggregatedCell';
 
 interface Props extends GetCostForecastParams {
-  value: CostCol | null;
+  value: CostColValue | null;
   isContinuous: boolean;
 }
 
 export function CostAggregatedCellRenderer({
-  value: col,
+  value,
   isRestRow,
   categoryId,
   subcategoryId,
@@ -37,45 +43,47 @@ export function CostAggregatedCellRenderer({
       isIncome,
     }) ?? new Decimal(0);
 
-  const result = useCostAggregatedCell({
-    col,
-    isContinuous,
-    forecast,
-  });
+  const isYearMode = useAtomValue(viewModeAtom) === 'year';
+  const year = useAtomValue(selectedYearAtom);
+  const month = useAtomValue(selectedMonth0BasedAtom);
 
-  if (!result) {
+  if (!value) {
     return null;
   }
 
-  if (!result.hasDiff) {
-    return (
-      <CostCellView
-        cost={result.costString}
-        isSubscription={result.isSubscription}
-        isUpcomingSubscription={result.isUpcomingSubscription}
-      />
-    );
+  const costString = costToString(value.cost);
+
+  if (isYearMode) {
+    return <CostCellView cost={costString} />;
   }
+
+  const result = getCostAggregatedCell({
+    value,
+    isContinuous,
+    forecast,
+    month,
+    year,
+  });
 
   return (
     <CostWithDiffCellView
-      cost={result.costString}
-      suffix={result.diffString}
+      cost={costString}
+      suffix={costToDiffString(result.diff)}
       color={result.color}
       barOffset={result.barOffset}
-      barWidth={result.barWidth}
+      barLength={result.barLength}
       tooltip={
-        result.exceedAmount !== undefined ? (
+        result.exceedingAmount !== undefined ? (
           <Stack gap={0}>
-            <div>{result.tooltip}</div>
+            <div>{t('forecast.plan', { value: costToString(forecast) })}</div>
             <div>
               {t('forecast.exceededBy', {
-                value: costToString(result.exceedAmount),
+                value: costToString(result.exceedingAmount),
               })}
             </div>
           </Stack>
         ) : (
-          result.tooltip
+          t('forecast.plan', { value: costToString(forecast) })
         )
       }
     />

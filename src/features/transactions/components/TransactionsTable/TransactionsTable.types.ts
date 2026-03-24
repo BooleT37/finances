@@ -3,8 +3,8 @@ import type Decimal from 'decimal.js';
 export const UPCOMING_SUBSCRIPTION_ID = -1;
 
 /** Mirrors CostCol from finances-t3/src/features/expense/Expense.ts */
-export interface CostCol {
-  value: Decimal;
+export interface CostColValue {
+  cost: Decimal;
   isSubscription?: boolean; // true for subscription expenses
   isUpcomingSubscription?: boolean;
   isIncome?: boolean;
@@ -16,7 +16,7 @@ export interface CostCol {
 export interface TransactionTableItem {
   id: number;
   name: string;
-  cost: CostCol | null;
+  cost: CostColValue | null;
   date: string; // formatted with DATE_FORMAT, e.g. '15.02.2026'
   category: string; // category.name
   categoryId: number;

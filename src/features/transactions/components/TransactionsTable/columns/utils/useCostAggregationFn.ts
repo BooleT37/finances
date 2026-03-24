@@ -3,22 +3,27 @@ import Decimal from 'decimal.js';
 import { useCallback } from 'react';
 
 import type {
-  CostCol,
+  CostColValue,
   TransactionTableItem,
 } from '~/features/transactions/components/TransactionsTable/TransactionsTable.types';
 
 export const useCostAggregationFn = () =>
   useCallback(
-    (_columnId: string, rows: Row<TransactionTableItem>[]): CostCol => {
+    (_columnId: string, rows: Row<TransactionTableItem>[]): CostColValue => {
       const value = rows.reduce(
         (a, c) =>
           c.original.isUpcomingSubscription
             ? a
-            : a.add(c.original.cost?.value ?? 0),
+            : a.add(c.original.cost?.cost ?? 0),
         new Decimal(0),
       );
 
-      return { value };
+      return {
+        cost: value,
+        isIncome: rows[0].original.isIncome,
+        isSubscription: false,
+        isUpcomingSubscription: false,
+      };
     },
     [],
   );

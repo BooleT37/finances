@@ -5,7 +5,7 @@ interface Props {
   cost: string;
   suffix: string;
   color: 'red' | 'orange' | 'green';
-  barWidth: number;
+  barLength: number;
   barOffset?: number;
   tooltip?: ReactNode;
 }
@@ -15,7 +15,7 @@ export function CostWithDiffCellView({
   suffix,
   color,
   barOffset = 0,
-  barWidth,
+  barLength,
   tooltip,
 }: Props) {
   return (
@@ -40,7 +40,7 @@ export function CostWithDiffCellView({
           style={{
             height: 2,
             backgroundColor: color,
-            width: `${barWidth * 100}%`,
+            width: `${barLength * 100}%`,
             marginLeft: `${barOffset * 100}%`,
           }}
         />

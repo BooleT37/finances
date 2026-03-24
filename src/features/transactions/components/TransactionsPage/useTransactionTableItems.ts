@@ -112,7 +112,7 @@ function mapTransaction(
     id: tx.id,
     name: tableDataName(tx, savingSpendingCategoryMap, savingSpendingMap),
     cost: {
-      value: costWithoutComponents(tx.cost, tx.components),
+      cost: costWithoutComponents(tx.cost, tx.components),
       isSubscription: tx.subscriptionId !== null,
       isIncome: category.isIncome,
       costWithComponents: tx.components.length > 0 ? tx.cost : undefined,
@@ -149,7 +149,7 @@ function mapSubscription(
     id: UPCOMING_SUBSCRIPTION_ID,
     name: s.name,
     cost: {
-      value: s.cost,
+      cost: s.cost,
       isSubscription: true,
       isUpcomingSubscription: true,
       isIncome: category.isIncome,
@@ -212,7 +212,7 @@ function useMapComponents() {
           id: c.id,
           name,
           cost: {
-            value: c.cost,
+            cost: c.cost,
             isSubscription: false,
             isUpcomingSubscription: false,
             isIncome: category.isIncome,
