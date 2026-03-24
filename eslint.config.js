@@ -28,6 +28,7 @@ export default defineConfig(
   {
     rules: {
       curly: ['error', 'all'],
+      'object-shorthand': 'error',
     },
   },
   {
