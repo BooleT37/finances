@@ -144,9 +144,13 @@ vi.mock('~/features/categories/api', () => ({
 vi.mock('~/features/categories/api');
 ```
 
+### Read feature docs before writing mocks
+
+Before implementing mocks for a feature's entities, read `src/features/{feature}/{FEATURE}.md`. Feature docs describe domain concepts, distinctions between similarly-named entities, and business rules that are not obvious from type names alone. Getting the mock data wrong (e.g. confusing `Category` with `SavingSpendingCategory`) produces tests that pass but don't reflect production behaviour.
+
 ### Language and entity names in tests
 
 The app is configured with Russian as the default locale. Always:
 
 - **Assert against Russian translations**, not English. Check `src/features/{feature}/locales/ru/{feature}.json` for the exact strings.
-- **Use Russian names for mocked entities** (categories, sources, etc.) — e.g. `'Продукты'` not `'Food'`. This is closer to production, and catches bugs where a component accidentally renders a key instead of a translated value.
+- **Use Russian names for mocked entities** (categories, sources, etc.) — e.g. `'Продукты'` not `'Food'`. This is closer to production, and catches bugs where a component accidentally renders a key instead of a translated value. Translate "FROM_SAVINGS" category as "Из сбережений"

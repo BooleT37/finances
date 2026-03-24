@@ -22,6 +22,8 @@ Each saving spending event has a list of categories (e.g. "Flight", "Transport",
 
 Saving event categories are distinct from `TO_SAVINGS` subcategories. Subcategories represent continuous saving streams, while event categories represent the breakdown of a specific, time-limited spending event.
 
+> **`SavingSpendingCategory` is not a `Category`.** Despite similar naming, these are entirely separate entities. A `Category` (with `type === 'FROM_SAVINGS'`) is a transaction category that marks an expense as paid from savings. A `SavingSpendingCategory` is a budget line within a saving spending event (e.g. "Билеты", "Отель") with its own `forecast` amount. One is about classifying a transaction; the other is about breaking down a savings goal.
+
 ### Completion
 
 A saving spending event can be marked as **completed**, which prevents new transactions from being assigned to it.
