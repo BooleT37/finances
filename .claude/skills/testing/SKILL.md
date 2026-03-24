@@ -11,6 +11,18 @@ Three tiers, each with a different cost/confidence tradeoff:
 - **Component (React Testing Library)** — cover small, self-contained UI components with non-trivial branching logic. Fast and isolated. Keep each case in its own `test`/`it` block for clarity and precise failure attribution.
 - **Unit** — cover pure functions only. Fastest, zero setup cost. Same rule: one case per `test`/`it`.
 
+### Fixed test date
+
+`getToday()` (`~/shared/utils/today`) returns a **fixed date when `NODE_ENV === 'test'`**: April 15, 2024. The constants are exported:
+
+```ts
+import { TODAY_DAY, TODAY_MONTH, TODAY_YEAR } from '~/shared/utils/today';
+// TODAY_YEAR=2024, TODAY_MONTH=3 (0-based April, 30 days), TODAY_DAY=15
+// passedDaysRatio for current month = 15/30 = 0.5
+```
+
+Use these constants in unit tests that depend on date logic — **no mocking needed**. Pass `month=TODAY_MONTH, year=TODAY_YEAR` for "current month" scenarios, any other date for "past month".
+
 ---
 
 ## E2E Testing with Playwright

@@ -14,7 +14,7 @@ export interface GetCostAggregatedCellResult {
   /** How long the colored bar is, in % */
   barLength: number;
   /** For over budget costs, we put the red bar to the right side, offset indicates where it starts, in % */
-  barOffset?: number;
+  barOffset: number;
   /** For exceeding (but not yet over budget) continuous forecasts, this is the amount the forecast is exceeding by */
   exceedingAmount?: Decimal;
 }
@@ -46,6 +46,13 @@ export function getCostAggregatedCell({
   const costNumber = value.cost.toNumber();
   const color: 'green' | 'red' = diff.isNeg() ? 'red' : 'green';
 
+  if (forecastNumber !== 0 && costNumber * forecastNumber < 0) {
+    console.warn(
+      'getCostAggregatedCell: cost and forecast have opposite signs',
+      { cost: costNumber, forecast: forecastNumber },
+    );
+  }
+
   if (value.cost.abs().lessThanOrEqualTo(forecast.abs())) {
     const spentRatio = divideWithFallbackToOne(costNumber, forecastNumber);
     const exceedingForecast =
@@ -55,6 +62,7 @@ export function getCostAggregatedCell({
       return {
         diff,
         color: 'orange',
+        barOffset: 0,
         barLength: spentRatio,
         exceedingAmount: new Decimal(
           Math.abs(costNumber - passedDaysRatio * forecastNumber),
@@ -65,6 +73,7 @@ export function getCostAggregatedCell({
     return {
       diff,
       color,
+      barOffset: 0,
       barLength: spentRatio,
     };
   }

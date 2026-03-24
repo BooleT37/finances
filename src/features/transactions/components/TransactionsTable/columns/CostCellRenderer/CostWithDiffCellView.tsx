@@ -6,7 +6,7 @@ interface Props {
   suffix: string;
   color: 'red' | 'orange' | 'green';
   barLength: number;
-  barOffset?: number;
+  barOffset: number;
   tooltip?: ReactNode;
 }
 
@@ -14,7 +14,7 @@ export function CostWithDiffCellView({
   cost,
   suffix,
   color,
-  barOffset = 0,
+  barOffset,
   barLength,
   tooltip,
 }: Props) {
