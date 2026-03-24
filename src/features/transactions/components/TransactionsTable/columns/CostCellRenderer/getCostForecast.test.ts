@@ -1,27 +1,16 @@
 import Decimal from 'decimal.js';
-import { vi } from 'vitest';
+import { indexBy, prop } from 'ramda';
 
-import { fetchAllCategories } from '~/features/categories/api';
-import type { CategoryWire } from '~/features/categories/schema';
-import { fetchForecastsByYear } from '~/features/forecasts/api';
-import type { ForecastWire } from '~/features/forecasts/schema';
-import { fetchAllSavingSpendings } from '~/features/savingSpendings/api';
-import type { SavingSpendingWire } from '~/features/savingSpendings/schema';
-import { renderHook, waitFor } from '~/test/render';
+import type { Category } from '~/features/categories/schema';
+import type { Forecast } from '~/features/forecasts/schema';
+import type { SavingSpending } from '~/features/savingSpendings/schema';
 
-import { useGetCostForecast } from './getCostForecast';
+import { getCostForecast } from './getCostForecast';
 
-vi.mock('~/features/forecasts/api', () => ({ fetchForecastsByYear: vi.fn() }));
-vi.mock('~/features/categories/api', () => ({ fetchAllCategories: vi.fn() }));
-vi.mock('~/features/savingSpendings/api', () => ({
-  fetchAllSavingSpendings: vi.fn(),
-}));
-
-// Matches '2026-03' in localStorage: year=2026, month=2 (0-based March)
 const YEAR = 2026;
-const MONTH = 2;
+const MONTH = 2; // 0-based March
 
-const mockCategories: CategoryWire[] = [
+const mockCategories: Category[] = [
   {
     id: 1,
     name: 'Продукты',
@@ -77,17 +66,20 @@ const mockCategories: CategoryWire[] = [
   },
 ];
 
+const mockCategoryMap = indexBy(prop('id'), mockCategories);
+
 function makeForecast(
-  forecast: Omit<ForecastWire, 'month' | 'year'>,
-): ForecastWire {
+  forecast: Omit<Forecast, 'month' | 'year' | 'sum'> & { sum: string },
+): Forecast {
   return {
     month: MONTH,
     year: YEAR,
     ...forecast,
+    sum: new Decimal(forecast.sum),
   };
 }
 
-const mockForecasts = [
+const mockForecasts: Forecast[] = [
   { categoryId: 1, subcategoryId: null, sum: '-100.00' },
   { categoryId: 3, subcategoryId: null, sum: '200.00' },
   { categoryId: 4, subcategoryId: null, sum: '-150.00' },
@@ -96,7 +88,7 @@ const mockForecasts = [
   // Cat5 has no forecast — used for "returns undefined" tests
 ].map(makeForecast);
 
-const mockSavingSpendings: SavingSpendingWire[] = [
+const mockSavingSpendings: SavingSpending[] = [
   {
     id: 1,
     name: 'Отпуск',
@@ -105,14 +97,14 @@ const mockSavingSpendings: SavingSpendingWire[] = [
       {
         id: 1,
         name: 'Билеты',
-        forecast: '500.00',
+        forecast: new Decimal('500.00'),
         comment: '',
         savingSpendingId: 1,
       },
       {
         id: 2,
         name: 'Отель',
-        forecast: '300.00',
+        forecast: new Decimal('300.00'),
         comment: '',
         savingSpendingId: 1,
       },
@@ -126,7 +118,7 @@ const mockSavingSpendings: SavingSpendingWire[] = [
       {
         id: 3,
         name: 'Грузчики',
-        forecast: '400.00',
+        forecast: new Decimal('400.00'),
         comment: '',
         savingSpendingId: 2,
       },
@@ -134,39 +126,21 @@ const mockSavingSpendings: SavingSpendingWire[] = [
   },
 ];
 
-beforeEach(() => {
-  localStorage.setItem('finances.selectedMonth', '2026-03');
-  vi.mocked(fetchForecastsByYear).mockResolvedValue(mockForecasts);
-  vi.mocked(fetchAllCategories).mockResolvedValue(mockCategories);
-  vi.mocked(fetchAllSavingSpendings).mockResolvedValue([]);
-});
+const baseData = {
+  categoryForecasts: mockForecasts.filter((f) => f.subcategoryId === null),
+  subcategoryForecasts: mockForecasts.filter((f) => f.subcategoryId !== null),
+  savingSpendings: [] as SavingSpending[],
+  categoryMap: mockCategoryMap,
+  month: MONTH,
+  year: YEAR,
+};
 
-/**
- * Renders useGetCostForecast and waits until categoryForecasts + categoryMap are
- * loaded (confirmed by a known-existing forecast returning a Decimal, not undefined).
- */
-async function renderAndLoad() {
-  const { result } = renderHook(() => useGetCostForecast());
-  await waitFor(() => {
-    expect(
-      result.current({
-        categoryId: 1,
-        subcategoryId: undefined,
-        isRestRow: false,
-        isIncome: false,
-      }),
-    ).toBeDefined();
-  });
-  return result.current;
-}
-
-describe('useGetCostForecast', () => {
+describe('getCostForecast', () => {
   describe('total row (categoryId undefined)', () => {
-    it('sums expense category forecasts, excluding FROM_SAVINGS categories', async () => {
-      const getCostForecast = await renderAndLoad();
+    it('sums expense category forecasts, excluding FROM_SAVINGS categories', () => {
       // Cat1 (-100) + Cat4 (-150) = -250; Cat2 (FROM_SAVINGS) excluded
       expect(
-        getCostForecast({
+        getCostForecast(baseData, {
           categoryId: undefined,
           subcategoryId: undefined,
           isRestRow: false,
@@ -175,11 +149,10 @@ describe('useGetCostForecast', () => {
       ).toBe(true);
     });
 
-    it('sums income category forecasts', async () => {
-      const getCostForecast = await renderAndLoad();
+    it('sums income category forecasts', () => {
       // Cat3 (200)
       expect(
-        getCostForecast({
+        getCostForecast(baseData, {
           categoryId: undefined,
           subcategoryId: undefined,
           isRestRow: false,
@@ -190,10 +163,9 @@ describe('useGetCostForecast', () => {
   });
 
   describe('category row (categoryId defined, no subcategory)', () => {
-    it('returns the category-level forecast — expense sum is negative', async () => {
-      const getCostForecast = await renderAndLoad();
+    it('returns the category-level forecast — expense sum is negative', () => {
       expect(
-        getCostForecast({
+        getCostForecast(baseData, {
           categoryId: 1,
           subcategoryId: undefined,
           isRestRow: false,
@@ -202,22 +174,21 @@ describe('useGetCostForecast', () => {
       ).toBe(true);
     });
 
-    it('income category forecast sum is positive', async () => {
-      const getCostForecast = await renderAndLoad();
-      const forecast = getCostForecast({
-        categoryId: 3,
-        subcategoryId: undefined,
-        isRestRow: false,
-        isIncome: true,
-      });
-      expect(forecast?.greaterThan(0)).toBe(true);
+    it('income category forecast sum is positive', () => {
+      expect(
+        getCostForecast(baseData, {
+          categoryId: 3,
+          subcategoryId: undefined,
+          isRestRow: false,
+          isIncome: true,
+        })?.greaterThan(0),
+      ).toBe(true);
     });
 
-    it('returns undefined when no forecast exists for the category', async () => {
-      const getCostForecast = await renderAndLoad();
-      // Cat5 has no forecast entry in mockForecasts
+    it('returns undefined when no forecast exists for the category', () => {
+      // Cat5 has no forecast entry
       expect(
-        getCostForecast({
+        getCostForecast(baseData, {
           categoryId: 5,
           subcategoryId: undefined,
           isRestRow: false,
@@ -228,29 +199,26 @@ describe('useGetCostForecast', () => {
   });
 
   describe('FROM_SAVINGS category', () => {
-    beforeEach(() => {
-      vi.mocked(fetchAllSavingSpendings).mockResolvedValue(mockSavingSpendings);
-    });
-
-    it('sums category forecasts for the specified saving spending event, excluding other events', async () => {
-      const getCostForecast = await renderAndLoad();
+    it('sums category forecasts for the specified saving spending event, excluding other events', () => {
       // Отпуск (id=1): Билеты (500) + Отель (300) = 800; Переезд (id=2) excluded
       expect(
-        getCostForecast({
-          categoryId: 2,
-          subcategoryId: 1,
-          isRestRow: false,
-          isIncome: false,
-        })?.equals(new Decimal('800')),
+        getCostForecast(
+          { ...baseData, savingSpendings: mockSavingSpendings },
+          {
+            categoryId: 2,
+            subcategoryId: 1,
+            isRestRow: false,
+            isIncome: false,
+          },
+        )?.equals(new Decimal('800')),
       ).toBe(true);
     });
   });
 
   describe('subcategory row', () => {
-    it('returns the subcategory-level forecast', async () => {
-      const getCostForecast = await renderAndLoad();
+    it('returns the subcategory-level forecast', () => {
       expect(
-        getCostForecast({
+        getCostForecast(baseData, {
           categoryId: 4,
           subcategoryId: 41,
           isRestRow: false,
@@ -259,11 +227,9 @@ describe('useGetCostForecast', () => {
       ).toBe(true);
     });
 
-    it('returns undefined when no forecast exists for the subcategory', async () => {
-      const getCostForecast = await renderAndLoad();
-      // subcategoryId 99 has no entry in mockForecasts
+    it('returns undefined when no forecast exists for the subcategory', () => {
       expect(
-        getCostForecast({
+        getCostForecast(baseData, {
           categoryId: 5,
           subcategoryId: 51,
           isRestRow: false,
@@ -274,11 +240,10 @@ describe('useGetCostForecast', () => {
   });
 
   describe('rest row (isRestRow)', () => {
-    it('returns category forecast minus sum of subcategory forecasts', async () => {
-      const getCostForecast = await renderAndLoad();
+    it('returns category forecast minus sum of subcategory forecasts', () => {
       // Cat4 category forecast: -150; subcategory forecasts: -60 + -40 = -100; rest = -50
       expect(
-        getCostForecast({
+        getCostForecast(baseData, {
           categoryId: 4,
           subcategoryId: undefined,
           isRestRow: true,

@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import Decimal from 'decimal.js';
 import { useAtomValue } from 'jotai';
-import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { costToDiffString, costToString } from '~/shared/utils/costToString';
@@ -15,14 +14,7 @@ import {
 
 import type { CostCol } from '../../TransactionsTable.types';
 
-interface Params {
-  col: CostCol | null;
-  isContinuous: boolean;
-  forecast: Decimal;
-}
-
-export type UseCostAggregatedCellResult =
-  | null
+export type GetCostAggregatedCellResult =
   | {
       hasDiff: false;
       passedDaysRatio: null;
@@ -42,30 +34,29 @@ export type UseCostAggregatedCellResult =
       exceedAmount?: number;
     };
 
-export function useCostAggregatedCell({
+interface GetCostAggregatedCellParams {
+  col: CostCol;
+  isContinuous: boolean;
+  forecast: Decimal;
+  isYearMode: boolean;
+  month: number;
+  year: number;
+  tooltipPlanString: string;
+}
+
+export function getCostAggregatedCell({
   col,
   isContinuous,
   forecast,
-}: Params): UseCostAggregatedCellResult {
-  const { t } = useTranslation('transactions');
-  const isYearMode = useAtomValue(viewModeAtom) === 'year';
-  const year = useAtomValue(selectedYearAtom);
-  const month = useAtomValue(selectedMonth0BasedAtom);
-
-  // getToday() is called at render time (not module load), so vi.setSystemTime() can mock it in tests
-  const passedDaysRatio = useMemo((): number | null => {
-    if (isYearMode) {
-      return null;
-    }
-    const today = getToday();
-    const isCurrentMonth = today.month() === month && today.year() === year;
-    const daysInMonth = dayjs(new Date(year, month)).daysInMonth();
-    return isCurrentMonth ? today.date() / daysInMonth : 1;
-  }, [isYearMode, month, year]);
-
-  if (!col) {
-    return null;
-  }
+  isYearMode,
+  month,
+  year,
+  tooltipPlanString,
+}: GetCostAggregatedCellParams): GetCostAggregatedCellResult {
+  // getToday() is called at invocation time (not module load), so vi.setSystemTime() can mock it in tests
+  const today = getToday();
+  const isCurrentMonth = today.month() === month && today.year() === year;
+  const daysInMonth = dayjs(new Date(year, month)).daysInMonth();
 
   const { value } = col;
   const costString = costToString(value);
@@ -80,11 +71,12 @@ export function useCostAggregatedCell({
     };
   }
 
+  const passedDaysRatio = isCurrentMonth ? today.date() / daysInMonth : 1;
+
   const forecastNumber = forecast.toNumber();
   const diff = value.minus(forecast);
   const diffNumber = diff.toNumber();
   const valueNumber = value.toNumber();
-  const tooltip = t('forecast.plan', { value: costToString(forecast) });
   const color: 'green' | 'red' = diff.isNeg() ? 'red' : 'green';
 
   if (value.abs().lessThanOrEqualTo(forecast.abs())) {
@@ -100,7 +92,7 @@ export function useCostAggregatedCell({
         diffString: costToDiffString(diff),
         color: 'orange',
         barWidth: spentRatio,
-        tooltip,
+        tooltip: tooltipPlanString,
         exceedAmount: Math.abs(valueNumber - passedDaysRatio * forecastNumber),
       };
     }
@@ -112,7 +104,7 @@ export function useCostAggregatedCell({
       diffString: costToDiffString(diff),
       color,
       barWidth: spentRatio,
-      tooltip,
+      tooltip: tooltipPlanString,
     };
   }
 
@@ -124,6 +116,37 @@ export function useCostAggregatedCell({
     color,
     barOffset: forecastNumber / valueNumber,
     barWidth: diffNumber / valueNumber,
-    tooltip,
+    tooltip: tooltipPlanString,
   };
+}
+
+interface Params {
+  col: CostCol | null;
+  isContinuous: boolean;
+  forecast: Decimal;
+}
+
+export function useCostAggregatedCell({
+  col,
+  isContinuous,
+  forecast,
+}: Params): GetCostAggregatedCellResult | null {
+  const { t } = useTranslation('transactions');
+  const isYearMode = useAtomValue(viewModeAtom) === 'year';
+  const year = useAtomValue(selectedYearAtom);
+  const month = useAtomValue(selectedMonth0BasedAtom);
+
+  if (!col) {
+    return null;
+  }
+
+  return getCostAggregatedCell({
+    col,
+    isContinuous,
+    forecast,
+    isYearMode,
+    month,
+    year,
+    tooltipPlanString: t('forecast.plan', { value: costToString(forecast) }),
+  });
 }
