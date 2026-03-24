@@ -36,24 +36,20 @@ Do not aim for 100% coverage. Prioritise cases where a silent regression would b
 
 ### Component tests (RTL)
 
-#### `useCostAggregatedCell` (to be extracted from `CostAggregatedCellRenderer`) ⬜
+#### `getCostAggregatedCell` ✅ [`getCostAggregatedCell.test.ts`](../src/features/transactions/components/TransactionsTable/columns/CostCellRenderer/getCostAggregatedCell.test.ts)
 
-`CostAggregatedCellRenderer` contains significant business logic (forecast comparison, bar width/offset, `exceedingForecast`, color, tooltip) that is currently untested. The plan:
-
-1. Move `getPassedDaysRatio` (currently a module-level standalone function) inside the new hook, so `getToday()` is called at render time and can be mocked in tests.
-2. Extract all derived values from `CostAggregatedCellRenderer` into a `useCostAggregatedCell` hook. The component becomes a thin renderer that maps hook output to JSX.
-3. Test the hook with `renderHook`, mocking server function responses (forecast data, category map) rather than passing derived values directly as inputs.
+Business logic was extracted from `CostAggregatedCellRenderer` into a pure function `getCostAggregatedCell` and tested directly — no `renderHook` or mocking needed. `getToday()` returns a fixed date in test mode (April 15, 2024), so `passedDaysRatio` is naturally controlled by the `month`/`year` inputs.
 
 | # | Case |
 |---|------|
-| 1 | `isRangePicker = true` → `passedDaysRatio` is `null`; no forecast data returned |
-| 2 | Current month → `passedDaysRatio` is `today.date / daysInMonth` (fractional) |
-| 3 | Past or future month → `passedDaysRatio` is `1` |
-| 4 | Value ≤ forecast, `isContinuous = false` → green/red bar at `spentRatio`; no exceeding-forecast variant |
-| 5 | Value ≤ forecast, `isContinuous = true`, `spentRatio ≤ passedDaysRatio` → same as case 4 |
-| 6 | Value ≤ forecast, `isContinuous = true`, `spentRatio > passedDaysRatio` → orange color + exceeded-by hint |
-| 7 | Value exceeds forecast → bar uses `barOffset + barWidth` layout |
-| 8 | No forecast (forecast = 0) → `divideWithFallbackToOne` prevents division by zero |
+| 1 | ~~`isRangePicker = true` → `passedDaysRatio` is `null`; no forecast data returned~~ _(concept removed; year mode handled upstream)_ |
+| 2 | ✅ Current month → `passedDaysRatio` is `today.date / daysInMonth` (fractional) |
+| 3 | ✅ Past or future month → `passedDaysRatio` is `1` |
+| 4 | ✅ Value ≤ forecast, `isContinuous = false` → green/red bar at `spentRatio`; no exceeding-forecast variant |
+| 5 | ✅ Value ≤ forecast, `isContinuous = true`, `spentRatio ≤ passedDaysRatio` → same as case 4 |
+| 6 | ✅ Value ≤ forecast, `isContinuous = true`, `spentRatio > passedDaysRatio` → orange color + exceeded-by hint |
+| 7 | ✅ Value exceeds forecast → bar uses `barOffset + barLength` layout |
+| 8 | ⬜ No forecast (forecast = 0) → `divideWithFallbackToOne` prevents division by zero |
 
 ---
 
