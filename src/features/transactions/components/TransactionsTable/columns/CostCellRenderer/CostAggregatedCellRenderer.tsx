@@ -1,4 +1,5 @@
 import { Stack } from '@mantine/core';
+import { Decimal } from 'decimal.js';
 import { useTranslation } from 'react-i18next';
 
 import { costToString } from '~/shared/utils/costToString';
@@ -6,33 +7,40 @@ import { costToString } from '~/shared/utils/costToString';
 import type { CostCol } from '../../TransactionsTable.types';
 import { CostCellView } from './CostCellView';
 import { CostWithDiffCellView } from './CostWithDiffCellView';
+import {
+  type GetCostForecastParams,
+  useGetCostForecast,
+} from './getCostForecast';
 import { useCostAggregatedCell } from './useCostAggregatedCell';
 
-interface CostAggregatedCellRendererProps {
+interface Props extends GetCostForecastParams {
   value: CostCol | null;
-  isIncome: boolean;
   isContinuous: boolean;
-  isSubcategoryRow: boolean;
-  categoryId: number | undefined;
-  subcategoryId: number | undefined;
 }
 
 export function CostAggregatedCellRenderer({
   value: col,
-  isSubcategoryRow,
+  isRestRow,
   categoryId,
   subcategoryId,
   isIncome,
   isContinuous,
-}: CostAggregatedCellRendererProps) {
+}: Props) {
   const { t } = useTranslation('transactions');
+
+  const getCostForecast = useGetCostForecast();
+  const forecast =
+    getCostForecast({
+      categoryId,
+      isRestRow,
+      subcategoryId,
+      isIncome,
+    }) ?? new Decimal(0);
+
   const result = useCostAggregatedCell({
     col,
-    isIncome,
     isContinuous,
-    isSubcategoryRow,
-    categoryId,
-    subcategoryId,
+    forecast,
   });
 
   if (!result) {

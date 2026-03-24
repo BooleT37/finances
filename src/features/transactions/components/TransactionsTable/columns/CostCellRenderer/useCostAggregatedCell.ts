@@ -8,21 +8,17 @@ import { costToDiffString, costToString } from '~/shared/utils/costToString';
 import { divideWithFallbackToOne } from '~/shared/utils/divideWithFallbackToOne';
 import { getToday } from '~/shared/utils/today';
 import {
-  selectedMonthNumberAtom,
+  selectedMonth0BasedAtom,
   selectedYearAtom,
   viewModeAtom,
 } from '~/stores/month';
 
 import type { CostCol } from '../../TransactionsTable.types';
-import { useGetCostForecast } from './getCostForecast';
 
 interface Params {
   col: CostCol | null;
-  isIncome: boolean;
   isContinuous: boolean;
-  isSubcategoryRow: boolean;
-  categoryId: number | undefined;
-  subcategoryId: number | undefined;
+  forecast: Decimal;
 }
 
 export type UseCostAggregatedCellResult =
@@ -48,18 +44,13 @@ export type UseCostAggregatedCellResult =
 
 export function useCostAggregatedCell({
   col,
-  isIncome,
   isContinuous,
-  isSubcategoryRow,
-  categoryId,
-  subcategoryId,
+  forecast,
 }: Params): UseCostAggregatedCellResult {
   const { t } = useTranslation('transactions');
-  const getCostForecast = useGetCostForecast();
   const isYearMode = useAtomValue(viewModeAtom) === 'year';
   const year = useAtomValue(selectedYearAtom);
-  // selectedMonthNumberAtom is 1-based; dayjs months are 0-based
-  const month = useAtomValue(selectedMonthNumberAtom) - 1;
+  const month = useAtomValue(selectedMonth0BasedAtom);
 
   // getToday() is called at render time (not module load), so vi.setSystemTime() can mock it in tests
   const passedDaysRatio = useMemo((): number | null => {
@@ -88,16 +79,6 @@ export function useCostAggregatedCell({
       isUpcomingSubscription: col.isUpcomingSubscription ?? false,
     };
   }
-
-  const forecast =
-    getCostForecast({
-      categoryId,
-      isSubcategoryRow,
-      subcategoryId,
-      month,
-      year,
-      isIncome,
-    }) ?? new Decimal(0);
 
   const forecastNumber = forecast.toNumber();
   const diff = value.minus(forecast);
