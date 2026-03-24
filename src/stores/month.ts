@@ -18,6 +18,11 @@ export const selectedMonthNumberAtom = atom((get) =>
   parseInt(get(selectedMonthAtom).slice(5, 7), 10),
 );
 
+// selectedMonthNumberAtom is 1-based; dayjs months are 0-based
+export const selectedMonth0BasedAtom = atom(
+  (get) => get(selectedMonthNumberAtom) - 1,
+);
+
 /** Whether the navigator shows individual months or full years. Only meaningful on Expenses page. */
 export const viewModeAtom = atomWithStorage<'month' | 'year'>(
   'finances.viewMode',
