@@ -74,12 +74,39 @@ function mapTransaction(
   savingSpendingMap: SavingSpendingMap,
 ): TransactionTableItem {
   const category = getOrThrow(categoryMap, tx.categoryId, 'Category');
-  const subcategory =
-    tx.subcategoryId !== null
-      ? findByIdOrThrow(category.subcategories, tx.subcategoryId, 'Subcategory')
-      : null;
   const source =
     tx.sourceId !== null ? getOrThrow(sourceMap, tx.sourceId, 'Source') : null;
+
+  let subcategoryName: string | null = null;
+  let subcategoryId: number | null = null;
+
+  if (
+    category.type === 'FROM_SAVINGS' &&
+    tx.savingSpendingCategoryId !== null
+  ) {
+    const savingSpendingCat = getOrThrow(
+      savingSpendingCategoryMap,
+      tx.savingSpendingCategoryId,
+      'SavingSpendingCategory',
+    );
+    if (savingSpendingCat.savingSpendingId !== null) {
+      const saving = getOrThrow(
+        savingSpendingMap,
+        savingSpendingCat.savingSpendingId,
+        'SavingSpending',
+      );
+      subcategoryName = saving.name;
+      subcategoryId = savingSpendingCat.savingSpendingId;
+    }
+  } else if (tx.subcategoryId !== null) {
+    const sub = findByIdOrThrow(
+      category.subcategories,
+      tx.subcategoryId,
+      'Subcategory',
+    );
+    subcategoryName = sub.name;
+    subcategoryId = tx.subcategoryId;
+  }
 
   return {
     id: tx.id,
@@ -95,8 +122,8 @@ function mapTransaction(
     categoryId: tx.categoryId,
     categoryShortname: category.shortname,
     categoryIcon: category.icon,
-    subcategory: subcategory?.name ?? null,
-    subcategoryId: tx.subcategoryId,
+    subcategory: subcategoryName,
+    subcategoryId,
     source: source?.name ?? '',
     isUpcomingSubscription: false,
     expenseId: null,
