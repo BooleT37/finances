@@ -101,6 +101,20 @@ describe('getCostAggregatedCell', () => {
     });
   });
 
+  describe('zero forecast', () => {
+    it('cost = 0, forecast = 0 → divideWithFallbackToOne prevents NaN; barLength = 1', () => {
+      const result = getCostAggregatedCell({
+        value: col('0'),
+        forecast: new Decimal('0'),
+        isContinuous: false,
+        month: 0,
+        year: 2024,
+      });
+      expect(result.barLength).toBe(1);
+      expect(result.barOffset).toBe(0);
+    });
+  });
+
   describe('income row', () => {
     it('under-earned income → red', () => {
       const result = getCostAggregatedCell({

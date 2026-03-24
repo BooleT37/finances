@@ -49,7 +49,7 @@ Business logic was extracted from `CostAggregatedCellRenderer` into a pure funct
 | 5 | ✅ Value ≤ forecast, `isContinuous = true`, `spentRatio ≤ passedDaysRatio` → same as case 4 |
 | 6 | ✅ Value ≤ forecast, `isContinuous = true`, `spentRatio > passedDaysRatio` → orange color + exceeded-by hint |
 | 7 | ✅ Value exceeds forecast → bar uses `barOffset + barLength` layout |
-| 8 | ⬜ No forecast (forecast = 0) → `divideWithFallbackToOne` prevents division by zero |
+| 8 | ✅ No forecast (forecast = 0) → `divideWithFallbackToOne` prevents division by zero |
 
 ---
 
