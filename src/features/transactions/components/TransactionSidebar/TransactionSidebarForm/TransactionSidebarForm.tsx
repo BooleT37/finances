@@ -98,22 +98,28 @@ export function TransactionSidebarForm() {
   const validateActualDate = useActualDateValidator();
 
   // Auto-save when editing an existing transaction (600 ms debounce).
-  // Skipped when the form is invalid (e.g. cost is mid-edit like "12.").
-  const debouncedSave = useDebouncedCallback(
-    async (values: TransactionFormValues) => {
-      const f = store.get(formRefAtom);
-      if (editingId == null || !f?.isValid()) {
-        return;
-      }
-      const prepared = f.getTransformedValues();
-      if (!prepared) {
-        return;
-      }
-      await saveTransaction(prepared);
-      f.resetDirty(values);
-    },
-    600,
-  );
+  // Skipped when the form is invalid (e.g. cost is mid-edit like "12.") or clean.
+  const debouncedSave = useDebouncedCallback(async () => {
+    const f = store.get(formRefAtom);
+    if (editingId == null || !f?.isValid() || !f?.isDirty()) {
+      return;
+    }
+    const prepared = f.getTransformedValues();
+    if (!prepared) {
+      return;
+    }
+    await saveTransaction(prepared);
+    f.resetDirty();
+    // NOTE: to make form values fully consistent with the BE (e.g. correct cost
+    // signs after a round-trip), we would reset the form here with BE values:
+    //   const updatedTx = await saveTransaction(prepared);
+    //   const newValues = transactionToFormValues(updatedTx);
+    //   f.setValues(newValues);
+    //   f.resetDirty(newValues);
+    // This was intentionally left out: the async delay would revert any changes
+    // the user made while the save was in flight. Fixing this properly requires
+    // disabling the form during saves, which adds friction we decided isn't worth it.
+  }, 600);
 
   const form = useForm<TransactionFormValues, TransactionFormTransform>({
     initialValues,
