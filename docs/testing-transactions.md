@@ -55,13 +55,13 @@ Business logic was extracted from `CostAggregatedCellRenderer` into a pure funct
 
 ## Components
 
-### E2E ⬜
+### E2E ✅ [`transactions.spec.ts`](../e2e/transactions.spec.ts)
 
 | # | Combined cases | Key assertions |
 |---|----------------|----------------|
-| 6 | Add two components in different categories; component costs sum less than parent | Hint appears below cost field; parent row + two component rows in table; remainder displayed in hint |
-| 7 | Open a transaction that already has components; verify hint; click "edit components" → modal opens with components pre-filled; delete one component → its row disappears from the table and the hint updates | Components hint visible on pre-existing transaction; modal fields match seeded data; deleted component row gone; hint reflects new remainder |
-| 8 | Click the row-action "edit" on a component row (not the parent); components modal opens immediately with that component scrolled into view; edit the component's cost and submit → parent row cost and hint remainder both update in the table | Modal opens directly from component row action; component highlighted; updated cost propagates to parent row and hint |
+| 6 | ✅ Add two components in different categories; component costs sum less than parent | Hint appears below cost field; parent row + two component rows in table; remainder displayed in hint |
+| 7 | ✅ Open a transaction that already has components; verify hint; click "edit components" → modal opens with components pre-filled; delete one component → its row disappears from the table and the hint updates | Components hint visible on pre-existing transaction; modal fields match seeded data; deleted component row gone; hint reflects new remainder |
+| 8 | ✅ Click the row-action "edit" on a component row (not the parent); components modal opens immediately with that component scrolled into view; edit the component's cost and submit → parent row cost and hint remainder both update in the table | Modal opens directly from component row action; component highlighted; updated cost propagates to parent row and hint |
 
 ### Component tests (RTL)
 
