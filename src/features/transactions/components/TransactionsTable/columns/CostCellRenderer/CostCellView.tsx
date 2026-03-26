@@ -42,7 +42,16 @@ export function CostCellView({
               : t('subscription')
           }
         >
-          <IconCoinFilled size={14} color="gray" />
+          <IconCoinFilled
+            size={14}
+            color="gray"
+            role="img"
+            aria-label={
+              isUpcomingSubscription
+                ? t('upcomingSubscription')
+                : t('subscription')
+            }
+          />
         </Tooltip>
       )}
       {parentExpenseName !== undefined && (

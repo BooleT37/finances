@@ -23,6 +23,18 @@ import { TODAY_DAY, TODAY_MONTH, TODAY_YEAR } from '~/shared/utils/today';
 
 Use these constants in unit tests that depend on date logic — **no mocking needed**. Pass `month=TODAY_MONTH, year=TODAY_YEAR` for "current month" scenarios, any other date for "past month".
 
+**Always use `getToday()` for dates in E2E test seedings** — never `new Date()` or `dayjs()`. The Playwright webServer runs with `NODE_ENV: 'test'`, so `getToday()` returns the same fixed April 2024 date in both the test runner and the app server. Use a relative import in E2E files:
+
+```ts
+import { TODAY_DAY, TODAY_MONTH, TODAY_YEAR } from '../src/shared/utils/today';
+// transaction date:
+date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY)
+// subscription firstDate (period=1 advances month-by-month to the current month):
+firstDate: new Date(TODAY_YEAR, TODAY_MONTH, 1)
+```
+
+If a test fails because transactions don't appear in the expected month, it means some app code still uses `dayjs()` or `new Date()` instead of `getToday()` — fix that app code.
+
 ---
 
 ## E2E Testing with Playwright

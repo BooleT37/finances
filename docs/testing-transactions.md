@@ -94,13 +94,13 @@ Business logic was extracted from `CostAggregatedCellRenderer` into a pure funct
 
 ## Subscriptions
 
-### E2E ⬜
+### E2E ✅ [`transactions.spec.ts`](../e2e/transactions.spec.ts)
 
 | # | Combined cases | Key assertions |
 |---|----------------|----------------|
-| 9 | Create transaction: select an available subscription from the dropdown | Name and cost fields auto-fill from the subscription |
-| 10 | Edit an existing subscription transaction: select a different subscription | Sidebar fields update; cost updates in the table row without a manual save |
-| 11 | Toggle "show upcoming subscriptions": verify correct rows appear and correct rows are absent; confirm upcoming rows have no edit/delete actions; confirm they are excluded from the expense grand total; confirm each row shows a subscription badge | Upcoming rows visible; rows not due this month absent; action buttons absent on upcoming rows; grand total unchanged; badge visible |
+| 9 | ✅ Create transaction: select an available subscription from the dropdown | Name and cost fields auto-fill from the subscription |
+| 10 | ✅ Edit an existing subscription transaction: select a different subscription | Sidebar fields update; cost updates in the table row without a manual save |
+| 11 | ✅ Toggle "show upcoming subscriptions": verify correct rows appear and correct rows are absent; confirm upcoming rows have no edit/delete actions; confirm they are excluded from the expense grand total; confirm each row shows a subscription badge | Upcoming rows visible; rows not due this month absent; action buttons absent on upcoming rows; grand total unchanged; badge visible |
 
 ### Component tests (RTL)
 

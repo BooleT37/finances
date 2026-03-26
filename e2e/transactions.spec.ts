@@ -3,6 +3,7 @@ import type { Locator, Page } from '@playwright/test';
 import { expect, test } from './fixtures';
 import { testPrisma } from './db/client';
 import { transactionNameCellClass } from '../src/features/transactions/components/TransactionsTable/TransactionsTable';
+import { TODAY_DAY, TODAY_MONTH, TODAY_YEAR } from '../src/shared/utils/today';
 
 async function selectTreeOption(page: Page, treeSelect: Locator, option: string) {
   await treeSelect.click();
@@ -252,7 +253,7 @@ test.describe('Transaction components', () => {
       data: {
         name: 'Покупка в магазине',
         cost: 100,
-        date: new Date(),
+        date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
         categoryId: seedData.categoryIds.продукты,
         userId: seedData.userId,
         components: {
@@ -321,7 +322,7 @@ test.describe('Transaction components', () => {
       data: {
         name: 'Семья',
         cost: 100,
-        date: new Date(),
+        date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
         categoryId: seedData.categoryIds.продукты,
         userId: seedData.userId,
         components: {
@@ -372,7 +373,7 @@ test.describe('Transaction editing', () => {
       data: {
         name: 'Смена типа',
         cost: 50, // positive income cost
-        date: new Date(),
+        date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
         categoryId: seedData.categoryIds.зарплата,
         userId: seedData.userId,
       },
@@ -410,7 +411,7 @@ test.describe('Transaction editing', () => {
       data: {
         name: 'Несохранённые изменения',
         cost: -50,
-        date: new Date(),
+        date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
         categoryId: seedData.categoryIds.продукты,
         userId: seedData.userId,
       },
@@ -465,7 +466,7 @@ test.describe('Transaction editing', () => {
       data: {
         name: 'Правка и удаление',
         cost: -50,
-        date: new Date(),
+        date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
         categoryId: seedData.categoryIds.продукты,
         sourceId: seedData.sourceId,
         userId: seedData.userId,
@@ -508,6 +509,202 @@ test.describe('Transaction editing', () => {
       page.locator(
         `.${transactionNameCellClass}[data-testing-category-id="${seedData.categoryIds.продукты}"]`,
         { hasText: 'Правка и удаление' },
+      ),
+    ).toHaveCount(0);
+  });
+});
+
+test.describe('Subscriptions', () => {
+  test('create transaction: select subscription auto-fills name, cost, source', async ({
+    page,
+    seedData,
+  }) => {
+    await testPrisma.subscription.create({
+      data: {
+        name: 'Спотифай',
+        cost: 9.99,
+        categoryId: seedData.categoryIds.развлечения,
+        sourceId: seedData.sourceId,
+        period: 1,
+        firstDate: new Date(TODAY_YEAR, TODAY_MONTH, 1),
+        active: true,
+        userId: seedData.userId,
+      },
+    });
+    await page.goto('/transactions');
+
+    const form = page.getByRole('form', { name: 'Форма транзакции' });
+
+    await page.getByRole('button', { name: 'Добавить' }).click();
+    await selectOption(page, 'Категория', 'Развлечения');
+
+    // Subscription field appears for this category
+    await expect(form.getByRole('textbox', { name: 'Подписка' })).toBeVisible();
+    await selectOption(page, 'Подписка', 'Спотифай');
+
+    // Form auto-fills name, cost and source from the subscription
+    await expect(form.getByLabel('Комментарий')).toHaveValue('Спотифай');
+    await expect(form.getByLabel('Сумма (€)')).toHaveValue('-9.99');
+    await expect(form.getByRole('textbox', { name: 'Источник' })).toHaveValue(
+      'Vivid',
+    );
+
+    await form.getByRole('button', { name: 'Добавить' }).click();
+    await page.waitForLoadState('networkidle');
+
+    const row = await findTransactionRow(page, {
+      name: 'Спотифай',
+      categoryId: seedData.categoryIds.развлечения,
+    });
+    await expect(row.getByRole('img', { name: 'Подписка' })).toBeVisible();
+  });
+
+  test('edit subscription transaction: change subscription updates fields and auto-saves', async ({
+    page,
+    seedData,
+  }) => {
+    const firstDate = new Date(TODAY_YEAR, TODAY_MONTH, 1);
+    const sub1 = await testPrisma.subscription.create({
+      data: {
+        name: 'Спотифай',
+        cost: 9.99,
+        categoryId: seedData.categoryIds.развлечения,
+        sourceId: seedData.sourceId,
+        period: 1,
+        firstDate,
+        active: true,
+        userId: seedData.userId,
+      },
+    });
+    await testPrisma.subscription.create({
+      data: {
+        name: 'Кинопоиск',
+        cost: 5.99,
+        categoryId: seedData.categoryIds.развлечения,
+        sourceId: seedData.sourceId,
+        period: 1,
+        firstDate,
+        active: true,
+        userId: seedData.userId,
+      },
+    });
+    await testPrisma.expense.create({
+      data: {
+        name: 'Спотифай',
+        cost: -9.99,
+        date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
+        categoryId: seedData.categoryIds.развлечения,
+        sourceId: seedData.sourceId,
+        subscriptionId: sub1.id,
+        userId: seedData.userId,
+      },
+    });
+    await page.goto('/transactions');
+
+    const row = await findTransactionRow(page, {
+      name: 'Спотифай',
+      categoryId: seedData.categoryIds.развлечения,
+    });
+    await row.getByRole('button', { name: 'Редактировать' }).click();
+
+    const form = page.getByRole('form', { name: 'Форма транзакции' });
+
+    // Subscription field shows the original subscription
+    await expect(form.getByRole('textbox', { name: 'Подписка' })).toHaveValue(
+      'Спотифай',
+    );
+
+    // Change to a different subscription — form fields update automatically
+    await selectOption(page, 'Подписка', 'Кинопоиск');
+    await expect(form.getByLabel('Комментарий')).toHaveValue('Кинопоиск');
+    await expect(form.getByLabel('Сумма (€)')).toHaveValue('-5.99');
+
+    // Auto-save fires after the debounce; the row name updates to 'Кинопоиск' (auto-filled).
+    // Find it fresh — the original 'Спотифай' locator is now stale.
+    const updatedRow = await findTransactionRow(page, {
+      name: 'Кинопоиск',
+      categoryId: seedData.categoryIds.развлечения,
+    });
+    await expect(updatedRow.getByText('-€5.99')).toBeVisible();
+  });
+
+  test('toggle upcoming subscriptions: rows appear/disappear, no actions, excluded from total', async ({
+    page,
+    seedData,
+  }) => {
+    const firstDate = new Date(TODAY_YEAR, TODAY_MONTH, 1);
+    await testPrisma.expense.create({
+      data: {
+        name: 'Обед',
+        cost: -50,
+        date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
+        categoryId: seedData.categoryIds.развлечения,
+        userId: seedData.userId,
+      },
+    });
+    await testPrisma.subscription.create({
+      data: {
+        name: 'Спотифай',
+        cost: 9.99,
+        categoryId: seedData.categoryIds.развлечения,
+        sourceId: seedData.sourceId,
+        period: 1,
+        firstDate,
+        active: true,
+        userId: seedData.userId,
+      },
+    });
+    await page.goto('/transactions');
+
+    // Toggle is off by default — upcoming subscription row is not shown
+    await expect(
+      page.locator(
+        `.${transactionNameCellClass}[data-testing-category-id="${seedData.categoryIds.развлечения}"]`,
+        { hasText: 'Спотифай' },
+      ),
+    ).toHaveCount(0);
+
+    // Развлечения aggregate shows only the regular transaction.
+    // Use data-testing-depth="1" to target the category-level aggregate row specifically
+    // (individual transaction rows also have 'Развлечения' in their cells, causing ambiguity
+    // with a plain text filter).
+    const развлеченияAggRow = page
+      .locator(`.${transactionNameCellClass}[data-testing-depth="1"]`, {
+        hasText: 'Развлечения',
+      })
+      .locator('xpath=ancestor::tr');
+    await expect(развлеченияAggRow.getByText('-€50.00').first()).toBeVisible();
+
+    // Enable upcoming subscriptions
+    await page.getByLabel('Предстоящие подписки').click();
+
+    const upcomingRow = await findTransactionRow(page, {
+      name: 'Спотифай',
+      categoryId: seedData.categoryIds.развлечения,
+    });
+
+    // Upcoming row shows the subscription badge
+    await expect(
+      upcomingRow.getByRole('img', { name: 'Предстоящая подписка' }),
+    ).toBeVisible();
+
+    // Upcoming rows have no edit or delete actions
+    await expect(
+      upcomingRow.getByRole('button', { name: 'Редактировать' }),
+    ).toHaveCount(0);
+    await expect(
+      upcomingRow.getByRole('button', { name: 'Удалить' }),
+    ).toHaveCount(0);
+
+    // Aggregate total is unchanged — upcoming subscriptions are excluded
+    await expect(развлеченияAggRow.getByText('-€50.00').first()).toBeVisible();
+
+    // Disable upcoming subscriptions — row disappears
+    await page.getByLabel('Предстоящие подписки').click();
+    await expect(
+      page.locator(
+        `.${transactionNameCellClass}[data-testing-category-id="${seedData.categoryIds.развлечения}"]`,
+        { hasText: 'Спотифай' },
       ),
     ).toHaveCount(0);
   });
