@@ -93,6 +93,8 @@ Examples:
 - `test(e2e): add unsaved-changes confirm dialog test`
 - `chore: update dependencies`
 
+**Stop before each commit** to let the user verify the changes in the working directory
+
 ## Testing
 
 Run E2E tests (starts dev server automatically):
