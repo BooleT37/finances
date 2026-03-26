@@ -1,11 +1,12 @@
-import dayjs from 'dayjs';
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
+
+import { getToday } from '~/shared/utils/today';
 
 /** Selected month stored as 'YYYY-MM', e.g. '2026-02'. Persisted to localStorage. */
 export const selectedMonthAtom = atomWithStorage(
   'finances.selectedMonth',
-  dayjs().format('YYYY-MM'),
+  getToday().format('YYYY-MM'),
 );
 
 /** Derived: numeric year from selectedMonthAtom, e.g. 2026 */

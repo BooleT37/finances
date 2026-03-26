@@ -25,6 +25,6 @@ export default defineConfig({
     command: 'npm run dev',
     url: 'http://localhost:3000',
     reuseExistingServer: false, // always fresh — tests must use the test DB, not the dev DB
-    env: { DATABASE_URL: TEST_DB_URL },
+    env: { DATABASE_URL: TEST_DB_URL, NODE_ENV: 'test' },
   },
 });
