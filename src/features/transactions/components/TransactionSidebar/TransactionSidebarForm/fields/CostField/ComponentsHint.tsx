@@ -73,7 +73,7 @@ export function ComponentsHint({ cost, components }: Props) {
 
   const remainder = cost
     .abs()
-    .minus(decimalSum(...componentLabels.map((c) => c.cost)));
+    .minus(decimalSum(...componentLabels.map((c) => c.cost.abs())));
 
   return (
     <Text span size="xs" c="dimmed">

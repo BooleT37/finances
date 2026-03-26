@@ -50,6 +50,7 @@ export function CostField({ form }: Props) {
                 disabled={!isCostValid}
                 onClick={() => setComponentsModalOpen(true)}
                 title={t('components.editButton')}
+                aria-label={t('components.editButton')}
               >
                 <IconList size={16} />
               </ActionIcon>
