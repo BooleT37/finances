@@ -58,12 +58,12 @@ describe('ComponentsHint', () => {
       <ComponentsHint
         cost={new Decimal(-50)}
         components={[
-          { name: '', cost: '20', categoryId: 1, subcategoryId: null },
+          { name: '', cost: '-20', categoryId: 1, subcategoryId: null },
         ]}
       />,
     );
     expect(
-      await screen.findByText(/Из них €20\.00 из «Продукты»/),
+      await screen.findByText(/Из них -€20\.00 из «Продукты»/),
     ).toBeInTheDocument();
   });
 
@@ -72,14 +72,14 @@ describe('ComponentsHint', () => {
       <ComponentsHint
         cost={new Decimal(-60)}
         components={[
-          { name: '', cost: '20', categoryId: 1, subcategoryId: null },
-          { name: '', cost: '30', categoryId: 2, subcategoryId: null },
+          { name: '', cost: '-20', categoryId: 1, subcategoryId: null },
+          { name: '', cost: '-30', categoryId: 2, subcategoryId: null },
         ]}
       />,
     );
 
-    expect(await screen.findByText('€20.00 из Продукты')).toBeInTheDocument();
-    expect(screen.getByText('€30.00 из Транспорт')).toBeInTheDocument();
+    expect(await screen.findByText('-€20.00 из Продукты')).toBeInTheDocument();
+    expect(screen.getByText('-€30.00 из Транспорт')).toBeInTheDocument();
     expect(screen.getByText(/(остаток: €10\.00)/)).toBeInTheDocument();
   });
 
@@ -88,12 +88,12 @@ describe('ComponentsHint', () => {
       <ComponentsHint
         cost={new Decimal(-50)}
         components={[
-          { name: '', cost: '20', categoryId: 1, subcategoryId: 10 },
+          { name: '', cost: '-20', categoryId: 1, subcategoryId: 10 },
         ]}
       />,
     );
     expect(
-      await screen.findByText(/Из них €20\.00 из «Продукты - Рынок»/),
+      await screen.findByText(/Из них -€20\.00 из «Продукты - Рынок»/),
     ).toBeInTheDocument();
   });
 
@@ -118,13 +118,13 @@ describe('ComponentsHint', () => {
       <ComponentsHint
         cost={new Decimal(200)}
         components={[
-          { name: '', cost: '80', categoryId: 1, subcategoryId: null },
-          { name: '', cost: '60', categoryId: 2, subcategoryId: null },
+          { name: '', cost: '-80', categoryId: 1, subcategoryId: null },
+          { name: '', cost: '-60', categoryId: 2, subcategoryId: null },
         ]}
       />,
     );
 
-    expect(await screen.findByText('€80.00 из Продукты')).toBeInTheDocument();
+    expect(await screen.findByText('-€80.00 из Продукты')).toBeInTheDocument();
     expect(screen.getByText(/(остаток: €60\.00)/)).toBeInTheDocument();
   });
 });

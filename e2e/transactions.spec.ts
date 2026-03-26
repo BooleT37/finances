@@ -1,8 +1,18 @@
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 import { expect, test } from './fixtures';
 import { testPrisma } from './db/client';
 import { transactionNameCellClass } from '../src/features/transactions/components/TransactionsTable/TransactionsTable';
+
+async function selectTreeOption(page: Page, treeSelect: Locator, option: string) {
+  await treeSelect.click();
+  await treeSelect.locator('.rc-tree-select-selection-search-input').fill(option);
+  await page
+    .locator('.treeSelectDropdown')
+    .getByText(option, { exact: true })
+    .first()
+    .click();
+}
 
 async function selectOption(page: Page, label: string, option: string) {
   await page.getByRole('textbox', { name: label }).click();
@@ -167,6 +177,189 @@ test.describe('Transaction creation', () => {
       name: 'прошлый месяц',
     });
     await expect(row.getByText('-€100.00')).toBeVisible();
+  });
+});
+
+test.describe('Transaction components', () => {
+  test('add two components in different categories; hint and rows appear', async ({
+    page,
+    seedData,
+  }) => {
+    await page.goto('/transactions');
+    const form = page.getByRole('form', { name: 'Форма транзакции' });
+
+    await page.getByRole('button', { name: 'Добавить' }).click();
+    await selectOption(page, 'Категория', 'Продукты');
+    await form.getByLabel('Сумма (€)').fill('100');
+    await form.getByLabel('Комментарий').fill('Тест компонентов');
+
+    // Open the components modal
+    await form.getByRole('button', { name: 'Редактировать составляющие' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Составляющие' });
+
+    // Add first component: 30 → Транспорт
+    await dialog.getByRole('button', { name: 'Добавить составляющую' }).click();
+    await dialog.getByPlaceholder('Сумма (€)').nth(0).fill('30');
+    await selectTreeOption(page, dialog.locator('.treeSelect').nth(0), 'Транспорт');
+
+    // Add second component: 20 → Развлечения
+    await dialog.getByRole('button', { name: 'Добавить составляющую' }).click();
+    await dialog.getByPlaceholder('Сумма (€)').nth(1).fill('20');
+    await selectTreeOption(page, dialog.locator('.treeSelect').nth(1), 'Развлечения');
+
+    // Modal shows correct remainder: 100 - 30 - 20 = 50
+    await expect(dialog.getByText('Остаток: €50.00')).toBeVisible();
+    await dialog.getByRole('button', { name: 'Сохранить' }).click();
+
+    // Hint visible in the form with signed costs and remainder
+    await expect(form.getByText('Из них:')).toBeVisible();
+    await expect(form.getByText('-€30.00 из Транспорт')).toBeVisible();
+    await expect(form.getByText('-€20.00 из Развлечения')).toBeVisible();
+    await expect(form.getByText('(остаток: €50.00)')).toBeVisible();
+
+    // Submit the transaction
+    await form.getByRole('button', { name: 'Добавить' }).click();
+    await page.waitForLoadState('networkidle');
+
+    // Parent row: cost without components = 100 - 30 - 20 = 50 → -€50.00 main
+    const parentRow = await findTransactionRow(page, {
+      categoryId: seedData.categoryIds.продукты,
+      name: 'Тест компонентов',
+    });
+    await expect(parentRow.getByText('-€50.00')).toBeVisible();
+    await expect(parentRow.getByText('(-€100.00)')).toBeVisible();
+
+    // Component rows appear under their respective categories
+    await expect(
+      page.locator(
+        `.${transactionNameCellClass}[data-testing-category-id="${seedData.categoryIds.транспорт}"]`,
+        { hasText: 'Тест компонентов' },
+      ),
+    ).toBeVisible();
+    await expect(
+      page.locator(
+        `.${transactionNameCellClass}[data-testing-category-id="${seedData.categoryIds.развлечения}"]`,
+        { hasText: 'Тест компонентов' },
+      ),
+    ).toBeVisible();
+  });
+
+  test('pre-existing transaction with components: verify hint, delete one component via modal', async ({
+    page,
+    seedData,
+  }) => {
+    await testPrisma.expense.create({
+      data: {
+        name: 'Покупка в магазине',
+        cost: 100,
+        date: new Date(),
+        categoryId: seedData.categoryIds.продукты,
+        userId: seedData.userId,
+        components: {
+          create: [
+            { name: 'Аптека', cost: 30, categoryId: seedData.categoryIds.транспорт },
+            { name: 'Напитки', cost: 20, categoryId: seedData.categoryIds.развлечения },
+          ],
+        },
+      },
+    });
+    await page.goto('/transactions');
+
+    // Component rows are visible in their categories
+    await expect(
+      page.locator(
+        `.${transactionNameCellClass}[data-testing-category-id="${seedData.categoryIds.транспорт}"]`,
+        { hasText: 'Аптека' },
+      ),
+    ).toBeVisible();
+    await expect(
+      page.locator(
+        `.${transactionNameCellClass}[data-testing-category-id="${seedData.categoryIds.развлечения}"]`,
+        { hasText: 'Напитки' },
+      ),
+    ).toBeVisible();
+
+    // Open parent transaction
+    const parentRow = await findTransactionRow(page, {
+      categoryId: seedData.categoryIds.продукты,
+      name: 'Покупка в магазине',
+    });
+    await parentRow.getByRole('button', { name: 'Редактировать' }).click();
+
+    const form = page.getByRole('form', { name: 'Форма транзакции' });
+    await expect(form.getByText('Из них:')).toBeVisible();
+
+    // Open components modal — both rows should be pre-filled
+    await form.getByRole('button', { name: 'Редактировать составляющие' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Составляющие' });
+    await expect(dialog.getByPlaceholder('Сумма (€)')).toHaveCount(2);
+
+    // Delete the first component (Аптека / Транспорт)
+    await dialog.getByRole('button', { name: 'Удалить' }).first().click();
+    await dialog.getByRole('button', { name: 'Сохранить' }).click();
+
+    // Auto-save fires; wait for the table to update
+    await expect(
+      page.locator(
+        `.${transactionNameCellClass}[data-testing-category-id="${seedData.categoryIds.транспорт}"]`,
+        { hasText: 'Аптека' },
+      ),
+    ).toHaveCount(0);
+
+    // Hint updates to single-component format
+    await expect(
+      form.getByText(/Из них -€20\.00 из «Развлечения»/),
+    ).toBeVisible();
+
+  });
+
+  test('edit component via its own row action: modal opens, updated cost propagates', async ({
+    page,
+    seedData,
+  }) => {
+    await testPrisma.expense.create({
+      data: {
+        name: 'Семья',
+        cost: 100,
+        date: new Date(),
+        categoryId: seedData.categoryIds.продукты,
+        userId: seedData.userId,
+        components: {
+          create: [
+            { name: 'Одежда', cost: 30, categoryId: seedData.categoryIds.транспорт },
+          ],
+        },
+      },
+    });
+    await page.goto('/transactions');
+
+    // Click "Редактировать" on the component row — opens sidebar + modal together
+    const componentRow = await findTransactionRow(page, {
+      categoryId: seedData.categoryIds.транспорт,
+      name: 'Одежда',
+    });
+    await componentRow.getByRole('button', { name: 'Редактировать' }).click();
+
+    const dialog = page.getByRole('dialog', { name: 'Составляющие' });
+    await expect(dialog).toBeVisible();
+
+    // Change the component cost from 30 to 50
+    await dialog.getByPlaceholder('Сумма (€)').fill('-50');
+    await dialog.getByRole('button', { name: 'Сохранить' }).click();
+
+    // Auto-save fires; component row updates to new cost
+    const updatedComponentRow = await findTransactionRow(page, {
+      categoryId: seedData.categoryIds.транспорт,
+      name: 'Одежда',
+    });
+    await expect(updatedComponentRow.getByText('-€50.00')).toBeVisible();
+
+    // Parent row remainder updates: 100 - 50 = 50
+    const parentRow = await findTransactionRow(page, {
+      categoryId: seedData.categoryIds.продукты,
+      name: 'Семья',
+    });
+    await expect(parentRow.getByText('-€50.00')).toBeVisible();
   });
 });
 
