@@ -26,6 +26,7 @@ export interface TransactionTableItem {
   subcategoryId: number | null;
   source: string; // source.name, or '' when source is null
   isUpcomingSubscription: boolean;
+  isFromSavings: boolean;
   expenseId: number | null; // null for regular rows; parent id for components
   isIncome: boolean;
   isContinuous: boolean;
