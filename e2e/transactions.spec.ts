@@ -709,3 +709,207 @@ test.describe('Subscriptions', () => {
     ).toHaveCount(0);
   });
 });
+
+test.describe('Saving spendings', () => {
+  // Case 13 — create a from-savings transaction
+  // Asserts: event select visible, category hidden for single-category event,
+  // category visible for multi-category event, completed event absent,
+  // row excluded from expense grand total, group rows appear under subcategory grouping.
+  test('create a from-savings transaction: event select, hidden/visible category, completed event absent, excluded from expense total, group rows appear', async ({
+    page,
+    seedData,
+  }) => {
+    // Pre-seed: one FROM_SAVINGS transaction (Event A, single category)
+    // and one regular expense to anchor the expense grand total.
+    await testPrisma.expense.create({
+      data: {
+        name: 'Предоплата',
+        cost: -100,
+        date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
+        categoryId: seedData.categoryIds.изСбережений,
+        savingSpendingCategoryId: seedData.savingSpendingCategoryIds.eventAGeneral,
+        userId: seedData.userId,
+      },
+    });
+    await testPrisma.expense.create({
+      data: {
+        name: 'Обед',
+        cost: -50,
+        date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
+        categoryId: seedData.categoryIds.продукты,
+        userId: seedData.userId,
+      },
+    });
+    await page.goto('/transactions');
+
+    // Pre-seeded FROM_SAVINGS row is visible (hasText matches "Отпуск Рим 2025 - Общее (Предоплата)")
+    await findTransactionRow(page, {
+      name: 'Предоплата',
+      categoryId: seedData.categoryIds.изСбережений,
+    });
+
+    const form = page.getByRole('form', { name: 'Форма транзакции' });
+    await page.getByRole('button', { name: 'Добавить' }).click();
+
+    // Switch to "Из сбережений" type
+    await page
+      .getByRole('radiogroup', { name: 'Тип' })
+      .locator('input[value="fromSavings"]')
+      .dispatchEvent('click');
+
+    // "Событие" select appears; saving-spending category not shown yet
+    await expect(form.getByRole('textbox', { name: 'Событие' })).toBeVisible();
+    await expect(
+      form.getByRole('textbox', { name: 'Категория' }),
+    ).not.toBeVisible();
+
+    // Completed event is absent from the dropdown
+    await form.getByRole('textbox', { name: 'Событие' }).click();
+    await expect(
+      page.getByRole('option', { name: 'Новый телевизор', exact: true }),
+    ).toHaveCount(0);
+
+    // Select Event A (single category) — category select stays hidden
+    await page.getByRole('option', { name: 'Отпуск Рим 2025' }).click();
+    await expect(
+      form.getByRole('textbox', { name: 'Категория' }),
+    ).not.toBeVisible();
+
+    // Select Event B (multiple categories) — category select appears
+    await selectOption(page, 'Событие', 'Переезд 2026');
+    await expect(form.getByRole('textbox', { name: 'Категория' })).toBeVisible();
+    await selectOption(page, 'Категория', 'Залог');
+
+    await form.getByLabel('Сумма (€)').fill('200');
+    await form.getByRole('button', { name: 'Добавить' }).click();
+    await page.waitForLoadState('networkidle');
+
+    // New row appears under Из сбережений, grouped under Event B
+    const newRow = await findTransactionRow(page, {
+      categoryId: seedData.categoryIds.изСбережений,
+      subcategoryId: seedData.savingSpendingIds.eventB,
+    });
+    await expect(newRow.getByText('-€200.00')).toBeVisible();
+
+    // Expense grand total (depth=0 "Расход" row) is unchanged — FROM_SAVINGS is excluded
+    const расходAggRow = page
+      .locator(`.${transactionNameCellClass}[data-testing-depth="0"]`, {
+        hasText: 'Расход',
+      })
+      .locator('xpath=ancestor::tr');
+    await expect(расходAggRow.getByText('-€50.00').first()).toBeVisible();
+
+    // Group by subcategories: event group rows appear for both pre-seeded (Event A) and new (Event B)
+    await page.getByLabel('Сгруппировать по подкатегориям').click();
+    await expect(
+      page.locator(`.${transactionNameCellClass}[data-testing-depth="2"]`, {
+        hasText: 'Отпуск Рим 2025',
+      }),
+    ).toBeVisible();
+    await expect(
+      page.locator(`.${transactionNameCellClass}[data-testing-depth="2"]`, {
+        hasText: 'Переезд 2026',
+      }),
+    ).toBeVisible();
+  });
+
+  // Case 14 — edit a from-savings transaction that was linked to a completed event.
+  // Asserts: completed event shown as initial value, category select updates on event change,
+  // auto-save moves the row to the new event's subcategory group.
+  test('edit from-savings transaction linked to completed event: initial value preserved, category select updates on event change', async ({
+    page,
+    seedData,
+  }) => {
+    await testPrisma.expense.create({
+      data: {
+        name: 'Ноутбук',
+        cost: -200,
+        date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
+        categoryId: seedData.categoryIds.изСбережений,
+        savingSpendingCategoryId:
+          seedData.savingSpendingCategoryIds.eventCElectronics,
+        userId: seedData.userId,
+      },
+    });
+    await page.goto('/transactions');
+
+    // Open the transaction (hasText matches "Новый телевизор - Электроника (Ноутбук)")
+    const row = await findTransactionRow(page, {
+      name: 'Ноутбук',
+      categoryId: seedData.categoryIds.изСбережений,
+    });
+    await row.getByRole('button', { name: 'Редактировать' }).click();
+
+    const form = page.getByRole('form', { name: 'Форма транзакции' });
+
+    // Completed event is preserved as the initial "Событие" value
+    await expect(form.getByRole('textbox', { name: 'Событие' })).toHaveValue(
+      'Новый телевизор',
+    );
+
+    // Category select hidden — Event C has only one category
+    await expect(
+      form.getByRole('textbox', { name: 'Категория' }),
+    ).not.toBeVisible();
+
+    // Switch to Event B (multiple categories) — category select appears
+    await selectOption(page, 'Событие', 'Переезд 2026');
+    await expect(form.getByRole('textbox', { name: 'Категория' })).toBeVisible();
+
+    // Select a category — auto-save fires; row moves to Event B subcategory
+    await selectOption(page, 'Категория', 'Залог');
+    await findTransactionRow(page, {
+      name: 'Ноутбук',
+      categoryId: seedData.categoryIds.изСбережений,
+      subcategoryId: seedData.savingSpendingIds.eventB,
+    });
+  });
+
+  // Case 15 — change transaction type from "from savings" to expense.
+  // Asserts: row moves to the expense category section; Из сбережений section becomes empty.
+  test('change from-savings type to expense: transaction moves to expense section', async ({
+    page,
+    seedData,
+  }) => {
+    await testPrisma.expense.create({
+      data: {
+        name: 'Мебель',
+        cost: -500,
+        date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
+        categoryId: seedData.categoryIds.изСбережений,
+        savingSpendingCategoryId: seedData.savingSpendingCategoryIds.eventAGeneral,
+        userId: seedData.userId,
+      },
+    });
+    await page.goto('/transactions');
+
+    const row = await findTransactionRow(page, {
+      name: 'Мебель',
+      categoryId: seedData.categoryIds.изСбережений,
+    });
+    await row.getByRole('button', { name: 'Редактировать' }).click();
+
+    // Switch to expense type
+    await page
+      .getByRole('radiogroup', { name: 'Тип' })
+      .locator('input[value="expense"]')
+      .dispatchEvent('click');
+
+    // Select an expense category to make the form valid — auto-save fires after this
+    await selectOption(page, 'Категория', 'Продукты');
+
+    // Row moves from Из сбережений to Продукты (cost now counts toward expense totals)
+    const expenseRow = await findTransactionRow(page, {
+      name: 'Мебель',
+      categoryId: seedData.categoryIds.продукты,
+    });
+    await expect(expenseRow.getByText('-€500.00')).toBeVisible();
+
+    // Из сбережений section is now empty
+    await expect(
+      page.locator(
+        `.${transactionNameCellClass}[data-testing-category-id="${seedData.categoryIds.изСбережений}"]`,
+      ),
+    ).toHaveCount(0);
+  });
+});
