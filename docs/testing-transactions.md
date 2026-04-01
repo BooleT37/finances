@@ -145,20 +145,20 @@ Seed requirements:
 - **Event B** — active, multiple categories (e.g. "Flight", "Accommodation")
 - **Event C** — completed
 
-### E2E (`e2e/transactions.spec.ts`) ⬜
+### E2E ✅ (`e2e/transactions.spec.ts`)
 
 #### Creating a from-savings transaction
 
 | # | Combined cases | Key assertions |
 |---|----------------|----------------|
-| 13 | Pre-seed one "from-savings" transaction. Create a new one. Select "From savings" type; select Event A (single category); select Event B (multiple categories); confirm Event C absent; save | Event select appears; category hidden for single-category event; category visible for multi-category event; completed event absent from list; row appears in table with cost not counted toward expense totals; Pressing "Group by subcategories" also shows the event group row: both for pre-seeded transaction, and for the one we just created (should be different events) |
+| 13 | ✅ Pre-seed one "from-savings" transaction. Create a new one. Select "From savings" type; select Event A (single category); select Event B (multiple categories); confirm Event C absent; save | Event select appears; category hidden for single-category event; category visible for multi-category event; completed event absent from list; row appears in table with cost not counted toward expense totals; Pressing "Group by subcategories" also shows the event group row: both for pre-seeded transaction, and for the one we just created (should be different events) |
 
 #### Editing an existing from-savings transaction
 
 | # | Combined cases | Key assertions |
 |---|----------------|----------------|
-| 14 | Open from-savings transaction linked to a completed event; change to a different active event | Completed event shown initially (initial value preserved); category select updates when event changes |
-| 15 | Change transaction type away from "From savings" (e.g. to expense) and save | Transaction cost now appears in the expense grand total |
+| 14 | ✅ Open from-savings transaction linked to a completed event; change to a different active event | Completed event shown initially (initial value preserved); category select updates when event changes; auto-save moves row to new event's subcategory |
+| 15 | ✅ Change transaction type away from "From savings" (e.g. to expense) and save | Transaction cost now appears in the expense grand total |
 
 ---
 
