@@ -468,7 +468,7 @@ test.describe('Transaction editing', () => {
         cost: -50,
         date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
         categoryId: seedData.categoryIds.продукты,
-        sourceId: seedData.sourceId,
+        sourceId: seedData.sourceIds.вивид,
         userId: seedData.userId,
       },
     });
@@ -524,7 +524,7 @@ test.describe('Subscriptions', () => {
         name: 'Спотифай',
         cost: 9.99,
         categoryId: seedData.categoryIds.развлечения,
-        sourceId: seedData.sourceId,
+        sourceId: seedData.sourceIds.вивид,
         period: 1,
         firstDate: new Date(TODAY_YEAR, TODAY_MONTH, 1),
         active: true,
@@ -569,7 +569,7 @@ test.describe('Subscriptions', () => {
         name: 'Спотифай',
         cost: 9.99,
         categoryId: seedData.categoryIds.развлечения,
-        sourceId: seedData.sourceId,
+        sourceId: seedData.sourceIds.вивид,
         period: 1,
         firstDate,
         active: true,
@@ -581,7 +581,7 @@ test.describe('Subscriptions', () => {
         name: 'Кинопоиск',
         cost: 5.99,
         categoryId: seedData.categoryIds.развлечения,
-        sourceId: seedData.sourceId,
+        sourceId: seedData.sourceIds.вивид,
         period: 1,
         firstDate,
         active: true,
@@ -594,7 +594,7 @@ test.describe('Subscriptions', () => {
         cost: -9.99,
         date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
         categoryId: seedData.categoryIds.развлечения,
-        sourceId: seedData.sourceId,
+        sourceId: seedData.sourceIds.вивид,
         subscriptionId: sub1.id,
         userId: seedData.userId,
       },
@@ -647,7 +647,7 @@ test.describe('Subscriptions', () => {
         name: 'Спотифай',
         cost: 9.99,
         categoryId: seedData.categoryIds.развлечения,
-        sourceId: seedData.sourceId,
+        sourceId: seedData.sourceIds.вивид,
         period: 1,
         firstDate,
         active: true,
@@ -727,7 +727,7 @@ test.describe('Saving spendings', () => {
         cost: -100,
         date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
         categoryId: seedData.categoryIds.изСбережений,
-        savingSpendingCategoryId: seedData.savingSpendingCategoryIds.eventAGeneral,
+        savingSpendingCategoryId: seedData.savingSpendingCategoryIds.общее,
         userId: seedData.userId,
       },
     });
@@ -787,7 +787,7 @@ test.describe('Saving spendings', () => {
     // New row appears under Из сбережений, grouped under Event B
     const newRow = await findTransactionRow(page, {
       categoryId: seedData.categoryIds.изСбережений,
-      subcategoryId: seedData.savingSpendingIds.eventB,
+      subcategoryId: seedData.savingSpendingIds.переезд2026,
     });
     await expect(newRow.getByText('-€200.00')).toBeVisible();
 
@@ -827,7 +827,7 @@ test.describe('Saving spendings', () => {
         date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
         categoryId: seedData.categoryIds.изСбережений,
         savingSpendingCategoryId:
-          seedData.savingSpendingCategoryIds.eventCElectronics,
+          seedData.savingSpendingCategoryIds.электроника,
         userId: seedData.userId,
       },
     });
@@ -861,7 +861,7 @@ test.describe('Saving spendings', () => {
     await findTransactionRow(page, {
       name: 'Ноутбук',
       categoryId: seedData.categoryIds.изСбережений,
-      subcategoryId: seedData.savingSpendingIds.eventB,
+      subcategoryId: seedData.savingSpendingIds.переезд2026,
     });
   });
 
@@ -877,7 +877,7 @@ test.describe('Saving spendings', () => {
         cost: -500,
         date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
         categoryId: seedData.categoryIds.изСбережений,
-        savingSpendingCategoryId: seedData.savingSpendingCategoryIds.eventAGeneral,
+        savingSpendingCategoryId: seedData.savingSpendingCategoryIds.общее,
         userId: seedData.userId,
       },
     });

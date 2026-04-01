@@ -17,18 +17,22 @@ export interface SeedData {
     такси: number;
     основная: number;
   };
-  sourceId: number;
-  subscriptionId: number;
+  sourceIds: {
+    вивид: number;
+  };
+  subscriptionIds: {
+    нетфликс: number;
+  };
   savingSpendingIds: {
-    eventA: number;
-    eventB: number;
-    eventC: number;
+    отпускРим2025: number;
+    переезд2026: number;
+    новыйТелевизор: number;
   };
   savingSpendingCategoryIds: {
-    eventAGeneral: number;
-    eventBDeposit: number;
-    eventBTransport: number;
-    eventCElectronics: number;
+    общее: number;
+    залог: number;
+    транспорт: number;
+    электроника: number;
   };
 }
 
@@ -39,39 +43,83 @@ export async function seed(): Promise<SeedData> {
 
   // Categories
   const продукты = await testPrisma.category.create({
-    data: { name: 'Продукты', shortname: 'Продукты', isIncome: false, isContinuous: false, userId: user.id },
+    data: {
+      name: 'Продукты',
+      shortname: 'Продукты',
+      isIncome: false,
+      isContinuous: false,
+      userId: user.id,
+    },
   });
   const рынок = await testPrisma.subcategory.create({
     data: { name: 'Рынок', categoryId: продукты.id },
   });
 
   const транспорт = await testPrisma.category.create({
-    data: { name: 'Транспорт', shortname: 'Транспорт', isIncome: false, isContinuous: false, userId: user.id },
+    data: {
+      name: 'Транспорт',
+      shortname: 'Транспорт',
+      isIncome: false,
+      isContinuous: false,
+      userId: user.id,
+    },
   });
   const такси = await testPrisma.subcategory.create({
     data: { name: 'Такси', categoryId: транспорт.id },
   });
 
   const развлечения = await testPrisma.category.create({
-    data: { name: 'Развлечения', shortname: 'Развлечения', isIncome: false, isContinuous: false, userId: user.id },
+    data: {
+      name: 'Развлечения',
+      shortname: 'Развлечения',
+      isIncome: false,
+      isContinuous: false,
+      userId: user.id,
+    },
   });
 
   const изСбережений = await testPrisma.category.create({
-    data: { name: 'Из сбережений', shortname: 'Из сбережений', isIncome: false, isContinuous: false, type: 'FROM_SAVINGS', userId: user.id },
+    data: {
+      name: 'Из сбережений',
+      shortname: 'Из сбережений',
+      isIncome: false,
+      isContinuous: false,
+      type: 'FROM_SAVINGS',
+      userId: user.id,
+    },
   });
 
   const вСбережения = await testPrisma.category.create({
-    data: { name: 'В сбережения', shortname: 'В сбережения', isIncome: false, isContinuous: false, type: 'TO_SAVINGS', userId: user.id },
+    data: {
+      name: 'В сбережения',
+      shortname: 'В сбережения',
+      isIncome: false,
+      isContinuous: false,
+      type: 'TO_SAVINGS',
+      userId: user.id,
+    },
   });
 
   const зарплата = await testPrisma.category.create({
-    data: { name: 'Зарплата', shortname: 'Зарплата', isIncome: true, isContinuous: false, userId: user.id },
+    data: {
+      name: 'Зарплата',
+      shortname: 'Зарплата',
+      isIncome: true,
+      isContinuous: false,
+      userId: user.id,
+    },
   });
   const основная = await testPrisma.subcategory.create({
     data: { name: 'Основная', categoryId: зарплата.id },
   });
 
-  const expenseCategories = [продукты, транспорт, развлечения, изСбережений, вСбережения];
+  const expenseCategories = [
+    продукты,
+    транспорт,
+    развлечения,
+    изСбережений,
+    вСбережения,
+  ];
   const incomeCategories = [зарплата];
 
   await testPrisma.userSetting.create({
@@ -102,7 +150,7 @@ export async function seed(): Promise<SeedData> {
   });
 
   // Saving spending events
-  const eventA = await testPrisma.savingSpending.create({
+  const отпускРим = await testPrisma.savingSpending.create({
     data: {
       name: 'Отпуск Рим 2025',
       completed: false,
@@ -114,7 +162,7 @@ export async function seed(): Promise<SeedData> {
     include: { categories: true },
   });
 
-  const eventB = await testPrisma.savingSpending.create({
+  const переезд = await testPrisma.savingSpending.create({
     data: {
       name: 'Переезд 2026',
       completed: false,
@@ -129,7 +177,7 @@ export async function seed(): Promise<SeedData> {
     include: { categories: true },
   });
 
-  const eventC = await testPrisma.savingSpending.create({
+  const новыйТелевизор = await testPrisma.savingSpending.create({
     data: {
       name: 'Новый телевизор',
       completed: true,
@@ -156,18 +204,22 @@ export async function seed(): Promise<SeedData> {
       такси: такси.id,
       основная: основная.id,
     },
-    sourceId: vivid.id,
-    subscriptionId: netflix.id,
+    sourceIds: {
+      вивид: vivid.id,
+    },
+    subscriptionIds: {
+      нетфликс: netflix.id,
+    },
     savingSpendingIds: {
-      eventA: eventA.id,
-      eventB: eventB.id,
-      eventC: eventC.id,
+      отпускРим2025: отпускРим.id,
+      переезд2026: переезд.id,
+      новыйТелевизор: новыйТелевизор.id,
     },
     savingSpendingCategoryIds: {
-      eventAGeneral: eventA.categories[0]!.id,
-      eventBDeposit: eventB.categories[0]!.id,
-      eventBTransport: eventB.categories[1]!.id,
-      eventCElectronics: eventC.categories[0]!.id,
+      общее: отпускРим.categories[0]!.id,
+      залог: переезд.categories[0]!.id,
+      транспорт: переезд.categories[1]!.id,
+      электроника: новыйТелевизор.categories[0]!.id,
     },
   };
 }
