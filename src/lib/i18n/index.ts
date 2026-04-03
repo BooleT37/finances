@@ -1,6 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
+import { i18nResources as budgetingResources } from '~/features/budgeting/i18n';
 import { i18nResources as navResources } from '~/features/nav/i18n';
 import { i18nResources as transactionsResources } from '~/features/transactions/i18n';
 
@@ -8,8 +9,18 @@ import homeEn from './locales/en/home.json';
 import homeRu from './locales/ru/home.json';
 
 export const resources = {
-  en: { home: homeEn, ...navResources.en, ...transactionsResources.en },
-  ru: { home: homeRu, ...navResources.ru, ...transactionsResources.ru },
+  en: {
+    home: homeEn,
+    ...navResources.en,
+    ...transactionsResources.en,
+    ...budgetingResources.en,
+  },
+  ru: {
+    home: homeRu,
+    ...navResources.ru,
+    ...transactionsResources.ru,
+    ...budgetingResources.ru,
+  },
 } as const;
 
 declare module 'i18next' {

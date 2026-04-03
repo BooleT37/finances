@@ -4,7 +4,8 @@
   "i18n-ally.localesPaths": [
     "src/lib/i18n/locales",
     "src/features/nav/locales",
-    "src/features/transactions/locales"
+    "src/features/transactions/locales",
+    "src/features/budgeting/locales"
   ],
   "i18n-ally.namespace": true,
   "i18n-ally.defaultNamespace": "home",

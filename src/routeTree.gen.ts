@@ -12,7 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TransactionsRouteImport } from './routes/transactions'
 import { Route as StatisticsRouteImport } from './routes/statistics'
 import { Route as SavingsSpendingsRouteImport } from './routes/savings-spendings'
-import { Route as PlanningRouteImport } from './routes/planning'
+import { Route as BudgetingRouteImport } from './routes/budgeting'
 import { Route as IndexRouteImport } from './routes/index'
 
 const TransactionsRoute = TransactionsRouteImport.update({
@@ -30,9 +30,9 @@ const SavingsSpendingsRoute = SavingsSpendingsRouteImport.update({
   path: '/savings-spendings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PlanningRoute = PlanningRouteImport.update({
-  id: '/planning',
-  path: '/planning',
+const BudgetingRoute = BudgetingRouteImport.update({
+  id: '/budgeting',
+  path: '/budgeting',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -43,14 +43,14 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/planning': typeof PlanningRoute
+  '/budgeting': typeof BudgetingRoute
   '/savings-spendings': typeof SavingsSpendingsRoute
   '/statistics': typeof StatisticsRoute
   '/transactions': typeof TransactionsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/planning': typeof PlanningRoute
+  '/budgeting': typeof BudgetingRoute
   '/savings-spendings': typeof SavingsSpendingsRoute
   '/statistics': typeof StatisticsRoute
   '/transactions': typeof TransactionsRoute
@@ -58,7 +58,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/planning': typeof PlanningRoute
+  '/budgeting': typeof BudgetingRoute
   '/savings-spendings': typeof SavingsSpendingsRoute
   '/statistics': typeof StatisticsRoute
   '/transactions': typeof TransactionsRoute
@@ -67,16 +67,21 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/planning'
+    | '/budgeting'
     | '/savings-spendings'
     | '/statistics'
     | '/transactions'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/planning' | '/savings-spendings' | '/statistics' | '/transactions'
+  to:
+    | '/'
+    | '/budgeting'
+    | '/savings-spendings'
+    | '/statistics'
+    | '/transactions'
   id:
     | '__root__'
     | '/'
-    | '/planning'
+    | '/budgeting'
     | '/savings-spendings'
     | '/statistics'
     | '/transactions'
@@ -84,7 +89,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  PlanningRoute: typeof PlanningRoute
+  BudgetingRoute: typeof BudgetingRoute
   SavingsSpendingsRoute: typeof SavingsSpendingsRoute
   StatisticsRoute: typeof StatisticsRoute
   TransactionsRoute: typeof TransactionsRoute
@@ -113,11 +118,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SavingsSpendingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/planning': {
-      id: '/planning'
-      path: '/planning'
-      fullPath: '/planning'
-      preLoaderRoute: typeof PlanningRouteImport
+    '/budgeting': {
+      id: '/budgeting'
+      path: '/budgeting'
+      fullPath: '/budgeting'
+      preLoaderRoute: typeof BudgetingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -132,7 +137,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  PlanningRoute: PlanningRoute,
+  BudgetingRoute: BudgetingRoute,
   SavingsSpendingsRoute: SavingsSpendingsRoute,
   StatisticsRoute: StatisticsRoute,
   TransactionsRoute: TransactionsRoute,

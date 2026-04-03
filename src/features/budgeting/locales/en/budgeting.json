@@ -1,0 +1,11 @@
+{
+  "expenses": "Expenses",
+  "income": "Income",
+  "grandTotal": "Estimated surplus",
+  "restSubcategory": "Rest",
+  "emptyState": "No categories found",
+  "columns": {
+    "name": "Name",
+    "plan": "Plan"
+  }
+}
