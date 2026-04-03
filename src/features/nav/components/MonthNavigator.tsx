@@ -16,6 +16,7 @@ import {
   IconChevronLeft,
   IconChevronRight,
 } from '@tabler/icons-react';
+import { useRouterState } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 import { useAtom, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
@@ -41,6 +42,7 @@ function formatLabel(
 export function MonthNavigator() {
   const [selectedMonth, setMonth] = useAtom(selectedMonthAtom);
   const [viewMode, setViewMode] = useAtom(viewModeAtom);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const setSearch = useSetAtom(transactionSearchAtom);
   const [pickerOpened, { toggle: togglePicker, close: closePicker }] =
     useDisclosure(false);
@@ -142,23 +144,25 @@ export function MonthNavigator() {
                   </Flex>
                 </Button>
               )}
-              <Button
-                variant="white"
-                size="xs"
-                onClick={handleToggleView}
-                w="100%"
-              >
-                <Flex gap={4} align="center">
-                  {viewMode === 'month' ? (
-                    <IconCalendarStats size={14} />
-                  ) : (
-                    <IconCalendarMonth size={14} />
-                  )}
-                  {viewMode === 'month'
-                    ? t('switchToYearView')
-                    : t('switchToMonthView')}
-                </Flex>
-              </Button>
+              {pathname === '/transactions' && (
+                <Button
+                  variant="white"
+                  size="xs"
+                  onClick={handleToggleView}
+                  w="100%"
+                >
+                  <Flex gap={4} align="center">
+                    {viewMode === 'month' ? (
+                      <IconCalendarStats size={14} />
+                    ) : (
+                      <IconCalendarMonth size={14} />
+                    )}
+                    {viewMode === 'month'
+                      ? t('switchToYearView')
+                      : t('switchToMonthView')}
+                  </Flex>
+                </Button>
+              )}
             </Stack>
           </Stack>
         </Popover.Dropdown>

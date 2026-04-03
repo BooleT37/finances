@@ -10,7 +10,7 @@ export function AppHeader() {
   const { t } = useTranslation('nav');
 
   const showNavigator =
-    pathname === '/transactions' || pathname === '/planning';
+    pathname === '/transactions' || pathname === '/budgeting';
 
   return (
     <Group h="100%" px="md" justify="space-between" align="center">

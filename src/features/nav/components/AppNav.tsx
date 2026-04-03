@@ -26,7 +26,11 @@ export function AppNav() {
       label: t('transactions'),
       icon: <IconTable size={18} />,
     },
-    { to: '/planning', label: t('planning'), icon: <IconCalendar size={18} /> },
+    {
+      to: '/budgeting',
+      label: t('planning'),
+      icon: <IconCalendar size={18} />,
+    },
     {
       to: '/savings-spendings',
       label: t('savings'),
