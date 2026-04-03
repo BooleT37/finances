@@ -28,14 +28,7 @@ Ask the user to review and confirm before moving on. Do not proceed to planning 
 
 Break the work into a sequence of atomic commits, each addressing a single concern. Use [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) format.
 
-Present the plan as an ordered list, e.g.:
-
-1. `feat(schema): add X field to transaction schema`
-2. `feat(api): expose X in fetchTransactions handler`
-3. `feat(ui): render X in TransactionsTable`
-4. `test(e2e): add E2E test for X`
-
-Goals:
+Present the plan as an ordered commits list, with a description what you want to do in each commit, code-wise
 
 - Each commit should be reviewable in isolation
 - Migrations and schema changes come before API changes; API before UI
