@@ -22,3 +22,4 @@ test-results/
 playwright/.cache/
 playwright/.auth/
 *.png
+.playwright-mcp/
