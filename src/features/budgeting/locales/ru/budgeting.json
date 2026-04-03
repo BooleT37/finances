@@ -1,11 +1,11 @@
 {
   "expenses": "Расходы",
   "income": "Доходы",
-  "grandTotal": "Прогноз остатка",
+  "grandTotal": "Итого",
   "restSubcategory": "Остальное",
   "emptyState": "Категории не найдены",
   "columns": {
     "name": "Категория",
-    "plan": "Бюджет"
+    "plan": "План"
   }
 }

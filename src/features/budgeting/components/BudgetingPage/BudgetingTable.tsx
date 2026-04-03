@@ -1,5 +1,6 @@
 import { Group, Text } from '@mantine/core';
 import Decimal from 'decimal.js';
+import { useAtomValue } from 'jotai';
 import {
   MantineReactTable,
   type MRT_ColumnDef,
@@ -11,26 +12,18 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { NameWithOptionalIcon } from '~/features/categories/components/NameWithOptionalIcon';
+import { costToString } from '~/shared/utils/costToString';
+import { selectedMonthNumberAtom, selectedYearAtom } from '~/stores/month';
 
 import type { BudgetingRow } from './BudgetingTable.types';
+import { useBudgetingRows } from './useBudgetingRows';
 
-function formatPlanSum(planSum: Decimal): string {
-  if (planSum.isZero()) {
-    return '0';
-  }
-  if (planSum.isNegative()) {
-    return '−' + planSum.abs().toFixed(0);
-  }
-  return planSum.toFixed(0);
-}
-
-interface Props {
-  rows: BudgetingRow[] | undefined;
-  isLoading: boolean;
-}
-
-export function BudgetingTable({ rows, isLoading }: Props) {
+export function BudgetingTable() {
   const { t } = useTranslation('budgeting');
+
+  const year = useAtomValue(selectedYearAtom);
+  const month = useAtomValue(selectedMonthNumberAtom);
+  const { rows, isLoading } = useBudgetingRows(month, year);
 
   const surplus = useMemo(() => {
     if (!rows) {
@@ -46,11 +39,11 @@ export function BudgetingTable({ rows, isLoading }: Props) {
         accessorKey: 'planSum',
         header: t('columns.plan'),
         Cell: ({ row }) => (
-          <Text size="sm">{formatPlanSum(row.original.planSum)}</Text>
+          <Text size="sm">{costToString(row.original.planSum)}</Text>
         ),
         Footer: () => (
           <Text size="sm" fw={600} c={surplus.isNegative() ? 'red' : 'green'}>
-            {formatPlanSum(surplus)}
+            {costToString(surplus)}
           </Text>
         ),
         size: 120,
@@ -81,6 +74,19 @@ export function BudgetingTable({ rows, isLoading }: Props) {
     state: {
       isLoading,
     },
+    mantineTableContainerProps: {
+      style: {
+        // subtract 2px for the MRT Paper's 1px top + 1px bottom border
+        maxHeight:
+          'calc(100dvh - var(--app-shell-header-height) - var(--app-shell-padding) * 2 - 2px)',
+      },
+    },
+    mantineTableFooterCellProps: {
+      style: {
+        padding:
+          'var(--table-vertical-spacing) var(--table-horizontal-spacing, var(--mantine-spacing-xs))',
+      },
+    },
     displayColumnDefOptions: {
       'mrt-row-expand': {
         header: t('columns.name'),
@@ -91,17 +97,11 @@ export function BudgetingTable({ rows, isLoading }: Props) {
         ),
         Cell: ({ row, table: t2 }) => (
           <Group align="center" gap="xs" wrap="nowrap">
-            {row.depth > 0 && row.getCanExpand() && (
-              <MRT_ExpandButton row={row} table={t2} />
-            )}
-            {row.depth === 0 && <span>{row.original.name}</span>}
-            {row.depth === 1 && (
-              <NameWithOptionalIcon
-                name={row.original.name}
-                icon={row.original.icon}
-              />
-            )}
-            {row.depth === 2 && <span>{row.original.name}</span>}
+            <MRT_ExpandButton row={row} table={t2} />
+            <NameWithOptionalIcon
+              name={row.original.name}
+              icon={row.original.icon}
+            />
           </Group>
         ),
         size: 240,

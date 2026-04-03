@@ -1,7 +1,7 @@
 {
   "expenses": "Expenses",
   "income": "Income",
-  "grandTotal": "Estimated surplus",
+  "grandTotal": "Total",
   "restSubcategory": "Rest",
   "emptyState": "No categories found",
   "columns": {

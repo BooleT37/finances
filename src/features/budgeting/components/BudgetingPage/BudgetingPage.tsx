@@ -4,19 +4,16 @@ import { useEffect } from 'react';
 import { getToday } from '~/shared/utils/today';
 import {
   selectedMonthAtom,
-  selectedMonthNumberAtom,
   selectedYearAtom,
   viewModeAtom,
 } from '~/stores/month';
 
 import { BudgetingTable } from './BudgetingTable';
-import { useBudgetingRows } from './useBudgetingRows';
 
 export function BudgetingPage() {
   const [viewMode, setViewMode] = useAtom(viewModeAtom);
   const [, setMonth] = useAtom(selectedMonthAtom);
   const year = useAtomValue(selectedYearAtom);
-  const month = useAtomValue(selectedMonthNumberAtom);
 
   useEffect(() => {
     if (viewMode === 'year') {
@@ -28,10 +25,7 @@ export function BudgetingPage() {
         setMonth(`${year}-01`);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [setMonth, setViewMode, viewMode, year]);
 
-  const { rows, isLoading } = useBudgetingRows(month, year);
-
-  return <BudgetingTable rows={rows} isLoading={isLoading} />;
+  return <BudgetingTable />;
 }
