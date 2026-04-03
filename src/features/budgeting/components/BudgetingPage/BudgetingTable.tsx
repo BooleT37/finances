@@ -91,7 +91,9 @@ export function BudgetingTable({ rows, isLoading }: Props) {
         ),
         Cell: ({ row, table: t2 }) => (
           <Group align="center" gap="xs" wrap="nowrap">
-            {row.depth > 0 && <MRT_ExpandButton row={row} table={t2} />}
+            {row.depth > 0 && row.getCanExpand() && (
+              <MRT_ExpandButton row={row} table={t2} />
+            )}
             {row.depth === 0 && <span>{row.original.name}</span>}
             {row.depth === 1 && (
               <NameWithOptionalIcon
