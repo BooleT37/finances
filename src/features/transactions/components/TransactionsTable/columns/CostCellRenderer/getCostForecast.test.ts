@@ -1,8 +1,8 @@
 import Decimal from 'decimal.js';
 import { indexBy, prop } from 'ramda';
 
+import type { Forecast } from '~/features/budgeting/schema';
 import type { Category } from '~/features/categories/schema';
-import type { Forecast } from '~/features/forecasts/schema';
 import type { SavingSpending } from '~/features/savingSpendings/schema';
 
 import { getCostForecast } from './getCostForecast';

@@ -39,7 +39,7 @@ Detailed framework-specific documentation is split into separate files:
 Each feature has a dedicated documentation file at `src/features/{feature}/{FEATURE}.md` describing its domain concepts, business rules, and known limitations. Read the relevant feature doc(s) before implementing significant new UI or writing tests for that feature:
 
 - [Transactions](src/features/transactions/TRANSACTIONS.md)
-- [Forecasts](src/features/forecasts/FORECASTS.md)
+- [Budgeting](src/features/budgeting/BUDGETING.md)
 - [Categories](src/features/categories/CATEGORIES.md)
 - [Sources](src/features/sources/SOURCES.md)
 - [Subscriptions](src/features/subscriptions/SUBSCRIPTIONS.md)
