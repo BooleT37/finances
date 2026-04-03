@@ -57,6 +57,7 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
     enablePagination: false,
     groupedColumnMode: 'remove',
     enableColumnActions: true,
+    enableStickyHeader: true,
     initialState: {
       grouping: ['isIncome', 'categoryId'],
       expanded: true,
@@ -69,6 +70,13 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
     },
     state: {
       isLoading: !items,
+    },
+    mantineTableContainerProps: {
+      // 36px toolbar + --mantine-spacing-md stack gap + 2px MRT Paper border
+      style: {
+        maxHeight:
+          'calc(100dvh - var(--app-shell-header-height) - var(--app-shell-padding) * 2 - 36px - var(--mantine-spacing-md) - 2px)',
+      },
     },
     enableRowActions: true,
     renderRowActions: ({ row }) => {

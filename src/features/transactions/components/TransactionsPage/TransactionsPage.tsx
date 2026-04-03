@@ -43,7 +43,10 @@ export function TransactionsPage() {
   );
 
   return (
-    <Stack h="100%" style={{ flex: 1, marginRight: sidebarWidth }}>
+    <Stack
+      h="100%"
+      style={{ flex: 1, marginRight: sidebarWidth, minWidth: 910 }}
+    >
       <Group justify="space-between">
         <Group gap="sm">
           <Button
