@@ -55,6 +55,7 @@ Once implementation is complete, use the Playwright MCP server to open the app i
 - Exercise key edge cases identified in the DoD
 
 Report what was tested and whether it passed. If anything looks wrong, fix it before proceeding to tests.
+If the port/browser is busy, ask the user to unblock
 
 ---
 
@@ -69,6 +70,7 @@ Decide on the right layer(s):
 - **Unit** — for pure utility functions
 
 If unsure which layer is appropriate for a given case, ask.
+If the port is busy, ask the user to unblock
 
 ---
 
