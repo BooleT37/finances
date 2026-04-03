@@ -21,3 +21,4 @@ blob-report/
 test-results/
 playwright/.cache/
 playwright/.auth/
+*.png

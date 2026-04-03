@@ -6,7 +6,9 @@
       "Bash(npm run format:check)",
       "Read(//Users/alekseylevin/projects/finances-t3/**)",
       "Bash(npx prettier:*)",
-      "Bash(npx playwright:*)"
+      "Bash(npx playwright:*)",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_take_screenshot"
     ]
   },
   "hooks": {
@@ -17,6 +19,16 @@
           {
             "type": "command",
             "command": "jq -r '.tool_input.file_path' | xargs prettier --write"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "notify-send 'Claude done ❇️'"
           }
         ]
       }
