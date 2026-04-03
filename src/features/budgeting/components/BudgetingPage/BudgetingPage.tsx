@@ -1,20 +1,22 @@
-import { Text } from '@mantine/core';
 import { useAtom, useAtomValue } from 'jotai';
 import { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { getToday } from '~/shared/utils/today';
 import {
   selectedMonthAtom,
+  selectedMonthNumberAtom,
   selectedYearAtom,
   viewModeAtom,
 } from '~/stores/month';
 
+import { BudgetingTable } from './BudgetingTable';
+import { useBudgetingRows } from './useBudgetingRows';
+
 export function BudgetingPage() {
-  const { t } = useTranslation('budgeting');
   const [viewMode, setViewMode] = useAtom(viewModeAtom);
   const [, setMonth] = useAtom(selectedMonthAtom);
   const year = useAtomValue(selectedYearAtom);
+  const month = useAtomValue(selectedMonthNumberAtom);
 
   useEffect(() => {
     if (viewMode === 'year') {
@@ -29,5 +31,7 @@ export function BudgetingPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <Text c="dimmed">{t('grandTotal')}</Text>;
+  const { rows, isLoading } = useBudgetingRows(month, year);
+
+  return <BudgetingTable rows={rows} isLoading={isLoading} />;
 }
