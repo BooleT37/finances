@@ -1,11 +1,14 @@
 {
-  "expenses": "Expenses",
-  "income": "Income",
-  "grandTotal": "Total",
-  "restSubcategory": "Rest",
-  "emptyState": "No categories found",
   "columns": {
+    "comment": "Comment",
     "name": "Name",
     "plan": "Plan"
-  }
+  },
+  "emptyState": "No categories found",
+  "expenses": "Expenses",
+  "grandTotal": "Total",
+  "income": "Income",
+  "lockedPlanTooltip": "Value is calculated automatically as the sum of subcategories",
+  "restRowTooltip": "This is a superficial subcategory, it's not possible to add a comment to it.",
+  "restSubcategory": "Rest"
 }

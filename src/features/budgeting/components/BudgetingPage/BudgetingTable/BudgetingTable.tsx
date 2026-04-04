@@ -3,8 +3,8 @@ import Decimal from 'decimal.js';
 import { useAtomValue } from 'jotai';
 import {
   MantineReactTable,
-  type MRT_ColumnDef,
   MRT_ExpandButton,
+  type MRT_ExpandedState,
   useMantineReactTable,
 } from 'mantine-react-table';
 import { MRT_Localization_RU } from 'mantine-react-table/locales/ru/index.cjs';
@@ -12,11 +12,13 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { NameWithOptionalIcon } from '~/features/categories/components/NameWithOptionalIcon';
-import { costToString } from '~/shared/utils/costToString';
 import { selectedMonthNumberAtom, selectedYearAtom } from '~/stores/month';
 
-import type { BudgetingRow } from './BudgetingTable.types';
+import { buildBudgetingRowId } from './budgetingRowId';
+import { useBudgetingTableColumns } from './columns/useBudgetingTableColumns';
 import { useBudgetingRows } from './useBudgetingRows';
+import { useSaveForecastComment } from './useSaveForecastComment';
+import { useSaveForecastSum } from './useSaveForecastSum';
 
 export function BudgetingTable() {
   const { t } = useTranslation('budgeting');
@@ -24,6 +26,8 @@ export function BudgetingTable() {
   const year = useAtomValue(selectedYearAtom);
   const month = useAtomValue(selectedMonthNumberAtom);
   const { rows, isLoading } = useBudgetingRows(month, year);
+  const savePlan = useSaveForecastSum(month, year);
+  const saveComment = useSaveForecastComment(month, year);
 
   const surplus = useMemo(() => {
     if (!rows) {
@@ -32,25 +36,7 @@ export function BudgetingTable() {
     return rows.reduce((sum, r) => sum.plus(r.planSum), new Decimal(0));
   }, [rows]);
 
-  const columns = useMemo<MRT_ColumnDef<BudgetingRow>[]>(
-    () => [
-      {
-        id: 'planSum',
-        accessorKey: 'planSum',
-        header: t('columns.plan'),
-        Cell: ({ row }) => (
-          <Text size="sm">{costToString(row.original.planSum)}</Text>
-        ),
-        Footer: () => (
-          <Text size="sm" fw={600} c={surplus.isNegative() ? 'red' : 'green'}>
-            {costToString(surplus)}
-          </Text>
-        ),
-        size: 120,
-      },
-    ],
-    [t, surplus],
-  );
+  const columns = useBudgetingTableColumns({ surplus, savePlan, saveComment });
 
   const table = useMantineReactTable({
     columns,
@@ -66,9 +52,14 @@ export function BudgetingTable() {
     enableColumnDragging: false,
     enableStickyHeader: true,
     enableStickyFooter: true,
+    editDisplayMode: 'cell',
+    enableEditing: true,
     localization: MRT_Localization_RU,
     initialState: {
-      expanded: true,
+      expanded: {
+        [buildBudgetingRowId({ rowType: 'typeGroup', isIncome: false })]: true,
+        [buildBudgetingRowId({ rowType: 'typeGroup', isIncome: true })]: true,
+      } as MRT_ExpandedState,
       density: 'xs',
     },
     state: {

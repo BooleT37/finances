@@ -17,5 +17,7 @@ export interface BudgetingRow {
   isIncome: boolean;
   /** Precomputed plan sum at every level. Negative for expense rows (adaptCost applied). */
   planSum: Decimal;
+  /** '' if no DB record exists. Always '' for Rest and typeGroup rows. */
+  comment: string;
   subRows?: BudgetingRow[];
 }

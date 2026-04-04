@@ -1,11 +1,14 @@
 {
-  "expenses": "Расходы",
-  "income": "Доходы",
-  "grandTotal": "Итого",
-  "restSubcategory": "Остальное",
-  "emptyState": "Категории не найдены",
   "columns": {
+    "comment": "Комментарий",
     "name": "Категория",
     "plan": "План"
-  }
+  },
+  "emptyState": "Категории не найдены",
+  "expenses": "Расходы",
+  "grandTotal": "Итого",
+  "income": "Доходы",
+  "lockedPlanTooltip": "Значение рассчитывается автоматически как сумма подкатегорий",
+  "restRowTooltip": "Это фиктивная подкатегория, добавить комментарий к ней нельзя",
+  "restSubcategory": "Остальное"
 }

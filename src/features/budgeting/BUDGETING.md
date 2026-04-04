@@ -10,6 +10,10 @@ Each forecast is unique for the combination of: **category id + subcategory id +
 
 All forecasts for a given month are sometimes called "planning" or "budgeting". The forecasts table page is sometimes called "Planning page"
 
+## Sum Storage
+
+Forecast sums are stored in the database as **absolute values**, the same way transaction costs are stored. The sign is applied on read via `adaptCost` in the API handler (negative for expense categories, positive for income). When writing a forecast, send the absolute value — the server always calls `.abs()` before persisting.
+
 ## Sparse Storage
 
 In the UI, we always display forecasts for all possible categories and subcategories for the given month. However, in the database we only store forecasts that were "touched" (i.e. edited). The rest are pre-filled with empty values in the UI. When a forecast is edited, we check whether it already exists — if not, we create it; otherwise, we update it.

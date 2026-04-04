@@ -55,6 +55,7 @@ function buildCategoryRows(
         isRestRow: false,
         isIncome: category.isIncome,
         planSum: categoryPlanSum,
+        comment: catForecast?.comment ?? '',
       } satisfies BudgetingRow;
     }
 
@@ -80,6 +81,7 @@ function buildCategoryRows(
           isRestRow: false,
           isIncome: category.isIncome,
           planSum: subForecast?.sum ?? ZERO,
+          comment: subForecast?.comment ?? '',
         } satisfies BudgetingRow;
       },
     );
@@ -88,16 +90,12 @@ function buildCategoryRows(
       sortSubcategories(category.id, a.subcategoryId, b.subcategoryId),
     );
 
-    const subRows: BudgetingRow[] = [...subcategoryRows];
+    const subcategorySum = decimalSum(...subcategoryRows.map((r) => r.planSum));
+    const restPlanSum = categoryPlanSum;
 
-    const hasNonZeroSubcategory = subcategoryRows.some(
-      (r) => !r.planSum.isZero(),
-    );
-    if (hasNonZeroSubcategory) {
-      const subcategorySum = decimalSum(
-        ...subcategoryRows.map((r) => r.planSum),
-      );
-      subRows.push({
+    const subRows: BudgetingRow[] = [
+      ...subcategoryRows,
+      {
         id: buildBudgetingRowId({ rowType: 'rest', categoryId: category.id }),
         rowType: 'subcategory',
         name: restSubcategoryName,
@@ -106,9 +104,10 @@ function buildCategoryRows(
         subcategoryId: REST_SUBCATEGORY_ID,
         isRestRow: true,
         isIncome: category.isIncome,
-        planSum: categoryPlanSum.minus(subcategorySum),
-      });
-    }
+        planSum: restPlanSum,
+        comment: '',
+      },
+    ];
 
     return {
       id: buildBudgetingRowId({ rowType: 'category', categoryId: category.id }),
@@ -119,7 +118,8 @@ function buildCategoryRows(
       subcategoryId: null,
       isRestRow: false,
       isIncome: category.isIncome,
-      planSum: categoryPlanSum,
+      planSum: subcategorySum.plus(restPlanSum),
+      comment: catForecast?.comment ?? '',
       subRows,
     } satisfies BudgetingRow;
   });
@@ -180,6 +180,7 @@ export function useBudgetingRows(
         isRestRow: false,
         isIncome: false,
         planSum: decimalSum(...expenseRows.map((r) => r.planSum)),
+        comment: '',
         subRows: expenseRows,
       },
       {
@@ -192,6 +193,7 @@ export function useBudgetingRows(
         isRestRow: false,
         isIncome: true,
         planSum: decimalSum(...incomeRows.map((r) => r.planSum)),
+        comment: '',
         subRows: incomeRows,
       },
     ];

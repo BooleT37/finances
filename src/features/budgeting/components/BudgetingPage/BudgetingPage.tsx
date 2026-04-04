@@ -8,7 +8,7 @@ import {
   viewModeAtom,
 } from '~/stores/month';
 
-import { BudgetingTable } from './BudgetingTable';
+import { BudgetingTable } from './BudgetingTable/BudgetingTable';
 
 export function BudgetingPage() {
   const [viewMode, setViewMode] = useAtom(viewModeAtom);
