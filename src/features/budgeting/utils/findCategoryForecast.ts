@@ -7,6 +7,7 @@ export function findCategoryForecast(
   return forecasts.find(
     (f) =>
       f.categoryId === params.categoryId &&
+      f.subcategoryId === null &&
       f.month === params.month &&
       f.year === params.year,
   );
