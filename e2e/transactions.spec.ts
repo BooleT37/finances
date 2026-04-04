@@ -498,6 +498,9 @@ test.describe('Transaction editing', () => {
     await form.getByLabel('Сумма (€)').fill('75');
     await expect(row.getByText('-€75.00')).toBeVisible();
 
+    await page.getByRole('button', { name: 'Закрыть' }).click();
+    await page.waitForLoadState('networkidle');
+
     await row.getByRole('button', { name: 'Удалить' }).click();
     await page
       .getByRole('dialog')
