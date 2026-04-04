@@ -8,6 +8,7 @@ export const forecastSchema = z.object({
   month: z.number(),
   year: z.number(),
   sum: decimalCodec,
+  comment: z.string(),
 });
 
 export type ForecastWire = z.input<typeof forecastSchema>;
