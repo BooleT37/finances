@@ -1,7 +1,7 @@
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 
-import { PrismaClient } from '../../src/generated/prisma/client';
+import { PrismaClient } from '../../../src/generated/prisma/client';
 
 export const TEST_DB_URL =
   'postgresql://postgres:postgres@localhost:5434/finances_test';

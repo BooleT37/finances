@@ -16,7 +16,7 @@ Do not aim for 100% coverage. Prioritise cases where a silent regression would b
 
 ## Transactions
 
-### E2E (`e2e/transactions.spec.ts`) ✅
+### E2E (`test/e2e/transactions.spec.ts`) ✅
 
 #### Create transaction
 
@@ -55,7 +55,7 @@ Business logic was extracted from `CostAggregatedCellRenderer` into a pure funct
 
 ## Components
 
-### E2E ✅ [`transactions.spec.ts`](../e2e/transactions.spec.ts)
+### E2E ✅ [`transactions.spec.ts`](../test/e2e/transactions.spec.ts)
 
 | # | Combined cases | Key assertions |
 |---|----------------|----------------|
@@ -94,7 +94,7 @@ Business logic was extracted from `CostAggregatedCellRenderer` into a pure funct
 
 ## Subscriptions
 
-### E2E ✅ [`transactions.spec.ts`](../e2e/transactions.spec.ts)
+### E2E ✅ [`transactions.spec.ts`](../test/e2e/transactions.spec.ts)
 
 | # | Combined cases | Key assertions |
 |---|----------------|----------------|
@@ -145,7 +145,7 @@ Seed requirements:
 - **Event B** — active, multiple categories (e.g. "Flight", "Accommodation")
 - **Event C** — completed
 
-### E2E ✅ (`e2e/transactions.spec.ts`)
+### E2E ✅ (`test/e2e/transactions.spec.ts`)
 
 #### Creating a from-savings transaction
 

@@ -1,15 +1,15 @@
 import { defineConfig, devices } from '@playwright/test';
 
-import { TEST_DB_URL } from './e2e/db/client';
+import { TEST_DB_URL } from './test/e2e/db/client';
 
 export default defineConfig({
-  testDir: './e2e',
+  testDir: './test/e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   reporter: 'html',
-  globalSetup: './e2e/global-setup.ts',
-  globalTeardown: './e2e/global-teardown.ts',
+  globalSetup: './test/e2e/global-setup.ts',
+  globalTeardown: './test/e2e/global-teardown.ts',
   workers: 1, // sequential spec files — parallel workers would race to reset the same DB
   use: {
     baseURL: 'http://localhost:3000',

@@ -1,4 +1,4 @@
-import { TODAY_MONTH, TODAY_YEAR } from '../../src/shared/utils/today';
+import { TODAY_MONTH, TODAY_YEAR } from '../../../src/shared/utils/today';
 import { testPrisma } from './client';
 
 export const TEST_USER_ID = 'test-user';

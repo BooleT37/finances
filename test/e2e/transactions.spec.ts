@@ -2,8 +2,8 @@ import type { Locator, Page } from '@playwright/test';
 
 import { expect, test } from './fixtures';
 import { testPrisma } from './db/client';
-import { transactionNameCellClass } from '../src/features/transactions/components/TransactionsTable/TransactionsTable';
-import { TODAY_DAY, TODAY_MONTH, TODAY_YEAR } from '../src/shared/utils/today';
+import { transactionNameCellClass } from '../../src/features/transactions/components/TransactionsTable/TransactionsTable';
+import { TODAY_DAY, TODAY_MONTH, TODAY_YEAR } from '../../src/shared/utils/today';
 
 async function selectTreeOption(page: Page, treeSelect: Locator, option: string) {
   await treeSelect.click();

@@ -16,7 +16,7 @@
   },
   "include": [
     "src",
-    "e2e",
+    "test",
     "vite.config.ts",
     "vitest.config.ts",
     "eslint.config.js",
