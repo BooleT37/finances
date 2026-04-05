@@ -61,6 +61,7 @@ export function useBudgetingTableColumns({
             }
           },
         }),
+        mantineTableBodyCellProps: { 'data-testing-column': 'plan' } as object,
         size: 120,
       }),
       columnHelper.accessor('comment', {
@@ -102,6 +103,9 @@ export function useBudgetingTableColumns({
             }
           },
         }),
+        mantineTableBodyCellProps: {
+          'data-testing-column': 'comment',
+        } as object,
         size: 200,
       }),
     ],

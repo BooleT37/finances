@@ -1,3 +1,4 @@
+import { TODAY_MONTH, TODAY_YEAR } from '../../src/shared/utils/today';
 import { testPrisma } from './client';
 
 export const TEST_USER_ID = 'test-user';
@@ -33,6 +34,9 @@ export interface SeedData {
     залог: number;
     транспорт: number;
     электроника: number;
+  };
+  forecastIds: {
+    продукты: number;
   };
 }
 
@@ -149,6 +153,20 @@ export async function seed(): Promise<SeedData> {
     },
   });
 
+  // Forecasts
+  // TODAY_MONTH is 0-indexed; DB month field is 1-indexed
+  const продуктыForecast = await testPrisma.forecast.create({
+    data: {
+      categoryId: продукты.id,
+      subcategoryId: null,
+      month: TODAY_MONTH + 1,
+      year: TODAY_YEAR,
+      sum: 100,
+      comment: '',
+      userId: user.id,
+    },
+  });
+
   // Saving spending events
   const отпускРим = await testPrisma.savingSpending.create({
     data: {
@@ -220,6 +238,9 @@ export async function seed(): Promise<SeedData> {
       залог: переезд.categories[0]!.id,
       транспорт: переезд.categories[1]!.id,
       электроника: новыйТелевизор.categories[0]!.id,
+    },
+    forecastIds: {
+      продукты: продуктыForecast.id,
     },
   };
 }
