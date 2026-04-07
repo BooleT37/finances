@@ -25,7 +25,7 @@ interface GetCostWithDiffParamsInput {
   value: CostColValue;
   isContinuous: boolean;
   forecast: Decimal;
-  /** 1-based month (1-12) */
+  /** 0-based month (0-11) */
   month: number;
   year: number;
 }
@@ -39,9 +39,8 @@ export function getCostWithDiffParams({
 }: GetCostWithDiffParamsInput): GetCostWithDiffParamsResult {
   // getToday() is called at invocation time (not module load), so vi.setSystemTime() can mock it in tests
   const today = getToday();
-  // today.month() is 0-based; month is 1-based
-  const isCurrentMonth = today.month() + 1 === month && today.year() === year;
-  const daysInMonth = dayjs(new Date(year, month - 1)).daysInMonth();
+  const isCurrentMonth = today.month() === month && today.year() === year;
+  const daysInMonth = dayjs(new Date(year, month)).daysInMonth();
 
   const passedDaysRatio = isCurrentMonth ? today.date() / daysInMonth : 1;
 

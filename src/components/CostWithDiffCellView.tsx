@@ -10,7 +10,7 @@ interface Props {
   cost: Decimal;
   forecast: Decimal;
   isContinuous: boolean;
-  /** 1-based month (1-12) */
+  /** 0-based month (0-11) */
   month: number;
   year: number;
   /** Show a "Plan: X" tooltip on the diff label; always shown when spending exceeds pace */

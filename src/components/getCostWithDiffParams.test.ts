@@ -2,9 +2,6 @@ import Decimal from 'decimal.js';
 
 import { TODAY_MONTH, TODAY_YEAR } from '~/shared/utils/today';
 
-// TODAY_MONTH is 0-based (3 = April); getCostWithDiffParams expects 1-based months
-const TODAY_MONTH_1BASED = TODAY_MONTH + 1;
-
 import { getCostWithDiffParams } from './getCostWithDiffParams';
 
 const col = (cost: string) => ({ cost: new Decimal(cost) });
@@ -16,7 +13,7 @@ describe('getCostWithDiffParams', () => {
         value: col('-80'),
         forecast: new Decimal('-100'),
         isContinuous: false,
-        month: 1,
+        month: 0,
         year: 2024,
       });
       expect(result.color).toBe('green');
@@ -31,7 +28,7 @@ describe('getCostWithDiffParams', () => {
         value: col('-120'),
         forecast: new Decimal('-100'),
         isContinuous: false,
-        month: 1,
+        month: 0,
         year: 2024,
       });
       expect(result.color).toBe('red');
@@ -49,7 +46,7 @@ describe('getCostWithDiffParams', () => {
         value: col('-80'),
         forecast: new Decimal('-100'),
         isContinuous: false,
-        month: TODAY_MONTH_1BASED,
+        month: TODAY_MONTH,
         year: TODAY_YEAR,
       });
       expect(result.color).toBe('green');
@@ -66,7 +63,7 @@ describe('getCostWithDiffParams', () => {
         value: col('-40'),
         forecast: new Decimal('-100'),
         isContinuous: true,
-        month: TODAY_MONTH_1BASED,
+        month: TODAY_MONTH,
         year: TODAY_YEAR,
       });
       expect(result.color).toBe('green');
@@ -80,7 +77,7 @@ describe('getCostWithDiffParams', () => {
         value: col('-80'),
         forecast: new Decimal('-100'),
         isContinuous: true,
-        month: TODAY_MONTH_1BASED,
+        month: TODAY_MONTH,
         year: TODAY_YEAR,
       });
       expect(result.color).toBe('orange');
@@ -93,7 +90,7 @@ describe('getCostWithDiffParams', () => {
         value: col('-120'),
         forecast: new Decimal('-100'),
         isContinuous: true,
-        month: TODAY_MONTH_1BASED,
+        month: TODAY_MONTH,
         year: TODAY_YEAR,
       });
       expect(result.color).toBe('red');
@@ -109,7 +106,7 @@ describe('getCostWithDiffParams', () => {
         value: col('0'),
         forecast: new Decimal('0'),
         isContinuous: false,
-        month: 1,
+        month: 0,
         year: 2024,
       });
       expect(result.barLength).toBe(1);
@@ -123,7 +120,7 @@ describe('getCostWithDiffParams', () => {
         value: col('80'),
         forecast: new Decimal('100'),
         isContinuous: false,
-        month: 1,
+        month: 0,
         year: 2024,
       });
       expect(result.color).toBe('red');
@@ -137,7 +134,7 @@ describe('getCostWithDiffParams', () => {
         value: col('120'),
         forecast: new Decimal('100'),
         isContinuous: false,
-        month: 1,
+        month: 0,
         year: 2024,
       });
       expect(result.color).toBe('green');

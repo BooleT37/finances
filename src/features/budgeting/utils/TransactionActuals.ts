@@ -16,7 +16,7 @@ export class TransactionActuals {
   constructor(transactions: Transaction[], categories: Category[]) {
     const grouped = Object.groupBy<MonthKey, Transaction>(
       transactions,
-      (tx) => `${tx.date.year()}-${tx.date.month() + 1}`,
+      (tx) => `${tx.date.year()}-${tx.date.month()}`,
     );
 
     const monthsMap = new Map<MonthKey, MonthActuals>();

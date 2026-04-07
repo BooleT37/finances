@@ -158,12 +158,12 @@ export async function seed(): Promise<SeedData> {
   });
 
   // Forecasts
-  // TODAY_MONTH is 0-indexed; DB month field is 1-indexed
+  // TODAY_MONTH is 0-indexed; DB month field is also 0-indexed
   const продуктыForecast = await testPrisma.forecast.create({
     data: {
       categoryId: продукты.id,
       subcategoryId: null,
-      month: TODAY_MONTH + 1,
+      month: TODAY_MONTH,
       year: TODAY_YEAR,
       sum: 100,
       comment: '',

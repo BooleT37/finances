@@ -211,8 +211,8 @@ export function useBudgetingRows(
     }
 
     const allTx = [...txCurrent, ...txPrev];
-    const lastMonth = month === 1 ? 12 : month - 1;
-    const lastYear = month === 1 ? year - 1 : year;
+    const lastMonth = month === 0 ? 11 : month - 1;
+    const lastYear = month === 0 ? year - 1 : year;
 
     const filtered = categories.filter((c) => c.type !== 'FROM_SAVINGS');
     const sorted = [...filtered].sort((a, b) =>

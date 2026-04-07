@@ -14,9 +14,9 @@ export const selectedYearAtom = atom((get) =>
   parseInt(get(selectedMonthKeyAtom).slice(0, 4), 10),
 );
 
-/** Derived: 1-based month (1-12) from selectedMonthKeyAtom, e.g. 4 for April */
-export const selectedMonthAtom = atom((get) =>
-  parseInt(get(selectedMonthKeyAtom).slice(5, 7), 10),
+/** Derived: 0-based month (0-11) from selectedMonthKeyAtom, e.g. 3 for April */
+export const selectedMonthAtom = atom(
+  (get) => parseInt(get(selectedMonthKeyAtom).slice(5, 7), 10) - 1,
 );
 
 /** Whether the navigator shows individual months or full years. Only meaningful on Expenses page. */
