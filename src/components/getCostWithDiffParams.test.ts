@@ -4,13 +4,11 @@ import { TODAY_MONTH, TODAY_YEAR } from '~/shared/utils/today';
 
 import { getCostWithDiffParams } from './getCostWithDiffParams';
 
-const col = (cost: string) => ({ cost: new Decimal(cost) });
-
 describe('getCostWithDiffParams', () => {
   describe('past month', () => {
     it('under-budget expense → green', () => {
       const result = getCostWithDiffParams({
-        value: col('-80'),
+        cost: new Decimal('-80'),
         forecast: new Decimal('-100'),
         isContinuous: false,
         month: 0,
@@ -25,7 +23,7 @@ describe('getCostWithDiffParams', () => {
 
     it('over-budget expense → red with barOffset', () => {
       const result = getCostWithDiffParams({
-        value: col('-120'),
+        cost: new Decimal('-120'),
         forecast: new Decimal('-100'),
         isContinuous: false,
         month: 0,
@@ -43,7 +41,7 @@ describe('getCostWithDiffParams', () => {
     it('spending ahead of pace, isContinuous=false → green (not orange)', () => {
       // spentRatio = 0.8 > passedDaysRatio (0.5)
       const result = getCostWithDiffParams({
-        value: col('-80'),
+        cost: new Decimal('-80'),
         forecast: new Decimal('-100'),
         isContinuous: false,
         month: TODAY_MONTH,
@@ -60,7 +58,7 @@ describe('getCostWithDiffParams', () => {
     it('spending behind pace → green', () => {
       // spentRatio = 0.4 < passedDaysRatio (0.5)
       const result = getCostWithDiffParams({
-        value: col('-40'),
+        cost: new Decimal('-40'),
         forecast: new Decimal('-100'),
         isContinuous: true,
         month: TODAY_MONTH,
@@ -74,7 +72,7 @@ describe('getCostWithDiffParams', () => {
     it('spending ahead of pace → orange with exact exceedingAmount', () => {
       // spentRatio = 0.8 > 0.5; exceedingAmount = |(-80) - 0.5*(-100)| = 30
       const result = getCostWithDiffParams({
-        value: col('-80'),
+        cost: new Decimal('-80'),
         forecast: new Decimal('-100'),
         isContinuous: true,
         month: TODAY_MONTH,
@@ -87,7 +85,7 @@ describe('getCostWithDiffParams', () => {
 
     it('over-budget → red (over-budget path; orange never applies)', () => {
       const result = getCostWithDiffParams({
-        value: col('-120'),
+        cost: new Decimal('-120'),
         forecast: new Decimal('-100'),
         isContinuous: true,
         month: TODAY_MONTH,
@@ -103,7 +101,7 @@ describe('getCostWithDiffParams', () => {
   describe('zero forecast', () => {
     it('cost = 0, forecast = 0 → divideWithFallbackToOne prevents NaN; barLength = 1', () => {
       const result = getCostWithDiffParams({
-        value: col('0'),
+        cost: new Decimal('0'),
         forecast: new Decimal('0'),
         isContinuous: false,
         month: 0,
@@ -117,7 +115,7 @@ describe('getCostWithDiffParams', () => {
   describe('income row', () => {
     it('under-earned income → red', () => {
       const result = getCostWithDiffParams({
-        value: col('80'),
+        cost: new Decimal('80'),
         forecast: new Decimal('100'),
         isContinuous: false,
         month: 0,
@@ -131,7 +129,7 @@ describe('getCostWithDiffParams', () => {
 
     it('over-earned income → green with barOffset', () => {
       const result = getCostWithDiffParams({
-        value: col('120'),
+        cost: new Decimal('120'),
         forecast: new Decimal('100'),
         isContinuous: false,
         month: 0,

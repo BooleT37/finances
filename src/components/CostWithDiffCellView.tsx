@@ -27,14 +27,14 @@ export function CostWithDiffCellView({
 }: Props) {
   const { t } = useTranslation('common');
 
-  const result = getCostWithDiffParams({
-    value: { cost },
-    forecast,
-    isContinuous,
-    month,
-    year,
-  });
-  const { diff, color, barLength, barOffset, exceedingAmount } = result;
+  const { diff, color, barLength, barOffset, exceedingAmount } =
+    getCostWithDiffParams({
+      cost,
+      forecast,
+      isContinuous,
+      month,
+      year,
+    });
 
   const tooltipLabel =
     exceedingAmount !== undefined ? (

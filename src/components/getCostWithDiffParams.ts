@@ -17,12 +17,8 @@ export interface GetCostWithDiffParamsResult {
   exceedingAmount?: Decimal;
 }
 
-interface CostColValue {
-  cost: Decimal;
-}
-
 interface GetCostWithDiffParamsInput {
-  value: CostColValue;
+  cost: Decimal;
   isContinuous: boolean;
   forecast: Decimal;
   /** 0-based month (0-11) */
@@ -31,7 +27,7 @@ interface GetCostWithDiffParamsInput {
 }
 
 export function getCostWithDiffParams({
-  value,
+  cost,
   isContinuous,
   forecast,
   month,
@@ -45,18 +41,20 @@ export function getCostWithDiffParams({
   const passedDaysRatio = isCurrentMonth ? today.date() / daysInMonth : 1;
 
   const forecastNumber = forecast.toNumber();
-  const diff = value.cost.minus(forecast);
-  const costNumber = value.cost.toNumber();
+  const diff = cost.minus(forecast);
+  const costNumber = cost.toNumber();
   const color: 'green' | 'red' = diff.isNeg() ? 'red' : 'green';
 
-  if (forecastNumber !== 0 && costNumber * forecastNumber < 0) {
-    console.warn(
-      'getCostWithDiffParams: cost and forecast have opposite signs',
-      { cost: costNumber, forecast: forecastNumber },
-    );
+  if (cost.isNeg() !== forecast.isNeg()) {
+    return {
+      diff,
+      color,
+      barLength: 1,
+      barOffset: 0,
+    };
   }
 
-  if (value.cost.abs().lessThanOrEqualTo(forecast.abs())) {
+  if (cost.abs().lessThanOrEqualTo(forecast.abs())) {
     const spentRatio = divideWithFallbackToOne(costNumber, forecastNumber);
     const exceedingForecast =
       isContinuous && passedDaysRatio !== null && spentRatio > passedDaysRatio;
