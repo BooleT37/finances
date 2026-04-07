@@ -38,6 +38,10 @@ export interface SeedData {
   forecastIds: {
     продукты: number;
   };
+  transactionIds: {
+    транспортТекущийМесяц: number;
+    транспортПрошлыйМесяц: number;
+  };
 }
 
 export async function seed(): Promise<SeedData> {
@@ -167,7 +171,37 @@ export async function seed(): Promise<SeedData> {
     },
   });
 
-  // Saving spending events
+  // Use ISO strings with noon UTC to avoid timezone-induced date shifts (e.g. Berlin UTC+1 turning
+  // midnight local into the previous day in UTC, which then round-trips back incorrectly).
+  // TODAY_MONTH is 0-based; 1-based current month = TODAY_MONTH + 1, last month = TODAY_MONTH.
+  const currentMonthStr = String(TODAY_MONTH + 1).padStart(2, '0');
+  const lastMonthStr =
+    (TODAY_MONTH as number) === 0 ? '12' : String(TODAY_MONTH).padStart(2, '0');
+  const lastMonthYear =
+    TODAY_MONTH === (0 as number) ? TODAY_YEAR - 1 : TODAY_YEAR;
+
+  const транспортТекущийМесяц = await testPrisma.expense.create({
+    data: {
+      name: 'Тест транспорт текущий',
+      cost: 50,
+      date: new Date(`${TODAY_YEAR}-${currentMonthStr}-01T12:00:00.000Z`),
+      categoryId: транспорт.id,
+      subcategoryId: null,
+      userId: user.id,
+    },
+  });
+
+  const транспортПрошлыйМесяц = await testPrisma.expense.create({
+    data: {
+      name: 'Тест транспорт прошлый',
+      cost: 30,
+      date: new Date(`${lastMonthYear}-${lastMonthStr}-01T12:00:00.000Z`),
+      categoryId: транспорт.id,
+      subcategoryId: null,
+      userId: user.id,
+    },
+  });
+
   const отпускРим = await testPrisma.savingSpending.create({
     data: {
       name: 'Отпуск Рим 2025',
@@ -241,6 +275,10 @@ export async function seed(): Promise<SeedData> {
     },
     forecastIds: {
       продукты: продуктыForecast.id,
+    },
+    transactionIds: {
+      транспортТекущийМесяц: транспортТекущийМесяц.id,
+      транспортПрошлыйМесяц: транспортПрошлыйМесяц.id,
     },
   };
 }
