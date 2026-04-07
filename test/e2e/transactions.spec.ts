@@ -3,11 +3,21 @@ import type { Locator, Page } from '@playwright/test';
 import { expect, test } from './fixtures';
 import { testPrisma } from './db/client';
 import { transactionNameCellClass } from '../../src/features/transactions/components/TransactionsTable/TransactionsTable';
-import { TODAY_DAY, TODAY_MONTH, TODAY_YEAR } from '../../src/shared/utils/today';
+import {
+  TODAY_DAY,
+  TODAY_MONTH,
+  TODAY_YEAR,
+} from '../../src/shared/utils/today';
 
-async function selectTreeOption(page: Page, treeSelect: Locator, option: string) {
+async function selectTreeOption(
+  page: Page,
+  treeSelect: Locator,
+  option: string,
+) {
   await treeSelect.click();
-  await treeSelect.locator('.rc-tree-select-selection-search-input').fill(option);
+  await treeSelect
+    .locator('.rc-tree-select-selection-search-input')
+    .fill(option);
   await page
     .locator('.treeSelectDropdown')
     .getByText(option, { exact: true })
@@ -195,18 +205,28 @@ test.describe('Transaction components', () => {
     await form.getByLabel('Комментарий').fill('Тест компонентов');
 
     // Open the components modal
-    await form.getByRole('button', { name: 'Редактировать составляющие' }).click();
+    await form
+      .getByRole('button', { name: 'Редактировать составляющие' })
+      .click();
     const dialog = page.getByRole('dialog', { name: 'Составляющие' });
 
     // Add first component: 30 → Транспорт
     await dialog.getByRole('button', { name: 'Добавить составляющую' }).click();
     await dialog.getByPlaceholder('Сумма (€)').nth(0).fill('30');
-    await selectTreeOption(page, dialog.locator('.treeSelect').nth(0), 'Транспорт');
+    await selectTreeOption(
+      page,
+      dialog.locator('.treeSelect').nth(0),
+      'Транспорт',
+    );
 
     // Add second component: 20 → Развлечения
     await dialog.getByRole('button', { name: 'Добавить составляющую' }).click();
     await dialog.getByPlaceholder('Сумма (€)').nth(1).fill('20');
-    await selectTreeOption(page, dialog.locator('.treeSelect').nth(1), 'Развлечения');
+    await selectTreeOption(
+      page,
+      dialog.locator('.treeSelect').nth(1),
+      'Развлечения',
+    );
 
     // Modal shows correct remainder: 100 - 30 - 20 = 50
     await expect(dialog.getByText('Остаток: €50.00')).toBeVisible();
@@ -258,8 +278,16 @@ test.describe('Transaction components', () => {
         userId: seedData.userId,
         components: {
           create: [
-            { name: 'Аптека', cost: 30, categoryId: seedData.categoryIds.транспорт },
-            { name: 'Напитки', cost: 20, categoryId: seedData.categoryIds.развлечения },
+            {
+              name: 'Аптека',
+              cost: 30,
+              categoryId: seedData.categoryIds.транспорт,
+            },
+            {
+              name: 'Напитки',
+              cost: 20,
+              categoryId: seedData.categoryIds.развлечения,
+            },
           ],
         },
       },
@@ -291,7 +319,9 @@ test.describe('Transaction components', () => {
     await expect(form.getByText('Из них:')).toBeVisible();
 
     // Open components modal — both rows should be pre-filled
-    await form.getByRole('button', { name: 'Редактировать составляющие' }).click();
+    await form
+      .getByRole('button', { name: 'Редактировать составляющие' })
+      .click();
     const dialog = page.getByRole('dialog', { name: 'Составляющие' });
     await expect(dialog.getByPlaceholder('Сумма (€)')).toHaveCount(2);
 
@@ -311,7 +341,6 @@ test.describe('Transaction components', () => {
     await expect(
       form.getByText(/Из них -€20\.00 из «Развлечения»/),
     ).toBeVisible();
-
   });
 
   test('edit component via its own row action: modal opens, updated cost propagates', async ({
@@ -327,7 +356,11 @@ test.describe('Transaction components', () => {
         userId: seedData.userId,
         components: {
           create: [
-            { name: 'Одежда', cost: 30, categoryId: seedData.categoryIds.транспорт },
+            {
+              name: 'Одежда',
+              cost: 30,
+              categoryId: seedData.categoryIds.транспорт,
+            },
           ],
         },
       },
@@ -780,7 +813,9 @@ test.describe('Saving spendings', () => {
 
     // Select Event B (multiple categories) — category select appears
     await selectOption(page, 'Событие', 'Переезд 2026');
-    await expect(form.getByRole('textbox', { name: 'Категория' })).toBeVisible();
+    await expect(
+      form.getByRole('textbox', { name: 'Категория' }),
+    ).toBeVisible();
     await selectOption(page, 'Категория', 'Залог');
 
     await form.getByLabel('Сумма (€)').fill('200');
@@ -794,13 +829,14 @@ test.describe('Saving spendings', () => {
     });
     await expect(newRow.getByText('-€200.00')).toBeVisible();
 
-    // Expense grand total (depth=0 "Расход" row) is unchanged — FROM_SAVINGS is excluded
+    // Expense grand total (depth=0 "Расход" row) is unchanged — FROM_SAVINGS is excluded.
+    // Seed includes Transport (-€50.00 current month) + Обед (-€50.00) = -€100.00 total.
     const расходAggRow = page
       .locator(`.${transactionNameCellClass}[data-testing-depth="0"]`, {
         hasText: 'Расход',
       })
       .locator('xpath=ancestor::tr');
-    await expect(расходAggRow.getByText('-€50.00').first()).toBeVisible();
+    await expect(расходAggRow.getByText('-€100.00').first()).toBeVisible();
 
     // Group by subcategories: event group rows appear for both pre-seeded (Event A) and new (Event B)
     await page.getByLabel('Сгруппировать по подкатегориям').click();
@@ -857,7 +893,9 @@ test.describe('Saving spendings', () => {
 
     // Switch to Event B (multiple categories) — category select appears
     await selectOption(page, 'Событие', 'Переезд 2026');
-    await expect(form.getByRole('textbox', { name: 'Категория' })).toBeVisible();
+    await expect(
+      form.getByRole('textbox', { name: 'Категория' }),
+    ).toBeVisible();
 
     // Select a category — auto-save fires; row moves to Event B subcategory
     await selectOption(page, 'Категория', 'Залог');
