@@ -161,7 +161,6 @@ function buildCategoryRows(
       },
     ];
 
-    const fullPlan = subcategorySum.plus(restPlanSum);
     const catRowId = buildBudgetingRowId({
       rowType: 'category',
       categoryId: category.id,
@@ -179,7 +178,7 @@ function buildCategoryRows(
       isRestRow: false,
       isIncome: category.isIncome,
       isContinuous: category.isContinuous,
-      planSum: fullPlan,
+      planSum: categoryPlanSum,
       comment: catForecast?.comment ?? '',
       thisMonthActual: thisMonthActuals.getCategoryTotal(category.id),
       lastMonthActual: lastMonthActuals.getCategoryTotal(category.id),
