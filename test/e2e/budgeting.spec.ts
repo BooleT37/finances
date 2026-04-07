@@ -110,7 +110,7 @@ test.describe('Budgeting inline editing', () => {
     await expect(продуктыRow.locator('input[type="number"]')).toBeVisible();
     await продуктыRow.locator('input[type="number"]').press('Escape');
 
-    // Edit Рынок to 30; additive model: total = subSum(30) + restSum(100) = 130
+    // Edit Рынок to 30; parent updates to keep rest(100) unchanged: total = sub(30) + rest(100) = 130
     await editPlanCell(рынокRow, '30');
     await expect(getPlanCell(рынокRow)).toHaveText('-€30.00');
     await expect(getPlanCell(остальноеRow)).toHaveText('-€100.00');

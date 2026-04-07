@@ -125,7 +125,7 @@ function buildCategoryRows(
     );
 
     const subcategorySum = decimalSum(...subcategoryRows.map((r) => r.planSum));
-    const restPlanSum = categoryPlanSum;
+    const restPlanSum = categoryPlanSum.minus(subcategorySum);
 
     const restRowId = buildBudgetingRowId({
       rowType: 'rest',

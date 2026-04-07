@@ -31,8 +31,8 @@ export function useBudgetingTableColumns({
   const { t } = useTranslation('budgeting');
 
   return useMemo(() => {
-    const lastMonthVal = month === 1 ? 12 : month - 1;
-    const lastMonthYear = month === 1 ? year - 1 : year;
+    const lastMonthVal = month === 0 ? 11 : month - 1;
+    const lastMonthYear = month === 0 ? year - 1 : year;
 
     return [
       columnHelper.display({
