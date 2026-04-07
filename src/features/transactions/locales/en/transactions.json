@@ -41,10 +41,6 @@
   "componentOfExpenseTooltipNoName": "Component of expense",
   "componentWithParent": "{{componentName}} (part of \"{{parentName}}\")",
   "costIncludingComponents": "Cost including all components",
-  "forecast": {
-    "exceededBy": "Exceeded by {{value}}",
-    "plan": "Plan: {{value}}"
-  },
   "form": {
     "actualDate": "Actual date",
     "actualDateDescription": "The date as shown in your bank app. Only used in the \"recent transactions\" hint shown under the source field.",

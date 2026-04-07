@@ -2,19 +2,21 @@ import Decimal from 'decimal.js';
 
 import { TODAY_MONTH, TODAY_YEAR } from '~/shared/utils/today';
 
-import type { CostColValue } from '../../TransactionsTable.types';
-import { getCostAggregatedCell } from './getCostAggregatedCell';
+// TODAY_MONTH is 0-based (3 = April); getCostWithDiffParams expects 1-based months
+const TODAY_MONTH_1BASED = TODAY_MONTH + 1;
 
-const col = (cost: string): CostColValue => ({ cost: new Decimal(cost) });
+import { getCostWithDiffParams } from './getCostWithDiffParams';
 
-describe('getCostAggregatedCell', () => {
+const col = (cost: string) => ({ cost: new Decimal(cost) });
+
+describe('getCostWithDiffParams', () => {
   describe('past month', () => {
     it('under-budget expense → green', () => {
-      const result = getCostAggregatedCell({
+      const result = getCostWithDiffParams({
         value: col('-80'),
         forecast: new Decimal('-100'),
         isContinuous: false,
-        month: 0,
+        month: 1,
         year: 2024,
       });
       expect(result.color).toBe('green');
@@ -25,11 +27,11 @@ describe('getCostAggregatedCell', () => {
     });
 
     it('over-budget expense → red with barOffset', () => {
-      const result = getCostAggregatedCell({
+      const result = getCostWithDiffParams({
         value: col('-120'),
         forecast: new Decimal('-100'),
         isContinuous: false,
-        month: 0,
+        month: 1,
         year: 2024,
       });
       expect(result.color).toBe('red');
@@ -43,11 +45,11 @@ describe('getCostAggregatedCell', () => {
   describe('current month, non-continuous', () => {
     it('spending ahead of pace, isContinuous=false → green (not orange)', () => {
       // spentRatio = 0.8 > passedDaysRatio (0.5)
-      const result = getCostAggregatedCell({
+      const result = getCostWithDiffParams({
         value: col('-80'),
         forecast: new Decimal('-100'),
         isContinuous: false,
-        month: TODAY_MONTH,
+        month: TODAY_MONTH_1BASED,
         year: TODAY_YEAR,
       });
       expect(result.color).toBe('green');
@@ -60,11 +62,11 @@ describe('getCostAggregatedCell', () => {
   describe('current month, continuous', () => {
     it('spending behind pace → green', () => {
       // spentRatio = 0.4 < passedDaysRatio (0.5)
-      const result = getCostAggregatedCell({
+      const result = getCostWithDiffParams({
         value: col('-40'),
         forecast: new Decimal('-100'),
         isContinuous: true,
-        month: TODAY_MONTH,
+        month: TODAY_MONTH_1BASED,
         year: TODAY_YEAR,
       });
       expect(result.color).toBe('green');
@@ -74,11 +76,11 @@ describe('getCostAggregatedCell', () => {
 
     it('spending ahead of pace → orange with exact exceedingAmount', () => {
       // spentRatio = 0.8 > 0.5; exceedingAmount = |(-80) - 0.5*(-100)| = 30
-      const result = getCostAggregatedCell({
+      const result = getCostWithDiffParams({
         value: col('-80'),
         forecast: new Decimal('-100'),
         isContinuous: true,
-        month: TODAY_MONTH,
+        month: TODAY_MONTH_1BASED,
         year: TODAY_YEAR,
       });
       expect(result.color).toBe('orange');
@@ -87,11 +89,11 @@ describe('getCostAggregatedCell', () => {
     });
 
     it('over-budget → red (over-budget path; orange never applies)', () => {
-      const result = getCostAggregatedCell({
+      const result = getCostWithDiffParams({
         value: col('-120'),
         forecast: new Decimal('-100'),
         isContinuous: true,
-        month: TODAY_MONTH,
+        month: TODAY_MONTH_1BASED,
         year: TODAY_YEAR,
       });
       expect(result.color).toBe('red');
@@ -103,11 +105,11 @@ describe('getCostAggregatedCell', () => {
 
   describe('zero forecast', () => {
     it('cost = 0, forecast = 0 → divideWithFallbackToOne prevents NaN; barLength = 1', () => {
-      const result = getCostAggregatedCell({
+      const result = getCostWithDiffParams({
         value: col('0'),
         forecast: new Decimal('0'),
         isContinuous: false,
-        month: 0,
+        month: 1,
         year: 2024,
       });
       expect(result.barLength).toBe(1);
@@ -117,11 +119,11 @@ describe('getCostAggregatedCell', () => {
 
   describe('income row', () => {
     it('under-earned income → red', () => {
-      const result = getCostAggregatedCell({
+      const result = getCostWithDiffParams({
         value: col('80'),
         forecast: new Decimal('100'),
         isContinuous: false,
-        month: 0,
+        month: 1,
         year: 2024,
       });
       expect(result.color).toBe('red');
@@ -131,11 +133,11 @@ describe('getCostAggregatedCell', () => {
     });
 
     it('over-earned income → green with barOffset', () => {
-      const result = getCostAggregatedCell({
+      const result = getCostWithDiffParams({
         value: col('120'),
         forecast: new Decimal('100'),
         isContinuous: false,
-        month: 0,
+        month: 1,
         year: 2024,
       });
       expect(result.color).toBe('green');

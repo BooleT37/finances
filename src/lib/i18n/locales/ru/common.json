@@ -1,0 +1,6 @@
+{
+  "forecast": {
+    "plan": "План: {{value}}",
+    "exceededBy": "Превышение на {{value}}"
+  }
+}

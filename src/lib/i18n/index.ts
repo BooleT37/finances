@@ -5,17 +5,21 @@ import { i18nResources as budgetingResources } from '~/features/budgeting/i18n';
 import { i18nResources as navResources } from '~/features/nav/i18n';
 import { i18nResources as transactionsResources } from '~/features/transactions/i18n';
 
+import commonEn from './locales/en/common.json';
 import homeEn from './locales/en/home.json';
+import commonRu from './locales/ru/common.json';
 import homeRu from './locales/ru/home.json';
 
 export const resources = {
   en: {
+    common: commonEn,
     home: homeEn,
     ...navResources.en,
     ...transactionsResources.en,
     ...budgetingResources.en,
   },
   ru: {
+    common: commonRu,
     home: homeRu,
     ...navResources.ru,
     ...transactionsResources.ru,

@@ -36,9 +36,9 @@ Do not aim for 100% coverage. Prioritise cases where a silent regression would b
 
 ### Component tests (RTL)
 
-#### `getCostAggregatedCell` ✅ [`getCostAggregatedCell.test.ts`](../src/features/transactions/components/TransactionsTable/columns/CostCellRenderer/getCostAggregatedCell.test.ts)
+#### `getCostWithDiffParams` ✅ [`getCostWithDiffParams.test.ts`](../src/components/getCostWithDiffParams.test.ts)
 
-Business logic was extracted from `CostAggregatedCellRenderer` into a pure function `getCostAggregatedCell` and tested directly — no `renderHook` or mocking needed. `getToday()` returns a fixed date in test mode (April 15, 2024), so `passedDaysRatio` is naturally controlled by the `month`/`year` inputs.
+Business logic was extracted from `CostAggregatedCellRenderer` into a pure function `getCostWithDiffParams` (colocated with `CostWithDiffCellView` in `src/components/`) and tested directly — no `renderHook` or mocking needed. `getToday()` returns a fixed date in test mode (April 15, 2024), so `passedDaysRatio` is naturally controlled by the `month`/`year` inputs.
 
 | # | Case |
 |---|------|

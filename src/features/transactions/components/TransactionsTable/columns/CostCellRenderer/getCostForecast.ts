@@ -15,7 +15,7 @@ import { getSavingSpendingsQueryOptions } from '~/features/savingSpendings/queri
 import type { SavingSpending } from '~/features/savingSpendings/schema';
 import { decimalSum } from '~/shared/utils/decimalSum';
 import { getOrThrow } from '~/shared/utils/getOrThrow';
-import { selectedMonth0BasedAtom, selectedYearAtom } from '~/stores/month';
+import { selectedMonthAtom, selectedYearAtom } from '~/stores/month';
 
 /** We only have forecasts for group rows, not for individual expenses
  * The structure of forecasts is:
@@ -124,7 +124,7 @@ export function getCostForecast(
 
 export function useGetCostForecast() {
   const year = useAtomValue(selectedYearAtom);
-  const month = useAtomValue(selectedMonth0BasedAtom);
+  const month = useAtomValue(selectedMonthAtom);
 
   const { data: categoryForecasts } = useQuery(
     getCategoryForecastsQueryOptions(year),

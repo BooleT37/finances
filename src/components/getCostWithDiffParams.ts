@@ -4,9 +4,7 @@ import Decimal from 'decimal.js';
 import { divideWithFallbackToOne } from '~/shared/utils/divideWithFallbackToOne';
 import { getToday } from '~/shared/utils/today';
 
-import type { CostColValue } from '../../TransactionsTable.types';
-
-export interface GetCostAggregatedCellResult {
+export interface GetCostWithDiffParamsResult {
   /** The difference between the cost and the forecast */
   diff: Decimal;
   /* The bar color under the cost. It is always drawn on top of white bordered bar which width is taken as 100% */
@@ -19,25 +17,31 @@ export interface GetCostAggregatedCellResult {
   exceedingAmount?: Decimal;
 }
 
-interface GetCostAggregatedCellParams {
+interface CostColValue {
+  cost: Decimal;
+}
+
+interface GetCostWithDiffParamsInput {
   value: CostColValue;
   isContinuous: boolean;
   forecast: Decimal;
+  /** 1-based month (1-12) */
   month: number;
   year: number;
 }
 
-export function getCostAggregatedCell({
+export function getCostWithDiffParams({
   value,
   isContinuous,
   forecast,
   month,
   year,
-}: GetCostAggregatedCellParams): GetCostAggregatedCellResult {
+}: GetCostWithDiffParamsInput): GetCostWithDiffParamsResult {
   // getToday() is called at invocation time (not module load), so vi.setSystemTime() can mock it in tests
   const today = getToday();
-  const isCurrentMonth = today.month() === month && today.year() === year;
-  const daysInMonth = dayjs(new Date(year, month)).daysInMonth();
+  // today.month() is 0-based; month is 1-based
+  const isCurrentMonth = today.month() + 1 === month && today.year() === year;
+  const daysInMonth = dayjs(new Date(year, month - 1)).daysInMonth();
 
   const passedDaysRatio = isCurrentMonth ? today.date() / daysInMonth : 1;
 
@@ -48,7 +52,7 @@ export function getCostAggregatedCell({
 
   if (forecastNumber !== 0 && costNumber * forecastNumber < 0) {
     console.warn(
-      'getCostAggregatedCell: cost and forecast have opposite signs',
+      'getCostWithDiffParams: cost and forecast have opposite signs',
       { cost: costNumber, forecast: forecastNumber },
     );
   }
