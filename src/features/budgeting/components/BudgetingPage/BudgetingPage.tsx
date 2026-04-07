@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 
 import { getToday } from '~/shared/utils/today';
 import {
-  selectedMonthAtom,
+  selectedMonthKeyAtom,
   selectedYearAtom,
   viewModeAtom,
 } from '~/stores/month';
@@ -12,7 +12,7 @@ import { BudgetingTable } from './BudgetingTable/BudgetingTable';
 
 export function BudgetingPage() {
   const [viewMode, setViewMode] = useAtom(viewModeAtom);
-  const [, setMonth] = useAtom(selectedMonthAtom);
+  const [, setMonth] = useAtom(selectedMonthKeyAtom);
   const year = useAtomValue(selectedYearAtom);
 
   useEffect(() => {

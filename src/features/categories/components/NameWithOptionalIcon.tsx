@@ -11,7 +11,11 @@ interface Props {
 export function NameWithOptionalIcon({ name, icon, testId }: Props) {
   if (icon) {
     return (
-      <Group gap={4} style={{ display: 'inline-flex' }} data-testid={testId}>
+      <Group
+        gap={4}
+        style={{ display: 'inline-flex', flexWrap: 'nowrap' }}
+        data-testid={testId}
+      >
         <CategoryIconComp value={icon} />
         {name}
       </Group>

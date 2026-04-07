@@ -1,8 +1,12 @@
 {
+  "averageTooltip": "{{count}} months for {{prevYear}}–{{year}}",
   "columns": {
+    "average": "Average",
     "comment": "Comment",
+    "lastMonth": "Last Month",
     "name": "Name",
-    "plan": "Plan"
+    "plan": "Plan",
+    "thisMonth": "This Month"
   },
   "emptyState": "No categories found",
   "expenses": "Expenses",

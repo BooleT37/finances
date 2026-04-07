@@ -1,5 +1,4 @@
 import { Group, Text } from '@mantine/core';
-import Decimal from 'decimal.js';
 import { useAtomValue } from 'jotai';
 import {
   MantineReactTable,
@@ -8,11 +7,10 @@ import {
   useMantineReactTable,
 } from 'mantine-react-table';
 import { MRT_Localization_RU } from 'mantine-react-table/locales/ru/index.cjs';
-import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { NameWithOptionalIcon } from '~/features/categories/components/NameWithOptionalIcon';
-import { selectedMonthNumberAtom, selectedYearAtom } from '~/stores/month';
+import { selectedMonthAtom, selectedYearAtom } from '~/stores/month';
 
 import { buildBudgetingRowId } from './budgetingRowId';
 import { useBudgetingTableColumns } from './columns/useBudgetingTableColumns';
@@ -24,19 +22,17 @@ export function BudgetingTable() {
   const { t } = useTranslation('budgeting');
 
   const year = useAtomValue(selectedYearAtom);
-  const month = useAtomValue(selectedMonthNumberAtom);
+  const month = useAtomValue(selectedMonthAtom);
   const { rows, isLoading } = useBudgetingRows(month, year);
   const savePlan = useSaveForecastSum(month, year);
   const saveComment = useSaveForecastComment(month, year);
 
-  const surplus = useMemo(() => {
-    if (!rows) {
-      return new Decimal(0);
-    }
-    return rows.reduce((sum, r) => sum.plus(r.planSum), new Decimal(0));
-  }, [rows]);
-
-  const columns = useBudgetingTableColumns({ surplus, savePlan, saveComment });
+  const columns = useBudgetingTableColumns({
+    month,
+    year,
+    savePlan,
+    saveComment,
+  });
 
   const table = useMantineReactTable({
     columns,

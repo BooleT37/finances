@@ -1,8 +1,12 @@
 {
+  "averageTooltip": "{{count}} месяцев за {{prevYear}}–{{year}}",
   "columns": {
+    "average": "Среднее",
     "comment": "Комментарий",
+    "lastMonth": "Прошлый месяц",
     "name": "Категория",
-    "plan": "План"
+    "plan": "План",
+    "thisMonth": "Этот месяц"
   },
   "emptyState": "Категории не найдены",
   "expenses": "Расходы",

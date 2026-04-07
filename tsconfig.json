@@ -7,7 +7,7 @@
     "module": "ES2022",
     "moduleResolution": "bundler",
     "skipLibCheck": true,
-    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "lib": ["DOM", "DOM.Iterable", "ES2024"],
     "types": ["node", "vite/client", "vitest/globals"],
     "resolveJsonModule": true,
     "paths": {
