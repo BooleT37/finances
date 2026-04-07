@@ -19,7 +19,7 @@ import { getTransactionsQueryOptions } from '~/features/transactions/queries';
 import { DATE_FORMAT } from '~/shared/constants';
 import { findByIdOrThrow, getOrThrow } from '~/shared/utils/getOrThrow';
 import {
-  selectedMonthAtom,
+  selectedMonthKeyAtom,
   selectedYearAtom,
   viewModeAtom,
 } from '~/stores/month';
@@ -254,7 +254,7 @@ export function useTransactionTableItems({
   searchString,
 }: UseTransactionTableItemsOptions): TransactionTableItem[] | undefined {
   const mapComponents = useMapComponents();
-  const selectedMonth = useAtomValue(selectedMonthAtom); // 'YYYY-MM'
+  const selectedMonth = useAtomValue(selectedMonthKeyAtom); // 'YYYY-MM'
   const year = useAtomValue(selectedYearAtom);
   const viewMode = useAtomValue(viewModeAtom); // 'month' | 'year'
 

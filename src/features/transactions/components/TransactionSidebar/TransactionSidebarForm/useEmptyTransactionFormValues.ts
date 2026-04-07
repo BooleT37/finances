@@ -3,12 +3,12 @@ import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 
 import { getToday } from '~/shared/utils/today';
-import { selectedMonthAtom } from '~/stores/month';
+import { selectedMonthKeyAtom } from '~/stores/month';
 
 import type { TransactionFormValues } from './transactionFormValues';
 
 export function useEmptyTransactionFormValues(): TransactionFormValues {
-  const selectedMonth = useAtomValue(selectedMonthAtom);
+  const selectedMonth = useAtomValue(selectedMonthKeyAtom);
 
   return useMemo(
     (): TransactionFormValues => ({

@@ -4,24 +4,19 @@ import { atomWithStorage } from 'jotai/utils';
 import { getToday } from '~/shared/utils/today';
 
 /** Selected month stored as 'YYYY-MM', e.g. '2026-02'. Persisted to localStorage. */
-export const selectedMonthAtom = atomWithStorage(
+export const selectedMonthKeyAtom = atomWithStorage(
   'finances.selectedMonth',
   getToday().format('YYYY-MM'),
 );
 
-/** Derived: numeric year from selectedMonthAtom, e.g. 2026 */
+/** Derived: numeric year from selectedMonthKeyAtom, e.g. 2026 */
 export const selectedYearAtom = atom((get) =>
-  parseInt(get(selectedMonthAtom).slice(0, 4), 10),
+  parseInt(get(selectedMonthKeyAtom).slice(0, 4), 10),
 );
 
-/** Derived: numeric month (1-12) from selectedMonthAtom, e.g. 2 */
-export const selectedMonthNumberAtom = atom((get) =>
-  parseInt(get(selectedMonthAtom).slice(5, 7), 10),
-);
-
-// selectedMonthNumberAtom is 1-based; dayjs months are 0-based
-export const selectedMonth0BasedAtom = atom(
-  (get) => get(selectedMonthNumberAtom) - 1,
+/** Derived: 1-based month (1-12) from selectedMonthKeyAtom, e.g. 4 for April */
+export const selectedMonthAtom = atom((get) =>
+  parseInt(get(selectedMonthKeyAtom).slice(5, 7), 10),
 );
 
 /** Whether the navigator shows individual months or full years. Only meaningful on Expenses page. */

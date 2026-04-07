@@ -4,7 +4,7 @@ import { useAtomValue } from 'jotai';
 
 import { getTransactionsQueryOptions } from '~/features/transactions/queries';
 import {
-  selectedMonthAtom,
+  selectedMonthKeyAtom,
   selectedYearAtom,
   viewModeAtom,
 } from '~/stores/month';
@@ -37,7 +37,7 @@ export function useAvailableSubscriptions(
   categoryId?: number,
   editingId?: number | null,
 ): AvailableSubscription[] | undefined {
-  const selectedMonth = useAtomValue(selectedMonthAtom);
+  const selectedMonth = useAtomValue(selectedMonthKeyAtom);
   const year = useAtomValue(selectedYearAtom);
   const viewMode = useAtomValue(viewModeAtom);
   const base = viewMode === 'year' ? dayjs(`${year}-01`) : dayjs(selectedMonth);

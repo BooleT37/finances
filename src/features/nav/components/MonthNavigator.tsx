@@ -22,7 +22,7 @@ import { useAtom, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
 import {
-  selectedMonthAtom,
+  selectedMonthKeyAtom,
   transactionSearchAtom,
   viewModeAtom,
 } from '~/stores/month';
@@ -40,7 +40,7 @@ function formatLabel(
 }
 
 export function MonthNavigator() {
-  const [selectedMonth, setMonth] = useAtom(selectedMonthAtom);
+  const [selectedMonth, setMonth] = useAtom(selectedMonthKeyAtom);
   const [viewMode, setViewMode] = useAtom(viewModeAtom);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const setSearch = useSetAtom(transactionSearchAtom);
