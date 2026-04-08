@@ -1,5 +1,7 @@
 import Decimal from 'decimal.js';
 
+import type { Category } from '~/features/categories/schema';
+
 import { MonthActuals } from './MonthActuals';
 import { TransactionAverages } from './TransactionAverages';
 
@@ -14,13 +16,33 @@ function makeTx(cost: string, catId: number, subId: number | null = null) {
   };
 }
 
-const expenseCat = { id: 1, isIncome: false, subcategories: [] };
-const incomeCat = { id: 2, isIncome: true, subcategories: [] };
-const subCat = {
-  id: 3,
-  isIncome: false,
-  subcategories: [{ id: 10 }, { id: 11 }],
-};
+function makeCat({
+  id,
+  isIncome,
+  subcategoryIds = [],
+  type = null,
+}: {
+  id: number;
+  isIncome: boolean;
+  subcategoryIds?: number[];
+  type?: Category['type'];
+}): Category {
+  return {
+    id,
+    name: '',
+    shortname: '',
+    type,
+    isIncome,
+    isContinuous: false,
+    icon: null,
+    subcategories: subcategoryIds.map((subId) => ({ id: subId, name: '' })),
+  };
+}
+
+const expenseCat = makeCat({ id: 1, isIncome: false });
+const incomeCat = makeCat({ id: 2, isIncome: true });
+const subCat = makeCat({ id: 3, isIncome: false, subcategoryIds: [10, 11] });
+const savingsCat = makeCat({ id: 5, isIncome: false, type: 'TO_SAVINGS' });
 
 /** Build a MonthActuals for a single list of transactions */
 function monthOf(
@@ -212,6 +234,42 @@ describe('TransactionAverages', () => {
       const result = avg.getCategoryTotal(999);
       expect(result.monthCount).toBe(0);
       expect(result.average.equals(d('0'))).toBe(true);
+    });
+  });
+
+  describe('savings typeGroup averages — getTotalSavings', () => {
+    it('savings totals -200, -400 → average=-300, monthCount=2', () => {
+      const allCats = [expenseCat, savingsCat];
+      const months = [
+        new MonthActuals([makeTx('-200', 5)], allCats),
+        new MonthActuals([makeTx('-400', 5)], allCats),
+      ];
+      const avg = new TransactionAverages(months, allCats);
+      const result = avg.getTotalSavings();
+      expect(result.monthCount).toBe(2);
+      expect(result.average.equals(d('-300'))).toBe(true);
+    });
+
+    it('savings: one active month, one zero → monthCount=1', () => {
+      const allCats = [savingsCat];
+      const months = [
+        new MonthActuals([makeTx('-500', 5)], allCats),
+        new MonthActuals([], allCats),
+      ];
+      const avg = new TransactionAverages(months, allCats);
+      const result = avg.getTotalSavings();
+      expect(result.monthCount).toBe(1);
+      expect(result.average.equals(d('-500'))).toBe(true);
+    });
+
+    it('savings excluded from getTotalExpenses', () => {
+      const allCats = [expenseCat, savingsCat];
+      const months = [
+        new MonthActuals([makeTx('-100', 1), makeTx('-500', 5)], allCats),
+      ];
+      const avg = new TransactionAverages(months, allCats);
+      expect(avg.getTotalExpenses().average.equals(d('-100'))).toBe(true);
+      expect(avg.getTotalSavings().average.equals(d('-500'))).toBe(true);
     });
   });
 });

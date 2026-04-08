@@ -53,8 +53,9 @@ export function BudgetingTable() {
     localization: MRT_Localization_RU,
     initialState: {
       expanded: {
-        [buildBudgetingRowId({ rowType: 'typeGroup', isIncome: false })]: true,
-        [buildBudgetingRowId({ rowType: 'typeGroup', isIncome: true })]: true,
+        [buildBudgetingRowId({ rowType: 'typeGroup', group: 'expense' })]: true,
+        [buildBudgetingRowId({ rowType: 'typeGroup', group: 'savings' })]: true,
+        [buildBudgetingRowId({ rowType: 'typeGroup', group: 'income' })]: true,
       } as MRT_ExpandedState,
       density: 'xs',
     },

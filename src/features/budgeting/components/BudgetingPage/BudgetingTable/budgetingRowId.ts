@@ -1,12 +1,13 @@
 export type BudgetingRowId =
   | 'expense'
+  | 'savings'
   | 'income'
   | `cat-${number}`
   | `cat-${number}-sub-${number}`
   | `cat-${number}-rest`;
 
 type BudgetingRowIdParams =
-  | { rowType: 'typeGroup'; isIncome: boolean }
+  | { rowType: 'typeGroup'; group: 'expense' | 'income' | 'savings' }
   | { rowType: 'category'; categoryId: number }
   | { rowType: 'subcategory'; categoryId: number; subcategoryId: number }
   | { rowType: 'rest'; categoryId: number };
@@ -16,7 +17,7 @@ export function buildBudgetingRowId(
 ): BudgetingRowId {
   switch (params.rowType) {
     case 'typeGroup':
-      return params.isIncome ? 'income' : 'expense';
+      return params.group;
     case 'category':
       return `cat-${params.categoryId}`;
     case 'subcategory':
@@ -27,11 +28,8 @@ export function buildBudgetingRowId(
 }
 
 export function parseBudgetingRowId(id: BudgetingRowId): BudgetingRowIdParams {
-  if (id === 'expense') {
-    return { rowType: 'typeGroup', isIncome: false };
-  }
-  if (id === 'income') {
-    return { rowType: 'typeGroup', isIncome: true };
+  if (id === 'expense' || id === 'income' || id === 'savings') {
+    return { rowType: 'typeGroup', group: id };
   }
 
   const restMatch = id.match(/^cat-(\d+)-rest$/);

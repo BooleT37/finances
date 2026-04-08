@@ -1,5 +1,7 @@
 import Decimal from 'decimal.js';
 
+import type { Category } from '~/features/categories/schema';
+
 import { MonthActuals } from './MonthActuals';
 
 const d = (n: string) => new Decimal(n);
@@ -22,13 +24,33 @@ function makeTx(
   };
 }
 
-const expenseCat = { id: 1, isIncome: false, subcategories: [] };
-const incomeCat = { id: 2, isIncome: true, subcategories: [] };
-const subCat = {
-  id: 3,
-  isIncome: false,
-  subcategories: [{ id: 10 }, { id: 11 }],
-};
+function makeCat({
+  id,
+  isIncome,
+  subcategoryIds = [],
+  type = null,
+}: {
+  id: number;
+  isIncome: boolean;
+  subcategoryIds?: number[];
+  type?: Category['type'];
+}): Category {
+  return {
+    id,
+    name: '',
+    shortname: '',
+    type,
+    isIncome,
+    isContinuous: false,
+    icon: null,
+    subcategories: subcategoryIds.map((subId) => ({ id: subId, name: '' })),
+  };
+}
+
+const expenseCat = makeCat({ id: 1, isIncome: false });
+const incomeCat = makeCat({ id: 2, isIncome: true });
+const subCat = makeCat({ id: 3, isIncome: false, subcategoryIds: [10, 11] });
+const savingsCat = makeCat({ id: 5, isIncome: false, type: 'TO_SAVINGS' });
 
 describe('MonthActuals', () => {
   describe('empty state', () => {
@@ -159,10 +181,36 @@ describe('MonthActuals', () => {
     });
 
     it('multiple expense categories → getTotalExpenses = sum of all', () => {
-      const cat4 = { id: 4, isIncome: false, subcategories: [] };
+      const cat4 = makeCat({ id: 4, isIncome: false });
       const txs = [makeTx('-80', 1), makeTx('-120', 4)];
       const ma = new MonthActuals(txs, [expenseCat, cat4]);
       expect(ma.getTotalExpenses().equals(d('-200'))).toBe(true);
+    });
+  });
+
+  describe('savings category (TO_SAVINGS)', () => {
+    it('savings tx → getTotalSavings includes it, getTotalExpenses excludes it', () => {
+      const ma = new MonthActuals(
+        [makeTx('-500', 5)],
+        [expenseCat, savingsCat],
+      );
+      expect(ma.getTotalSavings().equals(d('-500'))).toBe(true);
+      expect(ma.getTotalExpenses().equals(d('0'))).toBe(true);
+      expect(ma.getCategoryTotal(5).equals(d('-500'))).toBe(true);
+    });
+
+    it('expense and savings tx → totals are separated', () => {
+      const ma = new MonthActuals(
+        [makeTx('-80', 1), makeTx('-500', 5)],
+        [expenseCat, savingsCat],
+      );
+      expect(ma.getTotalExpenses().equals(d('-80'))).toBe(true);
+      expect(ma.getTotalSavings().equals(d('-500'))).toBe(true);
+    });
+
+    it('no savings tx → getTotalSavings = 0', () => {
+      const ma = new MonthActuals([makeTx('-80', 1)], [expenseCat, savingsCat]);
+      expect(ma.getTotalSavings().equals(d('0'))).toBe(true);
     });
   });
 });

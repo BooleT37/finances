@@ -258,8 +258,11 @@ export function useBudgetingRows(
 
     const ta = new TransactionActuals(allTx, sorted);
 
-    const expenseCategories = sorted.filter((c) => !c.isIncome);
+    const expenseCategories = sorted.filter(
+      (c) => !c.isIncome && c.type !== 'TO_SAVINGS',
+    );
     const incomeCategories = sorted.filter((c) => c.isIncome);
+    const savingsCategories = sorted.filter((c) => c.type === 'TO_SAVINGS');
     const restSubcategoryName = t('restSubcategory');
 
     const expenseRows = buildCategoryRows(
@@ -286,15 +289,28 @@ export function useBudgetingRows(
       restSubcategoryName,
       sortSubcategories,
     );
+    const savingsRows = buildCategoryRows(
+      savingsCategories,
+      forecasts,
+      allForecasts,
+      ta,
+      month,
+      year,
+      lastMonth,
+      lastYear,
+      restSubcategoryName,
+      sortSubcategories,
+    );
 
     const thisMonthActuals = ta.matrix.getMonthActuals(month, year);
     const lastMonthActuals = ta.matrix.getMonthActuals(lastMonth, lastYear);
     const expenseAvg = ta.averages.getTotalExpenses();
     const incomeAvg = ta.averages.getTotalIncome();
+    const savingsAvg = ta.averages.getTotalSavings();
 
     return [
       {
-        id: buildBudgetingRowId({ rowType: 'typeGroup', isIncome: false }),
+        id: buildBudgetingRowId({ rowType: 'typeGroup', group: 'expense' }),
         rowType: 'typeGroup',
         name: t('expenses'),
         icon: null,
@@ -315,7 +331,28 @@ export function useBudgetingRows(
         subRows: expenseRows,
       },
       {
-        id: buildBudgetingRowId({ rowType: 'typeGroup', isIncome: true }),
+        id: buildBudgetingRowId({ rowType: 'typeGroup', group: 'savings' }),
+        rowType: 'typeGroup',
+        name: t('savings'),
+        icon: null,
+        categoryId: null,
+        subcategoryId: null,
+        isRestRow: false,
+        isIncome: false,
+        isContinuous: false,
+        planSum: decimalSum(...savingsRows.map((r) => r.planSum)),
+        lastMonthPlanSum: decimalSum(
+          ...savingsRows.map((r) => r.lastMonthPlanSum),
+        ),
+        comment: '',
+        thisMonthActual: thisMonthActuals.getTotalSavings(),
+        lastMonthActual: lastMonthActuals.getTotalSavings(),
+        average: savingsAvg.average,
+        monthCount: savingsAvg.monthCount,
+        subRows: savingsRows,
+      },
+      {
+        id: buildBudgetingRowId({ rowType: 'typeGroup', group: 'income' }),
         rowType: 'typeGroup',
         name: t('income'),
         icon: null,

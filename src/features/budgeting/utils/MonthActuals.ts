@@ -1,5 +1,6 @@
 import Decimal from 'decimal.js';
 
+import type { Category } from '~/features/categories/schema';
 import { decimalSum } from '~/shared/utils/decimalSum';
 
 type TxComponent = Pick<
@@ -55,24 +56,19 @@ function computePairTotal(
 export class MonthActuals {
   private readonly expenses: Decimal;
   private readonly income: Decimal;
+  private readonly savings: Decimal;
   private readonly categoryTotals: Map<number, Decimal>;
   private readonly subcategoryTotals: Map<string, Decimal>;
   private readonly restTotals: Map<number, Decimal>;
 
-  constructor(
-    monthTx: Tx[],
-    categories: {
-      id: number;
-      isIncome: boolean;
-      subcategories: { id: number }[];
-    }[],
-  ) {
+  constructor(monthTx: Tx[], categories: Category[]) {
     this.categoryTotals = new Map();
     this.subcategoryTotals = new Map();
     this.restTotals = new Map();
 
     let expenseTotal = ZERO;
     let incomeTotal = ZERO;
+    let savingsTotal = ZERO;
 
     for (const category of categories) {
       const catId = category.id;
@@ -95,6 +91,8 @@ export class MonthActuals {
       const catTotal = this.categoryTotals.get(catId)!;
       if (category.isIncome) {
         incomeTotal = incomeTotal.plus(catTotal);
+      } else if (category.type === 'TO_SAVINGS') {
+        savingsTotal = savingsTotal.plus(catTotal);
       } else {
         expenseTotal = expenseTotal.plus(catTotal);
       }
@@ -102,6 +100,7 @@ export class MonthActuals {
 
     this.expenses = expenseTotal;
     this.income = incomeTotal;
+    this.savings = savingsTotal;
   }
 
   getTotalExpenses(): Decimal {
@@ -110,6 +109,10 @@ export class MonthActuals {
 
   getTotalIncome(): Decimal {
     return this.income;
+  }
+
+  getTotalSavings(): Decimal {
+    return this.savings;
   }
 
   getCategoryTotal(categoryId: number): Decimal {

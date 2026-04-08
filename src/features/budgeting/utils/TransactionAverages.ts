@@ -31,6 +31,7 @@ function computeAverage(values: Decimal[]): AverageResult {
 export class TransactionAverages {
   private readonly expenseAvg: AverageResult;
   private readonly incomeAvg: AverageResult;
+  private readonly savingsAvg: AverageResult;
   private readonly categoryAvgs: Map<number, AverageResult>;
   private readonly subcategoryAvgs: Map<string, AverageResult>;
   private readonly restAvgs: Map<number, AverageResult>;
@@ -73,6 +74,7 @@ export class TransactionAverages {
       allMonths.map((m) => m.getTotalExpenses()),
     );
     this.incomeAvg = computeAverage(allMonths.map((m) => m.getTotalIncome()));
+    this.savingsAvg = computeAverage(allMonths.map((m) => m.getTotalSavings()));
   }
 
   getTotalExpenses(): AverageResult {
@@ -81,6 +83,10 @@ export class TransactionAverages {
 
   getTotalIncome(): AverageResult {
     return this.incomeAvg;
+  }
+
+  getTotalSavings(): AverageResult {
+    return this.savingsAvg;
   }
 
   getCategoryTotal(categoryId: number): AverageResult {

@@ -14,5 +14,6 @@
   "income": "Income",
   "lockedPlanTooltip": "Value is calculated automatically as the sum of subcategories",
   "restRowTooltip": "This is a superficial subcategory, it's not possible to add a comment to it.",
-  "restSubcategory": "Rest"
+  "restSubcategory": "Rest",
+  "savings": "To savings"
 }
