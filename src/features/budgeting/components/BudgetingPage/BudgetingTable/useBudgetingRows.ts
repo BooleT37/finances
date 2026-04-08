@@ -26,6 +26,7 @@ const ZERO = new Decimal(0);
 function buildCategoryRows(
   categories: Category[],
   forecasts: Forecast[],
+  allForecasts: Forecast[],
   ta: TransactionActuals,
   month: number,
   year: number,
@@ -49,6 +50,13 @@ function buildCategoryRows(
     });
     const categoryPlanSum = catForecast?.sum ?? ZERO;
 
+    const lastMonthCategoryPlanSum =
+      findCategoryForecast(allForecasts, {
+        categoryId: category.id,
+        month: lastMonth,
+        year: lastYear,
+      })?.sum ?? ZERO;
+
     if (category.subcategories.length === 0) {
       const rowId = buildBudgetingRowId({
         rowType: 'category',
@@ -67,6 +75,7 @@ function buildCategoryRows(
         isIncome: category.isIncome,
         isContinuous: category.isContinuous,
         planSum: categoryPlanSum,
+        lastMonthPlanSum: lastMonthCategoryPlanSum,
         comment: catForecast?.comment ?? '',
         thisMonthActual: thisMonthActuals.getCategoryTotal(category.id),
         lastMonthActual: lastMonthActuals.getCategoryTotal(category.id),
@@ -84,6 +93,13 @@ function buildCategoryRows(
           year,
         });
         const subPlanSum = subForecast?.sum ?? ZERO;
+        const lastMonthSubPlanSum =
+          findSubcategoryForecast(allForecasts, {
+            categoryId: category.id,
+            subcategoryId: sub.id,
+            month: lastMonth,
+            year: lastYear,
+          })?.sum ?? ZERO;
         const subRowId = buildBudgetingRowId({
           rowType: 'subcategory',
           categoryId: category.id,
@@ -105,6 +121,7 @@ function buildCategoryRows(
           isIncome: category.isIncome,
           isContinuous: category.isContinuous,
           planSum: subPlanSum,
+          lastMonthPlanSum: lastMonthSubPlanSum,
           comment: subForecast?.comment ?? '',
           thisMonthActual: thisMonthActuals.getSubcategoryTotal(
             category.id,
@@ -127,6 +144,13 @@ function buildCategoryRows(
     const subcategorySum = decimalSum(...subcategoryRows.map((r) => r.planSum));
     const restPlanSum = categoryPlanSum.minus(subcategorySum);
 
+    const lastMonthSubcategorySum = decimalSum(
+      ...subcategoryRows.map((r) => r.lastMonthPlanSum),
+    );
+    const lastMonthRestPlanSum = lastMonthCategoryPlanSum.minus(
+      lastMonthSubcategorySum,
+    );
+
     const restRowId = buildBudgetingRowId({
       rowType: 'rest',
       categoryId: category.id,
@@ -147,6 +171,7 @@ function buildCategoryRows(
         isIncome: category.isIncome,
         isContinuous: category.isContinuous,
         planSum: restPlanSum,
+        lastMonthPlanSum: lastMonthRestPlanSum,
         comment: '',
         thisMonthActual: thisMonthActuals.getSubcategoryTotal(
           category.id,
@@ -179,6 +204,7 @@ function buildCategoryRows(
       isIncome: category.isIncome,
       isContinuous: category.isContinuous,
       planSum: categoryPlanSum,
+      lastMonthPlanSum: lastMonthCategoryPlanSum,
       comment: catForecast?.comment ?? '',
       thisMonthActual: thisMonthActuals.getCategoryTotal(category.id),
       lastMonthActual: lastMonthActuals.getCategoryTotal(category.id),
@@ -199,19 +225,31 @@ export function useBudgetingRows(
   const { t } = useTranslation('budgeting');
   const { data: categories } = useQuery(getCategoriesQueryOptions());
   const { data: forecasts } = useQuery(getForecastsQueryOptions(year));
+  const { data: prevYearForecasts } = useQuery(
+    getForecastsQueryOptions(year - 1),
+  );
   const { data: txCurrent } = useQuery(getTransactionsQueryOptions(year));
   const { data: txPrev } = useQuery(getTransactionsQueryOptions(year - 1));
   const sortAllCategoriesById = useSortAllCategoriesById();
   const sortSubcategories = useSortSubcategories();
 
   const rows = useMemo<BudgetingRow[] | undefined>(() => {
-    if (!categories || !forecasts || !txCurrent || !txPrev) {
+    if (
+      !categories ||
+      !forecasts ||
+      !prevYearForecasts ||
+      !txCurrent ||
+      !txPrev
+    ) {
       return undefined;
     }
 
     const allTx = [...txCurrent, ...txPrev];
     const lastMonth = month === 0 ? 11 : month - 1;
     const lastYear = month === 0 ? year - 1 : year;
+    // When lastYear === year, forecasts already covers last month; no need to merge.
+    const allForecasts =
+      lastYear === year ? forecasts : [...forecasts, ...prevYearForecasts];
 
     const filtered = categories.filter((c) => c.type !== 'FROM_SAVINGS');
     const sorted = [...filtered].sort((a, b) =>
@@ -227,6 +265,7 @@ export function useBudgetingRows(
     const expenseRows = buildCategoryRows(
       expenseCategories,
       forecasts,
+      allForecasts,
       ta,
       month,
       year,
@@ -238,6 +277,7 @@ export function useBudgetingRows(
     const incomeRows = buildCategoryRows(
       incomeCategories,
       forecasts,
+      allForecasts,
       ta,
       month,
       year,
@@ -264,6 +304,9 @@ export function useBudgetingRows(
         isIncome: false,
         isContinuous: false,
         planSum: decimalSum(...expenseRows.map((r) => r.planSum)),
+        lastMonthPlanSum: decimalSum(
+          ...expenseRows.map((r) => r.lastMonthPlanSum),
+        ),
         comment: '',
         thisMonthActual: thisMonthActuals.getTotalExpenses(),
         lastMonthActual: lastMonthActuals.getTotalExpenses(),
@@ -282,6 +325,9 @@ export function useBudgetingRows(
         isIncome: true,
         isContinuous: false,
         planSum: decimalSum(...incomeRows.map((r) => r.planSum)),
+        lastMonthPlanSum: decimalSum(
+          ...incomeRows.map((r) => r.lastMonthPlanSum),
+        ),
         comment: '',
         thisMonthActual: thisMonthActuals.getTotalIncome(),
         lastMonthActual: lastMonthActuals.getTotalIncome(),
@@ -293,6 +339,7 @@ export function useBudgetingRows(
   }, [
     categories,
     forecasts,
+    prevYearForecasts,
     txCurrent,
     txPrev,
     month,
@@ -304,6 +351,7 @@ export function useBudgetingRows(
 
   return {
     rows,
-    isLoading: !categories || !forecasts || !txCurrent || !txPrev,
+    isLoading:
+      !categories || !forecasts || !prevYearForecasts || !txCurrent || !txPrev,
   };
 }

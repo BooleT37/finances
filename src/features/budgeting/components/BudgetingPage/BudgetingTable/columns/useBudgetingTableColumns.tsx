@@ -73,10 +73,11 @@ export function useBudgetingTableColumns({
         Cell: ({ row }) => (
           <CostWithDiffCellView
             cost={row.original.lastMonthActual}
-            forecast={row.original.planSum}
+            forecast={row.original.lastMonthPlanSum}
             isContinuous={row.original.isContinuous}
             month={lastMonthVal}
             year={lastMonthYear}
+            showPlanTooltip
           />
         ),
         Footer: ({ table }) => (
@@ -89,7 +90,7 @@ export function useBudgetingTableColumns({
             forecast={decimalSum(
               ...table
                 .getCoreRowModel()
-                .rows.map((r) => r.original.planSum ?? new Decimal(0)),
+                .rows.map((r) => r.original.lastMonthPlanSum ?? new Decimal(0)),
             )}
             isContinuous={false}
             month={lastMonthVal}
