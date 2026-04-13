@@ -1,61 +1,11 @@
-import type { Locator, Page } from '@playwright/test';
-
-import { expect, test } from './fixtures';
-
-// Returns the first <tr> whose visible text contains `name`
-function getRow(page: Page, name: string) {
-  return page.locator('tbody tr').filter({ hasText: name }).first();
-}
-
-function getPlanCell(row: Locator) {
-  return row.locator('[data-testing-column="plan"]');
-}
-
-function getCommentCell(row: Locator) {
-  return row.locator('[data-testing-column="comment"]');
-}
-
-function getActualCell(
-  row: Locator,
-  col: 'thisMonth' | 'lastMonth' | 'average',
-) {
-  return row.locator(`[data-testing-column="${col}"]`);
-}
-
-async function editPlanCell(row: Locator, value: string) {
-  await getPlanCell(row).dblclick();
-  await row.locator('input[type="number"]').fill(value);
-  await row.locator('input[type="number"]').press('Enter');
-}
-
-async function editCommentCell(row: Locator, value: string) {
-  await getCommentCell(row).dblclick();
-  await getCommentCell(row).locator('input').fill(value);
-  await getCommentCell(row).locator('input').press('Enter');
-}
-
-test.describe('Budgeting transaction totals columns', () => {
-  test('shows seeded transaction actuals in thisMonth, lastMonth, and average columns', async ({
-    page,
-  }) => {
-    await page.goto('/budgeting');
-
-    const транспортRow = getRow(page, 'Транспорт');
-
-    // Seeded: cost=50 this month, cost=30 last month (both are positive in DB, shown as expenses)
-    await expect(getActualCell(транспортRow, 'thisMonth')).toContainText(
-      '-€50.00',
-    );
-    await expect(getActualCell(транспортRow, 'lastMonth')).toContainText(
-      '-€30.00',
-    );
-
-    // Average over 2 months: (-50 + -30) / 2 = -40
-    await expect(getActualCell(транспортRow, 'average')).toContainText(
-      '-€40.00',
-    );
-  });
-});
+import { expect, test } from '../fixtures';
+import {
+  editCommentCell,
+  editPlanCell,
+  getCommentCell,
+  getPlanCell,
+  getRow,
+} from './budgeting.utils';
 
 test.describe('Budgeting inline editing', () => {
   // Test 1: display + basic plan edit + persistence
@@ -69,7 +19,8 @@ test.describe('Budgeting inline editing', () => {
 
     // Seeded forecast shown; zero category shows €0.00
     await expect(getPlanCell(продуктыRow)).toHaveText('-€100.00');
-    await expect(getPlanCell(транспортRow)).toHaveText('€0.00');
+    // Транспорт has a subscription badge so we check containment, not exact text
+    await expect(getPlanCell(транспортRow)).toContainText('€0.00');
 
     // Double-click plan cell → edit input pre-populated with absolute magnitude
     await getPlanCell(транспортRow).dblclick();
@@ -80,11 +31,11 @@ test.describe('Budgeting inline editing', () => {
     // Fill and confirm with Enter
     await input.fill('50');
     await input.press('Enter');
-    await expect(getPlanCell(транспортRow)).toHaveText('-€50.00');
+    await expect(getPlanCell(транспортRow)).toContainText('-€50.00');
 
     // Reload confirms persistence
     await page.reload();
-    await expect(getPlanCell(транспортRow)).toHaveText('-€50.00');
+    await expect(getPlanCell(транспортRow)).toContainText('-€50.00');
   });
 
   // Test 2: subcategory edit, additive total, locked parent, rest row, comment

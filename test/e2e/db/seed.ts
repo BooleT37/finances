@@ -23,6 +23,9 @@ export interface SeedData {
   };
   subscriptionIds: {
     нетфликс: number;
+    яндексТакси: number;
+    яндексПлюс: number;
+    кинопоиск: number;
   };
   savingSpendingIds: {
     отпускРим2025: number;
@@ -143,14 +146,58 @@ export async function seed(): Promise<SeedData> {
     data: { name: 'Vivid', parser: 'VIVID', userId: user.id },
   });
 
-  // Subscription
+  // Subscriptions
   const netflix = await testPrisma.subscription.create({
     data: {
       name: 'Netflix',
       cost: 15.99,
       categoryId: развлечения.id,
       sourceId: vivid.id,
-      period: 30,
+      period: 1,
+      firstDate: new Date('2024-01-01'),
+      active: true,
+      userId: user.id,
+    },
+  });
+
+  // Quarterly subscription on Продукты — NOT due in April 2024
+  // Due schedule: Mar 2024, Jun 2024, Sep 2024… firstDate=2024-03-01, period=3
+  const яндексПлюс = await testPrisma.subscription.create({
+    data: {
+      name: 'Яндекс Плюс',
+      cost: 169,
+      categoryId: продукты.id,
+      sourceId: vivid.id,
+      period: 3,
+      firstDate: new Date('2024-03-01'),
+      active: true,
+      userId: user.id,
+    },
+  });
+
+  // Inactive subscription on Развлечения — should never appear in badges
+  const кинопоиск = await testPrisma.subscription.create({
+    data: {
+      name: 'Кинопоиск',
+      cost: 199,
+      categoryId: развлечения.id,
+      sourceId: vivid.id,
+      period: 1,
+      firstDate: new Date('2024-01-01'),
+      active: false,
+      userId: user.id,
+    },
+  });
+
+  // Subscription linked to Такси subcategory (period: 1 month, due every month)
+  const таксиСервис = await testPrisma.subscription.create({
+    data: {
+      name: 'Яндекс Такси',
+      cost: 299,
+      categoryId: транспорт.id,
+      subcategoryId: такси.id,
+      sourceId: vivid.id,
+      period: 1,
       firstDate: new Date('2024-01-01'),
       active: true,
       userId: user.id,
@@ -261,6 +308,9 @@ export async function seed(): Promise<SeedData> {
     },
     subscriptionIds: {
       нетфликс: netflix.id,
+      яндексТакси: таксиСервис.id,
+      яндексПлюс: яндексПлюс.id,
+      кинопоиск: кинопоиск.id,
     },
     savingSpendingIds: {
       отпускРим2025: отпускРим.id,
