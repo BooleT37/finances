@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import Decimal from 'decimal.js';
 
-import { divideWithFallbackToOne } from '~/shared/utils/divideWithFallbackToOne';
 import { getToday } from '~/shared/utils/today';
 
 export interface GetCostWithDiffParamsResult {
@@ -55,7 +54,7 @@ export function getCostWithDiffParams({
   }
 
   if (cost.abs().lessThanOrEqualTo(forecast.abs())) {
-    const spentRatio = divideWithFallbackToOne(costNumber, forecastNumber);
+    const spentRatio = forecastNumber === 0 ? 0 : costNumber / forecastNumber;
     const exceedingForecast =
       isContinuous && passedDaysRatio !== null && spentRatio > passedDaysRatio;
 
