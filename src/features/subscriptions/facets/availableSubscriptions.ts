@@ -15,6 +15,11 @@ import type { Subscription } from '../schema';
 export interface AvailableSubscription {
   subscription: Subscription;
   firstDate: Dayjs;
+  /**
+   * The transaction ID that paid this subscription in the selected period,
+   * or null if unpaid.
+   */
+  transactionId: number | null;
 }
 
 function firstDateInInterval(
@@ -35,7 +40,6 @@ function firstDateInInterval(
 
 export function useAvailableSubscriptions(
   categoryId?: number,
-  editingId?: number | null,
 ): AvailableSubscription[] | undefined {
   const selectedMonth = useAtomValue(selectedMonthKeyAtom);
   const year = useAtomValue(selectedYearAtom);
@@ -50,16 +54,15 @@ export function useAvailableSubscriptions(
     return undefined;
   }
 
-  const paidSubscriptionIds = new Set(
+  const paidSubscriptionMap = new Map<number, number>(
     transactions
       .filter(
-        (t) =>
-          t.subscriptionId !== null &&
-          t.id !== editingId &&
-          !t.date.isBefore(rangeStart, 'day') &&
-          !t.date.isAfter(rangeEnd, 'day'),
+        (tx) =>
+          tx.subscriptionId !== null &&
+          !tx.date.isBefore(rangeStart, 'day') &&
+          !tx.date.isAfter(rangeEnd, 'day'),
       )
-      .map((t) => t.subscriptionId),
+      .map((tx) => [tx.subscriptionId as number, tx.id]),
   );
 
   return subscriptions
@@ -72,10 +75,14 @@ export function useAvailableSubscriptions(
         rangeStart,
         rangeEnd,
       );
-      return date ? { subscription, firstDate: date } : null;
+      if (!date) {
+        return null;
+      }
+      return {
+        subscription,
+        firstDate: date,
+        transactionId: paidSubscriptionMap.get(subscription.id) ?? null,
+      };
     })
-    .filter(
-      (item): item is AvailableSubscription =>
-        item !== null && !paidSubscriptionIds.has(item.subscription.id),
-    );
+    .filter((item): item is AvailableSubscription => item !== null);
 }

@@ -300,6 +300,7 @@ export function useTransactionTableItems({
 
   const subscriptionRows = showUpcoming
     ? availableSubscriptions
+        .filter((a) => a.transactionId === null)
         .filter(
           (a) => !search || a.subscription.name.toLowerCase().includes(search),
         )

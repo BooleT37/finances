@@ -26,16 +26,19 @@ export function SubscriptionField({ form }: Props) {
       : form.values.expenseCategory;
   const availableSubscriptions = useAvailableSubscriptions(
     activeCategory !== null ? Number(activeCategory) : undefined,
-    editingId,
   );
 
   const subscriptionOptions = useMemo(
     () =>
-      (availableSubscriptions ?? []).map((s) => ({
-        value: String(s.subscription.id),
-        label: s.subscription.name,
-      })),
-    [availableSubscriptions],
+      (availableSubscriptions ?? [])
+        .filter(
+          (s) => s.transactionId === null || s.transactionId === editingId,
+        )
+        .map((s) => ({
+          value: String(s.subscription.id),
+          label: s.subscription.name,
+        })),
+    [availableSubscriptions, editingId],
   );
 
   const autofillSubscriptionFields = useCallback(
