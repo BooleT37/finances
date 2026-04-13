@@ -103,6 +103,11 @@ export class MonthActuals {
     this.savings = savingsTotal;
   }
 
+  /** Net total: income + expenses + savings. */
+  getTotal(): Decimal {
+    return this.income.plus(this.expenses).plus(this.savings);
+  }
+
   getTotalExpenses(): Decimal {
     return this.expenses;
   }

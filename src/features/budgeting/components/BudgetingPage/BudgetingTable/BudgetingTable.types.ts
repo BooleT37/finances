@@ -1,6 +1,20 @@
 import type Decimal from 'decimal.js';
 
+import type { AvailableSubscription } from '~/features/subscriptions/facets/availableSubscriptions';
+
 import type { BudgetingRowId } from './budgetingRowId';
+
+export interface BudgetingGrandTotal {
+  thisMonthActual: Decimal;
+  lastMonthActual: Decimal;
+  average: Decimal;
+  monthCount: number;
+  /** Estimated surplus: Σ(income planSums) + Σ(expense planSums) + Σ(savings planSums). */
+  planSum: Decimal;
+  lastMonthPlanSum: Decimal;
+  /** All available subscriptions due this month */
+  subscriptions: AvailableSubscription[];
+}
 
 export type BudgetingRowType = 'typeGroup' | 'category' | 'subcategory';
 
@@ -31,5 +45,7 @@ export interface BudgetingRow {
   average: Decimal;
   /** Denominator for average; shown in tooltip. 0 means no data. */
   monthCount: number;
+  /** Subscriptions due this month for this row's (categoryId, subcategoryId) pair. */
+  subscriptions: AvailableSubscription[];
   subRows?: BudgetingRow[];
 }

@@ -15,5 +15,15 @@
   "lockedPlanTooltip": "Value is calculated automatically as the sum of subcategories",
   "restRowTooltip": "This is a superficial subcategory, it's not possible to add a comment to it.",
   "restSubcategory": "Rest",
-  "savings": "To savings"
+  "savings": "To savings",
+  "subscriptions": {
+    "appliedSingle": "Plan filled: {{name}} — {{cost}}",
+    "appliedGroup": "Plan filled from subscriptions — {{cost}} across {{count}} rows",
+    "fillFromSubscriptions": "Fill from subscriptions",
+    "fromSubscriptions": "{{cost}} from subscriptions",
+    "fillFromSubscriptionsConfirm": "This will overwrite the plan values for all rows with subscriptions. Continue?",
+    "noSource": "No source",
+    "notPaid": "unpaid",
+    "paid": "paid"
+  }
 }

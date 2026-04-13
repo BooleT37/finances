@@ -14,11 +14,13 @@ import {
 } from '~/features/categories/facets/categoriesOrder';
 import { getCategoriesQueryOptions } from '~/features/categories/queries';
 import type { Category } from '~/features/categories/schema';
+import type { AvailableSubscription } from '~/features/subscriptions/facets/availableSubscriptions';
+import { useAvailableSubscriptions } from '~/features/subscriptions/facets/availableSubscriptions';
 import { getTransactionsQueryOptions } from '~/features/transactions/queries';
 import { decimalSum } from '~/shared/utils/decimalSum';
 
 import { buildBudgetingRowId } from './budgetingRowId';
-import type { BudgetingRow } from './BudgetingTable.types';
+import type { BudgetingGrandTotal, BudgetingRow } from './BudgetingTable.types';
 import { REST_SUBCATEGORY_ID } from './constants';
 
 const ZERO = new Decimal(0);
@@ -38,6 +40,7 @@ function buildCategoryRows(
     sub1Id: number | null,
     sub2Id: number | null,
   ) => number,
+  subscriptions: AvailableSubscription[],
 ): BudgetingRow[] {
   const thisMonthActuals = ta.matrix.getMonthActuals(month, year);
   const lastMonthActuals = ta.matrix.getMonthActuals(lastMonth, lastYear);
@@ -81,6 +84,11 @@ function buildCategoryRows(
         lastMonthActual: lastMonthActuals.getCategoryTotal(category.id),
         average,
         monthCount,
+        subscriptions: subscriptions.filter(
+          (s) =>
+            s.subscription.categoryId === category.id &&
+            s.subscription.subcategoryId === null,
+        ),
       } satisfies BudgetingRow;
     }
 
@@ -133,6 +141,11 @@ function buildCategoryRows(
           ),
           average,
           monthCount,
+          subscriptions: subscriptions.filter(
+            (s) =>
+              s.subscription.categoryId === category.id &&
+              s.subscription.subcategoryId === sub.id,
+          ),
         } satisfies BudgetingRow;
       },
     );
@@ -183,6 +196,11 @@ function buildCategoryRows(
         ),
         average: restAverage,
         monthCount: restMonthCount,
+        subscriptions: subscriptions.filter(
+          (s) =>
+            s.subscription.categoryId === category.id &&
+            s.subscription.subcategoryId === null,
+        ),
       },
     ];
 
@@ -210,6 +228,9 @@ function buildCategoryRows(
       lastMonthActual: lastMonthActuals.getCategoryTotal(category.id),
       average: catAverage,
       monthCount: catMonthCount,
+      subscriptions: subscriptions.filter(
+        (s) => s.subscription.categoryId === category.id,
+      ),
       subRows,
     } satisfies BudgetingRow;
   });
@@ -220,6 +241,7 @@ export function useBudgetingRows(
   year: number,
 ): {
   rows: BudgetingRow[] | undefined;
+  grandTotal: BudgetingGrandTotal | undefined;
   isLoading: boolean;
 } {
   const { t } = useTranslation('budgeting');
@@ -232,8 +254,11 @@ export function useBudgetingRows(
   const { data: txPrev } = useQuery(getTransactionsQueryOptions(year - 1));
   const sortAllCategoriesById = useSortAllCategoriesById();
   const sortSubcategories = useSortSubcategories();
+  const subscriptions = useAvailableSubscriptions();
 
-  const rows = useMemo<BudgetingRow[] | undefined>(() => {
+  const result = useMemo<
+    { rows: BudgetingRow[]; grandTotal: BudgetingGrandTotal } | undefined
+  >(() => {
     if (
       !categories ||
       !forecasts ||
@@ -264,6 +289,7 @@ export function useBudgetingRows(
     const incomeCategories = sorted.filter((c) => c.isIncome);
     const savingsCategories = sorted.filter((c) => c.type === 'TO_SAVINGS');
     const restSubcategoryName = t('restSubcategory');
+    const resolvedSubscriptions = subscriptions ?? [];
 
     const expenseRows = buildCategoryRows(
       expenseCategories,
@@ -276,6 +302,7 @@ export function useBudgetingRows(
       lastYear,
       restSubcategoryName,
       sortSubcategories,
+      resolvedSubscriptions,
     );
     const incomeRows = buildCategoryRows(
       incomeCategories,
@@ -288,6 +315,7 @@ export function useBudgetingRows(
       lastYear,
       restSubcategoryName,
       sortSubcategories,
+      resolvedSubscriptions,
     );
     const savingsRows = buildCategoryRows(
       savingsCategories,
@@ -300,6 +328,7 @@ export function useBudgetingRows(
       lastYear,
       restSubcategoryName,
       sortSubcategories,
+      resolvedSubscriptions,
     );
 
     const thisMonthActuals = ta.matrix.getMonthActuals(month, year);
@@ -307,8 +336,26 @@ export function useBudgetingRows(
     const expenseAvg = ta.averages.getTotalExpenses();
     const incomeAvg = ta.averages.getTotalIncome();
     const savingsAvg = ta.averages.getTotalSavings();
+    const totalAvg = ta.averages.getTotal();
 
-    return [
+    const expensePlanSum = decimalSum(...expenseRows.map((r) => r.planSum));
+    const savingsPlanSum = decimalSum(...savingsRows.map((r) => r.planSum));
+    const incomePlanSum = decimalSum(...incomeRows.map((r) => r.planSum));
+    const expenseLastMonthPlanSum = decimalSum(
+      ...expenseRows.map((r) => r.lastMonthPlanSum),
+    );
+    const savingsLastMonthPlanSum = decimalSum(
+      ...savingsRows.map((r) => r.lastMonthPlanSum),
+    );
+    const incomeLastMonthPlanSum = decimalSum(
+      ...incomeRows.map((r) => r.lastMonthPlanSum),
+    );
+
+    const expenseCategoryIds = new Set(expenseCategories.map((c) => c.id));
+    const savingsCategoryIds = new Set(savingsCategories.map((c) => c.id));
+    const incomeCategoryIds = new Set(incomeCategories.map((c) => c.id));
+
+    const rows: BudgetingRow[] = [
       {
         id: buildBudgetingRowId({ rowType: 'typeGroup', group: 'expense' }),
         rowType: 'typeGroup',
@@ -319,15 +366,16 @@ export function useBudgetingRows(
         isRestRow: false,
         isIncome: false,
         isContinuous: false,
-        planSum: decimalSum(...expenseRows.map((r) => r.planSum)),
-        lastMonthPlanSum: decimalSum(
-          ...expenseRows.map((r) => r.lastMonthPlanSum),
-        ),
+        planSum: expensePlanSum,
+        lastMonthPlanSum: expenseLastMonthPlanSum,
         comment: '',
         thisMonthActual: thisMonthActuals.getTotalExpenses(),
         lastMonthActual: lastMonthActuals.getTotalExpenses(),
         average: expenseAvg.average,
         monthCount: expenseAvg.monthCount,
+        subscriptions: resolvedSubscriptions.filter((s) =>
+          expenseCategoryIds.has(s.subscription.categoryId),
+        ),
         subRows: expenseRows,
       },
       {
@@ -340,15 +388,16 @@ export function useBudgetingRows(
         isRestRow: false,
         isIncome: false,
         isContinuous: false,
-        planSum: decimalSum(...savingsRows.map((r) => r.planSum)),
-        lastMonthPlanSum: decimalSum(
-          ...savingsRows.map((r) => r.lastMonthPlanSum),
-        ),
+        planSum: savingsPlanSum,
+        lastMonthPlanSum: savingsLastMonthPlanSum,
         comment: '',
         thisMonthActual: thisMonthActuals.getTotalSavings(),
         lastMonthActual: lastMonthActuals.getTotalSavings(),
         average: savingsAvg.average,
         monthCount: savingsAvg.monthCount,
+        subscriptions: resolvedSubscriptions.filter((s) =>
+          savingsCategoryIds.has(s.subscription.categoryId),
+        ),
         subRows: savingsRows,
       },
       {
@@ -361,18 +410,33 @@ export function useBudgetingRows(
         isRestRow: false,
         isIncome: true,
         isContinuous: false,
-        planSum: decimalSum(...incomeRows.map((r) => r.planSum)),
-        lastMonthPlanSum: decimalSum(
-          ...incomeRows.map((r) => r.lastMonthPlanSum),
-        ),
+        planSum: incomePlanSum,
+        lastMonthPlanSum: incomeLastMonthPlanSum,
         comment: '',
         thisMonthActual: thisMonthActuals.getTotalIncome(),
         lastMonthActual: lastMonthActuals.getTotalIncome(),
         average: incomeAvg.average,
         monthCount: incomeAvg.monthCount,
+        subscriptions: resolvedSubscriptions.filter((s) =>
+          incomeCategoryIds.has(s.subscription.categoryId),
+        ),
         subRows: incomeRows,
       },
     ];
+
+    const grandTotal: BudgetingGrandTotal = {
+      thisMonthActual: thisMonthActuals.getTotal(),
+      lastMonthActual: lastMonthActuals.getTotal(),
+      average: totalAvg.average,
+      monthCount: totalAvg.monthCount,
+      planSum: expensePlanSum.plus(savingsPlanSum).plus(incomePlanSum),
+      lastMonthPlanSum: expenseLastMonthPlanSum
+        .plus(savingsLastMonthPlanSum)
+        .plus(incomeLastMonthPlanSum),
+      subscriptions: resolvedSubscriptions,
+    };
+
+    return { rows, grandTotal };
   }, [
     categories,
     forecasts,
@@ -384,10 +448,12 @@ export function useBudgetingRows(
     sortAllCategoriesById,
     sortSubcategories,
     t,
+    subscriptions,
   ]);
 
   return {
-    rows,
+    rows: result?.rows,
+    grandTotal: result?.grandTotal,
     isLoading:
       !categories || !forecasts || !prevYearForecasts || !txCurrent || !txPrev,
   };

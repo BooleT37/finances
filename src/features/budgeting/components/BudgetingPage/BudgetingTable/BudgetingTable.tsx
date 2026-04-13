@@ -23,13 +23,14 @@ export function BudgetingTable() {
 
   const year = useAtomValue(selectedYearAtom);
   const month = useAtomValue(selectedMonthAtom);
-  const { rows, isLoading } = useBudgetingRows(month, year);
+  const { rows, grandTotal, isLoading } = useBudgetingRows(month, year);
   const savePlan = useSaveForecastSum(month, year);
   const saveComment = useSaveForecastComment(month, year);
 
   const columns = useBudgetingTableColumns({
     month,
     year,
+    grandTotal,
     savePlan,
     saveComment,
   });

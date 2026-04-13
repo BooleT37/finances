@@ -15,5 +15,15 @@
   "lockedPlanTooltip": "Значение рассчитывается автоматически как сумма подкатегорий",
   "restRowTooltip": "Это фиктивная подкатегория, добавить комментарий к ней нельзя",
   "restSubcategory": "Остальное",
-  "savings": "В сбережения"
+  "savings": "В сбережения",
+  "subscriptions": {
+    "appliedSingle": "План заполнен: {{name}} — {{cost}}",
+    "appliedGroup": "План заполнен из подписок — {{cost}} для {{count}} строк",
+    "fillFromSubscriptions": "Заполнить из подписок",
+    "fromSubscriptions": "{{cost}} из подписок",
+    "fillFromSubscriptionsConfirm": "Это перезапишет плановые значения для всех строк с подписками. Продолжить?",
+    "noSource": "Без источника",
+    "notPaid": "не оплачено",
+    "paid": "оплачено"
+  }
 }

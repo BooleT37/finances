@@ -29,6 +29,7 @@ function computeAverage(values: Decimal[]): AverageResult {
  * activity — regardless of which subcategory was active.
  */
 export class TransactionAverages {
+  private readonly totalAvg: AverageResult;
   private readonly expenseAvg: AverageResult;
   private readonly incomeAvg: AverageResult;
   private readonly savingsAvg: AverageResult;
@@ -75,6 +76,11 @@ export class TransactionAverages {
     );
     this.incomeAvg = computeAverage(allMonths.map((m) => m.getTotalIncome()));
     this.savingsAvg = computeAverage(allMonths.map((m) => m.getTotalSavings()));
+    this.totalAvg = computeAverage(allMonths.map((m) => m.getTotal()));
+  }
+
+  getTotal(): AverageResult {
+    return this.totalAvg;
   }
 
   getTotalExpenses(): AverageResult {

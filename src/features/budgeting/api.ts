@@ -34,6 +34,71 @@ const upsertForecastInputSchema = z.object({
 export type UpsertForecastInput = z.infer<typeof upsertForecastInputSchema>;
 
 // TODO: replace userId with actual user from auth once auth is implemented
+const upsertBulkForecastsInputSchema = z.array(upsertForecastInputSchema);
+export type UpsertBulkForecastsInput = z.infer<
+  typeof upsertBulkForecastsInputSchema
+>;
+
+export const upsertBulkForecasts = createServerFn({ method: 'POST' })
+  .inputValidator((input: UpsertBulkForecastsInput) =>
+    upsertBulkForecastsInputSchema.parse(input),
+  )
+  .handler(async ({ data }) => {
+    const user = await prisma.user.findFirstOrThrow();
+
+    const results = await prisma.$transaction(async (tx) => {
+      const output = [];
+      for (const item of data) {
+        const existing = await tx.forecast.findFirst({
+          where: {
+            categoryId: item.categoryId,
+            subcategoryId: item.subcategoryId,
+            month: item.month,
+            year: item.year,
+            userId: user.id,
+          },
+        });
+
+        let result;
+        if (existing) {
+          result = await tx.forecast.update({
+            where: { id: existing.id },
+            data:
+              item.sum !== undefined
+                ? { sum: new Decimal(item.sum).abs() }
+                : { comment: item.comment },
+            include: { category: true },
+          });
+        } else {
+          result = await tx.forecast.create({
+            data: {
+              categoryId: item.categoryId,
+              subcategoryId: item.subcategoryId,
+              month: item.month,
+              year: item.year,
+              userId: user.id,
+              sum:
+                item.sum !== undefined
+                  ? new Decimal(item.sum).abs()
+                  : new Decimal(0),
+              comment: item.comment ?? '',
+            },
+            include: { category: true },
+          });
+        }
+        output.push(result);
+      }
+      return output;
+    });
+
+    return results.map((result) =>
+      forecastSchema.encode({
+        ...result,
+        sum: adaptCost(result.sum, result.category.isIncome),
+      }),
+    );
+  });
+
 export const upsertForecast = createServerFn({ method: 'POST' })
   .inputValidator((input: UpsertForecastInput) =>
     upsertForecastInputSchema.parse(input),

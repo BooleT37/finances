@@ -1,4 +1,4 @@
-import { Text, Tooltip } from '@mantine/core';
+import { Group, Text, Tooltip } from '@mantine/core';
 import Decimal from 'decimal.js';
 import { createMRTColumnHelper, type MRT_Row } from 'mantine-react-table';
 import { useMemo } from 'react';
@@ -6,10 +6,13 @@ import { useTranslation } from 'react-i18next';
 
 import { CostWithDiffCellView } from '~/components/CostWithDiffCellView';
 import { costToString } from '~/shared/utils/costToString';
-import { decimalSum } from '~/shared/utils/decimalSum';
 
-import type { BudgetingRow } from '../BudgetingTable.types';
+import type {
+  BudgetingGrandTotal,
+  BudgetingRow,
+} from '../BudgetingTable.types';
 import { AverageCell } from './AverageCell';
+import { GrandTotalSubscriptionBadge } from './GrandTotalSubscriptionBadge';
 import { isPlanCellLocked } from './isPlanCellLocked';
 import { PlanCell } from './PlanCell';
 
@@ -18,6 +21,7 @@ const columnHelper = createMRTColumnHelper<BudgetingRow>();
 interface Params {
   month: number;
   year: number;
+  grandTotal: BudgetingGrandTotal | undefined;
   savePlan: (row: MRT_Row<BudgetingRow>, enteredAbs: number) => void;
   saveComment: (row: MRT_Row<BudgetingRow>, value: string) => void;
 }
@@ -25,6 +29,7 @@ interface Params {
 export function useBudgetingTableColumns({
   month,
   year,
+  grandTotal,
   savePlan,
   saveComment,
 }: Params) {
@@ -33,6 +38,7 @@ export function useBudgetingTableColumns({
   return useMemo(() => {
     const lastMonthVal = month === 0 ? 11 : month - 1;
     const lastMonthYear = month === 0 ? year - 1 : year;
+    const zero = new Decimal(0);
 
     return [
       columnHelper.display({
@@ -48,18 +54,11 @@ export function useBudgetingTableColumns({
             year={year}
           />
         ),
-        Footer: ({ table }) => {
-          const total = decimalSum(
-            ...table
-              .getCoreRowModel()
-              .rows.map((r) => r.original.average ?? new Decimal(0)),
-          );
-          return (
-            <Text size="sm" fw={600}>
-              {costToString(total)}
-            </Text>
-          );
-        },
+        Footer: () => (
+          <Text size="sm" fw={600}>
+            {costToString(grandTotal?.average ?? zero)}
+          </Text>
+        ),
         mantineTableBodyCellProps: {
           'data-testing-column': 'average',
         } as object,
@@ -80,18 +79,10 @@ export function useBudgetingTableColumns({
             showPlanTooltip
           />
         ),
-        Footer: ({ table }) => (
+        Footer: () => (
           <CostWithDiffCellView
-            cost={decimalSum(
-              ...table
-                .getCoreRowModel()
-                .rows.map((r) => r.original.lastMonthActual ?? new Decimal(0)),
-            )}
-            forecast={decimalSum(
-              ...table
-                .getCoreRowModel()
-                .rows.map((r) => r.original.lastMonthPlanSum ?? new Decimal(0)),
-            )}
+            cost={grandTotal?.lastMonthActual ?? zero}
+            forecast={grandTotal?.lastMonthPlanSum ?? zero}
             isContinuous={false}
             month={lastMonthVal}
             year={lastMonthYear}
@@ -108,23 +99,41 @@ export function useBudgetingTableColumns({
         enableEditing: (row) =>
           row.original.rowType !== 'typeGroup' &&
           !isPlanCellLocked(row.original),
-        Cell: ({ row }) => <PlanCell row={row} />,
+        Cell: ({ row }) => <PlanCell row={row} month={month} year={year} />,
         Footer: ({ table }) => {
-          const surplus = decimalSum(
-            ...table
-              .getCoreRowModel()
-              .rows.map((r) => r.original.planSum ?? new Decimal(0)),
-          );
+          const surplus = grandTotal?.planSum ?? zero;
           return (
-            <Text size="sm" fw={600} c={surplus.isNegative() ? 'red' : 'green'}>
-              {costToString(surplus)}
-            </Text>
+            <Group
+              gap={4}
+              align="center"
+              wrap="nowrap"
+              data-testid="plan-footer"
+            >
+              <Text
+                size="sm"
+                fw={600}
+                c={surplus.isNegative() ? 'red' : 'green'}
+              >
+                {costToString(surplus)}
+              </Text>
+              {grandTotal?.subscriptions &&
+                grandTotal?.subscriptions.length > 0 && (
+                  <GrandTotalSubscriptionBadge
+                    allDue={grandTotal?.subscriptions}
+                    rows={
+                      table.getCoreRowModel().rows as MRT_Row<BudgetingRow>[]
+                    }
+                    month={month}
+                    year={year}
+                  />
+                )}
+            </Group>
           );
         },
         sortingFn: (rowA, rowB) =>
-          (rowA.original.planSum ?? new Decimal(0))
+          (rowA.original.planSum ?? zero)
             .abs()
-            .comparedTo((rowB.original.planSum ?? new Decimal(0)).abs()),
+            .comparedTo((rowB.original.planSum ?? zero).abs()),
         mantineEditTextInputProps: ({ row, table }) => ({
           type: 'number',
           onBlur: (event) => {
@@ -160,18 +169,10 @@ export function useBudgetingTableColumns({
             year={year}
           />
         ),
-        Footer: ({ table }) => (
+        Footer: () => (
           <CostWithDiffCellView
-            cost={decimalSum(
-              ...table
-                .getCoreRowModel()
-                .rows.map((r) => r.original.thisMonthActual ?? new Decimal(0)),
-            )}
-            forecast={decimalSum(
-              ...table
-                .getCoreRowModel()
-                .rows.map((r) => r.original.planSum ?? new Decimal(0)),
-            )}
+            cost={grandTotal?.thisMonthActual ?? zero}
+            forecast={grandTotal?.planSum ?? zero}
             isContinuous={false}
             month={month}
             year={year}
@@ -227,5 +228,5 @@ export function useBudgetingTableColumns({
         size: 200,
       }),
     ];
-  }, [t, month, year, savePlan, saveComment]);
+  }, [t, month, year, grandTotal, savePlan, saveComment]);
 }
