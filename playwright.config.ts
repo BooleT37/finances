@@ -12,7 +12,7 @@ export default defineConfig({
   globalTeardown: './test/e2e/global-teardown.ts',
   workers: 1, // sequential spec files — parallel workers would race to reset the same DB
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: 'http://localhost:3001',
     trace: 'on-first-retry',
   },
   projects: [
@@ -22,8 +22,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:3000',
+    command: 'npm run dev -- --port 3001',
+    url: 'http://localhost:3001',
     reuseExistingServer: false, // always fresh — tests must use the test DB, not the dev DB
     env: { DATABASE_URL: TEST_DB_URL, NODE_ENV: 'test' },
   },
