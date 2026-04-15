@@ -14,6 +14,8 @@ import { Route as StatisticsRouteImport } from './routes/statistics'
 import { Route as SavingsSpendingsRouteImport } from './routes/savings-spendings'
 import { Route as BudgetingRouteImport } from './routes/budgeting'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SavingsSpendingsIndexRouteImport } from './routes/savings-spendings.index'
+import { Route as SavingsSpendingsArchiveRouteImport } from './routes/savings-spendings.archive'
 
 const TransactionsRoute = TransactionsRouteImport.update({
   id: '/transactions',
@@ -40,28 +42,43 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SavingsSpendingsIndexRoute = SavingsSpendingsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SavingsSpendingsRoute,
+} as any)
+const SavingsSpendingsArchiveRoute = SavingsSpendingsArchiveRouteImport.update({
+  id: '/archive',
+  path: '/archive',
+  getParentRoute: () => SavingsSpendingsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/budgeting': typeof BudgetingRoute
-  '/savings-spendings': typeof SavingsSpendingsRoute
+  '/savings-spendings': typeof SavingsSpendingsRouteWithChildren
   '/statistics': typeof StatisticsRoute
   '/transactions': typeof TransactionsRoute
+  '/savings-spendings/archive': typeof SavingsSpendingsArchiveRoute
+  '/savings-spendings/': typeof SavingsSpendingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/budgeting': typeof BudgetingRoute
-  '/savings-spendings': typeof SavingsSpendingsRoute
   '/statistics': typeof StatisticsRoute
   '/transactions': typeof TransactionsRoute
+  '/savings-spendings/archive': typeof SavingsSpendingsArchiveRoute
+  '/savings-spendings': typeof SavingsSpendingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/budgeting': typeof BudgetingRoute
-  '/savings-spendings': typeof SavingsSpendingsRoute
+  '/savings-spendings': typeof SavingsSpendingsRouteWithChildren
   '/statistics': typeof StatisticsRoute
   '/transactions': typeof TransactionsRoute
+  '/savings-spendings/archive': typeof SavingsSpendingsArchiveRoute
+  '/savings-spendings/': typeof SavingsSpendingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -71,13 +88,16 @@ export interface FileRouteTypes {
     | '/savings-spendings'
     | '/statistics'
     | '/transactions'
+    | '/savings-spendings/archive'
+    | '/savings-spendings/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/budgeting'
-    | '/savings-spendings'
     | '/statistics'
     | '/transactions'
+    | '/savings-spendings/archive'
+    | '/savings-spendings'
   id:
     | '__root__'
     | '/'
@@ -85,12 +105,14 @@ export interface FileRouteTypes {
     | '/savings-spendings'
     | '/statistics'
     | '/transactions'
+    | '/savings-spendings/archive'
+    | '/savings-spendings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BudgetingRoute: typeof BudgetingRoute
-  SavingsSpendingsRoute: typeof SavingsSpendingsRoute
+  SavingsSpendingsRoute: typeof SavingsSpendingsRouteWithChildren
   StatisticsRoute: typeof StatisticsRoute
   TransactionsRoute: typeof TransactionsRoute
 }
@@ -132,13 +154,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/savings-spendings/': {
+      id: '/savings-spendings/'
+      path: '/'
+      fullPath: '/savings-spendings/'
+      preLoaderRoute: typeof SavingsSpendingsIndexRouteImport
+      parentRoute: typeof SavingsSpendingsRoute
+    }
+    '/savings-spendings/archive': {
+      id: '/savings-spendings/archive'
+      path: '/archive'
+      fullPath: '/savings-spendings/archive'
+      preLoaderRoute: typeof SavingsSpendingsArchiveRouteImport
+      parentRoute: typeof SavingsSpendingsRoute
+    }
   }
 }
+
+interface SavingsSpendingsRouteChildren {
+  SavingsSpendingsArchiveRoute: typeof SavingsSpendingsArchiveRoute
+  SavingsSpendingsIndexRoute: typeof SavingsSpendingsIndexRoute
+}
+
+const SavingsSpendingsRouteChildren: SavingsSpendingsRouteChildren = {
+  SavingsSpendingsArchiveRoute: SavingsSpendingsArchiveRoute,
+  SavingsSpendingsIndexRoute: SavingsSpendingsIndexRoute,
+}
+
+const SavingsSpendingsRouteWithChildren =
+  SavingsSpendingsRoute._addFileChildren(SavingsSpendingsRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BudgetingRoute: BudgetingRoute,
-  SavingsSpendingsRoute: SavingsSpendingsRoute,
+  SavingsSpendingsRoute: SavingsSpendingsRouteWithChildren,
   StatisticsRoute: StatisticsRoute,
   TransactionsRoute: TransactionsRoute,
 }

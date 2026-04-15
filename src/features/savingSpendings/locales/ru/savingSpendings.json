@@ -1,0 +1,53 @@
+{
+  "actions": {
+    "archive": "Архивировать",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "unarchive": "Разархивировать"
+  },
+  "archive": "Архив",
+  "archivePageTitle": "Архив",
+  "backToSavingSpendings": "Назад к активным событиям",
+  "categoryForm": {
+    "comment": "Комментарий",
+    "deleteCategory": "Удалить категорию",
+    "deleteCategoryDisabled": "Нельзя удалить: есть расходы",
+    "name": "Название категории",
+    "plan": "Бюджет",
+    "planSuffix": "€"
+  },
+  "delete": {
+    "cancel": "Отмена",
+    "confirm": "Удалить",
+    "confirmMessage": "Вы уверены, что хотите удалить «{{name}}»? Это действие нельзя отменить.",
+    "confirmTitle": "Удалить событие"
+  },
+  "modal": {
+    "addCategory": "Добавить категорию",
+    "cancel": "Отмена",
+    "createTitle": "Новое событие",
+    "editTitle": "Редактировать событие",
+    "eventName": "Название события",
+    "save": "Сохранить"
+  },
+  "newEvent": "Новое событие",
+  "notifications": {
+    "archived": "Событие архивировано",
+    "created": "Событие создано",
+    "deleted": "Событие удалено",
+    "unarchived": "Событие разархивировано",
+    "updated": "Событие обновлено"
+  },
+  "pageTitle": "Целевые расходы",
+  "table": {
+    "actual": "Факт",
+    "category": "Категория",
+    "plan": "План",
+    "total": "Итого"
+  },
+  "validation": {
+    "categoryNameRequired": "Название категории обязательно",
+    "nameRequired": "Название обязательно",
+    "planRequired": "Бюджет должен быть числом"
+  }
+}

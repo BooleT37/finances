@@ -103,6 +103,7 @@ const mockSavingSpendings: SavingSpending[] = [
         forecast: new Decimal('500.00'),
         comment: '',
         savingSpendingId: 1,
+        actual: new Decimal('0'),
       },
       {
         id: 2,
@@ -110,6 +111,7 @@ const mockSavingSpendings: SavingSpending[] = [
         forecast: new Decimal('300.00'),
         comment: '',
         savingSpendingId: 1,
+        actual: new Decimal('0'),
       },
     ],
   },
@@ -124,6 +126,7 @@ const mockSavingSpendings: SavingSpending[] = [
         forecast: new Decimal('400.00'),
         comment: '',
         savingSpendingId: 2,
+        actual: new Decimal('0'),
       },
     ],
   },

@@ -3,6 +3,7 @@ import { initReactI18next } from 'react-i18next';
 
 import { i18nResources as budgetingResources } from '~/features/budgeting/i18n';
 import { i18nResources as navResources } from '~/features/nav/i18n';
+import { i18nResources as savingSpendingsResources } from '~/features/savingSpendings/i18n';
 import { i18nResources as transactionsResources } from '~/features/transactions/i18n';
 
 import commonEn from './locales/en/common.json';
@@ -17,6 +18,7 @@ export const resources = {
     ...navResources.en,
     ...transactionsResources.en,
     ...budgetingResources.en,
+    ...savingSpendingsResources.en,
   },
   ru: {
     common: commonRu,
@@ -24,6 +26,7 @@ export const resources = {
     ...navResources.ru,
     ...transactionsResources.ru,
     ...budgetingResources.ru,
+    ...savingSpendingsResources.ru,
   },
 } as const;
 

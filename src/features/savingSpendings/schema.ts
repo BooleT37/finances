@@ -8,6 +8,7 @@ export const savingSpendingCategorySchema = z.object({
   forecast: decimalCodec,
   comment: z.string(),
   savingSpendingId: z.number().nullable(),
+  actual: decimalCodec,
 });
 
 export type SavingSpendingCategoryWire = z.input<
@@ -26,3 +27,31 @@ export const savingSpendingSchema = z.object({
 
 export type SavingSpendingWire = z.input<typeof savingSpendingSchema>;
 export type SavingSpending = z.output<typeof savingSpendingSchema>;
+
+// Input schemas for mutations (used by forms and API validators)
+
+export const savingSpendingCategoryInputSchema = z.object({
+  id: z.number().optional(),
+  name: z.string(),
+  forecast: z.string(),
+  comment: z.string(),
+});
+
+export const createSavingSpendingSchema = z.object({
+  name: z.string(),
+  categories: z.array(savingSpendingCategoryInputSchema),
+});
+
+export const updateSavingSpendingSchema = createSavingSpendingSchema.extend({
+  id: z.number(),
+});
+
+export type SavingSpendingCategoryInput = z.infer<
+  typeof savingSpendingCategoryInputSchema
+>;
+export type CreateSavingSpendingInput = z.infer<
+  typeof createSavingSpendingSchema
+>;
+export type UpdateSavingSpendingInput = z.infer<
+  typeof updateSavingSpendingSchema
+>;

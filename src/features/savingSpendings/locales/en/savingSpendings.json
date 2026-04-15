@@ -1,0 +1,53 @@
+{
+  "pageTitle": "Saving Spendings",
+  "archivePageTitle": "Archive",
+  "newEvent": "New Event",
+  "archive": "Archive",
+  "backToSavingSpendings": "Back to Saving Spendings",
+  "actions": {
+    "edit": "Edit",
+    "archive": "Archive",
+    "unarchive": "Unarchive",
+    "delete": "Delete"
+  },
+  "modal": {
+    "createTitle": "New Saving Event",
+    "editTitle": "Edit Saving Event",
+    "eventName": "Event Name",
+    "save": "Save",
+    "cancel": "Cancel",
+    "addCategory": "Add Category"
+  },
+  "categoryForm": {
+    "name": "Category Name",
+    "plan": "Plan",
+    "planSuffix": "€",
+    "comment": "Comment",
+    "deleteCategory": "Delete category",
+    "deleteCategoryDisabled": "Cannot delete: category has expenses"
+  },
+  "table": {
+    "category": "Category",
+    "plan": "Plan",
+    "actual": "Actual",
+    "total": "Total"
+  },
+  "validation": {
+    "nameRequired": "Name is required",
+    "categoryNameRequired": "Category name is required",
+    "planRequired": "Plan must be a valid number"
+  },
+  "notifications": {
+    "created": "Saving event created",
+    "updated": "Saving event updated",
+    "deleted": "Saving event deleted",
+    "archived": "Saving event archived",
+    "unarchived": "Saving event unarchived"
+  },
+  "delete": {
+    "confirmTitle": "Delete saving event",
+    "confirmMessage": "Are you sure you want to delete \"{{name}}\"? This cannot be undone.",
+    "confirm": "Delete",
+    "cancel": "Cancel"
+  }
+}
