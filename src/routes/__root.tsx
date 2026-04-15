@@ -5,7 +5,14 @@ import 'mantine-react-table/styles.css';
 import 'dayjs/locale/ru';
 import '~/lib/dayjs';
 
-import { AppShell, createTheme, MantineProvider } from '@mantine/core';
+import {
+  AppShell,
+  Code,
+  createTheme,
+  MantineProvider,
+  Text,
+  Title,
+} from '@mantine/core';
 import { DatesProvider } from '@mantine/dates';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
@@ -31,6 +38,30 @@ const theme = createTheme({
 });
 const queryClient = new QueryClient();
 
+function RootErrorComponent({ error }: { error: unknown }) {
+  const message = error instanceof Error ? error.message : String(error);
+  const stack = error instanceof Error ? error.stack : undefined;
+  return (
+    <RootDocument>
+      <I18nextProvider i18n={i18n}>
+        <MantineProvider defaultColorScheme="light" theme={theme}>
+          <div style={{ padding: '2rem' }}>
+            <Title order={3} c="red" mb="xs">
+              Something went wrong
+            </Title>
+            <Text mb="xs">{message}</Text>
+            {stack && (
+              <Code block style={{ whiteSpace: 'pre-wrap' }}>
+                {stack}
+              </Code>
+            )}
+          </div>
+        </MantineProvider>
+      </I18nextProvider>
+    </RootDocument>
+  );
+}
+
 export const Route = createRootRoute({
   head: () => ({
     meta: [
@@ -40,6 +71,7 @@ export const Route = createRootRoute({
     links: [{ rel: 'icon', href: '/favicon.ico' }],
   }),
   component: RootComponent,
+  errorComponent: RootErrorComponent,
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {
