@@ -99,9 +99,21 @@ describe('getCostWithDiffParams', () => {
   });
 
   describe('zero forecast', () => {
-    it('cost = 0, forecast = 0 → divideWithFallbackToOne prevents NaN; barLength = 1', () => {
+    it('cost = 0, forecast = 0 → nothing spent against nothing planned; barLength = 0', () => {
       const result = getCostWithDiffParams({
         cost: new Decimal('0'),
+        forecast: new Decimal('0'),
+        isContinuous: false,
+        month: 0,
+        year: 2024,
+      });
+      expect(result.barLength).toBe(0);
+      expect(result.barOffset).toBe(0);
+    });
+
+    it('cost > 0, forecast = 0 → over budget with no plan; barLength = 1', () => {
+      const result = getCostWithDiffParams({
+        cost: new Decimal('-50'),
         forecast: new Decimal('0'),
         isContinuous: false,
         month: 0,
