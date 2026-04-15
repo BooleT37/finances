@@ -2,11 +2,11 @@
   "appName": "Персональные финансы",
   "backToCurrentMonth": "К текущему месяцу",
   "backToCurrentYear": "К текущему году",
+  "planning": "Планирование",
+  "savings": "Сбережения",
+  "statistics": "Статистика",
   "switchToMonthView": "Переключить на месяц",
   "switchToYearView": "Переключить на год",
-  "planning": "Планирование",
-  "savings": "Накопления",
-  "statistics": "Статистика",
   "thisYear": "Этот год",
   "transactions": "Транзакции"
 }
