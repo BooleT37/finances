@@ -8,6 +8,8 @@ import {
 } from 'jotai-tanstack-query';
 
 import { selectedYearAtom } from '~/stores/month';
+import { confirmUnsavedChanges } from '~/stores/sidebar/confirmUnsavedChanges';
+import { createSidebarMolecule } from '~/stores/sidebar/createSidebarMolecule';
 
 import { getTransactionsMapByYear } from '../../facets/transactionMap';
 import {
@@ -15,20 +17,14 @@ import {
   getDeleteTransactionMutationOptions,
   getUpdateTransactionMutationOptions,
 } from '../../queries';
-import { confirmUnsavedChanges } from './confirmUnsavedChanges';
 import type {
   TransactionFormType,
   TransformedTransactionFormValues,
 } from './TransactionSidebarForm/transactionFormValues';
 
 export const TransactionSidebarMolecule = molecule(() => {
-  // ── Selection / open state ────────────────────────────────────────────────
-  // undefined = sidebar closed
-  // null      = sidebar open, new transaction
-  // number    = sidebar open, editing existing transaction
+  // ── editingIdAtom: owned by this molecule ─────────────────────────────────
   const editingIdAtom = atom<number | null | undefined>(undefined);
-
-  const isOpenAtom = atom((get) => get(editingIdAtom) !== undefined);
 
   const isNewTransactionAtom = atom((get) => get(editingIdAtom) === null);
 
@@ -48,27 +44,10 @@ export const TransactionSidebarMolecule = molecule(() => {
 
   // ── Form state ────────────────────────────────────────────────────────────
   const componentsModalOpenAtom = atom(false);
-
   const highlightedComponentIdAtom = atom<number | null>(null);
-
   const actualDateShownAtom = atom(false);
 
-  // ── Form ref (synced from component via useEffect) ────────────────────────
-  const formRefAtom = atom<TransactionFormType | null>(null);
-
-  // ── Actions ───────────────────────────────────────────────────────────────
-  function doOpenForComponent(
-    get: Getter,
-    set: Setter,
-    parentId: number,
-    componentId: number,
-  ) {
-    doOpen(get, set, parentId);
-    set(componentsModalOpenAtom, true);
-    set(highlightedComponentIdAtom, componentId);
-    setTimeout(() => set(highlightedComponentIdAtom, null), 3500);
-  }
-
+  // ── Open/close helpers (passed to createSidebarMolecule as callbacks) ─────
   function doOpen(get: Getter, set: Setter, id: number | null) {
     set(editingIdAtom, id);
 
@@ -80,14 +59,33 @@ export const TransactionSidebarMolecule = molecule(() => {
     }
   }
 
-  const openAtom = atom(null, (get, set, id: number | null) => {
-    const formRef = get(formRefAtom);
-    if (formRef?.isDirty()) {
-      confirmUnsavedChanges(() => doOpen(get, set, id));
-      return;
-    }
-    doOpen(get, set, id);
-  });
+  function doClose(set: Setter) {
+    set(editingIdAtom, undefined);
+    set(componentsModalOpenAtom, false);
+    set(highlightedComponentIdAtom, null);
+    set(actualDateShownAtom, false);
+  }
+
+  // ── Core sidebar atoms from shared factory ────────────────────────────────
+  const { isOpenAtom, formRefAtom, openAtom, closeAtom } =
+    createSidebarMolecule<TransactionFormType, number | null>({
+      onOpen: doOpen,
+      onClose: doClose,
+    });
+
+  // ── openForComponentAtom: custom open that also manages component state ───
+  function doOpenForComponent(
+    get: Getter,
+    set: Setter,
+    parentId: number,
+    componentId: number,
+  ) {
+    doOpen(get, set, parentId);
+    set(isOpenAtom, true);
+    set(componentsModalOpenAtom, true);
+    set(highlightedComponentIdAtom, componentId);
+    setTimeout(() => set(highlightedComponentIdAtom, null), 3500);
+  }
 
   const openForComponentAtom = atom(
     null,
@@ -106,22 +104,6 @@ export const TransactionSidebarMolecule = molecule(() => {
       doOpenForComponent(get, set, parentId, componentId);
     },
   );
-
-  function doClose(set: Setter) {
-    set(editingIdAtom, undefined);
-    set(componentsModalOpenAtom, false);
-    set(highlightedComponentIdAtom, null);
-    set(actualDateShownAtom, false);
-  }
-
-  const closeAtom = atom(null, (get, set) => {
-    const formRef = get(formRefAtom);
-    if (formRef?.isDirty()) {
-      confirmUnsavedChanges(() => doClose(set));
-      return;
-    }
-    doClose(set);
-  });
 
   // ── Mutations ─────────────────────────────────────────────────────────────
   const addMutationAtom = atomWithMutation((get) =>
@@ -150,6 +132,7 @@ export const TransactionSidebarMolecule = molecule(() => {
       onSuccess: () => {
         if (get(editingIdAtom) === id) {
           doClose(set);
+          set(isOpenAtom, false);
         }
       },
     });

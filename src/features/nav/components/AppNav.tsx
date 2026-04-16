@@ -10,8 +10,8 @@ import { useMolecule } from 'bunshi/react';
 import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
-import { confirmUnsavedChanges } from '~/features/transactions/components/TransactionSidebar/confirmUnsavedChanges';
 import { TransactionSidebarMolecule } from '~/features/transactions/components/TransactionSidebar/transactionSidebarMolecule';
+import { confirmUnsavedChanges } from '~/stores/sidebar/confirmUnsavedChanges';
 
 export function AppNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });

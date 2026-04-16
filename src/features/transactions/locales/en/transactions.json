@@ -76,6 +76,8 @@
     "subscription": "Subscription"
   },
   "sidebar": {
+    "add": "Add transaction",
+    "edit": "Edit transaction",
     "close": "Close sidebar"
   },
   "groupBySubcategories": "Group by subcategories",
