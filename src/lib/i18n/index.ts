@@ -2,6 +2,7 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 import { i18nResources as budgetingResources } from '~/features/budgeting/i18n';
+import { i18nResources as categoriesResources } from '~/features/categories/i18n';
 import { i18nResources as navResources } from '~/features/nav/i18n';
 import { i18nResources as savingSpendingsResources } from '~/features/savingSpendings/i18n';
 import { i18nResources as transactionsResources } from '~/features/transactions/i18n';
@@ -19,6 +20,7 @@ export const resources = {
     ...transactionsResources.en,
     ...budgetingResources.en,
     ...savingSpendingsResources.en,
+    ...categoriesResources.en,
   },
   ru: {
     common: commonRu,
@@ -27,6 +29,7 @@ export const resources = {
     ...transactionsResources.ru,
     ...budgetingResources.ru,
     ...savingSpendingsResources.ru,
+    ...categoriesResources.ru,
   },
 } as const;
 

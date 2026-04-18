@@ -1,0 +1,26 @@
+{
+  "sidebar": {
+    "add": "Add category",
+    "edit": "Edit category"
+  },
+  "form": {
+    "icon": "Icon",
+    "name": "Name",
+    "shortname": "Short name",
+    "type": "Type",
+    "typeExpense": "Expense",
+    "typeIncome": "Income",
+    "isContinuous": "Continuous",
+    "isContinuousTooltip": "A continuous category has many small, evenly-spread expenses throughout the month (e.g. groceries, transport). Mid-month spending can be extrapolated to predict whether the plan will be exceeded.",
+    "subcategories": "Subcategories",
+    "addSubcategory": "Add subcategory",
+    "subcategoryName": "Subcategory name",
+    "add": "Add",
+    "unsavedChanges": "Fix the errors above to save changes.",
+    "errors": {
+      "nameRequired": "Name is required",
+      "shortnameRequired": "Short name is required",
+      "subcategoryNameRequired": "Subcategory name is required"
+    }
+  }
+}

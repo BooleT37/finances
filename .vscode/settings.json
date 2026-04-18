@@ -6,7 +6,8 @@
     "src/features/nav/locales",
     "src/features/transactions/locales",
     "src/features/budgeting/locales",
-    "src/features/savingSpendings/locales"
+    "src/features/savingSpendings/locales",
+    "src/features/categories/locales"
   ],
   "i18n-ally.namespace": true,
   "i18n-ally.defaultNamespace": "home",
