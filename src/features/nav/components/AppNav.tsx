@@ -3,22 +3,30 @@ import {
   IconBuildingBank,
   IconCalendar,
   IconChartLine,
+  IconSettings,
   IconTable,
+  IconTag,
 } from '@tabler/icons-react';
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
-import { useMolecule } from 'bunshi/react';
 import { useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
-import { TransactionSidebarMolecule } from '~/features/transactions/components/TransactionSidebar/transactionSidebarMolecule';
 import { confirmUnsavedChanges } from '~/stores/sidebar/confirmUnsavedChanges';
+import { sidebarFormRefAtom } from '~/stores/sidebar/sidebarStore';
 
 export function AppNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { t } = useTranslation('nav');
   const navigate = useNavigate();
-  const { formRefAtom } = useMolecule(TransactionSidebarMolecule);
-  const formRef = useAtomValue(formRefAtom);
+  const formRef = useAtomValue(sidebarFormRefAtom);
+
+  const handleNavClick = (e: React.MouseEvent, to: string) => {
+    if (!formRef?.isDirty()) {
+      return;
+    }
+    e.preventDefault();
+    confirmUnsavedChanges(() => void navigate({ to }));
+  };
 
   const items = [
     {
@@ -53,15 +61,27 @@ export function AppNav() {
           label={item.label}
           leftSection={item.icon}
           active={pathname === item.to}
-          onClick={(e: React.MouseEvent) => {
-            if (!formRef?.isDirty()) {
-              return;
-            }
-            e.preventDefault();
-            confirmUnsavedChanges(() => void navigate({ to: item.to }));
-          }}
+          onClick={(e: React.MouseEvent) => handleNavClick(e, item.to)}
         />
       ))}
+      <NavLink
+        label={t('settings')}
+        leftSection={<IconSettings size={18} />}
+        active={pathname.startsWith('/settings')}
+        defaultOpened
+        childrenOffset={28}
+      >
+        <NavLink
+          component={Link}
+          to="/settings/categories"
+          label={t('categories')}
+          leftSection={<IconTag size={18} />}
+          active={pathname === '/settings/categories'}
+          onClick={(e: React.MouseEvent) =>
+            handleNavClick(e, '/settings/categories')
+          }
+        />
+      </NavLink>
     </Stack>
   );
 }

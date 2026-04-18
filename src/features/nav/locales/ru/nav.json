@@ -8,5 +8,7 @@
   "switchToMonthView": "Переключить на месяц",
   "switchToYearView": "Переключить на год",
   "thisYear": "Этот год",
-  "transactions": "Транзакции"
+  "transactions": "Транзакции",
+  "settings": "Настройки",
+  "categories": "Категории"
 }
