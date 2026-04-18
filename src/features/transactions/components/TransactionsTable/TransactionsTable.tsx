@@ -42,7 +42,7 @@ interface Props {
 export function TransactionTable({ items, groupBySubcategories }: Props) {
   const { t } = useTranslation('transactions');
   const columns = useTransactionTableColumns();
-  const sortAllCategoriesById = useSortAllCategoriesById();
+  const { sortAllCategoriesById } = useSortAllCategoriesById();
   const sortSubcategories = useSortSubcategories();
 
   const { id: flashId, fading } = useAtomValue(flashStateAtom);

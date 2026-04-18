@@ -36,20 +36,25 @@ export const sortAllCategories = (
   ]);
 
 export const useSortAllCategoriesById = () => {
-  const { data: expenseOrder } = useQuery(
+  const { data: expenseOrder, isSuccess: isExpenseOrderSuccess } = useQuery(
     getExpenseCategoriesOrderQueryOptions(),
   );
-  const { data: incomeOrder } = useQuery(
+  const { data: incomeOrder, isSuccess: isIncomeOrderSuccess } = useQuery(
     getIncomeCategoriesOrderQueryOptions(),
   );
 
-  return useCallback(
+  const sortAllCategoriesById = useCallback(
     (category1Id: number, category2Id: number) =>
       expenseOrder && incomeOrder
         ? sortAllCategories(category1Id, category2Id, expenseOrder, incomeOrder)
         : 0,
     [expenseOrder, incomeOrder],
   );
+
+  return {
+    sortAllCategoriesById,
+    isSuccess: isExpenseOrderSuccess && isIncomeOrderSuccess,
+  };
 };
 
 export const useSortSubcategories = () => {

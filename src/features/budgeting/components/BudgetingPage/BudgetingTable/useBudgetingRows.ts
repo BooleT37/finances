@@ -252,7 +252,8 @@ export function useBudgetingRows(
   );
   const { data: txCurrent } = useQuery(getTransactionsQueryOptions(year));
   const { data: txPrev } = useQuery(getTransactionsQueryOptions(year - 1));
-  const sortAllCategoriesById = useSortAllCategoriesById();
+  const { sortAllCategoriesById, isSuccess: isCategoriesOrderLoaded } =
+    useSortAllCategoriesById();
   const sortSubcategories = useSortSubcategories();
   const subscriptions = useAvailableSubscriptions();
 
@@ -264,7 +265,8 @@ export function useBudgetingRows(
       !forecasts ||
       !prevYearForecasts ||
       !txCurrent ||
-      !txPrev
+      !txPrev ||
+      !isCategoriesOrderLoaded
     ) {
       return undefined;
     }
@@ -443,12 +445,13 @@ export function useBudgetingRows(
     prevYearForecasts,
     txCurrent,
     txPrev,
+    isCategoriesOrderLoaded,
     month,
     year,
-    sortAllCategoriesById,
-    sortSubcategories,
     t,
     subscriptions,
+    sortSubcategories,
+    sortAllCategoriesById,
   ]);
 
   return {

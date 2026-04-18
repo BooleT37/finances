@@ -1,4 +1,18 @@
 {
+  "pageTitle": "Categories",
+  "addCategory": "+ Add",
+  "actions": {
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "delete": {
+    "confirmTitle": "Delete category",
+    "confirmMessage": "Are you sure you want to delete \"{{name}}\"? This cannot be undone.",
+    "confirm": "Delete",
+    "cancel": "Cancel",
+    "disabledTooltip": "Built-in categories cannot be deleted",
+    "errorMessage": "Failed to delete category. It may still have transactions linked to it."
+  },
   "sidebar": {
     "add": "Add category",
     "edit": "Edit category"

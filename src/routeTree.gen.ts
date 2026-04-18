@@ -11,10 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TransactionsRouteImport } from './routes/transactions'
 import { Route as StatisticsRouteImport } from './routes/statistics'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SavingsSpendingsRouteImport } from './routes/savings-spendings'
 import { Route as BudgetingRouteImport } from './routes/budgeting'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SavingsSpendingsIndexRouteImport } from './routes/savings-spendings.index'
+import { Route as SettingsCategoriesRouteImport } from './routes/settings.categories'
 import { Route as SavingsSpendingsArchiveRouteImport } from './routes/savings-spendings.archive'
 
 const TransactionsRoute = TransactionsRouteImport.update({
@@ -25,6 +27,11 @@ const TransactionsRoute = TransactionsRouteImport.update({
 const StatisticsRoute = StatisticsRouteImport.update({
   id: '/statistics',
   path: '/statistics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SavingsSpendingsRoute = SavingsSpendingsRouteImport.update({
@@ -47,6 +54,11 @@ const SavingsSpendingsIndexRoute = SavingsSpendingsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => SavingsSpendingsRoute,
 } as any)
+const SettingsCategoriesRoute = SettingsCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => SettingsRoute,
+} as any)
 const SavingsSpendingsArchiveRoute = SavingsSpendingsArchiveRouteImport.update({
   id: '/archive',
   path: '/archive',
@@ -57,17 +69,21 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/budgeting': typeof BudgetingRoute
   '/savings-spendings': typeof SavingsSpendingsRouteWithChildren
+  '/settings': typeof SettingsRouteWithChildren
   '/statistics': typeof StatisticsRoute
   '/transactions': typeof TransactionsRoute
   '/savings-spendings/archive': typeof SavingsSpendingsArchiveRoute
+  '/settings/categories': typeof SettingsCategoriesRoute
   '/savings-spendings/': typeof SavingsSpendingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/budgeting': typeof BudgetingRoute
+  '/settings': typeof SettingsRouteWithChildren
   '/statistics': typeof StatisticsRoute
   '/transactions': typeof TransactionsRoute
   '/savings-spendings/archive': typeof SavingsSpendingsArchiveRoute
+  '/settings/categories': typeof SettingsCategoriesRoute
   '/savings-spendings': typeof SavingsSpendingsIndexRoute
 }
 export interface FileRoutesById {
@@ -75,9 +91,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/budgeting': typeof BudgetingRoute
   '/savings-spendings': typeof SavingsSpendingsRouteWithChildren
+  '/settings': typeof SettingsRouteWithChildren
   '/statistics': typeof StatisticsRoute
   '/transactions': typeof TransactionsRoute
   '/savings-spendings/archive': typeof SavingsSpendingsArchiveRoute
+  '/settings/categories': typeof SettingsCategoriesRoute
   '/savings-spendings/': typeof SavingsSpendingsIndexRoute
 }
 export interface FileRouteTypes {
@@ -86,26 +104,32 @@ export interface FileRouteTypes {
     | '/'
     | '/budgeting'
     | '/savings-spendings'
+    | '/settings'
     | '/statistics'
     | '/transactions'
     | '/savings-spendings/archive'
+    | '/settings/categories'
     | '/savings-spendings/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/budgeting'
+    | '/settings'
     | '/statistics'
     | '/transactions'
     | '/savings-spendings/archive'
+    | '/settings/categories'
     | '/savings-spendings'
   id:
     | '__root__'
     | '/'
     | '/budgeting'
     | '/savings-spendings'
+    | '/settings'
     | '/statistics'
     | '/transactions'
     | '/savings-spendings/archive'
+    | '/settings/categories'
     | '/savings-spendings/'
   fileRoutesById: FileRoutesById
 }
@@ -113,6 +137,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BudgetingRoute: typeof BudgetingRoute
   SavingsSpendingsRoute: typeof SavingsSpendingsRouteWithChildren
+  SettingsRoute: typeof SettingsRouteWithChildren
   StatisticsRoute: typeof StatisticsRoute
   TransactionsRoute: typeof TransactionsRoute
 }
@@ -131,6 +156,13 @@ declare module '@tanstack/react-router' {
       path: '/statistics'
       fullPath: '/statistics'
       preLoaderRoute: typeof StatisticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/savings-spendings': {
@@ -161,6 +193,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SavingsSpendingsIndexRouteImport
       parentRoute: typeof SavingsSpendingsRoute
     }
+    '/settings/categories': {
+      id: '/settings/categories'
+      path: '/categories'
+      fullPath: '/settings/categories'
+      preLoaderRoute: typeof SettingsCategoriesRouteImport
+      parentRoute: typeof SettingsRoute
+    }
     '/savings-spendings/archive': {
       id: '/savings-spendings/archive'
       path: '/archive'
@@ -184,10 +223,23 @@ const SavingsSpendingsRouteChildren: SavingsSpendingsRouteChildren = {
 const SavingsSpendingsRouteWithChildren =
   SavingsSpendingsRoute._addFileChildren(SavingsSpendingsRouteChildren)
 
+interface SettingsRouteChildren {
+  SettingsCategoriesRoute: typeof SettingsCategoriesRoute
+}
+
+const SettingsRouteChildren: SettingsRouteChildren = {
+  SettingsCategoriesRoute: SettingsCategoriesRoute,
+}
+
+const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
+  SettingsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BudgetingRoute: BudgetingRoute,
   SavingsSpendingsRoute: SavingsSpendingsRouteWithChildren,
+  SettingsRoute: SettingsRouteWithChildren,
   StatisticsRoute: StatisticsRoute,
   TransactionsRoute: TransactionsRoute,
 }
