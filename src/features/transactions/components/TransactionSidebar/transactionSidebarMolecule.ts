@@ -1,5 +1,4 @@
 import { molecule } from 'bunshi';
-import type { Getter, Setter } from 'jotai';
 import { atom } from 'jotai';
 import {
   atomWithMutation,
@@ -8,8 +7,10 @@ import {
 } from 'jotai-tanstack-query';
 
 import { selectedYearAtom } from '~/stores/month';
-import { confirmUnsavedChanges } from '~/stores/sidebar/confirmUnsavedChanges';
-import { createSidebarMolecule } from '~/stores/sidebar/createSidebarMolecule';
+import {
+  sidebarFormRefAtom,
+  withDirtyCheckAtom,
+} from '~/stores/sidebar/sidebarStore';
 
 import { getTransactionsMapByYear } from '../../facets/transactionMap';
 import {
@@ -23,12 +24,10 @@ import type {
 } from './TransactionSidebarForm/transactionFormValues';
 
 export const TransactionSidebarMolecule = molecule(() => {
-  // ── editingIdAtom: owned by this molecule ─────────────────────────────────
+  // ── Core state ──────────────────────────────────────────────────────────────
   const editingIdAtom = atom<number | null | undefined>(undefined);
-
   const isNewTransactionAtom = atom((get) => get(editingIdAtom) === null);
 
-  // ── Current transaction (from query cache) ────────────────────────────────
   const transactionsMapAtom = atomWithQuery((get) =>
     getTransactionsMapByYear(get(selectedYearAtom)),
   );
@@ -42,51 +41,46 @@ export const TransactionSidebarMolecule = molecule(() => {
     return result.data[id] ?? null;
   });
 
-  // ── Form state ────────────────────────────────────────────────────────────
+  // ── Form state ──────────────────────────────────────────────────────────────
   const componentsModalOpenAtom = atom(false);
   const highlightedComponentIdAtom = atom<number | null>(null);
   const actualDateShownAtom = atom(false);
+  const isOpenAtom = atom(false);
 
-  // ── Open/close helpers (passed to createSidebarMolecule as callbacks) ─────
-  function doOpen(get: Getter, set: Setter, id: number | null) {
-    set(editingIdAtom, id);
+  const _formAtom = atom<TransactionFormType | null>(null);
+  const formRefAtom = atom(
+    (get) => get(_formAtom),
+    (_get, set, value: TransactionFormType | null) => {
+      set(_formAtom, value);
+      set(sidebarFormRefAtom, value);
+    },
+  );
 
-    if (id !== null) {
-      const tx = get(transactionsMapAtom).data?.[id] ?? null;
-      set(actualDateShownAtom, tx?.actualDate != null);
-    } else {
-      set(actualDateShownAtom, false);
-    }
-  }
-
-  function doClose(set: Setter) {
-    set(editingIdAtom, undefined);
-    set(componentsModalOpenAtom, false);
-    set(highlightedComponentIdAtom, null);
-    set(actualDateShownAtom, false);
-  }
-
-  // ── Core sidebar atoms from shared factory ────────────────────────────────
-  const { isOpenAtom, formRefAtom, openAtom, closeAtom } =
-    createSidebarMolecule<TransactionFormType, number | null>({
-      onOpen: doOpen,
-      onClose: doClose,
+  // ── Open / close ────────────────────────────────────────────────────────────
+  const openAtom = atom(null, (get, set, id: number | null) => {
+    set(withDirtyCheckAtom, () => {
+      set(editingIdAtom, id);
+      if (id !== null) {
+        const tx = get(transactionsMapAtom).data?.[id] ?? null;
+        set(actualDateShownAtom, tx?.actualDate != null);
+      } else {
+        set(actualDateShownAtom, false);
+      }
+      set(isOpenAtom, true);
     });
+  });
 
-  // ── openForComponentAtom: custom open that also manages component state ───
-  function doOpenForComponent(
-    get: Getter,
-    set: Setter,
-    parentId: number,
-    componentId: number,
-  ) {
-    doOpen(get, set, parentId);
-    set(isOpenAtom, true);
-    set(componentsModalOpenAtom, true);
-    set(highlightedComponentIdAtom, componentId);
-    setTimeout(() => set(highlightedComponentIdAtom, null), 3500);
-  }
+  const closeAtom = atom(null, (_, set) => {
+    set(withDirtyCheckAtom, () => {
+      set(editingIdAtom, undefined);
+      set(componentsModalOpenAtom, false);
+      set(highlightedComponentIdAtom, null);
+      set(actualDateShownAtom, false);
+      set(isOpenAtom, false);
+    });
+  });
 
+  // ── openForComponentAtom ────────────────────────────────────────────────────
   const openForComponentAtom = atom(
     null,
     (
@@ -94,18 +88,19 @@ export const TransactionSidebarMolecule = molecule(() => {
       set,
       { parentId, componentId }: { parentId: number; componentId: number },
     ) => {
-      const formRef = get(formRefAtom);
-      if (formRef?.isDirty()) {
-        confirmUnsavedChanges(() =>
-          doOpenForComponent(get, set, parentId, componentId),
-        );
-        return;
-      }
-      doOpenForComponent(get, set, parentId, componentId);
+      set(withDirtyCheckAtom, () => {
+        set(editingIdAtom, parentId);
+        const tx = get(transactionsMapAtom).data?.[parentId] ?? null;
+        set(actualDateShownAtom, tx?.actualDate != null);
+        set(isOpenAtom, true);
+        set(componentsModalOpenAtom, true);
+        set(highlightedComponentIdAtom, componentId);
+        setTimeout(() => set(highlightedComponentIdAtom, null), 3500);
+      });
     },
   );
 
-  // ── Mutations ─────────────────────────────────────────────────────────────
+  // ── Mutations ───────────────────────────────────────────────────────────────
   const addMutationAtom = atomWithMutation((get) =>
     getAddTransactionMutationOptions(
       get(queryClientAtom),
@@ -131,7 +126,10 @@ export const TransactionSidebarMolecule = molecule(() => {
     get(deleteMutationAtom).mutate(id, {
       onSuccess: () => {
         if (get(editingIdAtom) === id) {
-          doClose(set);
+          set(editingIdAtom, undefined);
+          set(componentsModalOpenAtom, false);
+          set(highlightedComponentIdAtom, null);
+          set(actualDateShownAtom, false);
           set(isOpenAtom, false);
         }
       },
