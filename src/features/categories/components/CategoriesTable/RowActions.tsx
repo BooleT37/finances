@@ -32,7 +32,13 @@ export function RowActions({ row }: Props) {
       confirmProps: { color: 'red' },
       onConfirm: () => {
         deleteCategory.mutate(row.original.id, {
-          onSuccess: () => close(),
+          onSuccess: () => {
+            close();
+            notifications.show({
+              color: 'green',
+              message: t('delete.successMessage', { name: row.original.name }),
+            });
+          },
           onError: () =>
             notifications.show({
               color: 'red',

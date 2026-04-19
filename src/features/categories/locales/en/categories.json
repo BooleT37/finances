@@ -10,7 +10,8 @@
     "confirmMessage": "Are you sure you want to delete \"{{name}}\"? This cannot be undone.",
     "confirmTitle": "Delete category",
     "disabledTooltip": "Built-in categories cannot be deleted",
-    "errorMessage": "Failed to delete category. It may still have transactions linked to it."
+    "errorMessage": "Failed to delete category. It may still have transactions linked to it.",
+    "successMessage": "\"{{name}}\" deleted"
   },
   "form": {
     "add": "Add",

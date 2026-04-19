@@ -28,6 +28,7 @@ import {
 } from '~/features/categories/queries';
 import type { Category } from '~/features/categories/schema';
 
+import { insertedCategoryAtom } from '../CategoriesTable/flashCategory';
 import type { CategoryFormValues } from './categoryFormValues';
 import { CategorySidebarMolecule } from './categorySidebarMolecule';
 
@@ -60,6 +61,7 @@ export function CategorySidebarForm() {
   const isNew = useAtomValue(isNewCategoryAtom);
   const setFormRef = useSetAtom(formRefAtom);
   const close = useSetAtom(closeAtom);
+  const setInsertedCategory = useSetAtom(insertedCategoryAtom);
   const store = useStore();
   const { t } = useTranslation('categories');
 
@@ -124,7 +126,7 @@ export function CategorySidebarForm() {
   }, [form, setFormRef]);
 
   const handleSubmit = form.onSubmit(async (values) => {
-    await createCategory.mutateAsync({
+    const result = await createCategory.mutateAsync({
       name: values.name,
       shortname: values.shortname,
       icon: values.icon,
@@ -136,6 +138,7 @@ export function CategorySidebarForm() {
     });
     form.reset();
     close();
+    setInsertedCategory({ id: result.id, isIncome: result.isIncome });
   });
 
   const subcategoryFields = form.getValues().subcategories;

@@ -1,5 +1,6 @@
 import { Group } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
+import { useAtomValue } from 'jotai';
 import {
   MantineReactTable,
   MRT_ExpandButton,
@@ -19,6 +20,7 @@ import {
 import type { Category } from '~/features/categories/schema';
 
 import { useCategoriesTableColumns } from './columns/useCategoriesTableColumns';
+import { flashEffectAtom, flashStateAtom } from './flashCategory';
 import { RowActions } from './RowActions';
 
 function getOrderedIds(
@@ -42,6 +44,8 @@ export function CategoriesTable() {
   const { sortAllCategoriesById, isSuccess: isCategoriesOrderLoaded } =
     useSortAllCategoriesById();
   const updateCategoryOrder = useUpdateCategoryOrder();
+
+  const { id: flashId, fading } = useAtomValue(flashStateAtom);
 
   const orderedCategories = useMemo(() => {
     if (!categories) {
@@ -86,6 +90,20 @@ export function CategoriesTable() {
         maxWidth: 420,
       },
     },
+    mantineTableBodyCellProps: ({ row }) => {
+      const isFlashing = !row.getIsGrouped() && row.original.id === flashId;
+      return {
+        style: {
+          background: isFlashing
+            ? fading
+              ? 'transparent'
+              : '#fffde7'
+            : undefined,
+          transition:
+            isFlashing && fading ? 'background 1.5s ease-out' : undefined,
+        },
+      };
+    },
     mantineRowDragHandleProps: ({ row, table: tbl }) => ({
       onDragEnd: () => {
         const isIncome = row.original.isIncome;
@@ -128,6 +146,9 @@ export function CategoriesTable() {
     },
     localization: MRT_Localization_RU,
   });
+
+  const flashEffect = useMemo(() => flashEffectAtom(table), [table]);
+  useAtomValue(flashEffect);
 
   return <MantineReactTable table={table} />;
 }
