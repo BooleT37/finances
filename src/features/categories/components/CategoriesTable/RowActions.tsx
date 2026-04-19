@@ -44,7 +44,7 @@ export function RowActions({ row }: Props) {
   };
 
   return (
-    <Group gap={4} wrap="nowrap">
+    <Group gap={16} wrap="nowrap">
       <Tooltip label={t('actions.edit')}>
         <IconEdit
           size={18}
@@ -58,6 +58,7 @@ export function RowActions({ row }: Props) {
         <span>
           <IconTrash
             size={18}
+            color="red"
             style={{
               cursor: isSpecial ? 'not-allowed' : 'pointer',
               opacity: isSpecial ? 0.4 : 1,

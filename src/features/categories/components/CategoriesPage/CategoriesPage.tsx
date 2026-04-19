@@ -1,4 +1,4 @@
-import { Button, Group, Stack, Title } from '@mantine/core';
+import { Button, Stack } from '@mantine/core';
 import { IconPlus } from '@tabler/icons-react';
 import { useMolecule } from 'bunshi/react';
 import { useSetAtom } from 'jotai';
@@ -8,19 +8,22 @@ import { CategoriesTable } from '~/features/categories/components/CategoriesTabl
 import { CategorySidebar } from '~/features/categories/components/CategorySidebar/CategorySidebar';
 import { CategorySidebarMolecule } from '~/features/categories/components/CategorySidebar/categorySidebarMolecule';
 
+const SIDEBAR_WIDTH = 380;
+
 export function CategoriesPage() {
   const { t } = useTranslation('categories');
   const { openAtom } = useMolecule(CategorySidebarMolecule);
   const open = useSetAtom(openAtom);
 
   return (
-    <Stack gap="md">
-      <Group justify="space-between">
-        <Title order={3}>{t('pageTitle')}</Title>
-        <Button leftSection={<IconPlus size={16} />} onClick={() => open(null)}>
-          {t('addCategory')}
-        </Button>
-      </Group>
+    <Stack gap="md" style={{ paddingRight: SIDEBAR_WIDTH }}>
+      <Button
+        leftSection={<IconPlus size={16} />}
+        onClick={() => open(null)}
+        style={{ alignSelf: 'flex-start' }}
+      >
+        {t('addCategory')}
+      </Button>
       <CategoriesTable />
       <CategorySidebar />
     </Stack>

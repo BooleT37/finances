@@ -18,6 +18,7 @@ export function Sidebar({ isOpen, onClose, title, width, children }: Props) {
       top: 'var(--app-shell-header-height)',
       bottom: 0,
       width,
+      zIndex: 200,
       transition: 'transform 150ms ease',
     }),
     [width],

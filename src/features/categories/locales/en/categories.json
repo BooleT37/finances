@@ -1,40 +1,40 @@
 {
-  "pageTitle": "Categories",
-  "addCategory": "+ Add",
   "actions": {
-    "edit": "Edit",
-    "delete": "Delete"
+    "delete": "Delete",
+    "edit": "Edit"
   },
+  "addCategory": "Add",
   "delete": {
-    "confirmTitle": "Delete category",
-    "confirmMessage": "Are you sure you want to delete \"{{name}}\"? This cannot be undone.",
-    "confirm": "Delete",
     "cancel": "Cancel",
+    "confirm": "Delete",
+    "confirmMessage": "Are you sure you want to delete \"{{name}}\"? This cannot be undone.",
+    "confirmTitle": "Delete category",
     "disabledTooltip": "Built-in categories cannot be deleted",
     "errorMessage": "Failed to delete category. It may still have transactions linked to it."
   },
-  "sidebar": {
-    "add": "Add category",
-    "edit": "Edit category"
-  },
   "form": {
-    "icon": "Icon",
-    "name": "Name",
-    "shortname": "Short name",
-    "type": "Type",
-    "typeExpense": "Expense",
-    "typeIncome": "Income",
-    "isContinuous": "Continuous",
-    "isContinuousTooltip": "A continuous category has many small, evenly-spread expenses throughout the month (e.g. groceries, transport). Mid-month spending can be extrapolated to predict whether the plan will be exceeded.",
-    "subcategories": "Subcategories",
-    "addSubcategory": "Add subcategory",
-    "subcategoryName": "Subcategory name",
     "add": "Add",
-    "unsavedChanges": "Fix the errors above to save changes.",
+    "addSubcategory": "Add subcategory",
     "errors": {
       "nameRequired": "Name is required",
       "shortnameRequired": "Short name is required",
       "subcategoryNameRequired": "Subcategory name is required"
-    }
+    },
+    "icon": "Icon",
+    "isContinuous": "Continuous",
+    "isContinuousTooltip": "A continuous category has many small, evenly-spread expenses throughout the month (e.g. groceries, transport). Mid-month spending can be extrapolated to predict whether the plan will be exceeded.",
+    "name": "Name",
+    "shortname": "Short name",
+    "subcategories": "Subcategories",
+    "subcategoryName": "Subcategory name",
+    "type": "Type",
+    "typeExpense": "Expense",
+    "typeIncome": "Income",
+    "unsavedChanges": "Fix the errors above to save changes."
+  },
+  "pageTitle": "Categories",
+  "sidebar": {
+    "add": "Add category",
+    "edit": "Edit category"
   }
 }
