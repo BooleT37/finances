@@ -30,7 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "notify-send 'Claude done ❇️'"
+            "command": "osascript -e 'display notification \"Claude done ❇️\"'"
           }
         ]
       }
