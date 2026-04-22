@@ -18,6 +18,7 @@
     "addSubcategory": "Добавить подкатегорию",
     "errors": {
       "nameRequired": "Название обязательно",
+      "nameTaken": "Категория с таким названием уже существует",
       "shortnameRequired": "Краткое название обязательно",
       "subcategoryNameRequired": "Название подкатегории обязательно"
     },

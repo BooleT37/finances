@@ -18,6 +18,7 @@
     "addSubcategory": "Add subcategory",
     "errors": {
       "nameRequired": "Name is required",
+      "nameTaken": "A category with this name already exists",
       "shortnameRequired": "Short name is required",
       "subcategoryNameRequired": "Subcategory name is required"
     },

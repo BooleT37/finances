@@ -16,7 +16,7 @@ import { IconInfoCircle, IconPlus, IconTrash } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useMolecule } from 'bunshi/react';
 import { useAtomValue, useSetAtom, useStore } from 'jotai';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { CategoryIconComp } from '~/features/categories/components/categoryIcons/CategoryIconComp';
@@ -71,6 +71,14 @@ export function CategorySidebarForm() {
     [categories, editingId],
   );
 
+  // Keep validators stable while always seeing the latest categories + editingId
+  const categoriesRef = useRef<Category[] | undefined>(categories);
+  const editingIdRef = useRef<number | null | undefined>(editingId);
+  useEffect(() => {
+    categoriesRef.current = categories;
+    editingIdRef.current = editingId;
+  });
+
   const updateCategory = useUpdateCategory();
   const createCategory = useCreateCategory();
 
@@ -112,7 +120,15 @@ export function CategorySidebarForm() {
     validateInputOnBlur: true,
     onValuesChange: debouncedSave,
     validate: {
-      name: isNotEmpty(t('form.errors.nameRequired')),
+      name: (value: string) => {
+        if (value.trim().length === 0) {
+          return t('form.errors.nameRequired');
+        }
+        const taken = categoriesRef.current?.some(
+          (c) => c.id !== editingIdRef.current && c.name === value.trim(),
+        );
+        return taken ? t('form.errors.nameTaken') : null;
+      },
       shortname: isNotEmpty(t('form.errors.shortnameRequired')),
       subcategories: {
         name: isNotEmpty(t('form.errors.subcategoryNameRequired')),
