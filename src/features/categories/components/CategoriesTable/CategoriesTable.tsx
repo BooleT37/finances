@@ -1,10 +1,8 @@
 import { Group } from '@mantine/core';
-import { useQuery } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import {
   MantineReactTable,
   MRT_ExpandButton,
-  type MRT_TableInstance,
   useMantineReactTable,
 } from 'mantine-react-table';
 import { MRT_Localization_RU } from 'mantine-react-table/locales/ru/index.cjs';
@@ -12,51 +10,24 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { NameWithOptionalIcon } from '~/features/categories/components/NameWithOptionalIcon';
-import { useSortAllCategoriesById } from '~/features/categories/facets/categoriesOrder';
-import {
-  getCategoriesQueryOptions,
-  useUpdateCategoryOrder,
-} from '~/features/categories/queries';
-import type { Category } from '~/features/categories/schema';
+import { useCategoryTableItems } from '~/features/categories/facets/categoryTableItems';
 
 import { useCategoriesTableColumns } from './columns/useCategoriesTableColumns';
 import { flashEffectAtom, flashStateAtom } from './flashCategory';
+import { usePersistCategoriesOrder } from './hooks/usePersistCategoriesOrder';
 import { RowActions } from './RowActions';
-
-function getOrderedIds(
-  table: MRT_TableInstance<Category>,
-  isIncome: boolean,
-): number[] {
-  return table
-    .getSortedRowModel()
-    .flatRows.filter(
-      (row) => !row.getIsGrouped() && row.original.isIncome === isIncome,
-    )
-    .map((row) => row.original.id);
-}
 
 export function CategoriesTable() {
   const { t } = useTranslation('categories');
   const columns = useCategoriesTableColumns();
-  const { data: categories, isLoading: categoriesLoading } = useQuery(
-    getCategoriesQueryOptions(),
-  );
-  const { sortAllCategoriesById, isSuccess: isCategoriesOrderLoaded } =
-    useSortAllCategoriesById();
-  const updateCategoryOrder = useUpdateCategoryOrder();
+  const categoryTableItems = useCategoryTableItems();
+  const persistCategoriesOrder = usePersistCategoriesOrder();
 
   const { id: flashId, fading } = useAtomValue(flashStateAtom);
 
-  const orderedCategories = useMemo(() => {
-    if (!categories) {
-      return [];
-    }
-    return [...categories].sort((a, b) => sortAllCategoriesById(a.id, b.id));
-  }, [categories, sortAllCategoriesById]);
-
   const table = useMantineReactTable({
     columns,
-    data: isCategoriesOrderLoaded ? orderedCategories : [],
+    data: categoryTableItems ?? [],
     enableGrouping: true,
     enableTopToolbar: false,
     enableBottomToolbar: false,
@@ -77,7 +48,7 @@ export function CategoriesTable() {
     },
     state: {
       columnOrder: ['mrt-row-drag', 'mrt-row-expand', 'mrt-row-actions'],
-      isLoading: categoriesLoading || !isCategoriesOrderLoaded,
+      isLoading: !categoryTableItems,
     },
     mantineTableContainerProps: {
       style: {
@@ -105,13 +76,7 @@ export function CategoriesTable() {
       };
     },
     mantineRowDragHandleProps: ({ row, table: tbl }) => ({
-      onDragEnd: () => {
-        const isIncome = row.original.isIncome;
-        updateCategoryOrder.mutate({
-          isIncome,
-          categoryIds: getOrderedIds(tbl, isIncome),
-        });
-      },
+      onDragEnd: () => persistCategoriesOrder(tbl, row.original.isIncome),
     }),
     renderRowActions: ({ row }) => {
       if (row.getIsGrouped()) {
