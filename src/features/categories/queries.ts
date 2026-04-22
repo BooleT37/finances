@@ -5,6 +5,8 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 
+import { getUserSettingsQueryOptions } from '~/features/userSettings/queries';
+
 import {
   createCategory,
   deleteCategory,
@@ -29,7 +31,7 @@ const categoryKeys = createQueryKeys('categories', {
 export const getCategoriesQueryOptions = () =>
   queryOptions({
     ...categoryKeys.all,
-    staleTime: Infinity,
+    staleTime: 0,
     queryFn: async () => {
       const rows = await fetchAllCategories();
       return rows.map((c) => categorySchema.decode(c));
@@ -40,7 +42,11 @@ export function useCreateCategory() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: CreateCategoryInput) => createCategory({ data: input }),
-    onSuccess: () => queryClient.invalidateQueries(getCategoriesQueryOptions()),
+    onSuccess: () =>
+      Promise.all([
+        queryClient.invalidateQueries(getUserSettingsQueryOptions()),
+        queryClient.invalidateQueries(getCategoriesQueryOptions()),
+      ]),
   });
 }
 
@@ -57,7 +63,8 @@ export function useUpdateCategoryOrder() {
   return useMutation({
     mutationFn: (input: UpdateCategoryOrderInput) =>
       updateCategoryOrder({ data: input }),
-    onSettled: () => queryClient.invalidateQueries(getCategoriesQueryOptions()),
+    onSettled: () =>
+      queryClient.invalidateQueries(getUserSettingsQueryOptions()),
   });
 }
 
