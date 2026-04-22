@@ -28,8 +28,9 @@ export const CategorySidebarMolecule = molecule(() => {
     });
   });
 
-  const closeAtom = atom(null, (_, set) => {
+  const closeAtom = atom(null, (get, set) => {
     set(withDirtyCheckAtom, () => {
+      get(_formAtom)?.reset();
       set(editingIdAtom, undefined);
       set(isOpenAtom, false);
     });

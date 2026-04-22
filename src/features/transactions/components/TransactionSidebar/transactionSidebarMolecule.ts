@@ -70,8 +70,9 @@ export const TransactionSidebarMolecule = molecule(() => {
     });
   });
 
-  const closeAtom = atom(null, (_, set) => {
+  const closeAtom = atom(null, (get, set) => {
     set(withDirtyCheckAtom, () => {
+      get(_formAtom)?.reset();
       set(editingIdAtom, undefined);
       set(componentsModalOpenAtom, false);
       set(highlightedComponentIdAtom, null);
