@@ -34,7 +34,10 @@ async function hoverGrandTotalBadge(page: Page) {
 }
 
 async function confirmFill(page: Page) {
-  await page.getByRole('button', { name: 'Заполнить из подписок' }).click();
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: 'Заполнить из подписок' })
+    .click();
   await page.waitForLoadState('networkidle');
 }
 

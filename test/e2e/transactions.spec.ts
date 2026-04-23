@@ -470,7 +470,7 @@ test.describe('Transaction editing', () => {
     // Dismiss → sidebar stays open, change is preserved
     await page
       .getByRole('dialog')
-      .getByRole('button', { name: 'Отмена' })
+      .getByRole('button', { name: 'Продолжить редактирование' })
       .click();
     await expect(form).toBeVisible();
     await expect(form.getByLabel('Сумма (€)')).toHaveValue('');
@@ -481,7 +481,7 @@ test.describe('Transaction editing', () => {
     // Confirm → sidebar closes, change is discarded
     await page
       .getByRole('dialog')
-      .getByRole('button', { name: 'Продолжить' })
+      .getByRole('button', { name: 'Отменить' })
       .click();
     // Sidebar slides off-screen via CSS transform (translateX 100%) — use
     // toBeInViewport rather than toBeVisible, which CSS transforms don't affect.

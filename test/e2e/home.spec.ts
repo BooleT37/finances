@@ -13,7 +13,7 @@ test.describe('App shell', () => {
     await expect(
       page.getByRole('link', { name: 'Планирование' }),
     ).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Накопления' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Сбережения' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Статистика' })).toBeVisible();
   });
 
@@ -24,7 +24,7 @@ test.describe('App shell', () => {
     await expect(page.getByRole('button', { name: 'Previous' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Next' })).toBeVisible();
 
-    await page.getByRole('link', { name: 'Накопления' }).click();
+    await page.getByRole('link', { name: 'Сбережения' }).click();
     await expect(page).toHaveURL('/savings-spendings');
     await expect(
       page.getByRole('button', { name: 'Previous' }),
