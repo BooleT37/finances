@@ -3,6 +3,7 @@ import {
   IconBuildingBank,
   IconCalendar,
   IconChartLine,
+  IconCreditCard,
   IconSettings,
   IconTable,
   IconTag,
@@ -79,6 +80,16 @@ export function AppNav() {
           active={pathname === '/settings/categories'}
           onClick={(e: React.MouseEvent) =>
             handleNavClick(e, '/settings/categories')
+          }
+        />
+        <NavLink
+          component={Link}
+          to="/settings/sources"
+          label={t('sources')}
+          leftSection={<IconCreditCard size={18} />}
+          active={pathname === '/settings/sources'}
+          onClick={(e: React.MouseEvent) =>
+            handleNavClick(e, '/settings/sources')
           }
         />
       </NavLink>
