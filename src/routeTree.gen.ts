@@ -16,6 +16,7 @@ import { Route as SavingsSpendingsRouteImport } from './routes/savings-spendings
 import { Route as BudgetingRouteImport } from './routes/budgeting'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SavingsSpendingsIndexRouteImport } from './routes/savings-spendings.index'
+import { Route as SettingsSourcesRouteImport } from './routes/settings.sources'
 import { Route as SettingsCategoriesRouteImport } from './routes/settings.categories'
 import { Route as SavingsSpendingsArchiveRouteImport } from './routes/savings-spendings.archive'
 
@@ -54,6 +55,11 @@ const SavingsSpendingsIndexRoute = SavingsSpendingsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => SavingsSpendingsRoute,
 } as any)
+const SettingsSourcesRoute = SettingsSourcesRouteImport.update({
+  id: '/sources',
+  path: '/sources',
+  getParentRoute: () => SettingsRoute,
+} as any)
 const SettingsCategoriesRoute = SettingsCategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/transactions': typeof TransactionsRoute
   '/savings-spendings/archive': typeof SavingsSpendingsArchiveRoute
   '/settings/categories': typeof SettingsCategoriesRoute
+  '/settings/sources': typeof SettingsSourcesRoute
   '/savings-spendings/': typeof SavingsSpendingsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -84,6 +91,7 @@ export interface FileRoutesByTo {
   '/transactions': typeof TransactionsRoute
   '/savings-spendings/archive': typeof SavingsSpendingsArchiveRoute
   '/settings/categories': typeof SettingsCategoriesRoute
+  '/settings/sources': typeof SettingsSourcesRoute
   '/savings-spendings': typeof SavingsSpendingsIndexRoute
 }
 export interface FileRoutesById {
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   '/transactions': typeof TransactionsRoute
   '/savings-spendings/archive': typeof SavingsSpendingsArchiveRoute
   '/settings/categories': typeof SettingsCategoriesRoute
+  '/settings/sources': typeof SettingsSourcesRoute
   '/savings-spendings/': typeof SavingsSpendingsIndexRoute
 }
 export interface FileRouteTypes {
@@ -109,6 +118,7 @@ export interface FileRouteTypes {
     | '/transactions'
     | '/savings-spendings/archive'
     | '/settings/categories'
+    | '/settings/sources'
     | '/savings-spendings/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/transactions'
     | '/savings-spendings/archive'
     | '/settings/categories'
+    | '/settings/sources'
     | '/savings-spendings'
   id:
     | '__root__'
@@ -130,6 +141,7 @@ export interface FileRouteTypes {
     | '/transactions'
     | '/savings-spendings/archive'
     | '/settings/categories'
+    | '/settings/sources'
     | '/savings-spendings/'
   fileRoutesById: FileRoutesById
 }
@@ -193,6 +205,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SavingsSpendingsIndexRouteImport
       parentRoute: typeof SavingsSpendingsRoute
     }
+    '/settings/sources': {
+      id: '/settings/sources'
+      path: '/sources'
+      fullPath: '/settings/sources'
+      preLoaderRoute: typeof SettingsSourcesRouteImport
+      parentRoute: typeof SettingsRoute
+    }
     '/settings/categories': {
       id: '/settings/categories'
       path: '/categories'
@@ -225,10 +244,12 @@ const SavingsSpendingsRouteWithChildren =
 
 interface SettingsRouteChildren {
   SettingsCategoriesRoute: typeof SettingsCategoriesRoute
+  SettingsSourcesRoute: typeof SettingsSourcesRoute
 }
 
 const SettingsRouteChildren: SettingsRouteChildren = {
   SettingsCategoriesRoute: SettingsCategoriesRoute,
+  SettingsSourcesRoute: SettingsSourcesRoute,
 }
 
 const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
