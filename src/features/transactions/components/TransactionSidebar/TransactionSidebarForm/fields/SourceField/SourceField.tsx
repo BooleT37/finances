@@ -1,9 +1,8 @@
 import { Select } from '@mantine/core';
-import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { getSourcesQueryOptions } from '~/features/sources/queries';
+import { useOrderedSources } from '~/features/sources/facets/orderedSources';
 
 import type { TransactionFormType } from '../../transactionFormValues';
 import { SourceLastTransactions } from './SourceLastTransactions';
@@ -15,11 +14,15 @@ interface Props {
 export function SourceField({ form }: Props) {
   const { t } = useTranslation('transactions');
 
-  const { data: sources = [] } = useQuery(getSourcesQueryOptions());
+  const orderedSources = useOrderedSources();
 
   const sourceOptions = useMemo(
-    () => sources.map((s) => ({ value: String(s.id), label: s.name })),
-    [sources],
+    () =>
+      (orderedSources ?? []).map((s) => ({
+        value: String(s.id),
+        label: s.name,
+      })),
+    [orderedSources],
   );
 
   const sourceDescription =
