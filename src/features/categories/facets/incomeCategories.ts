@@ -1,21 +1,25 @@
-import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { useQueries } from '@tanstack/react-query';
 
 import { getIncomeCategoriesOrderQueryOptions } from '~/features/userSettings/facets/incomeCategoriesOrder';
 
 import { getCategoriesQueryOptions } from '../queries';
+import type { Category } from '../schema';
 import { sortCategories } from './categoriesOrder';
 
-export const useIncomeCategories = () => {
-  const { data: categories } = useQuery(getCategoriesQueryOptions());
-  const { data: order } = useQuery(getIncomeCategoriesOrderQueryOptions());
-  return useMemo(
-    () =>
-      categories && order
-        ? categories
-            .filter((c) => c.isIncome)
-            .sort((a, b) => sortCategories(a.id, b.id, order))
-        : undefined,
-    [categories, order],
-  );
-};
+export const useIncomeCategories = (): Category[] | undefined =>
+  useQueries({
+    queries: [
+      getCategoriesQueryOptions(),
+      getIncomeCategoriesOrderQueryOptions(),
+    ],
+    combine: ([categoriesResult, orderResult]) => {
+      const categories = categoriesResult.data;
+      const order = orderResult.data;
+      if (!categories || !order) {
+        return undefined;
+      }
+      return categories
+        .filter((c) => c.isIncome)
+        .sort((a, b) => sortCategories(a.id, b.id, order));
+    },
+  });

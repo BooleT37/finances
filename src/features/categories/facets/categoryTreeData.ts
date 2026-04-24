@@ -1,33 +1,44 @@
-import { queryOptions } from '@tanstack/react-query';
+import { useMemo } from 'react';
 
 import type { TreeNode } from '~/shared/components/TreeSelect';
 
 import { buildCategorySubcategoryId } from '../categorySubcategoryId';
-import { getCategoriesQueryOptions } from '../queries';
+import type { Category } from '../schema';
+import { useExpenseCategories } from './expenseCategories';
+import { useIncomeCategories } from './incomeCategories';
 
-export const getCategoryTreeDataQueryOptions = (options?: {
-  isIncome?: boolean;
-}) =>
-  queryOptions({
-    ...getCategoriesQueryOptions(),
-    select: (data): TreeNode[] =>
-      (options?.isIncome !== undefined
-        ? data.filter((c) => c.isIncome === options.isIncome)
-        : data
-      ).map((cat) => {
-        const node: TreeNode = {
-          value: buildCategorySubcategoryId({ categoryId: cat.id }),
-          title: cat.name,
-        };
-        if (cat.subcategories.length > 0) {
-          node.children = cat.subcategories.map((sub) => ({
-            value: buildCategorySubcategoryId({
-              categoryId: cat.id,
-              subcategoryId: sub.id,
-            }),
-            title: sub.name,
-          }));
-        }
-        return node;
+function categoryToTreeNode(cat: Category): TreeNode {
+  const node: TreeNode = {
+    value: buildCategorySubcategoryId({ categoryId: cat.id }),
+    title: cat.name,
+  };
+  if (cat.subcategories.length > 0) {
+    node.children = cat.subcategories.map((sub) => ({
+      value: buildCategorySubcategoryId({
+        categoryId: cat.id,
+        subcategoryId: sub.id,
       }),
-  });
+      title: sub.name,
+    }));
+  }
+  return node;
+}
+
+export const useCategoryTreeData = (options?: {
+  isIncome?: boolean;
+}): TreeNode[] | undefined => {
+  const expenseCategories = useExpenseCategories();
+  const incomeCategories = useIncomeCategories();
+  return useMemo(() => {
+    if (!expenseCategories || !incomeCategories) {
+      return undefined;
+    }
+    const categories =
+      options?.isIncome === true
+        ? incomeCategories
+        : options?.isIncome === false
+          ? expenseCategories
+          : [...expenseCategories, ...incomeCategories];
+    return categories.map(categoryToTreeNode);
+  }, [expenseCategories, incomeCategories, options?.isIncome]);
+};

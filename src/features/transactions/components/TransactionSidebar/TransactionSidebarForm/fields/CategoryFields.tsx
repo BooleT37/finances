@@ -4,7 +4,8 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getCategoryMapQueryOptions } from '~/features/categories/facets/categoryMap';
-import { getCategoriesQueryOptions } from '~/features/categories/queries';
+import { useExpenseCategories } from '~/features/categories/facets/expenseCategories';
+import { useIncomeCategories } from '~/features/categories/facets/incomeCategories';
 import { getOrThrow } from '~/shared/utils/getOrThrow';
 
 import type { TransactionFormType } from '../transactionFormValues';
@@ -17,7 +18,8 @@ export function CategoryFields({ form }: Props) {
   const { t } = useTranslation('transactions');
 
   const { data: categoryMap = {} } = useQuery(getCategoryMapQueryOptions());
-  const { data: allCategories = [] } = useQuery(getCategoriesQueryOptions());
+  const expenseCategories = useExpenseCategories();
+  const incomeCategories = useIncomeCategories();
 
   const isIncome = form.values.transactionType === 'income';
   const categoryField = isIncome ? 'incomeCategory' : 'expenseCategory';
@@ -25,14 +27,12 @@ export function CategoryFields({ form }: Props) {
     ? 'incomeSubcategory'
     : 'expenseSubcategory';
 
-  const categories = isIncome
-    ? allCategories.filter((c) => c.isIncome)
-    : allCategories.filter((c) => !c.isIncome && c.type !== 'FROM_SAVINGS');
-
-  const categoryOptions = useMemo(
-    () => categories.map((c) => ({ value: String(c.id), label: c.name })),
-    [categories],
-  );
+  const categoryOptions = useMemo(() => {
+    const categories = isIncome
+      ? (incomeCategories ?? [])
+      : (expenseCategories ?? []).filter((c) => c.type !== 'FROM_SAVINGS');
+    return categories.map((c) => ({ value: String(c.id), label: c.name }));
+  }, [isIncome, expenseCategories, incomeCategories]);
 
   const selectedCategory = useMemo(() => {
     const value = form.values[categoryField];

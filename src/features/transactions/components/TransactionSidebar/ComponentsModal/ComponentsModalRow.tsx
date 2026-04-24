@@ -1,10 +1,9 @@
 import { ActionIcon, Group, TextInput } from '@mantine/core';
 import type { UseFormReturnType } from '@mantine/form';
 import { IconTrash } from '@tabler/icons-react';
-import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
-import { getCategoryTreeDataQueryOptions } from '~/features/categories/facets/categoryTreeData';
+import { useCategoryTreeData } from '~/features/categories/facets/categoryTreeData';
 import { TreeSelect } from '~/shared/components/TreeSelect';
 
 import type { ComponentsFormValues } from './ComponentsModal';
@@ -24,9 +23,7 @@ export function ComponentsModalRow({
   onRemove,
 }: Props) {
   const { t } = useTranslation('transactions');
-  const { data: treeData = [] } = useQuery(
-    getCategoryTreeDataQueryOptions({ isIncome: false }),
-  );
+  const treeData = useCategoryTreeData({ isIncome: false }) ?? [];
 
   const row = form.values.components[index];
   const isHighlighted =
