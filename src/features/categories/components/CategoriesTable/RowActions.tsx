@@ -1,4 +1,4 @@
-import { Group, Tooltip } from '@mantine/core';
+import { ActionIcon, Group, Tooltip } from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
@@ -50,28 +50,24 @@ export function RowActions({ row }: Props) {
   };
 
   return (
-    <Group gap={16} wrap="nowrap">
-      <Tooltip label={t('actions.edit')}>
-        <IconEdit
-          size={18}
-          style={{ cursor: 'pointer' }}
-          onClick={() => open(row.original.id)}
-        />
-      </Tooltip>
-      <Tooltip
-        label={isSpecial ? t('delete.disabledTooltip') : t('actions.delete')}
+    <Group gap={4}>
+      <ActionIcon
+        variant="subtle"
+        aria-label={t('actions.edit')}
+        onClick={() => open(row.original.id)}
       >
-        <span>
-          <IconTrash
-            size={18}
-            color="red"
-            style={{
-              cursor: isSpecial ? 'not-allowed' : 'pointer',
-              opacity: isSpecial ? 0.4 : 1,
-            }}
-            onClick={isSpecial ? undefined : handleDelete}
-          />
-        </span>
+        <IconEdit size={16} />
+      </ActionIcon>
+      <Tooltip label={t('delete.disabledTooltip')} disabled={!isSpecial}>
+        <ActionIcon
+          variant="subtle"
+          color="red"
+          disabled={isSpecial}
+          aria-label={t('actions.delete')}
+          onClick={handleDelete}
+        >
+          <IconTrash size={16} />
+        </ActionIcon>
       </Tooltip>
     </Group>
   );

@@ -86,7 +86,7 @@ export function CategoriesTable() {
     },
     displayColumnDefOptions: {
       'mrt-row-drag': { header: '', size: 40 },
-      'mrt-row-actions': { header: '' },
+      'mrt-row-actions': { header: '', size: 80 },
       'mrt-row-expand': {
         header: t('form.name'),
         size: 280,
