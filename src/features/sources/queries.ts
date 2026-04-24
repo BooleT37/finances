@@ -1,7 +1,14 @@
 import { createQueryKeys } from '@lukemorales/query-key-factory';
-import { queryOptions } from '@tanstack/react-query';
+import {
+  queryOptions,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 
-import { fetchAllSources } from './api';
+import { getUserSettingsQueryOptions } from '~/features/userSettings/queries';
+
+import { fetchAllSources, updateSourceName, updateSourceOrder } from './api';
+import type { UpdateSourceNameInput, UpdateSourceOrderInput } from './schema';
 import { sourceSchema } from './schema';
 
 const sourceKeys = createQueryKeys('sources', {
@@ -11,9 +18,28 @@ const sourceKeys = createQueryKeys('sources', {
 export const getSourcesQueryOptions = () =>
   queryOptions({
     ...sourceKeys.all,
-    staleTime: Infinity, // Reference data — rarely changes within a session
+    staleTime: 0,
     queryFn: async () => {
       const rows = await fetchAllSources();
       return rows.map((s) => sourceSchema.decode(s));
     },
   });
+
+export function useUpdateSourceName() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: UpdateSourceNameInput) =>
+      updateSourceName({ data: input }),
+    onSuccess: () => queryClient.invalidateQueries(getSourcesQueryOptions()),
+  });
+}
+
+export function useUpdateSourceOrder() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: UpdateSourceOrderInput) =>
+      updateSourceOrder({ data: input }),
+    onSettled: () =>
+      queryClient.invalidateQueries(getUserSettingsQueryOptions()),
+  });
+}
