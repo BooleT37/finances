@@ -1,0 +1,56 @@
+{
+  "pageTitle": "Subscriptions",
+  "addSubscription": "Add subscription",
+  "archive": "Archive",
+  "back": "Back",
+  "sidebar": {
+    "add": "Add subscription",
+    "edit": "Edit subscription"
+  },
+  "actions": {
+    "edit": "Edit",
+    "archive": "Archive",
+    "unarchive": "Restore",
+    "delete": "Delete"
+  },
+  "delete": {
+    "confirmTitle": "Delete subscription",
+    "confirmMessage": "Are you sure you want to delete \"{{name}}\"? This cannot be undone.",
+    "confirm": "Delete",
+    "cancel": "Cancel",
+    "errorMessage": "Failed to delete subscription.",
+    "successMessage": "\"{{name}}\" deleted"
+  },
+  "archiveAction": {
+    "successMessage": "\"{{name}}\" archived",
+    "unarchiveSuccess": "\"{{name}}\" restored"
+  },
+  "form": {
+    "name": "Name",
+    "price": "Price",
+    "period": "Period",
+    "periodMonth": "month",
+    "periodQuarter": "quarter",
+    "periodSixMonths": "6 months",
+    "periodYear": "year",
+    "category": "Category",
+    "firstDate": "First date",
+    "source": "Source",
+    "errors": {
+      "nameRequired": "Name is required",
+      "priceRequired": "Price is required",
+      "categoryRequired": "Category is required",
+      "firstDateRequired": "First date is required"
+    },
+    "add": "Add",
+    "unsavedChanges": "Fix the errors above to save changes."
+  },
+  "columns": {
+    "name": "Name",
+    "price": "Price",
+    "firstDate": "First date",
+    "source": "Source",
+    "monthlyTotal": "/ month",
+    "grandMonthlyTotal": "Total per month"
+  }
+}

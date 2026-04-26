@@ -1,0 +1,56 @@
+{
+  "pageTitle": "Подписки",
+  "addSubscription": "Добавить подписку",
+  "archive": "Архив",
+  "back": "Назад",
+  "sidebar": {
+    "add": "Добавить подписку",
+    "edit": "Редактировать подписку"
+  },
+  "actions": {
+    "edit": "Редактировать",
+    "archive": "В архив",
+    "unarchive": "Восстановить",
+    "delete": "Удалить"
+  },
+  "delete": {
+    "confirmTitle": "Удалить подписку",
+    "confirmMessage": "Вы уверены, что хотите удалить «{{name}}»? Это действие нельзя отменить.",
+    "confirm": "Удалить",
+    "cancel": "Отмена",
+    "errorMessage": "Не удалось удалить подписку.",
+    "successMessage": "«{{name}}» удалена"
+  },
+  "archiveAction": {
+    "successMessage": "«{{name}}» перемещена в архив",
+    "unarchiveSuccess": "«{{name}}» восстановлена"
+  },
+  "form": {
+    "name": "Название",
+    "price": "Цена",
+    "period": "Период",
+    "periodMonth": "месяц",
+    "periodQuarter": "квартал",
+    "periodSixMonths": "6 месяцев",
+    "periodYear": "год",
+    "category": "Категория",
+    "firstDate": "Дата начала",
+    "source": "Счёт",
+    "errors": {
+      "nameRequired": "Название обязательно",
+      "priceRequired": "Цена обязательна",
+      "categoryRequired": "Категория обязательна",
+      "firstDateRequired": "Дата начала обязательна"
+    },
+    "add": "Добавить",
+    "unsavedChanges": "Исправьте ошибки выше, чтобы сохранить изменения."
+  },
+  "columns": {
+    "name": "Название",
+    "price": "Цена",
+    "firstDate": "Дата начала",
+    "source": "Счёт",
+    "monthlyTotal": "/ мес.",
+    "grandMonthlyTotal": "Итого в месяц"
+  }
+}
