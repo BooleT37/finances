@@ -9,8 +9,8 @@ import {
   viewModeAtom,
 } from '~/stores/month';
 
-import { getSubscriptionsQueryOptions } from '../queries';
 import type { Subscription } from '../schema';
+import { useSortedSubscriptions } from './sortedSubscriptions';
 
 export interface AvailableSubscription {
   subscription: Subscription;
@@ -47,7 +47,7 @@ export function useAvailableSubscriptions(
   const base = viewMode === 'year' ? dayjs(`${year}-01`) : dayjs(selectedMonth);
   const rangeStart = base.startOf(viewMode);
   const rangeEnd = base.endOf(viewMode);
-  const { data: subscriptions } = useQuery(getSubscriptionsQueryOptions());
+  const subscriptions = useSortedSubscriptions();
   const { data: transactions } = useQuery(getTransactionsQueryOptions(year));
 
   if (!subscriptions || !transactions) {
