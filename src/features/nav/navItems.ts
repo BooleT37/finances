@@ -4,6 +4,7 @@ import {
   IconCalendar,
   IconChartLine,
   IconCreditCard,
+  IconRepeat,
   IconSettings,
   IconTable,
   IconTag,
@@ -36,6 +37,11 @@ export const navItems: NavItem[] = [
     children: [
       { to: '/settings/categories', labelKey: 'categories', icon: IconTag },
       { to: '/settings/sources', labelKey: 'sources', icon: IconCreditCard },
+      {
+        to: '/settings/subscriptions',
+        labelKey: 'subscriptions',
+        icon: IconRepeat,
+      },
     ],
   },
 ];
