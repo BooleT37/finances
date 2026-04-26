@@ -20,6 +20,8 @@ import { Route as SettingsSubscriptionsRouteImport } from './routes/settings.sub
 import { Route as SettingsSourcesRouteImport } from './routes/settings.sources'
 import { Route as SettingsCategoriesRouteImport } from './routes/settings.categories'
 import { Route as SavingsSpendingsArchiveRouteImport } from './routes/savings-spendings.archive'
+import { Route as SettingsSubscriptionsIndexRouteImport } from './routes/settings.subscriptions.index'
+import { Route as SettingsSubscriptionsArchiveRouteImport } from './routes/settings.subscriptions.archive'
 
 const TransactionsRoute = TransactionsRouteImport.update({
   id: '/transactions',
@@ -76,6 +78,18 @@ const SavingsSpendingsArchiveRoute = SavingsSpendingsArchiveRouteImport.update({
   path: '/archive',
   getParentRoute: () => SavingsSpendingsRoute,
 } as any)
+const SettingsSubscriptionsIndexRoute =
+  SettingsSubscriptionsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => SettingsSubscriptionsRoute,
+  } as any)
+const SettingsSubscriptionsArchiveRoute =
+  SettingsSubscriptionsArchiveRouteImport.update({
+    id: '/archive',
+    path: '/archive',
+    getParentRoute: () => SettingsSubscriptionsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -87,8 +101,10 @@ export interface FileRoutesByFullPath {
   '/savings-spendings/archive': typeof SavingsSpendingsArchiveRoute
   '/settings/categories': typeof SettingsCategoriesRoute
   '/settings/sources': typeof SettingsSourcesRoute
-  '/settings/subscriptions': typeof SettingsSubscriptionsRoute
+  '/settings/subscriptions': typeof SettingsSubscriptionsRouteWithChildren
   '/savings-spendings/': typeof SavingsSpendingsIndexRoute
+  '/settings/subscriptions/archive': typeof SettingsSubscriptionsArchiveRoute
+  '/settings/subscriptions/': typeof SettingsSubscriptionsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -99,8 +115,9 @@ export interface FileRoutesByTo {
   '/savings-spendings/archive': typeof SavingsSpendingsArchiveRoute
   '/settings/categories': typeof SettingsCategoriesRoute
   '/settings/sources': typeof SettingsSourcesRoute
-  '/settings/subscriptions': typeof SettingsSubscriptionsRoute
   '/savings-spendings': typeof SavingsSpendingsIndexRoute
+  '/settings/subscriptions/archive': typeof SettingsSubscriptionsArchiveRoute
+  '/settings/subscriptions': typeof SettingsSubscriptionsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -113,8 +130,10 @@ export interface FileRoutesById {
   '/savings-spendings/archive': typeof SavingsSpendingsArchiveRoute
   '/settings/categories': typeof SettingsCategoriesRoute
   '/settings/sources': typeof SettingsSourcesRoute
-  '/settings/subscriptions': typeof SettingsSubscriptionsRoute
+  '/settings/subscriptions': typeof SettingsSubscriptionsRouteWithChildren
   '/savings-spendings/': typeof SavingsSpendingsIndexRoute
+  '/settings/subscriptions/archive': typeof SettingsSubscriptionsArchiveRoute
+  '/settings/subscriptions/': typeof SettingsSubscriptionsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -130,6 +149,8 @@ export interface FileRouteTypes {
     | '/settings/sources'
     | '/settings/subscriptions'
     | '/savings-spendings/'
+    | '/settings/subscriptions/archive'
+    | '/settings/subscriptions/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -140,8 +161,9 @@ export interface FileRouteTypes {
     | '/savings-spendings/archive'
     | '/settings/categories'
     | '/settings/sources'
-    | '/settings/subscriptions'
     | '/savings-spendings'
+    | '/settings/subscriptions/archive'
+    | '/settings/subscriptions'
   id:
     | '__root__'
     | '/'
@@ -155,6 +177,8 @@ export interface FileRouteTypes {
     | '/settings/sources'
     | '/settings/subscriptions'
     | '/savings-spendings/'
+    | '/settings/subscriptions/archive'
+    | '/settings/subscriptions/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -245,6 +269,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SavingsSpendingsArchiveRouteImport
       parentRoute: typeof SavingsSpendingsRoute
     }
+    '/settings/subscriptions/': {
+      id: '/settings/subscriptions/'
+      path: '/'
+      fullPath: '/settings/subscriptions/'
+      preLoaderRoute: typeof SettingsSubscriptionsIndexRouteImport
+      parentRoute: typeof SettingsSubscriptionsRoute
+    }
+    '/settings/subscriptions/archive': {
+      id: '/settings/subscriptions/archive'
+      path: '/archive'
+      fullPath: '/settings/subscriptions/archive'
+      preLoaderRoute: typeof SettingsSubscriptionsArchiveRouteImport
+      parentRoute: typeof SettingsSubscriptionsRoute
+    }
   }
 }
 
@@ -261,16 +299,31 @@ const SavingsSpendingsRouteChildren: SavingsSpendingsRouteChildren = {
 const SavingsSpendingsRouteWithChildren =
   SavingsSpendingsRoute._addFileChildren(SavingsSpendingsRouteChildren)
 
+interface SettingsSubscriptionsRouteChildren {
+  SettingsSubscriptionsArchiveRoute: typeof SettingsSubscriptionsArchiveRoute
+  SettingsSubscriptionsIndexRoute: typeof SettingsSubscriptionsIndexRoute
+}
+
+const SettingsSubscriptionsRouteChildren: SettingsSubscriptionsRouteChildren = {
+  SettingsSubscriptionsArchiveRoute: SettingsSubscriptionsArchiveRoute,
+  SettingsSubscriptionsIndexRoute: SettingsSubscriptionsIndexRoute,
+}
+
+const SettingsSubscriptionsRouteWithChildren =
+  SettingsSubscriptionsRoute._addFileChildren(
+    SettingsSubscriptionsRouteChildren,
+  )
+
 interface SettingsRouteChildren {
   SettingsCategoriesRoute: typeof SettingsCategoriesRoute
   SettingsSourcesRoute: typeof SettingsSourcesRoute
-  SettingsSubscriptionsRoute: typeof SettingsSubscriptionsRoute
+  SettingsSubscriptionsRoute: typeof SettingsSubscriptionsRouteWithChildren
 }
 
 const SettingsRouteChildren: SettingsRouteChildren = {
   SettingsCategoriesRoute: SettingsCategoriesRoute,
   SettingsSourcesRoute: SettingsSourcesRoute,
-  SettingsSubscriptionsRoute: SettingsSubscriptionsRoute,
+  SettingsSubscriptionsRoute: SettingsSubscriptionsRouteWithChildren,
 }
 
 const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
@@ -288,3 +341,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
