@@ -50,7 +50,6 @@
     "price": "Price",
     "firstDate": "First date",
     "source": "Source",
-    "monthlyTotal": "/ month",
-    "grandMonthlyTotal": "Total per month"
+    "monthlyTotal": "/ month"
   }
 }

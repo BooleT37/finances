@@ -1,5 +1,6 @@
 import { Group } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
+import Decimal from 'decimal.js';
 import { useAtomValue } from 'jotai';
 import {
   MantineReactTable,
@@ -18,6 +19,13 @@ import { useSubscriptionTableColumns } from './columns/useSubscriptionTableColum
 import { flashEffectAtom, flashStateAtom } from './flashSubscription';
 import { RowActions } from './RowActions';
 
+function getRowBgColor(depth: number) {
+  if (depth === 0) {
+    return '#e0e0e0';
+  }
+  return 'transparent';
+}
+
 interface Props {
   mode: 'active' | 'archived';
 }
@@ -34,7 +42,16 @@ export function SubscriptionsTable({ mode }: Props) {
 
   const { id: flashId, fading } = useAtomValue(flashStateAtom);
 
-  const columns = useSubscriptionTableColumns();
+  const grandTotal = useMemo(
+    () =>
+      filtered?.reduce(
+        (sum, s) => sum.plus(s.cost.abs().dividedBy(s.period)),
+        new Decimal(0),
+      ) ?? null,
+    [filtered],
+  );
+
+  const columns = useSubscriptionTableColumns(grandTotal);
 
   const table = useMantineReactTable({
     columns,
@@ -74,8 +91,11 @@ export function SubscriptionsTable({ mode }: Props) {
           'calc(100dvh - var(--app-shell-header-height) - var(--app-shell-padding) * 2 - var(--mantine-spacing-md) * 2 - 36px)',
       },
     },
-    mantinePaperProps: {
-      style: { maxWidth: 640 },
+    mantineTableFooterCellProps: {
+      style: {
+        padding:
+          'var(--table-vertical-spacing) var(--table-horizontal-spacing, var(--mantine-spacing-xs))',
+      },
     },
     mantineTableBodyCellProps: ({ row }) => {
       const isFlashing = !row.getIsGrouped() && row.original.id === flashId;
@@ -85,7 +105,7 @@ export function SubscriptionsTable({ mode }: Props) {
             ? fading
               ? 'transparent'
               : '#fffde7'
-            : undefined,
+            : getRowBgColor(row.depth),
           transition:
             isFlashing && fading ? 'background 1.5s ease-out' : undefined,
         },
@@ -98,7 +118,7 @@ export function SubscriptionsTable({ mode }: Props) {
       return <RowActions row={row} mode={mode} />;
     },
     displayColumnDefOptions: {
-      'mrt-row-actions': { header: '', size: 100 },
+      'mrt-row-actions': { header: '', size: 120 },
       'mrt-row-expand': {
         header: t('columns.name'),
         size: 220,

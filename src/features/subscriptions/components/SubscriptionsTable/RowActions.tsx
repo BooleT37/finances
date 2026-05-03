@@ -112,13 +112,15 @@ export function RowActions({ row, mode }: Props) {
 
   return (
     <Group gap={4}>
-      <ActionIcon
-        variant="subtle"
-        aria-label={t('actions.edit')}
-        onClick={() => open(id)}
-      >
-        <IconEdit size={16} />
-      </ActionIcon>
+      <Tooltip label={t('actions.edit')}>
+        <ActionIcon
+          variant="subtle"
+          aria-label={t('actions.edit')}
+          onClick={() => open(id)}
+        >
+          <IconEdit size={16} />
+        </ActionIcon>
+      </Tooltip>
       {mode === 'active' ? (
         <Tooltip label={t('actions.archive')}>
           <ActionIcon
@@ -140,14 +142,16 @@ export function RowActions({ row, mode }: Props) {
           </ActionIcon>
         </Tooltip>
       )}
-      <ActionIcon
-        variant="subtle"
-        color="red"
-        aria-label={t('actions.delete')}
-        onClick={handleDelete}
-      >
-        <IconTrash size={16} />
-      </ActionIcon>
+      <Tooltip label={t('actions.delete')}>
+        <ActionIcon
+          variant="subtle"
+          color="red"
+          aria-label={t('actions.delete')}
+          onClick={handleDelete}
+        >
+          <IconTrash size={16} />
+        </ActionIcon>
+      </Tooltip>
     </Group>
   );
 }

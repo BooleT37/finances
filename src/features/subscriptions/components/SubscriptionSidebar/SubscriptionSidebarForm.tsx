@@ -205,7 +205,7 @@ export function SubscriptionSidebarForm() {
             form.setFieldValue('cost', val === '' ? '' : String(val))
           }
           error={form.errors.cost}
-          rightSectionWidth={110}
+          rightSectionWidth={200}
           rightSection={
             <Select
               value={form.values.period}

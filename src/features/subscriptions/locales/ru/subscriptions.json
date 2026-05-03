@@ -29,13 +29,13 @@
     "name": "Название",
     "price": "Цена",
     "period": "Период",
-    "periodMonth": "месяц",
+    "periodMonth": "мес.",
     "periodQuarter": "квартал",
     "periodSixMonths": "6 месяцев",
     "periodYear": "год",
     "category": "Категория",
     "firstDate": "Дата начала",
-    "source": "Счёт",
+    "source": "Источник",
     "errors": {
       "nameRequired": "Название обязательно",
       "priceRequired": "Цена обязательна",
@@ -49,8 +49,7 @@
     "name": "Название",
     "price": "Цена",
     "firstDate": "Дата начала",
-    "source": "Счёт",
-    "monthlyTotal": "/ мес.",
-    "grandMonthlyTotal": "Итого в месяц"
+    "source": "Источник",
+    "monthlyTotal": "/ мес."
   }
 }

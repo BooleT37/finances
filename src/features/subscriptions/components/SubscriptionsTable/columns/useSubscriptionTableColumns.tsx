@@ -9,7 +9,9 @@ import { costToString } from '~/shared/utils/costToString';
 
 import type { Subscription } from '../../../schema';
 
-export function useSubscriptionTableColumns(): MRT_ColumnDef<Subscription>[] {
+export function useSubscriptionTableColumns(
+  grandTotal: Decimal | null,
+): MRT_ColumnDef<Subscription>[] {
   const { t } = useTranslation('subscriptions');
   const { data: sourceMap = {} } = useQuery(getSourceMapQueryOptions());
 
@@ -41,15 +43,11 @@ export function useSubscriptionTableColumns(): MRT_ColumnDef<Subscription>[] {
           `${costToString(row.original.cost.abs())} / ${getPeriodLabel(row.original.period)}`,
         AggregatedCell: ({ cell }) =>
           `${costToString(new Decimal(cell.getValue<number>()))} ${t('columns.monthlyTotal')}`,
-        Footer: ({ table }) => {
-          const total = table
-            .getFilteredRowModel()
-            .rows.filter((r) => !r.getIsGrouped())
-            .reduce((sum, r) => sum + r.getValue<number>('price'), 0);
-          if (total === 0) {
+        Footer: () => {
+          if (!grandTotal || grandTotal.isZero()) {
             return null;
           }
-          return `${t('columns.grandMonthlyTotal')}: ${costToString(new Decimal(total))}`;
+          return `${costToString(grandTotal)} ${t('columns.monthlyTotal')}`;
         },
       },
       {
@@ -70,5 +68,5 @@ export function useSubscriptionTableColumns(): MRT_ColumnDef<Subscription>[] {
         },
       },
     ];
-  }, [t, sourceMap]);
+  }, [t, sourceMap, grandTotal]);
 }
