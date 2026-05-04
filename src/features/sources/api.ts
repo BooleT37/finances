@@ -8,6 +8,8 @@ import {
   updateSourceNameSchema,
   type UpdateSourceOrderInput,
   updateSourceOrderSchema,
+  type UpdateSourceParserInput,
+  updateSourceParserSchema,
 } from './schema';
 
 export const fetchAllSources = createServerFn({ method: 'GET' }).handler(
@@ -27,6 +29,18 @@ export const updateSourceName = createServerFn({ method: 'POST' })
     const updated = await prisma.source.update({
       where: { id: data.id },
       data: { name: data.name },
+    });
+    return sourceSchema.encode(updated);
+  });
+
+export const updateSourceParser = createServerFn({ method: 'POST' })
+  .inputValidator((input: UpdateSourceParserInput) =>
+    updateSourceParserSchema.parse(input),
+  )
+  .handler(async ({ data }) => {
+    const updated = await prisma.source.update({
+      where: { id: data.id },
+      data: { parser: data.parser },
     });
     return sourceSchema.encode(updated);
   });

@@ -1,3 +1,5 @@
+import { Group, Select, Text, Tooltip } from '@mantine/core';
+import { IconInfoCircle } from '@tabler/icons-react';
 import {
   MantineReactTable,
   type MRT_ColumnDef,
@@ -8,8 +10,12 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useOrderedSources } from '~/features/sources/facets/orderedSources';
-import { useUpdateSourceName } from '~/features/sources/queries';
+import {
+  useUpdateSourceName,
+  useUpdateSourceParser,
+} from '~/features/sources/queries';
 import type { Source } from '~/features/sources/schema';
+import { ExpensesParser } from '~/generated/prisma/enums';
 
 import { usePersistSourcesOrder } from './hooks/usePersistSourcesOrder';
 
@@ -18,6 +24,15 @@ export function SourcesTable() {
   const orderedSources = useOrderedSources();
   const persistSourcesOrder = usePersistSourcesOrder();
   const updateSourceName = useUpdateSourceName();
+  const updateSourceParser = useUpdateSourceParser();
+
+  const parserOptions = useMemo(
+    () => [
+      { value: '', label: t('parsers.none') },
+      { value: ExpensesParser.VIVID, label: t('parsers.VIVID') },
+    ],
+    [t],
+  );
 
   const columns = useMemo<MRT_ColumnDef<Source>[]>(
     () => [
@@ -34,8 +49,44 @@ export function SourcesTable() {
           },
         }),
       },
+      {
+        accessorKey: 'parser',
+        header: t('columns.parser'),
+        Header: () => (
+          <Group gap={4} wrap="nowrap">
+            <Text size="sm" fw={700}>
+              {t('columns.parser')}
+            </Text>
+            <Tooltip
+              label={t('columns.parserTooltip')}
+              multiline
+              maw={280}
+              withArrow
+            >
+              <IconInfoCircle size={14} style={{ cursor: 'help' }} />
+            </Tooltip>
+          </Group>
+        ),
+        enableEditing: false,
+        size: 160,
+        Cell: ({ row }) => (
+          <Select
+            value={row.original.parser ?? ''}
+            data={parserOptions}
+            size="xs"
+            variant="unstyled"
+            allowDeselect={false}
+            onChange={(val) =>
+              updateSourceParser.mutate({
+                id: row.original.id,
+                parser: val === '' ? null : (val as ExpensesParser),
+              })
+            }
+          />
+        ),
+      },
     ],
-    [t, updateSourceName],
+    [t, updateSourceName, updateSourceParser, parserOptions],
   );
 
   const table = useMantineReactTable({
@@ -53,10 +104,10 @@ export function SourcesTable() {
     layoutMode: 'grid-no-grow',
     initialState: { density: 'xs' },
     state: {
-      columnOrder: ['mrt-row-drag', 'name'],
+      columnOrder: ['mrt-row-drag', 'name', 'parser'],
       isLoading: !orderedSources,
     },
-    mantinePaperProps: { style: { maxWidth: 320 } },
+    mantinePaperProps: { style: { maxWidth: 480 } },
     mantineTableContainerProps: {
       style: {
         maxHeight:

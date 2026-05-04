@@ -7,8 +7,17 @@ import {
 
 import { getUserSettingsQueryOptions } from '~/features/userSettings/queries';
 
-import { fetchAllSources, updateSourceName, updateSourceOrder } from './api';
-import type { UpdateSourceNameInput, UpdateSourceOrderInput } from './schema';
+import {
+  fetchAllSources,
+  updateSourceName,
+  updateSourceOrder,
+  updateSourceParser,
+} from './api';
+import type {
+  UpdateSourceNameInput,
+  UpdateSourceOrderInput,
+  UpdateSourceParserInput,
+} from './schema';
 import { sourceSchema } from './schema';
 
 const sourceKeys = createQueryKeys('sources', {
@@ -30,6 +39,15 @@ export function useUpdateSourceName() {
   return useMutation({
     mutationFn: (input: UpdateSourceNameInput) =>
       updateSourceName({ data: input }),
+    onSuccess: () => queryClient.invalidateQueries(getSourcesQueryOptions()),
+  });
+}
+
+export function useUpdateSourceParser() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: UpdateSourceParserInput) =>
+      updateSourceParser({ data: input }),
     onSuccess: () => queryClient.invalidateQueries(getSourcesQueryOptions()),
   });
 }
