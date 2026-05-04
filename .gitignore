@@ -23,3 +23,6 @@ playwright/.cache/
 playwright/.auth/
 *.png
 .playwright-mcp/
+
+# Local sample data
+data/sample pdfs/
