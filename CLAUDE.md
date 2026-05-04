@@ -95,6 +95,8 @@ Examples:
 
 **Stop before each commit** to let the user verify the changes in the working directory
 
+**Never push** to the remote unless the user explicitly asks for it. Committing locally is fine; `git push` requires an explicit instruction.
+
 ## Testing
 
 Run E2E tests (starts dev server automatically):
