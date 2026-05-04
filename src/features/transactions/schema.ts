@@ -29,6 +29,7 @@ export const transactionSchema = z.object({
   sourceId: z.number().nullable(),
   subscriptionId: z.number().nullable(),
   savingSpendingCategoryId: z.number().nullable(),
+  peHash: z.string().nullable().optional(),
 });
 
 export const transactionWithComponentsSchema = transactionSchema.extend({
@@ -75,3 +76,25 @@ export const updateTransactionSchema = newTransactionSchema.extend({
 });
 
 export type UpdateTransactionInput = z.infer<typeof updateTransactionSchema>;
+
+// ── ImportTransactions (bulk import from PDF) ─────────────────────────────────
+
+export const importTransactionItemSchema = z.object({
+  name: z.string(),
+  cost: z.string(),
+  date: z.string(),
+  categoryId: z.number(),
+  subcategoryId: z.number().nullable().optional(),
+  sourceId: z.number(),
+  peHash: z.string(),
+});
+
+export const importTransactionsSchema = z.array(importTransactionItemSchema);
+export type ImportTransactionItem = z.infer<typeof importTransactionItemSchema>;
+export type ImportTransactionsInput = z.infer<typeof importTransactionsSchema>;
+
+export const parsePdfExpensesSchema = z.object({
+  fileBase64: z.string(),
+  parser: z.enum(['VIVID']),
+});
+export type ParsePdfExpensesInput = z.infer<typeof parsePdfExpensesSchema>;

@@ -86,6 +86,28 @@
     "income": "Доход"
   },
   "import": "Импорт",
+  "importModal": {
+    "title": "Импорт расходов",
+    "source": "Источник",
+    "sourcePlaceholder": "Выберите источник",
+    "noParser": "У этого источника нет парсера. Перейдите в Настройки → Источники для настройки.",
+    "uploadLabel": "Загрузить PDF-выписку",
+    "uploadDescription": "PDF-файл из банковского приложения",
+    "parse": "Разобрать файл",
+    "columns": {
+      "date": "Дата",
+      "type": "Тип",
+      "description": "Описание",
+      "amount": "Сумма (€)",
+      "category": "Категория"
+    },
+    "selectAll": "Выбрать все",
+    "importButton": "Импортировать",
+    "success_one": "Добавлена {{count}} транзакция",
+    "success_few": "Добавлено {{count}} транзакции",
+    "success_many": "Добавлено {{count}} транзакций",
+    "duplicateWarning": "Позиции без галочки уже существуют в базе данных за этот год."
+  },
   "searchPlaceholder": "Найти...",
   "subscription": "Подписка",
   "upcomingSubscription": "Предстоящая подписка",

@@ -86,6 +86,27 @@
     "income": "Income"
   },
   "import": "Import",
+  "importModal": {
+    "title": "Import expenses",
+    "source": "Source",
+    "sourcePlaceholder": "Select source",
+    "noParser": "This source has no parser configured. Go to Settings → Sources to set one up.",
+    "uploadLabel": "Upload PDF statement",
+    "uploadDescription": "PDF file from your banking app",
+    "parse": "Parse file",
+    "columns": {
+      "date": "Date",
+      "type": "Type",
+      "description": "Description",
+      "amount": "Amount (€)",
+      "category": "Category"
+    },
+    "selectAll": "Select all",
+    "importButton": "Import",
+    "success_one": "{{count}} transaction added",
+    "success_other": "{{count}} transactions added",
+    "duplicateWarning": "Unchecked items already exist in the database for this year."
+  },
   "searchPlaceholder": "Search...",
   "subscription": "Subscription",
   "upcomingSubscription": "Upcoming subscription",

@@ -3,16 +3,20 @@ import {
   mutationOptions,
   type QueryClient,
   queryOptions,
+  useMutation,
+  useQueryClient,
 } from '@tanstack/react-query';
 
 import {
   createTransaction,
   deleteTransaction,
   fetchTransactionsByYear,
+  importTransactions,
   updateTransaction,
 } from '~/features/transactions/api';
 
 import {
+  type ImportTransactionsInput,
   type NewTransactionInput,
   transactionWithComponentsSchema,
   type UpdateTransactionInput,
@@ -66,6 +70,16 @@ export const getDeleteTransactionMutationOptions = (
       );
     },
   });
+
+export function useImportTransactions() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: ImportTransactionsInput) =>
+      importTransactions({ data: input }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: transactionsKeys._def }),
+  });
+}
 
 export const getAddTransactionMutationOptions = (
   queryClient: QueryClient,

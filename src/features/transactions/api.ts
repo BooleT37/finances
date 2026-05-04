@@ -1,13 +1,23 @@
+import { randomUUID } from 'node:crypto';
+import { unlinkSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
 import { createServerFn } from '@tanstack/react-start';
 import dayjs from 'dayjs';
 import Decimal from 'decimal.js';
 
 import { prisma } from '~/server/db';
+import { VividPdfExpensesParser } from '~/server/ExpensesParser/VividPdfExpensesParser';
 import { adaptCost } from '~/shared/utils/adaptCost';
 
 import {
+  type ImportTransactionsInput,
+  importTransactionsSchema,
   type NewTransactionInput,
   newTransactionSchema,
+  type ParsePdfExpensesInput,
+  parsePdfExpensesSchema,
   transactionWithComponentsSchema,
   type UpdateTransactionInput,
   updateTransactionSchema,
@@ -180,4 +190,45 @@ export const updateTransaction = createServerFn({ method: 'POST' })
         cost: adaptCost(c.cost, c.category.isIncome),
       })),
     });
+  });
+
+export const parsePdfExpenses = createServerFn({ method: 'POST' })
+  .inputValidator((input: ParsePdfExpensesInput) =>
+    parsePdfExpensesSchema.parse(input),
+  )
+  .handler(async ({ data }) => {
+    const buffer = Buffer.from(data.fileBase64, 'base64');
+    const tmpPath = join(tmpdir(), `${randomUUID()}.pdf`);
+    try {
+      writeFileSync(tmpPath, buffer);
+      const parser = new VividPdfExpensesParser(tmpPath);
+      return await parser.parse();
+    } finally {
+      try {
+        unlinkSync(tmpPath);
+      } catch {
+        // ignore cleanup errors
+      }
+    }
+  });
+
+export const importTransactions = createServerFn({ method: 'POST' })
+  .inputValidator((input: ImportTransactionsInput) =>
+    importTransactionsSchema.parse(input),
+  )
+  .handler(async ({ data }) => {
+    const user = await prisma.user.findFirstOrThrow();
+    const result = await prisma.expense.createMany({
+      data: data.map((item) => ({
+        name: item.name,
+        cost: new Decimal(item.cost).abs(),
+        date: new Date(item.date),
+        categoryId: item.categoryId,
+        subcategoryId: item.subcategoryId ?? null,
+        sourceId: item.sourceId,
+        peHash: item.peHash,
+        userId: user.id,
+      })),
+    });
+    return result.count;
   });
