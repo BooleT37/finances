@@ -103,6 +103,7 @@
     },
     "selectAll": "Выбрать все",
     "importButton": "Импортировать",
+    "success": "Добавлено {{count}} транзакций",
     "success_one": "Добавлена {{count}} транзакция",
     "success_few": "Добавлено {{count}} транзакции",
     "success_many": "Добавлено {{count}} транзакций",

@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { getUserSettingsQueryOptions } from '~/features/userSettings/queries';
 import { transactionSearchAtom } from '~/stores/month';
 
-import { ImportModal } from '../ImportModal';
+import { ImportModal, importModalOpenAtom } from '../ImportModal';
 import { TransactionSidebar } from '../TransactionSidebar/TransactionSidebar';
 import { TransactionSidebarMolecule } from '../TransactionSidebar/transactionSidebarMolecule';
 import { TransactionTable } from '../TransactionsTable/TransactionsTable';
@@ -30,6 +30,7 @@ export function TransactionsPage() {
   const { t } = useTranslation('transactions');
   const { openAtom } = useMolecule(TransactionSidebarMolecule);
   const openSidebar = useSetAtom(openAtom);
+  const setImportOpen = useSetAtom(importModalOpenAtom);
   const [search, setSearch] = useAtom(transactionSearchAtom);
   const [showUpcoming, setShowUpcoming] = useState(false);
   const [groupBySubcategories, setGroupBySubcategories] = useState(false);
@@ -57,12 +58,9 @@ export function TransactionsPage() {
           </Button>
           <Tooltip label={t('import')}>
             <ActionIcon
-              disabled
               variant="default"
               size="lg"
-              onClick={() => {
-                /* TODO: importModal.open() */
-              }}
+              onClick={() => setImportOpen(true)}
             >
               <IconFileImport size={16} />
             </ActionIcon>

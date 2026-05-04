@@ -1,3 +1,168 @@
+import {
+  Button,
+  FileInput,
+  Group,
+  Modal,
+  Select,
+  Stack,
+  Text,
+  Tooltip,
+} from '@mantine/core';
+import { useQuery } from '@tanstack/react-query';
+import dayjs from 'dayjs';
+import Decimal from 'decimal.js';
+import { atom, useAtom } from 'jotai';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { getSourcesQueryOptions } from '~/features/sources/queries';
+import { parsePdfExpenses } from '~/features/transactions/api';
+import type {
+  ParsedExpense,
+  ParsedExpenseFromApi,
+} from '~/features/transactions/parsedExpense';
+
+import { ParsedExpensesModal } from './ParsedExpensesModal/ParsedExpensesModal';
+
+export const importModalOpenAtom = atom(false);
+
+function adaptParsedExpense(e: ParsedExpenseFromApi): ParsedExpense {
+  return {
+    date: dayjs(e.date),
+    type: e.type,
+    description: e.description,
+    amount: new Decimal(e.amount),
+    hash: e.hash,
+  };
+}
+
 export function ImportModal() {
-  return null;
+  const { t } = useTranslation('transactions');
+  const [open, setOpen] = useAtom(importModalOpenAtom);
+  const [selectedSourceId, setSelectedSourceId] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [parsedExpenses, setParsedExpenses] = useState<ParsedExpense[] | null>(
+    null,
+  );
+
+  const { data: sources = [] } = useQuery(getSourcesQueryOptions());
+
+  const sourcesWithParser = sources.filter((s) => s.parser !== null);
+  const sourceOptions = sources.map((s) => ({
+    value: String(s.id),
+    label: s.name,
+    disabled: s.parser === null,
+  }));
+
+  const selectedSource = selectedSourceId
+    ? (sources.find((s) => String(s.id) === selectedSourceId) ?? null)
+    : null;
+
+  const canParse = selectedSource !== null && file !== null && !loading;
+
+  const handleParse = async () => {
+    if (!selectedSource?.parser || !file) {
+      return;
+    }
+    setLoading(true);
+    try {
+      const reader = new FileReader();
+      const base64 = await new Promise<string>((resolve, reject) => {
+        reader.onload = () => {
+          const result = reader.result as string;
+          resolve(result.split(',')[1] ?? '');
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const rows = await parsePdfExpenses({
+        data: { fileBase64: base64, parser: selectedSource.parser as 'VIVID' },
+      });
+      setOpen(false);
+      setParsedExpenses(rows.map(adaptParsedExpense));
+    } catch (err) {
+      console.error('PDF parse error', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setFile(null);
+  };
+
+  const handleReviewClose = () => {
+    setParsedExpenses(null);
+    setSelectedSourceId(null);
+    setFile(null);
+  };
+
+  return (
+    <>
+      <Modal opened={open} onClose={handleClose} title={t('importModal.title')}>
+        <Stack gap="sm">
+          <Select
+            label={t('importModal.source')}
+            placeholder={t('importModal.sourcePlaceholder')}
+            data={sourceOptions}
+            value={selectedSourceId}
+            onChange={setSelectedSourceId}
+            renderOption={({ option }) => {
+              const src = sources.find((s) => String(s.id) === option.value);
+              if (src && !src.parser) {
+                return (
+                  <Tooltip
+                    label={t('importModal.noParser')}
+                    multiline
+                    maw={240}
+                  >
+                    <Text size="sm" c="dimmed">
+                      {option.label}
+                    </Text>
+                  </Tooltip>
+                );
+              }
+              return <Text size="sm">{option.label}</Text>;
+            }}
+          />
+
+          {sourcesWithParser.length === 0 && (
+            <Text size="sm" c="dimmed">
+              {t('importModal.noParser')}
+            </Text>
+          )}
+
+          <FileInput
+            label={t('importModal.uploadLabel')}
+            description={t('importModal.uploadDescription')}
+            accept=".pdf"
+            value={file}
+            onChange={setFile}
+            disabled={!selectedSource}
+          />
+
+          <Group justify="flex-end">
+            <Button
+              onClick={handleParse}
+              loading={loading}
+              disabled={!canParse}
+            >
+              {t('importModal.parse')}
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+
+      {parsedExpenses && selectedSource && (
+        <ParsedExpensesModal
+          parsedExpenses={parsedExpenses}
+          sourceId={selectedSource.id}
+          onClose={handleReviewClose}
+        />
+      )}
+    </>
+  );
 }
