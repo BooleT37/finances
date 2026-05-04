@@ -36,7 +36,12 @@ export function useSubscriptionTableColumns(
       },
       {
         id: 'price',
-        accessorFn: (row) => row.cost.abs().dividedBy(row.period).toNumber(),
+        accessorFn: (row) => {
+          if (row.cost == null) {
+            return 0;
+          }
+          return row.cost.abs().dividedBy(row.period).toNumber();
+        },
         header: t('columns.price'),
         aggregationFn: 'sum',
         Cell: ({ row }) =>

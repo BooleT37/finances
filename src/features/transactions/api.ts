@@ -1,14 +1,8 @@
-import { randomUUID } from 'node:crypto';
-import { unlinkSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-
 import { createServerFn } from '@tanstack/react-start';
 import dayjs from 'dayjs';
 import Decimal from 'decimal.js';
 
 import { prisma } from '~/server/db';
-import { VividPdfExpensesParser } from '~/server/ExpensesParser/VividPdfExpensesParser';
 import { adaptCost } from '~/shared/utils/adaptCost';
 
 import {
@@ -197,6 +191,13 @@ export const parsePdfExpenses = createServerFn({ method: 'POST' })
     parsePdfExpensesSchema.parse(input),
   )
   .handler(async ({ data }) => {
+    const { randomUUID } = await import('node:crypto');
+    const { unlinkSync, writeFileSync } = await import('node:fs');
+    const { tmpdir } = await import('node:os');
+    const { join } = await import('node:path');
+    const { VividPdfExpensesParser } =
+      await import('~/server/ExpensesParser/VividPdfExpensesParser');
+
     const buffer = Buffer.from(data.fileBase64, 'base64');
     const tmpPath = join(tmpdir(), `${randomUUID()}.pdf`);
     try {
