@@ -1,4 +1,4 @@
-import { Checkbox, Grid, TextInput } from '@mantine/core';
+import { Checkbox, TextInput } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import type { UseFormReturnType } from '@mantine/form';
 import dayjs from 'dayjs';
@@ -45,76 +45,54 @@ export function ParsedExpenseRow({ index, form }: Props) {
 
   return (
     <>
-      <Grid.Col
-        span="content"
-        style={{ display: 'flex', alignItems: 'center' }}
-      >
-        <Checkbox
-          checked={selected}
-          onChange={(e) =>
-            form.setFieldValue(
-              `expenses.${index}.selected`,
-              e.currentTarget.checked,
-            )
+      <Checkbox
+        checked={selected}
+        onChange={(e) =>
+          form.setFieldValue(
+            `expenses.${index}.selected`,
+            e.currentTarget.checked,
+          )
+        }
+      />
+
+      <DatePickerInput
+        size="xs"
+        valueFormat="DD.MM.YYYY"
+        disabled={!selected}
+        value={row.date?.toDate() ?? null}
+        onChange={(val) =>
+          form.setFieldValue(`expenses.${index}.date`, val ? dayjs(val) : null)
+        }
+        error={getInputProps('date').error}
+      />
+
+      <TextInput
+        size="xs"
+        disabled
+        variant="unstyled"
+        value={row.type}
+        style={{ paddingLeft: 0 }}
+      />
+
+      <TextInput
+        size="xs"
+        disabled={!selected}
+        {...getInputProps('description')}
+      />
+
+      <TextInput size="xs" disabled={!selected} {...getInputProps('amount')} />
+
+      <TreeSelect
+        treeData={categoryTreeData ?? []}
+        value={row.categorySubcategoryId as CategorySubcategoryId | null}
+        onChange={(val) => {
+          if (val) {
+            parseCategorySubcategoryId(val as CategorySubcategoryId);
           }
-        />
-      </Grid.Col>
-
-      <Grid.Col span={2}>
-        <DatePickerInput
-          size="xs"
-          valueFormat="DD.MM.YYYY"
-          disabled={!selected}
-          value={row.date?.toDate() ?? null}
-          onChange={(val) =>
-            form.setFieldValue(
-              `expenses.${index}.date`,
-              val ? dayjs(val) : null,
-            )
-          }
-          error={getInputProps('date').error}
-        />
-      </Grid.Col>
-
-      <Grid.Col span={2}>
-        <TextInput
-          size="xs"
-          disabled
-          variant="unstyled"
-          value={row.type}
-          style={{ paddingLeft: 0 }}
-        />
-      </Grid.Col>
-
-      <Grid.Col span={3}>
-        <TextInput
-          size="xs"
-          disabled={!selected}
-          {...getInputProps('description')}
-        />
-      </Grid.Col>
-
-      <Grid.Col span={1}>
-        <TextInput
-          size="xs"
-          disabled={!selected}
-          {...getInputProps('amount')}
-        />
-      </Grid.Col>
-
-      <Grid.Col span={3}>
-        <TreeSelect
-          treeData={categoryTreeData ?? []}
-          value={row.categorySubcategoryId as CategorySubcategoryId | null}
-          onChange={(val) => {
-            if (val) {
-              parseCategorySubcategoryId(val as CategorySubcategoryId);
-            }
-            form.setFieldValue(`expenses.${index}.categorySubcategoryId`, val);
-          }}
-          error={getInputProps('categorySubcategoryId').error}
-        />
-      </Grid.Col>
+          form.setFieldValue(`expenses.${index}.categorySubcategoryId`, val);
+        }}
+        error={getInputProps('categorySubcategoryId').error}
+      />
     </>
   );
 }

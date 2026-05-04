@@ -1,12 +1,4 @@
-import {
-  Alert,
-  Button,
-  Checkbox,
-  Grid,
-  Group,
-  Modal,
-  Text,
-} from '@mantine/core';
+import { Alert, Button, Checkbox, Group, Modal, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useQuery } from '@tanstack/react-query';
@@ -172,44 +164,39 @@ export function ParsedExpensesModal({
       )}
 
       <form onSubmit={handleSubmit}>
-        <Grid gutter="xs" align="center">
-          <Grid.Col span="content">
-            <Checkbox
-              checked={allSelected}
-              indeterminate={someSelected && !allSelected}
-              onChange={handleToggleAll}
-            />
-          </Grid.Col>
-          <Grid.Col span={2}>
-            <Text fw={700} size="sm">
-              {t('importModal.columns.date')}
-            </Text>
-          </Grid.Col>
-          <Grid.Col span={2}>
-            <Text fw={700} size="sm">
-              {t('importModal.columns.type')}
-            </Text>
-          </Grid.Col>
-          <Grid.Col span={3}>
-            <Text fw={700} size="sm">
-              {t('importModal.columns.description')}
-            </Text>
-          </Grid.Col>
-          <Grid.Col span={1}>
-            <Text fw={700} size="sm">
-              {t('importModal.columns.amount')}
-            </Text>
-          </Grid.Col>
-          <Grid.Col span={3}>
-            <Text fw={700} size="sm">
-              {t('importModal.columns.category')}
-            </Text>
-          </Grid.Col>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '24px 2fr 3fr 8fr 100px 4fr',
+            gap: '8px 12px',
+            alignItems: 'center',
+          }}
+        >
+          <Checkbox
+            checked={allSelected}
+            indeterminate={someSelected && !allSelected}
+            onChange={handleToggleAll}
+          />
+          <Text fw={700} size="sm">
+            {t('importModal.columns.date')}
+          </Text>
+          <Text fw={700} size="sm">
+            {t('importModal.columns.type')}
+          </Text>
+          <Text fw={700} size="sm">
+            {t('importModal.columns.description')}
+          </Text>
+          <Text fw={700} size="sm">
+            {t('importModal.columns.amount')}
+          </Text>
+          <Text fw={700} size="sm">
+            {t('importModal.columns.category')}
+          </Text>
 
           {expenses.map((_, index) => (
             <ParsedExpenseRow key={index} index={index} form={form} />
           ))}
-        </Grid>
+        </div>
 
         <Group justify="flex-end" mt="md">
           <Button
