@@ -71,7 +71,7 @@ export function ParsedExpenseRow({ index, form }: Props) {
         disabled
         variant="unstyled"
         value={row.type}
-        style={{ paddingLeft: 0 }}
+        styles={{ input: { paddingInline: 'var(--mantine-spacing-xs)' } }}
       />
 
       <TextInput
@@ -92,6 +92,7 @@ export function ParsedExpenseRow({ index, form }: Props) {
           form.setFieldValue(`expenses.${index}.categorySubcategoryId`, val);
         }}
         error={getInputProps('categorySubcategoryId').error}
+        disabled={!selected}
       />
     </>
   );

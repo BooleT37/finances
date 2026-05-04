@@ -4,8 +4,8 @@ import { notifications } from '@mantine/notifications';
 import { useQuery } from '@tanstack/react-query';
 import { type Dayjs } from 'dayjs';
 import Decimal from 'decimal.js';
-import { useAtomValue } from 'jotai';
-import { useMemo } from 'react';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -17,6 +17,7 @@ import { getTransactionsQueryOptions } from '~/features/transactions/queries';
 import { useImportTransactions } from '~/features/transactions/queries';
 import { selectedYearAtom } from '~/stores/month';
 
+import { insertedTransactionsAtom } from '../TransactionsTable/flashTransaction';
 import { ParsedExpenseRow } from './ParsedExpenseRow';
 
 export interface ParsedExpenseRowValues {
@@ -31,6 +32,18 @@ export interface ParsedExpenseRowValues {
 export interface ParsedExpenseFormValues {
   expenses: ParsedExpenseRowValues[];
 }
+
+const gridColumns = '24px 2fr 3fr 8fr 100px 4fr';
+const gridGap = '8px 12px';
+
+const baseStickyHeaderRowStyle: React.CSSProperties = {
+  gridColumn: '1 / -1',
+  position: 'sticky',
+  top: 0,
+  background: 'var(--mantine-color-body)',
+  zIndex: 1,
+  paddingBlock: 4,
+};
 
 interface Props {
   parsedExpenses: ParsedExpense[];
@@ -49,6 +62,7 @@ export function ParsedExpensesModal({
     getTransactionsQueryOptions(selectedYear),
   );
   const importTransactions = useImportTransactions();
+  const setInsertedTransactions = useSetAtom(insertedTransactionsAtom);
 
   const isDuplicateFn = useMemo(
     () => (e: ParsedExpense) =>
@@ -78,6 +92,9 @@ export function ParsedExpensesModal({
   }, [parsedExpenses, isDuplicateFn]);
 
   const form = useForm<ParsedExpenseFormValues>({ initialValues });
+
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [duplicateAlertHidden, setDuplicateAlertHidden] = useState(false);
 
   const expenses = form.values.expenses;
   const allSelected = expenses.length > 0 && expenses.every((e) => e.selected);
@@ -147,58 +164,119 @@ export function ParsedExpensesModal({
       };
     });
 
-    const count = await importTransactions.mutateAsync(items);
+    const created = await importTransactions.mutateAsync(items);
+    setInsertedTransactions(created);
     notifications.show({
       color: 'green',
-      message: t('importModal.success', { count }),
+      message: t('importModal.success', { count: created.length }),
     });
     onClose();
   });
 
   return (
-    <Modal opened onClose={onClose} title={t('importModal.title')} size={1200}>
-      {hasDuplicates && (
-        <Alert color="yellow" mb="md" p="xs">
+    <Modal
+      opened
+      onClose={onClose}
+      title={t('importModal.title')}
+      size={1200}
+      centered
+      styles={{
+        content: { display: 'flex', flexDirection: 'column' },
+        body: {
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+          minHeight: 0,
+        },
+      }}
+    >
+      {hasDuplicates && !duplicateAlertHidden && (
+        <Alert
+          color="yellow"
+          mb="md"
+          p="xs"
+          style={{ flexShrink: 0 }}
+          withCloseButton
+          onClose={() => setDuplicateAlertHidden(true)}
+        >
           {t('importModal.duplicateWarning')}
         </Alert>
       )}
 
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={handleSubmit}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+          minHeight: 0,
+        }}
+      >
         <div
+          onScroll={(e) => {
+            setIsScrolled(e.currentTarget.scrollTop > 0);
+          }}
           style={{
-            display: 'grid',
-            gridTemplateColumns: '24px 2fr 3fr 8fr 100px 4fr',
-            gap: '8px 12px',
-            alignItems: 'center',
+            flex: 1,
+            overflowY: 'auto',
+            minHeight: 0,
           }}
         >
-          <Checkbox
-            checked={allSelected}
-            indeterminate={someSelected && !allSelected}
-            onChange={handleToggleAll}
-          />
-          <Text fw={700} size="sm">
-            {t('importModal.columns.date')}
-          </Text>
-          <Text fw={700} size="sm">
-            {t('importModal.columns.type')}
-          </Text>
-          <Text fw={700} size="sm">
-            {t('importModal.columns.description')}
-          </Text>
-          <Text fw={700} size="sm">
-            {t('importModal.columns.amount')}
-          </Text>
-          <Text fw={700} size="sm">
-            {t('importModal.columns.category')}
-          </Text>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: gridColumns,
+              gap: gridGap,
+              alignItems: 'center',
+            }}
+          >
+            <div
+              style={{
+                ...baseStickyHeaderRowStyle,
+                boxShadow: isScrolled
+                  ? '0 4px 6px -3px rgba(0, 0, 0, 0.12)'
+                  : 'none',
+                transition: 'box-shadow 150ms ease',
+              }}
+            >
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: gridColumns,
+                  gap: gridGap,
+                  alignItems: 'center',
+                }}
+              >
+                <Checkbox
+                  checked={allSelected}
+                  indeterminate={someSelected && !allSelected}
+                  onChange={handleToggleAll}
+                />
+                <Text fw={700} size="sm">
+                  {t('importModal.columns.date')}
+                </Text>
+                <Text fw={700} size="sm">
+                  {t('importModal.columns.type')}
+                </Text>
+                <Text fw={700} size="sm">
+                  {t('importModal.columns.description')}
+                </Text>
+                <Text fw={700} size="sm">
+                  {t('importModal.columns.amount')}
+                </Text>
+                <Text fw={700} size="sm">
+                  {t('importModal.columns.category')}
+                </Text>
+              </div>
+            </div>
 
-          {expenses.map((_, index) => (
-            <ParsedExpenseRow key={index} index={index} form={form} />
-          ))}
+            {expenses.map((_, index) => (
+              <ParsedExpenseRow key={index} index={index} form={form} />
+            ))}
+          </div>
         </div>
 
-        <Group justify="flex-end" mt="md">
+        <Group justify="flex-end" mt="md" style={{ flexShrink: 0 }}>
           <Button
             type="submit"
             loading={importTransactions.isPending}

@@ -219,7 +219,7 @@ export const importTransactions = createServerFn({ method: 'POST' })
   )
   .handler(async ({ data }) => {
     const user = await prisma.user.findFirstOrThrow();
-    const result = await prisma.expense.createMany({
+    const created = await prisma.expense.createManyAndReturn({
       data: data.map((item) => ({
         name: item.name,
         cost: new Decimal(item.cost).abs(),
@@ -230,6 +230,16 @@ export const importTransactions = createServerFn({ method: 'POST' })
         peHash: item.peHash,
         userId: user.id,
       })),
+      include: { category: true },
     });
-    return result.count;
+
+    return created.map((tx) =>
+      transactionWithComponentsSchema.encode({
+        ...tx,
+        cost: adaptCost(tx.cost, tx.category.isIncome),
+        date: dayjs(tx.date),
+        actualDate: tx.actualDate ? dayjs(tx.actualDate) : null,
+        components: [],
+      }),
+    );
   });

@@ -1,13 +1,4 @@
-import {
-  Button,
-  FileInput,
-  Group,
-  Modal,
-  Select,
-  Stack,
-  Text,
-  Tooltip,
-} from '@mantine/core';
+import { Button, FileInput, Group, Modal, Select, Stack } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import Decimal from 'decimal.js';
@@ -49,10 +40,9 @@ export function ImportModal() {
   const { data: sources = [] } = useQuery(getSourcesQueryOptions());
 
   const sourcesWithParser = sources.filter((s) => s.parser !== null);
-  const sourceOptions = sources.map((s) => ({
+  const sourceOptions = sourcesWithParser.map((s) => ({
     value: String(s.id),
     label: s.name,
-    disabled: s.parser === null,
   }));
 
   const selectedSource = selectedSourceId
@@ -110,30 +100,7 @@ export function ImportModal() {
             data={sourceOptions}
             value={selectedSourceId}
             onChange={setSelectedSourceId}
-            renderOption={({ option }) => {
-              const src = sources.find((s) => String(s.id) === option.value);
-              if (src && !src.parser) {
-                return (
-                  <Tooltip
-                    label={t('importModal.noParser')}
-                    multiline
-                    maw={240}
-                  >
-                    <Text size="sm" c="dimmed">
-                      {option.label}
-                    </Text>
-                  </Tooltip>
-                );
-              }
-              return <Text size="sm">{option.label}</Text>;
-            }}
           />
-
-          {sourcesWithParser.length === 0 && (
-            <Text size="sm" c="dimmed">
-              {t('importModal.noParser')}
-            </Text>
-          )}
 
           <FileInput
             label={t('importModal.uploadLabel')}

@@ -74,10 +74,22 @@ export const getDeleteTransactionMutationOptions = (
 export function useImportTransactions() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (input: ImportTransactionsInput) =>
-      importTransactions({ data: input }),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: transactionsKeys._def }),
+    mutationFn: async (input: ImportTransactionsInput) => {
+      const wires = await importTransactions({ data: input });
+      return wires.map((w) => transactionWithComponentsSchema.decode(w));
+    },
+    onSuccess: async (created) => {
+      const years = new Set(created.map((tx) => tx.date.year()));
+      for (const year of years) {
+        queryClient.setQueryData(
+          getTransactionsQueryOptions(year).queryKey,
+          (old) => {
+            const additions = created.filter((tx) => tx.date.year() === year);
+            return old ? [...old, ...additions] : additions;
+          },
+        );
+      }
+    },
   });
 }
 

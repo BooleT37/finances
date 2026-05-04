@@ -5,10 +5,17 @@ import type { MRT_TableInstance } from 'mantine-react-table';
 import type { Transaction } from '../../schema';
 import type { TransactionTableItem } from './TransactionsTable.types';
 
-export const insertedTransactionAtom = atom<Transaction | null>(null);
+export const insertedTransactionsAtom = atom<Transaction[] | null>(null);
 
-export const flashStateAtom = atom<{ id: number | null; fading: boolean }>({
-  id: null,
+export const insertedTransactionAtom = atom(
+  null,
+  (_get, set, tx: Transaction) => {
+    set(insertedTransactionsAtom, [tx]);
+  },
+);
+
+export const flashStateAtom = atom<{ ids: Set<number>; fading: boolean }>({
+  ids: new Set<number>(),
   fading: false,
 });
 
@@ -50,18 +57,28 @@ export const flashEffectAtom = (
   table: MRT_TableInstance<TransactionTableItem>,
 ) =>
   atomEffect((get, set) => {
-    const tx = get(insertedTransactionAtom);
-    if (!tx) {
+    const txs = get(insertedTransactionsAtom);
+    if (!txs || txs.length === 0) {
       return;
     }
-    expandCategoryRow(table, tx.categoryId);
-    set(flashStateAtom, { id: tx.id, fading: false });
-    setTimeout(() => scrollToRow(table, tx.id), 50);
+    const ids = new Set(txs.map((tx) => tx.id));
+    const categoryIds = new Set(txs.map((tx) => tx.categoryId));
+    for (const categoryId of categoryIds) {
+      expandCategoryRow(table, categoryId);
+    }
+    set(flashStateAtom, { ids, fading: false });
+    setTimeout(() => {
+      const firstId = txs[0]?.id;
+      if (firstId !== undefined) {
+        scrollToRow(table, firstId);
+      }
+    }, 50);
     const fadeTimer = setTimeout(() => {
-      set(flashStateAtom, { id: tx.id, fading: true });
+      set(flashStateAtom, { ids, fading: true });
     }, 300);
     const clearTimer = setTimeout(() => {
-      set(flashStateAtom, { id: null, fading: false });
+      set(flashStateAtom, { ids: new Set<number>(), fading: false });
+      set(insertedTransactionsAtom, null);
     }, 1800);
     return () => {
       clearTimeout(fadeTimer);

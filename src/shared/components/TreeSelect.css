@@ -136,8 +136,14 @@
 
 /* ── Disabled state ── */
 .rc-tree-select-disabled .rc-tree-select-selector {
-  opacity: 0.6;
+  background: var(--mantine-color-default-hover);
+  color: var(--mantine-color-disabled);
   cursor: not-allowed;
+}
+
+.rc-tree-select-disabled .rc-tree-select-selection-search-input {
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 /* ══════════════════════════════════════════════════════════

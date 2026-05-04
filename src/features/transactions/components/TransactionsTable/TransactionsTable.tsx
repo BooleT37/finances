@@ -45,7 +45,7 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
   const { sortAllCategoriesById } = useSortAllCategoriesById();
   const sortSubcategories = useSortSubcategories();
 
-  const { id: flashId, fading } = useAtomValue(flashStateAtom);
+  const { ids: flashIds, fading } = useAtomValue(flashStateAtom);
 
   const table = useMantineReactTable({
     columns,
@@ -167,7 +167,7 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
     },
     localization: MRT_Localization_RU,
     mantineTableBodyCellProps: ({ row }) => {
-      const isFlashing = !row.getIsGrouped() && row.original.id === flashId;
+      const isFlashing = !row.getIsGrouped() && flashIds.has(row.original.id);
       return {
         style: {
           color: row.original.isUpcomingSubscription ? 'darkgray' : undefined,
@@ -177,7 +177,7 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
               : '#fffde7'
             : getRowBgColor(row.depth),
           transition:
-            isFlashing && fading ? 'background 1.5s ease-out' : undefined,
+            isFlashing && fading ? 'background 3s ease-out' : undefined,
           padding: '8px',
         },
       };

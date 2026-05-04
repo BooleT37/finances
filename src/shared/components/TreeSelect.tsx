@@ -17,6 +17,7 @@ interface Props<T extends string> {
   placeholder?: string;
   notFoundContent?: string;
   error?: ReactNode;
+  disabled?: boolean;
 }
 
 export function TreeSelect<T extends string>({
@@ -26,6 +27,7 @@ export function TreeSelect<T extends string>({
   placeholder,
   notFoundContent,
   error,
+  disabled,
 }: Props<T>) {
   return (
     <div>
@@ -43,6 +45,7 @@ export function TreeSelect<T extends string>({
         treeDefaultExpandAll
         allowClear
         notFoundContent={notFoundContent}
+        disabled={disabled}
       />
       {error && (
         <Text size="xs" c="red" mt={4}>
