@@ -191,6 +191,32 @@ export const parsePdfExpenses = createServerFn({ method: 'POST' })
     parsePdfExpensesSchema.parse(input),
   )
   .handler(async ({ data }) => {
+    // pdfjs-dist needs DOMMatrix on globalThis (not available in Vercel's
+    // Node.js runtime). Polyfill before importing pdfjs.
+    if (typeof globalThis.DOMMatrix === 'undefined') {
+      const { default: DOMMatrixPolyfill } = await import('@thednp/dommatrix');
+      globalThis.DOMMatrix = DOMMatrixPolyfill as unknown as typeof DOMMatrix;
+    }
+
+    // Nitro flattens pdfjs-dist into _libs/ and doesn't ship pdf.worker.mjs
+    // alongside, so pdfjs's relative dynamic import to "./pdf.worker.mjs"
+    // fails. Bake the worker source via Vite's ?raw, write it to /tmp at
+    // runtime, and point GlobalWorkerOptions.workerSrc at it. The cached
+    // pdfjs module instance is reused later by pdf-data-parser.
+    const workerModule =
+      (await import('pdfjs-dist/legacy/build/pdf.worker.mjs?raw')) as {
+        default: string;
+      };
+    const fs = await import('node:fs');
+    const tmpWorkerPath = '/tmp/pdf.worker.mjs';
+    if (!fs.existsSync(tmpWorkerPath)) {
+      fs.writeFileSync(tmpWorkerPath, workerModule.default);
+    }
+    const pdfjs = (await import('pdfjs-dist/legacy/build/pdf.mjs')) as {
+      GlobalWorkerOptions: { workerSrc: string };
+    };
+    pdfjs.GlobalWorkerOptions.workerSrc = tmpWorkerPath;
+
     const { randomUUID } = await import('node:crypto');
     const { unlinkSync, writeFileSync } = await import('node:fs');
     const { tmpdir } = await import('node:os');
