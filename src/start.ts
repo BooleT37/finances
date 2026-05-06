@@ -1,9 +1,15 @@
 import { createStart } from '@tanstack/react-start';
 
-import { errorNotificationMiddleware } from './middleware';
+import {
+  errorNotificationMiddleware,
+  posthogTrackingMiddleware,
+} from './middleware';
 
 export const startInstance = createStart(() => {
   return {
-    functionMiddleware: [errorNotificationMiddleware],
+    functionMiddleware: [
+      errorNotificationMiddleware,
+      posthogTrackingMiddleware,
+    ],
   };
 });

@@ -64,6 +64,7 @@
     "object-hash": "^3.0.0",
     "pdf-data-parser": "^1.2.21",
     "pg": "^8.18.0",
+    "posthog-node": "^5.33.3",
     "ramda": "^0.32.0",
     "rc-tree-select": "^5.27.0",
     "react": "^19.0.0",

@@ -130,6 +130,16 @@ Uses **react-i18next** with feature-colocated translations. Each feature owns it
 
 Types are inferred automatically via `as const` — no manual type maintenance needed. See [docs/project-structure.md](docs/project-structure.md) for the full pattern.
 
+## Analytics (PostHog)
+
+All `createServerFn` POST mutations are auto-captured via the global `posthogTrackingMiddleware` registered in [src/start.ts](src/start.ts). Events are named `serverfn_<functionName>` (e.g. `serverfn_createTransaction`) and logged with `{ input, timestamp, success: true, environment }`. The `environment` field is `VERCEL_ENV` on Vercel (`production` / `preview` / `development`) or `NODE_ENV` locally — filter by it in PostHog to separate prod traffic from preview/dev noise.
+
+Required env vars (set on Vercel for production, in `.env` for local):
+- `POSTHOG_API_KEY` — Project API key
+- `POSTHOG_HOST` — defaults to `https://eu.i.posthog.com`
+
+Currently `distinctId` is hardcoded (matches the value used in `finances-t3` so events keep flowing under the same user). Replace it with the real session user id once auth is implemented.
+
 ## Authentication
 
 **Not yet implemented.** The `Expense` (and other) Prisma models have a required `userId` field, but no auth system is in place yet. Current workarounds:
