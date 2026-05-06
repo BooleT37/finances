@@ -46,6 +46,7 @@ export function ParsedExpenseRow({ index, form }: Props) {
   return (
     <div style={{ display: 'contents' }} data-expense-row={index}>
       <Checkbox
+        style={{ marginTop: 5 }}
         checked={selected}
         onChange={(e) =>
           form.setFieldValue(

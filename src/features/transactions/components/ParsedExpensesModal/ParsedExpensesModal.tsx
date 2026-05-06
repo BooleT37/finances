@@ -268,7 +268,7 @@ export function ParsedExpensesModal({
               display: 'grid',
               gridTemplateColumns: gridColumns,
               gap: gridGap,
-              alignItems: 'center',
+              alignItems: 'start',
             }}
           >
             <div
