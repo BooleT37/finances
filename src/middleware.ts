@@ -28,7 +28,38 @@ const HARDCODED_DISTINCT_ID = 'clg6kpbtn0000mr081ntz0f8i';
 export const posthogTrackingMiddleware = createMiddleware({
   type: 'function',
 }).server(async ({ next, method, serverFnMeta, data }) => {
-  const result = await next();
+  const environment =
+    process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? 'unknown';
+  const commonProps = {
+    name: serverFnMeta.name,
+    input: data,
+    timestamp: new Date().toISOString(),
+    environment,
+  };
+
+  let result: Awaited<ReturnType<typeof next>>;
+  try {
+    result = await next();
+  } catch (error) {
+    console.error(`[serverfn] ${serverFnMeta.name} failed:`, error);
+    if (method === 'POST' && posthog) {
+      try {
+        posthog.capture({
+          distinctId: HARDCODED_DISTINCT_ID,
+          event: `serverfn_${serverFnMeta.name}`,
+          properties: {
+            ...commonProps,
+            success: false,
+            error: error instanceof Error ? error.message : String(error),
+          },
+        });
+      } catch (phError) {
+        console.error('PostHog capture failed:', phError);
+      }
+    }
+    throw error;
+  }
+
   if (method !== 'POST' || !posthog) {
     return result;
   }
@@ -36,14 +67,7 @@ export const posthogTrackingMiddleware = createMiddleware({
     posthog.capture({
       distinctId: HARDCODED_DISTINCT_ID,
       event: `serverfn_${serverFnMeta.name}`,
-      properties: {
-        name: serverFnMeta.name,
-        input: data,
-        timestamp: new Date().toISOString(),
-        success: true,
-        environment:
-          process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? 'unknown',
-      },
+      properties: { ...commonProps, success: true },
     });
   } catch (error) {
     console.error('PostHog capture failed:', error);
