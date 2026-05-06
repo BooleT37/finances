@@ -44,7 +44,7 @@ export function ParsedExpenseRow({ index, form }: Props) {
     form.getInputProps(`expenses.${index}.${field}`);
 
   return (
-    <>
+    <div style={{ display: 'contents' }} data-expense-row={index}>
       <Checkbox
         checked={selected}
         onChange={(e) =>
@@ -94,6 +94,6 @@ export function ParsedExpenseRow({ index, form }: Props) {
         error={getInputProps('categorySubcategoryId').error}
         disabled={!selected}
       />
-    </>
+    </div>
   );
 }

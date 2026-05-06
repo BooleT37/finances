@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { type Dayjs } from 'dayjs';
 import Decimal from 'decimal.js';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -93,6 +93,7 @@ export function ParsedExpensesModal({
 
   const form = useForm<ParsedExpenseFormValues>({ initialValues });
 
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [duplicateAlertHidden, setDuplicateAlertHidden] = useState(false);
 
@@ -101,6 +102,34 @@ export function ParsedExpensesModal({
   const someSelected = expenses.some((e) => e.selected);
   const noneSelected = !someSelected;
 
+  const scrollToFirstError = useCallback((firstErrorIndex: number) => {
+    if (!scrollContainerRef.current) {
+      return;
+    }
+    const container = scrollContainerRef.current;
+    const rowEl = container.querySelector<HTMLElement>(
+      `[data-expense-row="${firstErrorIndex}"]`,
+    );
+    const targetEl = rowEl?.firstElementChild as HTMLElement | null;
+    if (!targetEl) {
+      return;
+    }
+    const containerRect = container.getBoundingClientRect();
+    const elRect = targetEl.getBoundingClientRect();
+    const stickyHeader = container.querySelector<HTMLElement>(
+      '[data-sticky-header]',
+    );
+    const headerHeight = stickyHeader?.getBoundingClientRect().height ?? 0;
+    const visibleTop = containerRect.top + headerHeight;
+    const visibleBottom = containerRect.bottom;
+    const scrollPadding = 8;
+    if (elRect.top < visibleTop) {
+      container.scrollTop += elRect.top - visibleTop - scrollPadding;
+    } else if (elRect.bottom > visibleBottom) {
+      container.scrollTop += elRect.bottom - visibleBottom + scrollPadding;
+    }
+  }, []);
+
   const handleToggleAll = () => {
     form.setFieldValue(
       'expenses',
@@ -108,7 +137,9 @@ export function ParsedExpensesModal({
     );
   };
 
-  const handleSubmit = form.onSubmit(async (values) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const values = form.values;
     const selected = values.expenses.filter((e) => e.selected);
 
     const invalid = selected.some(
@@ -141,6 +172,15 @@ export function ParsedExpensesModal({
           }),
         ),
       );
+
+      const firstErrorIndex = values.expenses.findIndex(
+        (e) =>
+          e.selected && (!e.date || !e.description || !e.categorySubcategoryId),
+      );
+      if (firstErrorIndex >= 0) {
+        scrollToFirstError(firstErrorIndex);
+      }
+
       return;
     }
 
@@ -171,7 +211,7 @@ export function ParsedExpensesModal({
       message: t('importModal.success', { count: created.length }),
     });
     onClose();
-  });
+  };
 
   return (
     <Modal
@@ -213,6 +253,7 @@ export function ParsedExpensesModal({
         }}
       >
         <div
+          ref={scrollContainerRef}
           onScroll={(e) => {
             setIsScrolled(e.currentTarget.scrollTop > 0);
           }}
@@ -231,6 +272,7 @@ export function ParsedExpensesModal({
             }}
           >
             <div
+              data-sticky-header
               style={{
                 ...baseStickyHeaderRowStyle,
                 boxShadow: isScrolled
