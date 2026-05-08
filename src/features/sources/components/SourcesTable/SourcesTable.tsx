@@ -8,6 +8,7 @@ import { TableFlash, useTableFlash } from '~/shared/hooks/useTableFlash';
 
 import { useSourcesTableColumns } from './columns/useSourcesTableColumns';
 import { usePersistSourcesOrder } from './hooks/usePersistSourcesOrder';
+import { RowActions } from './RowActions';
 
 export function SourcesTable() {
   const orderedSources = useOrderedSources();
@@ -23,6 +24,8 @@ export function SourcesTable() {
     enableEditing: true,
     editDisplayMode: 'cell',
     enableRowOrdering: true,
+    enableRowActions: true,
+    positionActionsColumn: 'last',
     enableSorting: false,
     enableTopToolbar: false,
     enableBottomToolbar: false,
@@ -32,7 +35,7 @@ export function SourcesTable() {
     layoutMode: 'grid-no-grow',
     initialState: { density: 'xs' },
     state: {
-      columnOrder: ['mrt-row-drag', 'name', 'parser'],
+      columnOrder: ['mrt-row-drag', 'name', 'parser', 'mrt-row-actions'],
       isLoading: !orderedSources,
     },
     mantinePaperProps: { style: { maxWidth: 480 } },
@@ -44,10 +47,12 @@ export function SourcesTable() {
     },
     displayColumnDefOptions: {
       'mrt-row-drag': { header: '', size: 40 },
+      'mrt-row-actions': { header: '', size: 60 },
     },
     mantineRowDragHandleProps: ({ table: tbl }) => ({
       onDragEnd: () => persistSourcesOrder(tbl),
     }),
+    renderRowActions: ({ row }) => <RowActions row={row} />,
     mantineTableBodyCellProps: ({ row }) => ({
       style: withFlashingStyles(row),
     }),

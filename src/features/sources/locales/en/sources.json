@@ -10,5 +10,16 @@
   "parsers": {
     "none": "None",
     "VIVID": "Vivid"
+  },
+  "actions": {
+    "delete": "Delete"
+  },
+  "delete": {
+    "confirmTitle": "Delete source",
+    "confirmMessage": "Delete \"{{name}}\"? Transactions and subscriptions referencing this source will keep their data but lose the source link.",
+    "confirm": "Delete",
+    "cancel": "Cancel",
+    "successMessage": "Source \"{{name}}\" deleted",
+    "errorMessage": "Failed to delete source"
   }
 }

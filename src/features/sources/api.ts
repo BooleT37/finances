@@ -79,3 +79,26 @@ export const updateSourceOrder = createServerFn({ method: 'POST' })
       data: { sourcesOrder: data.sourceIds },
     });
   });
+
+export const deleteSource = createServerFn({ method: 'POST' })
+  .inputValidator((id: number) => id)
+  .handler(async ({ data: id }) => {
+    await prisma.$transaction(async (tx) => {
+      // Subscription/Expense.sourceId use onDelete: SetNull, so no need to
+      // null them out manually.
+      await tx.source.delete({ where: { id } });
+
+      const user = await tx.user.findFirstOrThrow();
+      const settings = await tx.userSetting.findFirst({
+        where: { userId: user.id },
+      });
+      if (settings) {
+        await tx.userSetting.update({
+          where: { userId: user.id },
+          data: {
+            sourcesOrder: settings.sourcesOrder.filter((sId) => sId !== id),
+          },
+        });
+      }
+    });
+  });
