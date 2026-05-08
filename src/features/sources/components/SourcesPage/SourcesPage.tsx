@@ -3,18 +3,25 @@ import { IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 
 import { useCreateSource } from '~/features/sources/queries';
+import { TableFlash, useFlashTrigger } from '~/shared/hooks/useTableFlash';
 
 import { SourcesTable } from '../SourcesTable/SourcesTable';
 
 export function SourcesPage() {
   const { t } = useTranslation('sources');
   const createSource = useCreateSource();
+  const triggerFlash = useFlashTrigger(TableFlash.Sources);
 
   return (
     <Stack gap="md">
       <Button
         leftSection={<IconPlus size={16} />}
-        onClick={() => createSource.mutate({ name: t('newSourceName') })}
+        onClick={() =>
+          createSource.mutate(
+            { name: t('newSourceName') },
+            { onSuccess: (source) => triggerFlash([source.id]) },
+          )
+        }
         loading={createSource.isPending}
         style={{ alignSelf: 'flex-start' }}
       >

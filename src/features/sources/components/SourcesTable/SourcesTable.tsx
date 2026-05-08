@@ -6,7 +6,7 @@ import {
   useMantineReactTable,
 } from 'mantine-react-table';
 import { MRT_Localization_RU } from 'mantine-react-table/locales/ru/index.cjs';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useOrderedSources } from '~/features/sources/facets/orderedSources';
@@ -16,6 +16,7 @@ import {
 } from '~/features/sources/queries';
 import type { Source } from '~/features/sources/schema';
 import { ExpensesParser } from '~/generated/prisma/enums';
+import { TableFlash, useTableFlash } from '~/shared/hooks/useTableFlash';
 
 import { usePersistSourcesOrder } from './hooks/usePersistSourcesOrder';
 
@@ -25,6 +26,9 @@ export function SourcesTable() {
   const persistSourcesOrder = usePersistSourcesOrder();
   const updateSourceName = useUpdateSourceName();
   const updateSourceParser = useUpdateSourceParser();
+  const { withFlashingStyles, setTable } = useTableFlash<Source>(
+    TableFlash.Sources,
+  );
 
   const parserOptions = useMemo(
     () => [
@@ -120,7 +124,14 @@ export function SourcesTable() {
     mantineRowDragHandleProps: ({ table: tbl }) => ({
       onDragEnd: () => persistSourcesOrder(tbl),
     }),
+    mantineTableBodyCellProps: ({ row }) => ({
+      style: withFlashingStyles(row),
+    }),
     localization: MRT_Localization_RU,
+  });
+
+  useEffect(() => {
+    setTable(table);
   });
 
   return <MantineReactTable table={table} />;

@@ -11,6 +11,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 export enum TableFlash {
   Categories = 'categories',
+  Sources = 'sources',
   Subscriptions = 'subscriptions',
   Transactions = 'transactions',
 }
