@@ -69,7 +69,7 @@ export function useTableFlash<TData extends MRT_RowData & { id: number }>(
   tableName: TableFlash,
   options?: { fadeDuration?: number },
 ) {
-  const { fadeDuration = 1500 } = options ?? {};
+  const { fadeDuration = 3000 } = options ?? {};
 
   const tableRef = useRef<MRT_TableInstance<TData> | null>(null);
 
