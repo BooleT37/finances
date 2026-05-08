@@ -1,5 +1,5 @@
 import { Group, Text, Tooltip } from '@mantine/core';
-import { IconCoinFilled, IconList } from '@tabler/icons-react';
+import { IconList, IconRepeat } from '@tabler/icons-react';
 import type Decimal from 'decimal.js';
 import { useTranslation } from 'react-i18next';
 
@@ -42,7 +42,7 @@ export function CostCellView({
               : t('subscription')
           }
         >
-          <IconCoinFilled
+          <IconRepeat
             size={14}
             color="gray"
             role="img"
