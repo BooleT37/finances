@@ -1,5 +1,4 @@
 import { Group } from '@mantine/core';
-import { useAtomValue } from 'jotai';
 import {
   MantineReactTable,
   MRT_ExpandAllButton,
@@ -8,7 +7,7 @@ import {
 } from 'mantine-react-table';
 // important to import cjs file directly: https://github.com/KevinVandy/mantine-react-table/issues/390#issuecomment-2348339328
 import { MRT_Localization_RU } from 'mantine-react-table/locales/ru/index.cjs';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { NameWithOptionalIcon } from '~/features/categories/components/NameWithOptionalIcon';
@@ -16,9 +15,9 @@ import {
   useSortAllCategoriesById,
   useSortSubcategories,
 } from '~/features/categories/facets/categoriesOrder';
+import { TableFlash, useTableFlash } from '~/shared/hooks/useTableFlash';
 
 import { useTransactionTableColumns } from './columns/useTransactionTableColumns';
-import { flashEffectAtom, flashStateAtom } from './flashTransaction';
 import { RowActions } from './RowActions';
 import type { TransactionTableItem } from './TransactionsTable.types';
 
@@ -45,7 +44,10 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
   const { sortAllCategoriesById } = useSortAllCategoriesById();
   const sortSubcategories = useSortSubcategories();
 
-  const { ids: flashIds, fading } = useAtomValue(flashStateAtom);
+  const { withFlashingStyles, setTable } = useTableFlash<TransactionTableItem>(
+    TableFlash.Transactions,
+    { fadeDuration: 3000 },
+  );
 
   const table = useMantineReactTable({
     columns,
@@ -166,26 +168,18 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
           : 0,
     },
     localization: MRT_Localization_RU,
-    mantineTableBodyCellProps: ({ row }) => {
-      const isFlashing = !row.getIsGrouped() && flashIds.has(row.original.id);
-      return {
-        style: {
-          color: row.original.isUpcomingSubscription ? 'darkgray' : undefined,
-          background: isFlashing
-            ? fading
-              ? 'transparent'
-              : '#fffde7'
-            : getRowBgColor(row.depth),
-          transition:
-            isFlashing && fading ? 'background 3s ease-out' : undefined,
-          padding: '8px',
-        },
-      };
-    },
+    mantineTableBodyCellProps: ({ row }) => ({
+      style: withFlashingStyles(row, {
+        color: row.original.isUpcomingSubscription ? 'darkgray' : undefined,
+        background: getRowBgColor(row.depth),
+        padding: '8px',
+      }),
+    }),
   });
 
-  const flashEffect = useMemo(() => flashEffectAtom(table), [table]);
-  useAtomValue(flashEffect);
+  useEffect(() => {
+    setTable(table);
+  });
 
   useEffect(() => {
     if (groupBySubcategories) {

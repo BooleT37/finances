@@ -9,8 +9,8 @@ import { useTranslation } from 'react-i18next';
 
 import { getFromSavingsCategoryQueryOptions } from '~/features/categories/facets/categoriesByType';
 import { DatePickerWithTodayInput } from '~/shared/components/DatePickerWithTodayInput';
+import { TableFlash, useFlashTrigger } from '~/shared/hooks/useTableFlash';
 
-import { insertedTransactionAtom } from '../../TransactionsTable/flashTransaction';
 import { TransactionSidebarMolecule } from '../transactionSidebarMolecule';
 import { ActualDateField } from './fields/ActualDateField';
 import { useActualDateValidator } from './fields/ActualDateField.validator';
@@ -43,7 +43,7 @@ export function TransactionSidebarForm() {
   const currentTransaction = useAtomValue(currentTransactionAtom);
   const saveTransaction = useSetAtom(saveTransactionAtom);
   const close = useSetAtom(closeAtom);
-  const setInsertedTransaction = useSetAtom(insertedTransactionAtom);
+  const triggerFlash = useFlashTrigger(TableFlash.Transactions);
   const setFormRef = useSetAtom(formRefAtom);
   const store = useStore();
 
@@ -186,7 +186,7 @@ export function TransactionSidebarForm() {
         return;
       }
       const tx = await saveTransaction(prepared);
-      setInsertedTransaction(tx);
+      triggerFlash([tx.id]);
       form.reset();
       close();
     },

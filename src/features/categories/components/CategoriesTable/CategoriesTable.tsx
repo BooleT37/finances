@@ -1,19 +1,19 @@
 import { Group } from '@mantine/core';
-import { useAtomValue } from 'jotai';
 import {
   MantineReactTable,
   MRT_ExpandButton,
   useMantineReactTable,
 } from 'mantine-react-table';
 import { MRT_Localization_RU } from 'mantine-react-table/locales/ru/index.cjs';
-import { useMemo } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { NameWithOptionalIcon } from '~/features/categories/components/NameWithOptionalIcon';
 import { useCategoryTableItems } from '~/features/categories/facets/categoryTableItems';
+import type { Category } from '~/features/categories/schema';
+import { TableFlash, useTableFlash } from '~/shared/hooks/useTableFlash';
 
 import { useCategoriesTableColumns } from './columns/useCategoriesTableColumns';
-import { flashEffectAtom, flashStateAtom } from './flashCategory';
 import { usePersistCategoriesOrder } from './hooks/usePersistCategoriesOrder';
 import { RowActions } from './RowActions';
 
@@ -23,7 +23,9 @@ export function CategoriesTable() {
   const categoryTableItems = useCategoryTableItems();
   const persistCategoriesOrder = usePersistCategoriesOrder();
 
-  const { id: flashId, fading } = useAtomValue(flashStateAtom);
+  const { withFlashingStyles, setTable } = useTableFlash<Category>(
+    TableFlash.Categories,
+  );
 
   const table = useMantineReactTable({
     columns,
@@ -61,20 +63,9 @@ export function CategoriesTable() {
         maxWidth: 420,
       },
     },
-    mantineTableBodyCellProps: ({ row }) => {
-      const isFlashing = !row.getIsGrouped() && row.original.id === flashId;
-      return {
-        style: {
-          background: isFlashing
-            ? fading
-              ? 'transparent'
-              : '#fffde7'
-            : undefined,
-          transition:
-            isFlashing && fading ? 'background 1.5s ease-out' : undefined,
-        },
-      };
-    },
+    mantineTableBodyCellProps: ({ row }) => ({
+      style: withFlashingStyles(row),
+    }),
     mantineRowDragHandleProps: ({ row, table: tbl }) => ({
       onDragEnd: () => persistCategoriesOrder(tbl, row.original.isIncome),
     }),
@@ -112,8 +103,9 @@ export function CategoriesTable() {
     localization: MRT_Localization_RU,
   });
 
-  const flashEffect = useMemo(() => flashEffectAtom(table), [table]);
-  useAtomValue(flashEffect);
+  useEffect(() => {
+    setTable(table);
+  });
 
   return <MantineReactTable table={table} />;
 }

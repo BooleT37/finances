@@ -27,8 +27,8 @@ import {
   useUpdateCategory,
 } from '~/features/categories/queries';
 import type { Category } from '~/features/categories/schema';
+import { TableFlash, useFlashTrigger } from '~/shared/hooks/useTableFlash';
 
-import { insertedCategoryAtom } from '../CategoriesTable/flashCategory';
 import type { CategoryFormValues } from './categoryFormValues';
 import { CategorySidebarMolecule } from './categorySidebarMolecule';
 
@@ -61,7 +61,7 @@ export function CategorySidebarForm() {
   const isNew = useAtomValue(isNewCategoryAtom);
   const setFormRef = useSetAtom(formRefAtom);
   const close = useSetAtom(closeAtom);
-  const setInsertedCategory = useSetAtom(insertedCategoryAtom);
+  const triggerFlash = useFlashTrigger(TableFlash.Categories);
   const store = useStore();
   const { t } = useTranslation('categories');
 
@@ -154,7 +154,7 @@ export function CategorySidebarForm() {
     });
     form.reset();
     close();
-    setInsertedCategory({ id: result.id, isIncome: result.isIncome });
+    triggerFlash([result.id]);
   });
 
   const subcategoryFields = form.getValues().subcategories;

@@ -4,7 +4,7 @@ import { notifications } from '@mantine/notifications';
 import { useQuery } from '@tanstack/react-query';
 import { type Dayjs } from 'dayjs';
 import Decimal from 'decimal.js';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -15,9 +15,9 @@ import {
 import type { ParsedExpense } from '~/features/transactions/parsedExpense';
 import { getTransactionsQueryOptions } from '~/features/transactions/queries';
 import { useImportTransactions } from '~/features/transactions/queries';
+import { TableFlash, useFlashTrigger } from '~/shared/hooks/useTableFlash';
 import { selectedYearAtom } from '~/stores/month';
 
-import { insertedTransactionsAtom } from '../TransactionsTable/flashTransaction';
 import { ParsedExpenseRow } from './ParsedExpenseRow';
 
 export interface ParsedExpenseRowValues {
@@ -62,7 +62,7 @@ export function ParsedExpensesModal({
     getTransactionsQueryOptions(selectedYear),
   );
   const importTransactions = useImportTransactions();
-  const setInsertedTransactions = useSetAtom(insertedTransactionsAtom);
+  const triggerFlash = useFlashTrigger(TableFlash.Transactions);
 
   const isDuplicateFn = useMemo(
     () => (e: ParsedExpense) =>
@@ -205,7 +205,7 @@ export function ParsedExpensesModal({
     });
 
     const created = await importTransactions.mutateAsync(items);
-    setInsertedTransactions(created);
+    triggerFlash(created.map((tx) => tx.id));
     notifications.show({
       color: 'green',
       message: t('importModal.success', { count: created.length }),

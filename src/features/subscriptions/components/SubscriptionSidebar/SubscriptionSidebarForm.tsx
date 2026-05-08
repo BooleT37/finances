@@ -24,6 +24,7 @@ import { useCategoryTreeData } from '~/features/categories/facets/categoryTreeDa
 import { useOrderedSources } from '~/features/sources/facets/orderedSources';
 import { DatePickerWithTodayInput } from '~/shared/components/DatePickerWithTodayInput';
 import { TreeSelect } from '~/shared/components/TreeSelect';
+import { TableFlash, useFlashTrigger } from '~/shared/hooks/useTableFlash';
 
 import {
   getSubscriptionsQueryOptions,
@@ -31,7 +32,6 @@ import {
   useUpdateSubscription,
 } from '../../queries';
 import type { Subscription } from '../../schema';
-import { insertedSubscriptionAtom } from '../SubscriptionsTable/flashSubscription';
 import type { SubscriptionFormValues } from './subscriptionFormValues';
 import { SubscriptionSidebarMolecule } from './subscriptionSidebarMolecule';
 
@@ -56,7 +56,7 @@ export function SubscriptionSidebarForm() {
   const isNew = useAtomValue(isNewSubscriptionAtom);
   const setFormRef = useSetAtom(formRefAtom);
   const close = useSetAtom(closeAtom);
-  const setInsertedSubscription = useSetAtom(insertedSubscriptionAtom);
+  const triggerFlash = useFlashTrigger(TableFlash.Subscriptions);
   const store = useStore();
   const { t } = useTranslation('subscriptions');
 
@@ -180,7 +180,7 @@ export function SubscriptionSidebarForm() {
     });
     form.reset();
     close();
-    setInsertedSubscription({ id: result.id, categoryId: result.categoryId });
+    triggerFlash([result.id]);
   });
 
   const costValue =

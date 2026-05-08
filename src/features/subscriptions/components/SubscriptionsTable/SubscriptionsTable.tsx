@@ -1,22 +1,22 @@
 import { Group } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import Decimal from 'decimal.js';
-import { useAtomValue } from 'jotai';
 import {
   MantineReactTable,
   MRT_ExpandButton,
   useMantineReactTable,
 } from 'mantine-react-table';
 import { MRT_Localization_RU } from 'mantine-react-table/locales/ru/index.cjs';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getCategoryMapQueryOptions } from '~/features/categories/facets/categoryMap';
+import { TableFlash, useTableFlash } from '~/shared/hooks/useTableFlash';
 import { getOrThrow } from '~/shared/utils/getOrThrow';
 
 import { useSortedSubscriptions } from '../../facets/sortedSubscriptions';
+import type { Subscription } from '../../schema';
 import { useSubscriptionTableColumns } from './columns/useSubscriptionTableColumns';
-import { flashEffectAtom, flashStateAtom } from './flashSubscription';
 import { RowActions } from './RowActions';
 
 function getRowBgColor(depth: number) {
@@ -40,8 +40,6 @@ export function SubscriptionsTable({ mode }: Props) {
     [sorted, mode],
   );
 
-  const { id: flashId, fading } = useAtomValue(flashStateAtom);
-
   const grandTotal = useMemo(
     () =>
       filtered?.reduce(
@@ -52,6 +50,10 @@ export function SubscriptionsTable({ mode }: Props) {
   );
 
   const columns = useSubscriptionTableColumns(grandTotal);
+
+  const { withFlashingStyles, setTable } = useTableFlash<Subscription>(
+    TableFlash.Subscriptions,
+  );
 
   const table = useMantineReactTable({
     columns,
@@ -97,20 +99,11 @@ export function SubscriptionsTable({ mode }: Props) {
           'var(--table-vertical-spacing) var(--table-horizontal-spacing, var(--mantine-spacing-xs))',
       },
     },
-    mantineTableBodyCellProps: ({ row }) => {
-      const isFlashing = !row.getIsGrouped() && row.original.id === flashId;
-      return {
-        style: {
-          background: isFlashing
-            ? fading
-              ? 'transparent'
-              : '#fffde7'
-            : getRowBgColor(row.depth),
-          transition:
-            isFlashing && fading ? 'background 1.5s ease-out' : undefined,
-        },
-      };
-    },
+    mantineTableBodyCellProps: ({ row }) => ({
+      style: withFlashingStyles(row, {
+        background: getRowBgColor(row.depth),
+      }),
+    }),
     renderRowActions: ({ row }) => {
       if (row.getIsGrouped()) {
         return null;
@@ -139,8 +132,9 @@ export function SubscriptionsTable({ mode }: Props) {
     localization: MRT_Localization_RU,
   });
 
-  const flashEffect = useMemo(() => flashEffectAtom(table), [table]);
-  useAtomValue(flashEffect);
+  useEffect(() => {
+    setTable(table);
+  });
 
   return <MantineReactTable table={table} />;
 }
