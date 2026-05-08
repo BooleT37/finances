@@ -38,7 +38,7 @@ export function SourcesTable() {
       columnOrder: ['mrt-row-drag', 'name', 'parser', 'mrt-row-actions'],
       isLoading: !orderedSources,
     },
-    mantinePaperProps: { style: { maxWidth: 480 } },
+    mantinePaperProps: { style: { width: 'fit-content' } },
     mantineTableContainerProps: {
       style: {
         maxHeight:
