@@ -19,6 +19,7 @@ import { TableFlash, useFlashTrigger } from '~/shared/hooks/useTableFlash';
 import { selectedYearAtom } from '~/stores/month';
 
 import { ParsedExpenseRow } from './ParsedExpenseRow';
+import styles from './ParsedExpensesModal.module.css';
 
 export interface ParsedExpenseRowValues {
   selected: boolean;
@@ -36,7 +37,7 @@ export interface ParsedExpenseFormValues {
 const gridColumns = '24px 2fr 3fr 8fr 100px 4fr';
 const gridGap = '8px 12px';
 
-const baseStickyHeaderRowStyle: React.CSSProperties = {
+const stickyHeaderRowStyle: React.CSSProperties = {
   gridColumn: '1 / -1',
   position: 'sticky',
   top: 0,
@@ -94,7 +95,6 @@ export function ParsedExpensesModal({
   const form = useForm<ParsedExpenseFormValues>({ initialValues });
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [duplicateAlertHidden, setDuplicateAlertHidden] = useState(false);
 
   const expenses = form.values.expenses;
@@ -254,9 +254,6 @@ export function ParsedExpensesModal({
       >
         <div
           ref={scrollContainerRef}
-          onScroll={(e) => {
-            setIsScrolled(e.currentTarget.scrollTop > 0);
-          }}
           style={{
             flex: 1,
             overflowY: 'auto',
@@ -273,13 +270,8 @@ export function ParsedExpensesModal({
           >
             <div
               data-sticky-header
-              style={{
-                ...baseStickyHeaderRowStyle,
-                boxShadow: isScrolled
-                  ? '0 4px 6px -3px rgba(0, 0, 0, 0.12)'
-                  : 'none',
-                transition: 'box-shadow 150ms ease',
-              }}
+              className={styles.stickyHeader}
+              style={stickyHeaderRowStyle}
             >
               <div
                 style={{

@@ -1,0 +1,14 @@
+@keyframes sticky-header-shadow {
+  0% {
+    box-shadow: none;
+  }
+  1%,
+  100% {
+    box-shadow: 0 4px 6px -3px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.stickyHeader {
+  animation: sticky-header-shadow linear forwards;
+  animation-timeline: scroll();
+}
