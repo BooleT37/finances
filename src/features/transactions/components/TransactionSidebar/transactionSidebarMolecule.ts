@@ -1,4 +1,5 @@
 import { molecule } from 'bunshi';
+import dayjs from 'dayjs';
 import { atom } from 'jotai';
 import {
   atomWithMutation,
@@ -157,8 +158,13 @@ export const TransactionSidebarMolecule = molecule(() => {
       const commonFields = {
         name: values.name,
         cost: values.cost,
-        date: values.date.toISOString(),
-        actualDate: values.actualDate?.toISOString() ?? null,
+        // Expense.date is @db.Date; serialize as a calendar date in the user's
+        // local timezone so toISOString's UTC shift doesn't bump the row to
+        // the previous day for positive-offset zones.
+        date: dayjs(values.date).format('YYYY-MM-DD'),
+        actualDate: values.actualDate
+          ? dayjs(values.actualDate).format('YYYY-MM-DD')
+          : null,
         categoryId: Number(values.category),
         subcategoryId:
           values.subcategory !== null ? Number(values.subcategory) : null,
