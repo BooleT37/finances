@@ -15,8 +15,15 @@ export const decimalCodec = z.codec(
   },
 );
 
-/** Wire: ISO datetime string  ↔  Client: dayjs */
+/**
+ * Wire: 'YYYY-MM-DD' calendar-date string  ↔  Client: dayjs at local midnight.
+ *
+ * Every field using this codec maps to a Postgres `@db.Date` column, so the
+ * value is a calendar date with no time/zone. Encoding via toISOString() would
+ * shift the date back a day for users in negative-offset zones; encoding as
+ * 'YYYY-MM-DD' keeps the calendar date intact across all zones.
+ */
 export const datetimeCodec = z.codec(z.string(), dayjsSchema, {
   decode: (s) => dayjs(s),
-  encode: (d) => d.toISOString(),
+  encode: (d) => d.format('YYYY-MM-DD'),
 });
