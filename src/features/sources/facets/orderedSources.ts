@@ -14,6 +14,12 @@ export const useOrderedSources = (): Source[] | undefined =>
       if (!sources || !order) {
         return undefined;
       }
+      const unorderedSources = sources.filter((s) => !order.includes(s.id));
+      if (unorderedSources.length > 0) {
+        console.error(
+          `Sources [${unorderedSources.map((s) => s.name).join(', ')}] are not included in the order setting. They will be appended at the end.`,
+        );
+      }
       return [...sources].sort(
         (a, b) => order.indexOf(a.id) - order.indexOf(b.id),
       );

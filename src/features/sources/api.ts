@@ -21,6 +21,17 @@ export const createSource = createServerFn({ method: 'POST' })
     const created = await prisma.source.create({
       data: { name: data.name, userId: user.id },
     });
+
+    const settings = await prisma.userSetting.findFirst({
+      where: { userId: user.id },
+    });
+    if (settings) {
+      await prisma.userSetting.update({
+        where: { userId: user.id },
+        data: { sourcesOrder: [...settings.sourcesOrder, created.id] },
+      });
+    }
+
     return sourceSchema.encode(created);
   });
 

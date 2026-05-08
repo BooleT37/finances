@@ -40,7 +40,11 @@ export function useCreateSource() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: CreateSourceInput) => createSource({ data: input }),
-    onSuccess: () => queryClient.invalidateQueries(getSourcesQueryOptions()),
+    onSuccess: () =>
+      Promise.all([
+        queryClient.invalidateQueries(getUserSettingsQueryOptions()),
+        queryClient.invalidateQueries(getSourcesQueryOptions()),
+      ]),
   });
 }
 
