@@ -55,7 +55,8 @@ interface GetCostForecastData {
 export function getCostForecast(
   data: GetCostForecastData,
   params: GetCostForecastParams,
-): Decimal | undefined {
+  // null means "not applicable", undefined means "no forecast"
+): Decimal | null | undefined {
   const {
     categoryForecasts,
     subcategoryForecasts,
@@ -85,10 +86,9 @@ export function getCostForecast(
   const categoryType = getOrThrow(categoryMap, categoryId, 'Category').type;
 
   if (categoryType === 'FROM_SAVINGS') {
+    // FROM_SAVINGS group row;
     if (subcategoryId === undefined) {
-      console.error(
-        'getCostForecast: subcategoryId must be defined for FROM_SAVINGS category rows',
-      );
+      return null;
     }
     return decimalSum(
       ...savingSpendings
@@ -136,7 +136,7 @@ export function useGetCostForecast() {
   const { data: categoryMap } = useQuery(getCategoryMapQueryOptions());
 
   return useCallback(
-    (params: GetCostForecastParams): Decimal | undefined => {
+    (params: GetCostForecastParams): Decimal | undefined | null => {
       if (!categoryForecasts || !categoryMap || !savingSpendings) {
         return undefined;
       }

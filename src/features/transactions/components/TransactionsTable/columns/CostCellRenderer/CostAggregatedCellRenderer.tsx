@@ -30,13 +30,15 @@ export function CostAggregatedCellRenderer({
   isContinuous,
 }: Props) {
   const getCostForecast = useGetCostForecast();
-  const forecast =
-    getCostForecast({
-      categoryId,
-      isRestRow,
-      subcategoryId,
-      isIncome,
-    }) ?? new Decimal(0);
+  let forecast = getCostForecast({
+    categoryId,
+    isRestRow,
+    subcategoryId,
+    isIncome,
+  });
+  if (forecast === undefined) {
+    forecast = new Decimal(0);
+  }
 
   const isYearMode = useAtomValue(viewModeAtom) === 'year';
   const year = useAtomValue(selectedYearAtom);
@@ -46,7 +48,7 @@ export function CostAggregatedCellRenderer({
     return null;
   }
 
-  if (isYearMode) {
+  if (isYearMode || forecast === null) {
     return <CostCellView cost={costToString(value.cost)} />;
   }
 

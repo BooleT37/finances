@@ -12,7 +12,7 @@ export const useCostAggregationFn = () =>
     (_columnId: string, rows: Row<TransactionTableItem>[]): CostColValue => {
       const value = rows.reduce(
         (a, c) =>
-          c.original.isUpcomingSubscription || c.original.isFromSavings
+          c.original.isUpcomingSubscription
             ? a
             : a.add(c.original.cost?.cost ?? 0),
         new Decimal(0),

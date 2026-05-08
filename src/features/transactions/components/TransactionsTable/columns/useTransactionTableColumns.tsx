@@ -46,7 +46,9 @@ export const useTransactionTableColumns = () => {
                 : (row.getGroupingValue('categoryId') as number)
             }
             subcategoryId={
-              row.getGroupingValue('subcategoryId') as number | undefined
+              row.groupingColumnId === 'subcategoryId'
+                ? (row.getGroupingValue('subcategoryId') as number | undefined)
+                : undefined
             }
           />
         ),
