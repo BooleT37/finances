@@ -1,5 +1,7 @@
 {
   "pageTitle": "Sources",
+  "addSource": "Add",
+  "newSourceName": "New source",
   "columns": {
     "name": "Name",
     "parser": "Parser",

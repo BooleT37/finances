@@ -3,6 +3,8 @@ import { createServerFn } from '@tanstack/react-start';
 import { prisma } from '~/server/db';
 
 import {
+  type CreateSourceInput,
+  createSourceSchema,
   sourceSchema,
   type UpdateSourceNameInput,
   updateSourceNameSchema,
@@ -11,6 +13,16 @@ import {
   type UpdateSourceParserInput,
   updateSourceParserSchema,
 } from './schema';
+
+export const createSource = createServerFn({ method: 'POST' })
+  .inputValidator((input: CreateSourceInput) => createSourceSchema.parse(input))
+  .handler(async ({ data }) => {
+    const user = await prisma.user.findFirstOrThrow();
+    const created = await prisma.source.create({
+      data: { name: data.name, userId: user.id },
+    });
+    return sourceSchema.encode(created);
+  });
 
 export const fetchAllSources = createServerFn({ method: 'GET' }).handler(
   async () => {

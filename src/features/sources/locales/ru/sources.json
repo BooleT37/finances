@@ -1,5 +1,7 @@
 {
   "pageTitle": "Источники",
+  "addSource": "Добавить",
+  "newSourceName": "Новый источник",
   "columns": {
     "name": "Название",
     "parser": "Парсер",

@@ -11,6 +11,12 @@ export const sourceSchema = z.object({
 export type SourceWire = z.input<typeof sourceSchema>;
 export type Source = z.output<typeof sourceSchema>;
 
+export const createSourceSchema = z.object({
+  name: z.string().min(1),
+});
+
+export type CreateSourceInput = z.infer<typeof createSourceSchema>;
+
 export const updateSourceNameSchema = z.object({
   id: z.number(),
   name: z.string().min(1),

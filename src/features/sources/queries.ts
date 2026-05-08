@@ -8,12 +8,14 @@ import {
 import { getUserSettingsQueryOptions } from '~/features/userSettings/queries';
 
 import {
+  createSource,
   fetchAllSources,
   updateSourceName,
   updateSourceOrder,
   updateSourceParser,
 } from './api';
 import type {
+  CreateSourceInput,
   UpdateSourceNameInput,
   UpdateSourceOrderInput,
   UpdateSourceParserInput,
@@ -33,6 +35,14 @@ export const getSourcesQueryOptions = () =>
       return rows.map((s) => sourceSchema.decode(s));
     },
   });
+
+export function useCreateSource() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: CreateSourceInput) => createSource({ data: input }),
+    onSuccess: () => queryClient.invalidateQueries(getSourcesQueryOptions()),
+  });
+}
 
 export function useUpdateSourceName() {
   const queryClient = useQueryClient();
