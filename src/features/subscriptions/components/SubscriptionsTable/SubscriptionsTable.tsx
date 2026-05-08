@@ -64,7 +64,6 @@ export function SubscriptionsTable({ mode }: Props) {
     enablePagination: false,
     enableColumnActions: false,
     enableColumnDragging: false,
-    enableSorting: false,
     enableRowOrdering: false,
     enableRowActions: true,
     enableTableFooter: true,

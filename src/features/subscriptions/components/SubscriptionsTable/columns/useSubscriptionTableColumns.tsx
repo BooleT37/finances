@@ -33,6 +33,7 @@ export function useSubscriptionTableColumns(
       {
         accessorKey: 'categoryId',
         header: '',
+        enableSorting: false,
       },
       {
         id: 'price',
@@ -58,11 +59,13 @@ export function useSubscriptionTableColumns(
       {
         accessorKey: 'firstDate',
         header: t('columns.firstDate'),
+        enableSorting: false,
         Cell: ({ row }) => row.original.firstDate.format('DD.MM.YYYY'),
       },
       {
         accessorKey: 'sourceId',
         header: t('columns.source'),
+        enableSorting: false,
         Cell: ({ row }) => {
           const { sourceId } = row.original;
           if (sourceId === null) {
