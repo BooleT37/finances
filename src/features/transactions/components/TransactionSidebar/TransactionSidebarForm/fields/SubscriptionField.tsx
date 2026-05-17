@@ -51,12 +51,15 @@ export function SubscriptionField({ form }: Props) {
         Number(subscriptionId),
         'Subscription',
       );
-      form.setFieldValue('name', sub.name);
-      form.setFieldValue('cost', sub.cost.toString());
-      form.setFieldValue(
-        'source',
-        sub.sourceId !== null ? String(sub.sourceId) : null,
-      );
+      if (!form.values.name) {
+        form.setFieldValue('name', sub.name);
+      }
+      if (!form.values.cost) {
+        form.setFieldValue('cost', sub.cost.toString());
+      }
+      if (form.values.source === null && sub.sourceId !== null) {
+        form.setFieldValue('source', String(sub.sourceId));
+      }
     },
     [availableSubscriptions, form],
   );

@@ -595,7 +595,44 @@ test.describe('Subscriptions', () => {
     await expect(row.getByRole('img', { name: 'Подписка' })).toBeVisible();
   });
 
-  test('edit subscription transaction: change subscription updates fields and auto-saves', async ({
+  test('create transaction: subscription autofill skips pre-filled fields', async ({
+    page,
+    seedData,
+  }) => {
+    await testPrisma.subscription.create({
+      data: {
+        name: 'Спотифай',
+        cost: 9.99,
+        categoryId: seedData.categoryIds.развлечения,
+        sourceId: seedData.sourceIds.вивид,
+        period: 1,
+        firstDate: new Date(TODAY_YEAR, TODAY_MONTH, 1),
+        active: true,
+        userId: seedData.userId,
+      },
+    });
+    await page.goto('/transactions');
+
+    const form = page.getByRole('form', { name: 'Форма транзакции' });
+
+    await page.getByRole('button', { name: 'Добавить' }).click();
+    await selectOption(page, 'Категория', 'Развлечения');
+
+    // Type a custom name before selecting a subscription
+    await form.getByLabel('Комментарий').fill('Мой платёж');
+
+    await selectOption(page, 'Подписка', 'Спотифай');
+
+    // Pre-filled name is preserved — subscription autofill skips non-empty fields
+    await expect(form.getByLabel('Комментарий')).toHaveValue('Мой платёж');
+    // Empty cost and source are filled from the subscription
+    await expect(form.getByLabel('Сумма (€)')).toHaveValue('-9.99');
+    await expect(form.getByRole('textbox', { name: 'Источник' })).toHaveValue(
+      'Vivid',
+    );
+  });
+
+  test('edit subscription transaction: change subscription auto-saves, preserves existing fields', async ({
     page,
     seedData,
   }) => {
@@ -650,18 +687,17 @@ test.describe('Subscriptions', () => {
       'Спотифай',
     );
 
-    // Change to a different subscription — form fields update automatically
+    // Change subscription — existing name and cost are preserved (fields were non-empty)
     await selectOption(page, 'Подписка', 'Кинопоиск');
-    await expect(form.getByLabel('Комментарий')).toHaveValue('Кинопоиск');
-    await expect(form.getByLabel('Сумма (€)')).toHaveValue('-5.99');
+    await expect(form.getByLabel('Комментарий')).toHaveValue('Спотифай');
+    await expect(form.getByLabel('Сумма (€)')).toHaveValue('-9.99');
 
-    // Auto-save fires after the debounce; the row name updates to 'Кинопоиск' (auto-filled).
-    // Find it fresh — the original 'Спотифай' locator is now stale.
+    // Auto-save fires after the debounce; row is found by the unchanged name
     const updatedRow = await findTransactionRow(page, {
-      name: 'Кинопоиск',
+      name: 'Спотифай',
       categoryId: seedData.categoryIds.развлечения,
     });
-    await expect(updatedRow.getByText('-€5.99')).toBeVisible();
+    await expect(updatedRow.getByText('-€9.99')).toBeVisible();
   });
 
   test('toggle upcoming subscriptions: rows appear/disappear, no actions, excluded from total', async ({
