@@ -113,66 +113,73 @@ export const updateTransaction = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const { id, components, ...fields } = data;
 
-    const tx = await prisma.$transaction(async (db) => {
-      if (components !== undefined) {
-        const keptIds = components
-          .filter((c) => c.id !== undefined)
-          .map((c) => c.id!);
+    const keptIds = components
+      ?.filter((c) => c.id !== undefined)
+      .map((c) => c.id!);
 
-        await db.expenseComponent.deleteMany({
-          where: { expenseId: id, id: { notIn: keptIds } },
-        });
-      }
-
-      return db.expense.update({
-        where: { id },
-        data: {
-          name: fields.name,
-          cost: new Decimal(fields.cost).abs(),
-          date: new Date(fields.date),
-          categoryId: fields.categoryId,
-          actualDate:
-            fields.actualDate !== undefined
-              ? fields.actualDate
-                ? new Date(fields.actualDate)
-                : null
-              : undefined,
-          subcategoryId: fields.subcategoryId,
-          sourceId: fields.sourceId,
-          subscriptionId: fields.subscriptionId,
-          savingSpendingCategoryId: fields.savingSpendingCategoryId,
-          ...(components !== undefined && {
-            components: {
-              createMany: {
-                data: components
-                  .filter((c) => c.id === undefined)
-                  .map((c) => ({
-                    name: c.name,
-                    cost: new Decimal(c.cost).abs(),
-                    categoryId: c.categoryId,
-                    subcategoryId: c.subcategoryId ?? null,
-                  })),
-              },
-              update: components
-                .filter((c) => c.id !== undefined)
+    // Build the update query once — used directly or inside a batch transaction.
+    // Batch $transaction([...]) avoids holding a DB connection open (unlike the
+    // interactive callback form), which prevents P2028 timeouts in serverless.
+    const expenseUpdate = prisma.expense.update({
+      where: { id },
+      data: {
+        name: fields.name,
+        cost: new Decimal(fields.cost).abs(),
+        date: new Date(fields.date),
+        categoryId: fields.categoryId,
+        actualDate:
+          fields.actualDate !== undefined
+            ? fields.actualDate
+              ? new Date(fields.actualDate)
+              : null
+            : undefined,
+        subcategoryId: fields.subcategoryId,
+        sourceId: fields.sourceId,
+        subscriptionId: fields.subscriptionId,
+        savingSpendingCategoryId: fields.savingSpendingCategoryId,
+        ...(components !== undefined && {
+          components: {
+            createMany: {
+              data: components
+                .filter((c) => c.id === undefined)
                 .map((c) => ({
-                  where: { id: c.id },
-                  data: {
-                    name: c.name,
-                    cost: new Decimal(c.cost).abs(),
-                    categoryId: c.categoryId,
-                    subcategoryId: c.subcategoryId ?? null,
-                  },
+                  name: c.name,
+                  cost: new Decimal(c.cost).abs(),
+                  categoryId: c.categoryId,
+                  subcategoryId: c.subcategoryId ?? null,
                 })),
             },
-          }),
-        },
-        include: {
-          category: true,
-          components: { include: { category: true } },
-        },
-      });
+            update: components
+              .filter((c) => c.id !== undefined)
+              .map((c) => ({
+                where: { id: c.id },
+                data: {
+                  name: c.name,
+                  cost: new Decimal(c.cost).abs(),
+                  categoryId: c.categoryId,
+                  subcategoryId: c.subcategoryId ?? null,
+                },
+              })),
+          },
+        }),
+      },
+      include: {
+        category: true,
+        components: { include: { category: true } },
+      },
     });
+
+    const tx =
+      keptIds !== undefined
+        ? (
+            await prisma.$transaction([
+              prisma.expenseComponent.deleteMany({
+                where: { expenseId: id, id: { notIn: keptIds } },
+              }),
+              expenseUpdate,
+            ])
+          )[1]
+        : await expenseUpdate;
 
     return transactionWithComponentsSchema.encode({
       ...tx,
