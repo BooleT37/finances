@@ -6,7 +6,7 @@
       "script": "dev",
       "problemMatcher": [],
       "label": "dev",
-      "detail": "vite --port 3000"
+      "detail": "vite --port 3002"
     }
   ]
 }
