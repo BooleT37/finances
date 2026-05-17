@@ -1,11 +1,14 @@
 import { ActionIcon, Group } from '@mantine/core';
-import { openConfirmModal } from '@mantine/modals';
-import { IconEdit, IconTrash } from '@tabler/icons-react';
+import { modals, openConfirmModal } from '@mantine/modals';
+import { IconCopy, IconEdit, IconTrash } from '@tabler/icons-react';
 import { useMolecule } from 'bunshi/react';
-import { useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
+import { TableFlash, useFlashTrigger } from '~/shared/hooks/useTableFlash';
+
 import { TransactionSidebarMolecule } from '../TransactionSidebar/transactionSidebarMolecule';
+import { CopyComponentsModal } from './CopyComponentsModal';
 
 interface Props {
   id: number;
@@ -14,12 +17,19 @@ interface Props {
 }
 
 export function RowActions({ id, parentExpenseId, name }: Props) {
-  const { openAtom, openForComponentAtom, deleteTransactionAtom } = useMolecule(
-    TransactionSidebarMolecule,
-  );
+  const {
+    openAtom,
+    openForComponentAtom,
+    deleteTransactionAtom,
+    transactionsMapAtom,
+    copyTransactionAtom,
+  } = useMolecule(TransactionSidebarMolecule);
   const open = useSetAtom(openAtom);
   const openForComponent = useSetAtom(openForComponentAtom);
   const deleteTx = useSetAtom(deleteTransactionAtom);
+  const copyTx = useSetAtom(copyTransactionAtom);
+  const transactionsMap = useAtomValue(transactionsMapAtom);
+  const triggerFlash = useFlashTrigger(TableFlash.Transactions);
   const { t } = useTranslation('transactions');
 
   const handleDelete = () => {
@@ -29,6 +39,33 @@ export function RowActions({ id, parentExpenseId, name }: Props) {
       labels: { confirm: t('delete.confirm'), cancel: t('delete.cancel') },
       confirmProps: { color: 'red' },
       onConfirm: () => void deleteTx(id),
+    });
+  };
+
+  const doCopy = async ({ withComponents }: { withComponents: boolean }) => {
+    const newId = await copyTx({ id, withComponents });
+    if (newId !== undefined) {
+      triggerFlash([newId]);
+    }
+  };
+
+  const handleCopy = () => {
+    const tx = transactionsMap.data?.[id];
+    const hasComponents = (tx?.components.length ?? 0) > 0;
+
+    if (!hasComponents) {
+      void doCopy({ withComponents: false });
+      return;
+    }
+
+    modals.open({
+      title: t('copy.title'),
+      children: (
+        <CopyComponentsModal
+          onYes={() => void doCopy({ withComponents: true })}
+          onNo={() => void doCopy({ withComponents: false })}
+        />
+      ),
     });
   };
 
@@ -45,6 +82,15 @@ export function RowActions({ id, parentExpenseId, name }: Props) {
       >
         <IconEdit size={16} />
       </ActionIcon>
+      {parentExpenseId === null && (
+        <ActionIcon
+          variant="subtle"
+          aria-label={t('actions.copy')}
+          onClick={handleCopy}
+        >
+          <IconCopy size={16} />
+        </ActionIcon>
+      )}
       <ActionIcon
         variant="subtle"
         color="red"

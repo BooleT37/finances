@@ -189,11 +189,51 @@ export const TransactionSidebarMolecule = molecule(() => {
     },
   );
 
+  // ── Copy ────────────────────────────────────────────────────────────────────
+  const copyTransactionAtom = atom(
+    null,
+    async (
+      get,
+      set,
+      { id, withComponents }: { id: number; withComponents: boolean },
+    ): Promise<number | undefined> => {
+      const tx = get(transactionsMapAtom).data?.[id];
+      if (!tx) {
+        return undefined;
+      }
+
+      const newTx = await get(addMutationAtom).mutateAsync({
+        name: tx.name,
+        cost: tx.cost.abs().toString(),
+        date: tx.date.format('YYYY-MM-DD'),
+        actualDate: tx.actualDate ? tx.actualDate.format('YYYY-MM-DD') : null,
+        categoryId: tx.categoryId,
+        subcategoryId: tx.subcategoryId ?? null,
+        sourceId: tx.sourceId ?? null,
+        subscriptionId: null,
+        savingSpendingCategoryId: tx.savingSpendingCategoryId ?? null,
+        components:
+          withComponents && tx.components.length > 0
+            ? tx.components.map((c) => ({
+                name: c.name,
+                cost: c.cost.abs().toString(),
+                categoryId: c.categoryId,
+                subcategoryId: c.subcategoryId ?? null,
+              }))
+            : undefined,
+      });
+
+      set(openAtom, newTx.id);
+      return newTx.id;
+    },
+  );
+
   return {
     editingIdAtom,
     isOpenAtom,
     isNewTransactionAtom,
     currentTransactionAtom,
+    transactionsMapAtom,
     componentsModalOpenAtom,
     actualDateShownAtom,
     formRefAtom,
@@ -203,5 +243,6 @@ export const TransactionSidebarMolecule = molecule(() => {
     closeAtom,
     saveTransactionAtom,
     deleteTransactionAtom,
+    copyTransactionAtom,
   };
 });
