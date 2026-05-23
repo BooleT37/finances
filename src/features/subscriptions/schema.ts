@@ -1,13 +1,13 @@
 import { z } from 'zod';
 
-import { datetimeCodec, decimalCodec } from '~/shared/codecs';
+import { dateCodec, decimalCodec } from '~/shared/codecs';
 
 export const subscriptionSchema = z.object({
   id: z.number(),
   name: z.string(),
   cost: decimalCodec,
   period: z.number(),
-  firstDate: datetimeCodec,
+  firstDate: dateCodec,
   active: z.boolean(),
   categoryId: z.number(),
   subcategoryId: z.number().nullable(),
