@@ -105,7 +105,22 @@ export const getAddTransactionMutationOptions = (
     onSuccess: (newTx) => {
       queryClient.setQueryData(
         getTransactionsQueryOptions(year).queryKey,
-        (old) => (old ? [...old, newTx] : [newTx]),
+        (old) => {
+          if (!old) {
+            return [newTx];
+          }
+          const idx = old.findIndex(
+            (tx) =>
+              tx.date.isAfter(newTx.date, 'day') ||
+              (tx.date.isSame(newTx.date, 'day') &&
+                (tx.createdAt.isAfter(newTx.createdAt) ||
+                  (tx.createdAt.isSame(newTx.createdAt) && tx.id > newTx.id))),
+          );
+          if (idx === -1) {
+            return [...old, newTx];
+          }
+          return [...old.slice(0, idx), newTx, ...old.slice(idx)];
+        },
       );
     },
   });

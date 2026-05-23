@@ -27,7 +27,7 @@ export const fetchTransactionsByYear = createServerFn({ method: 'GET' })
           lt: new Date(`${year + 1}-01-01`),
         },
       },
-      orderBy: { date: 'asc' },
+      orderBy: [{ date: 'asc' }, { createdAt: 'asc' }, { id: 'asc' }],
       include: {
         category: true,
         components: { include: { category: true } },
@@ -40,6 +40,7 @@ export const fetchTransactionsByYear = createServerFn({ method: 'GET' })
         cost: adaptCost(tx.cost, tx.category.isIncome),
         date: dayjs(tx.date),
         actualDate: tx.actualDate ? dayjs(tx.actualDate) : null,
+        createdAt: dayjs(tx.createdAt),
         components: tx.components.map((c) => ({
           ...c,
           cost: adaptCost(c.cost, c.category.isIncome),
@@ -93,6 +94,7 @@ export const createTransaction = createServerFn({ method: 'POST' })
       cost: adaptCost(tx.cost, tx.category.isIncome),
       date: dayjs(tx.date),
       actualDate: tx.actualDate ? dayjs(tx.actualDate) : null,
+      createdAt: dayjs(tx.createdAt),
       components: tx.components.map((c) => ({
         ...c,
         cost: adaptCost(c.cost, c.category.isIncome),
@@ -186,6 +188,7 @@ export const updateTransaction = createServerFn({ method: 'POST' })
       cost: adaptCost(tx.cost, tx.category.isIncome),
       date: dayjs(tx.date),
       actualDate: tx.actualDate ? dayjs(tx.actualDate) : null,
+      createdAt: dayjs(tx.createdAt),
       components: tx.components.map((c) => ({
         ...c,
         cost: adaptCost(c.cost, c.category.isIncome),
@@ -272,6 +275,7 @@ export const importTransactions = createServerFn({ method: 'POST' })
         cost: adaptCost(tx.cost, tx.category.isIncome),
         date: dayjs(tx.date),
         actualDate: tx.actualDate ? dayjs(tx.actualDate) : null,
+        createdAt: dayjs(tx.createdAt),
         components: [],
       }),
     );

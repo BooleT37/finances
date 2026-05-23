@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { datetimeCodec, decimalCodec } from '~/shared/codecs';
+import { dateCodec, datetimeCodec, decimalCodec } from '~/shared/codecs';
 
 // ── TransactionComponent ──────────────────────────────────────────────────────
 
@@ -22,14 +22,15 @@ export const transactionSchema = z.object({
   id: z.number(),
   name: z.string(),
   cost: decimalCodec,
-  date: datetimeCodec,
-  actualDate: datetimeCodec.nullable(),
+  date: dateCodec,
+  actualDate: dateCodec.nullable(),
   categoryId: z.number(),
   subcategoryId: z.number().nullable(),
   sourceId: z.number().nullable(),
   subscriptionId: z.number().nullable(),
   savingSpendingCategoryId: z.number().nullable(),
   peHash: z.string().nullable().optional(),
+  createdAt: datetimeCodec,
 });
 
 export const transactionWithComponentsSchema = transactionSchema.extend({

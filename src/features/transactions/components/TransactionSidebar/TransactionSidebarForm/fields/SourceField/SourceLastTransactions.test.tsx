@@ -61,6 +61,7 @@ const makeTx = (overrides: Partial<TransactionWire> = {}): TransactionWire => ({
   sourceId: 1,
   subscriptionId: null,
   savingSpendingCategoryId: null,
+  createdAt: TEST_DATE_ISO,
   components: [],
   ...overrides,
 });
