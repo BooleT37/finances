@@ -874,18 +874,34 @@ test.describe('Saving spendings', () => {
       .locator('xpath=ancestor::tr');
     await expect(расходAggRow.getByText('-€100.00').first()).toBeVisible();
 
-    // Group by subcategories: event group rows appear for both pre-seeded (Event A) and new (Event B)
+    // Из сбережений group row shows no total at all — from-savings is excluded from totals.
+    const изСбереженийAggRow = page
+      .locator(`.${transactionNameCellClass}[data-testing-depth="1"]`, {
+        hasText: 'Из сбережений',
+      })
+      .locator('xpath=ancestor::tr');
+    await expect(изСбереженийAggRow).toBeVisible();
+    await expect(изСбереженийAggRow.getByText(/€/)).toHaveCount(0);
+
+    // Group by subcategories: event group rows appear for both pre-seeded (Event A)
+    // and new (Event B), neither displaying a total.
     await page.getByLabel('Сгруппировать по подкатегориям').click();
-    await expect(
-      page.locator(`.${transactionNameCellClass}[data-testing-depth="2"]`, {
+
+    const eventAAggRow = page
+      .locator(`.${transactionNameCellClass}[data-testing-depth="2"]`, {
         hasText: 'Отпуск Рим 2025',
-      }),
-    ).toBeVisible();
-    await expect(
-      page.locator(`.${transactionNameCellClass}[data-testing-depth="2"]`, {
+      })
+      .locator('xpath=ancestor::tr');
+    await expect(eventAAggRow).toBeVisible();
+    await expect(eventAAggRow.getByText(/€/)).toHaveCount(0);
+
+    const eventBAggRow = page
+      .locator(`.${transactionNameCellClass}[data-testing-depth="2"]`, {
         hasText: 'Переезд 2026',
-      }),
-    ).toBeVisible();
+      })
+      .locator('xpath=ancestor::tr');
+    await expect(eventBAggRow).toBeVisible();
+    await expect(eventBAggRow.getByText(/€/)).toHaveCount(0);
   });
 
   // Case 14 — edit a from-savings transaction that was linked to a completed event.

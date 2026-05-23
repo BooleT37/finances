@@ -19,6 +19,7 @@ import {
 interface Props extends GetCostForecastParams {
   value: CostColValue | null;
   isContinuous: boolean;
+  isFromSavingsGroup: boolean;
 }
 
 export function CostAggregatedCellRenderer({
@@ -28,6 +29,7 @@ export function CostAggregatedCellRenderer({
   subcategoryId,
   isIncome,
   isContinuous,
+  isFromSavingsGroup,
 }: Props) {
   const getCostForecast = useGetCostForecast();
   let forecast = getCostForecast({
@@ -44,7 +46,8 @@ export function CostAggregatedCellRenderer({
   const year = useAtomValue(selectedYearAtom);
   const month = useAtomValue(selectedMonthAtom);
 
-  if (!value) {
+  // FROM_SAVINGS group rows show no total — from-savings is excluded from totals (SAVING_SPENDINGS.md).
+  if (!value || isFromSavingsGroup) {
     return null;
   }
 

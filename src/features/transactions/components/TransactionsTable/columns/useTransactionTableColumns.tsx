@@ -36,6 +36,9 @@ export const useTransactionTableColumns = () => {
             value={cell.getValue()}
             isIncome={row.original.isIncome}
             isContinuous={row.original.isContinuous}
+            isFromSavingsGroup={
+              row.groupingColumnId !== 'isIncome' && row.original.isFromSavings
+            }
             isRestRow={
               row.groupingColumnId === 'subcategoryId' &&
               row.getGroupingValue('subcategoryId') === undefined
