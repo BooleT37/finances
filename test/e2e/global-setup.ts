@@ -11,7 +11,7 @@ export default async function globalSetup() {
     .withDatabase('finances_test')
     .withPassword('postgres')
     .withUsername('postgres')
-    .withExposedPorts({ host: 5434, container: 5432 })
+    .withExposedPorts({ host: 5435, container: 5432 })
     .start();
   console.log('PostgreSQL test container started');
 
