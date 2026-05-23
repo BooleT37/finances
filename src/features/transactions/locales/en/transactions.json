@@ -1,7 +1,15 @@
 {
   "actions": {
+    "copy": "Copy",
     "delete": "Delete",
     "edit": "Edit"
+  },
+  "copy": {
+    "cancel": "Cancel",
+    "message": "Copy components too?",
+    "no": "No",
+    "title": "Copy transaction",
+    "yes": "Yes"
   },
   "add": "Add",
   "delete": {
