@@ -6,12 +6,12 @@ import {
   MRT_ExpandButton,
   useMantineReactTable,
 } from 'mantine-react-table';
-import { MRT_Localization_RU } from 'mantine-react-table/locales/ru/index.cjs';
 import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getCategoryMapQueryOptions } from '~/features/categories/facets/categoryMap';
 import { TableFlash, useTableFlash } from '~/shared/hooks/useTableFlash';
+import { useTableLocalization } from '~/shared/hooks/useTableLocalization';
 import { getOrThrow } from '~/shared/utils/getOrThrow';
 
 import { useSortedSubscriptions } from '../../facets/sortedSubscriptions';
@@ -54,6 +54,8 @@ export function SubscriptionsTable({ mode }: Props) {
   const { withFlashingStyles, setTable } = useTableFlash<Subscription>(
     TableFlash.Subscriptions,
   );
+
+  const tableLocalization = useTableLocalization();
 
   const table = useMantineReactTable({
     columns,
@@ -128,7 +130,7 @@ export function SubscriptionsTable({ mode }: Props) {
         ),
       },
     },
-    localization: MRT_Localization_RU,
+    localization: tableLocalization,
   });
 
   useEffect(() => {

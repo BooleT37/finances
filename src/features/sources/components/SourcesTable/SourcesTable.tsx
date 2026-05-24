@@ -1,10 +1,10 @@
 import { MantineReactTable, useMantineReactTable } from 'mantine-react-table';
-import { MRT_Localization_RU } from 'mantine-react-table/locales/ru/index.cjs';
 import { useEffect } from 'react';
 
 import { useOrderedSources } from '~/features/sources/facets/orderedSources';
 import type { Source } from '~/features/sources/schema';
 import { TableFlash, useTableFlash } from '~/shared/hooks/useTableFlash';
+import { useTableLocalization } from '~/shared/hooks/useTableLocalization';
 
 import { useSourcesTableColumns } from './columns/useSourcesTableColumns';
 import { usePersistSourcesOrder } from './hooks/usePersistSourcesOrder';
@@ -17,6 +17,8 @@ export function SourcesTable() {
   const { withFlashingStyles, setTable } = useTableFlash<Source>(
     TableFlash.Sources,
   );
+
+  const tableLocalization = useTableLocalization();
 
   const table = useMantineReactTable({
     columns,
@@ -56,7 +58,7 @@ export function SourcesTable() {
     mantineTableBodyCellProps: ({ row }) => ({
       style: withFlashingStyles(row),
     }),
-    localization: MRT_Localization_RU,
+    localization: tableLocalization,
   });
 
   useEffect(() => {

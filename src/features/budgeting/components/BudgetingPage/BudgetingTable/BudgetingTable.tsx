@@ -6,10 +6,10 @@ import {
   type MRT_ExpandedState,
   useMantineReactTable,
 } from 'mantine-react-table';
-import { MRT_Localization_RU } from 'mantine-react-table/locales/ru/index.cjs';
 import { useTranslation } from 'react-i18next';
 
 import { NameWithOptionalIcon } from '~/features/categories/components/NameWithOptionalIcon';
+import { useTableLocalization } from '~/shared/hooks/useTableLocalization';
 import { selectedMonthAtom, selectedYearAtom } from '~/stores/month';
 
 import { buildBudgetingRowId } from './budgetingRowId';
@@ -35,6 +35,8 @@ export function BudgetingTable() {
     saveComment,
   });
 
+  const tableLocalization = useTableLocalization();
+
   const table = useMantineReactTable({
     columns,
     data: rows ?? [],
@@ -51,7 +53,7 @@ export function BudgetingTable() {
     enableStickyFooter: true,
     editDisplayMode: 'cell',
     enableEditing: true,
-    localization: MRT_Localization_RU,
+    localization: tableLocalization,
     initialState: {
       expanded: {
         [buildBudgetingRowId({ rowType: 'typeGroup', group: 'expense' })]: true,

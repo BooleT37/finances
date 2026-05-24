@@ -5,8 +5,6 @@ import {
   MRT_ExpandButton,
   useMantineReactTable,
 } from 'mantine-react-table';
-// important to import cjs file directly: https://github.com/KevinVandy/mantine-react-table/issues/390#issuecomment-2348339328
-import { MRT_Localization_RU } from 'mantine-react-table/locales/ru/index.cjs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -16,6 +14,7 @@ import {
   useSortSubcategories,
 } from '~/features/categories/facets/categoriesOrder';
 import { TableFlash, useTableFlash } from '~/shared/hooks/useTableFlash';
+import { useTableLocalization } from '~/shared/hooks/useTableLocalization';
 
 import { useTransactionTableColumns } from './columns/useTransactionTableColumns';
 import { RowActions } from './RowActions';
@@ -48,6 +47,8 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
     TableFlash.Transactions,
     { fadeDuration: 3000 },
   );
+
+  const tableLocalization = useTableLocalization();
 
   const table = useMantineReactTable({
     columns,
@@ -170,7 +171,7 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
             )
           : 0,
     },
-    localization: MRT_Localization_RU,
+    localization: tableLocalization,
     mantineTableBodyCellProps: ({ row }) => ({
       style: withFlashingStyles(row, {
         color: row.original.isUpcomingSubscription ? 'darkgray' : undefined,

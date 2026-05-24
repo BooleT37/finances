@@ -4,7 +4,6 @@ import {
   MRT_ExpandButton,
   useMantineReactTable,
 } from 'mantine-react-table';
-import { MRT_Localization_RU } from 'mantine-react-table/locales/ru/index.cjs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -12,6 +11,7 @@ import { NameWithOptionalIcon } from '~/features/categories/components/NameWithO
 import { useCategoryTableItems } from '~/features/categories/facets/categoryTableItems';
 import type { Category } from '~/features/categories/schema';
 import { TableFlash, useTableFlash } from '~/shared/hooks/useTableFlash';
+import { useTableLocalization } from '~/shared/hooks/useTableLocalization';
 
 import { useCategoriesTableColumns } from './columns/useCategoriesTableColumns';
 import { usePersistCategoriesOrder } from './hooks/usePersistCategoriesOrder';
@@ -26,6 +26,8 @@ export function CategoriesTable() {
   const { withFlashingStyles, setTable } = useTableFlash<Category>(
     TableFlash.Categories,
   );
+
+  const tableLocalization = useTableLocalization();
 
   const table = useMantineReactTable({
     columns,
@@ -100,7 +102,7 @@ export function CategoriesTable() {
         ),
       },
     },
-    localization: MRT_Localization_RU,
+    localization: tableLocalization,
   });
 
   useEffect(() => {
