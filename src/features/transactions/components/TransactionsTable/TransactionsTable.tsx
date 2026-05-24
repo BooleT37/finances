@@ -149,6 +149,9 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
         GroupedCell: ({ row }) => row.original.name,
         size: 200,
       },
+      'mrt-row-actions': {
+        minSize: 110,
+      },
     },
     sortingFns: {
       sortCategories: (rowA, rowB) =>
