@@ -98,4 +98,14 @@ export const i18nResources = {
 
 `src/lib/i18n/index.ts` imports and spreads them all into the master `resources` object passed to `i18n.init()`. TypeScript infers all namespace types automatically via `as const` + `(typeof resources)['ru']` — no manual type maintenance needed.
 
+### State: colocate atoms with their reader
+
+An atom that is read in only one place lives next to where it is read, regardless of where it is set. A writer in another feature imports the atom from the reader's folder — the reader owns the state, the writer just pokes it. Reserve `src/stores/` for truly global state (e.g. the month picker shared across pages) and a feature's `stores/` folder for atoms read across several of that feature's components.
+
+For example, `transactionSearchAtom` is read only by `TransactionsPage`, so it lives in `features/transactions/components/TransactionsPage/TransactionsPage.atoms.ts` even though `MonthNavigator` (in the `nav` feature) sets it.
+
+### Naming colocated files: `{Component}.{type}.ts`
+
+When colocating helpers specific to a single component, name the file after the component with a type suffix: `{Component}.{type}.ts`. Examples: `TransactionsPage.atoms.ts`, `TransactionsPage.utils.ts`, `TransactionsPage.types.ts`. This keeps the owning component obvious at a glance and sorts the related files together next to `{Component}.tsx`.
+
 Do not use barrel files in the project unless a framework requires it
