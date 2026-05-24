@@ -24,6 +24,3 @@ export const viewModeAtom = atomWithStorage<'month' | 'year'>(
   'finances.viewMode',
   'month',
 );
-
-/** Current search string on the transactions page. */
-export const transactionSearchAtom = atom('');

@@ -21,11 +21,8 @@ import dayjs from 'dayjs';
 import { useAtom, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
-import {
-  selectedMonthKeyAtom,
-  transactionSearchAtom,
-  viewModeAtom,
-} from '~/stores/month';
+import { transactionSearchAtom } from '~/features/transactions/components/TransactionsPage/TransactionsPage.atoms';
+import { selectedMonthKeyAtom, viewModeAtom } from '~/stores/month';
 
 function formatLabel(
   monthStr: string,

@@ -16,12 +16,15 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getUserSettingsQueryOptions } from '~/features/userSettings/queries';
-import { transactionSearchAtom } from '~/stores/month';
 
 import { ImportModal, importModalOpenAtom } from '../ImportModal';
 import { TransactionSidebar } from '../TransactionSidebar/TransactionSidebar';
 import { TransactionSidebarMolecule } from '../TransactionSidebar/transactionSidebarMolecule';
 import { TransactionTable } from '../TransactionsTable/TransactionsTable';
+import {
+  groupBySubcategoriesAtom,
+  transactionSearchAtom,
+} from './TransactionsPage.atoms';
 import { useTransactionTableItems } from './useTransactionTableItems';
 
 const sidebarWidth = 300;
@@ -33,7 +36,9 @@ export function TransactionsPage() {
   const setImportOpen = useSetAtom(importModalOpenAtom);
   const [search, setSearch] = useAtom(transactionSearchAtom);
   const [showUpcoming, setShowUpcoming] = useState(false);
-  const [groupBySubcategories, setGroupBySubcategories] = useState(false);
+  const [groupBySubcategories, setGroupBySubcategories] = useAtom(
+    groupBySubcategoriesAtom,
+  );
 
   const items = useTransactionTableItems({
     showUpcoming,

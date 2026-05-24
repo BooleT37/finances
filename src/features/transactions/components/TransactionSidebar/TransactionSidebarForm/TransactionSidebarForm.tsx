@@ -9,7 +9,6 @@ import { useTranslation } from 'react-i18next';
 
 import { getFromSavingsCategoryQueryOptions } from '~/features/categories/facets/categoriesByType';
 import { DatePickerWithTodayInput } from '~/shared/components/DatePickerWithTodayInput';
-import { TableFlash, useFlashTrigger } from '~/shared/hooks/useTableFlash';
 
 import { TransactionSidebarMolecule } from '../transactionSidebarMolecule';
 import { ActualDateField } from './fields/ActualDateField';
@@ -27,6 +26,7 @@ import type {
 } from './transactionFormValues';
 import { useTransactionToFormValues } from './transactionToFormValues';
 import { useEmptyTransactionFormValues } from './useEmptyTransactionFormValues';
+import { useFlashOnGroupChange } from './useFlashOnGroupChange';
 
 const costRegex = /^-?\d+(?:\.\d+)?$/;
 
@@ -43,7 +43,7 @@ export function TransactionSidebarForm() {
   const currentTransaction = useAtomValue(currentTransactionAtom);
   const saveTransaction = useSetAtom(saveTransactionAtom);
   const close = useSetAtom(closeAtom);
-  const triggerFlash = useFlashTrigger(TableFlash.Transactions);
+  const flashOnGroupChange = useFlashOnGroupChange();
   const setFormRef = useSetAtom(formRefAtom);
   const store = useStore();
 
@@ -108,8 +108,10 @@ export function TransactionSidebarForm() {
     if (!prepared) {
       return;
     }
-    await saveTransaction(prepared);
+    const previous = currentTransaction;
+    const updatedTx = await saveTransaction(prepared);
     f.resetDirty();
+    flashOnGroupChange(previous, updatedTx);
     // NOTE: to make form values fully consistent with the BE (e.g. correct cost
     // signs after a round-trip), we would reset the form here with BE values:
     //   const updatedTx = await saveTransaction(prepared);
@@ -186,7 +188,7 @@ export function TransactionSidebarForm() {
         return;
       }
       const tx = await saveTransaction(prepared);
-      triggerFlash([tx.id]);
+      flashOnGroupChange(null, tx);
       form.reset();
       close();
     },
