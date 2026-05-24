@@ -1,12 +1,12 @@
 import * as icons from '@fortawesome/free-solid-svg-icons';
 
-import type { CategoryIcon } from './categoryIcons';
+import type { CategoryIconDef } from './categoryIcons';
 
-export const categoryIconsDevices: CategoryIcon[] = [
-  { value: 'laptop', label: 'Ноутбук', icon: icons.faLaptop },
-  { value: 'plug', label: 'Вилка', icon: icons.faPlug },
-  { value: 'tv', label: 'Телевизор', icon: icons.faTv },
-  { value: 'mobile', label: 'Мобильный телефон', icon: icons.faMobile },
-  { value: 'camera', label: 'Камера', icon: icons.faCamera },
-  { value: 'ethernet', label: 'Ethernet', icon: icons.faEthernet },
-];
+export const categoryIconsDevices = [
+  { value: 'laptop', icon: icons.faLaptop },
+  { value: 'plug', icon: icons.faPlug },
+  { value: 'tv', icon: icons.faTv },
+  { value: 'mobile', icon: icons.faMobile },
+  { value: 'camera', icon: icons.faCamera },
+  { value: 'ethernet', icon: icons.faEthernet },
+] as const satisfies readonly CategoryIconDef[];

@@ -1,19 +1,15 @@
 import * as icons from '@fortawesome/free-solid-svg-icons';
 
-import type { CategoryIcon } from './categoryIcons';
+import type { CategoryIconDef } from './categoryIcons';
 
-export const categoryIconsTravel: CategoryIcon[] = [
-  { value: 'earth-europe', label: 'Земля', icon: icons.faEarthEurope },
-  { value: 'map', label: 'Карта', icon: icons.faMap },
-  { value: 'tree', label: 'Дерево', icon: icons.faTree },
-  { value: 'bed', label: 'Кровать', icon: icons.faBed },
-  { value: 'infinity', label: 'Бесконечность', icon: icons.faInfinity },
-  {
-    value: 'umbrella-beach',
-    label: 'Зонтик на пляже',
-    icon: icons.faUmbrellaBeach,
-  },
-  { value: 'suitcase', label: 'Чемодан', icon: icons.faSuitcase },
-  { value: 'smoking', label: 'Курение', icon: icons.faSmoking },
-  { value: 'kit-medical', label: 'Медицинский набор', icon: icons.faMedkit },
-];
+export const categoryIconsTravel = [
+  { value: 'earth-europe', icon: icons.faEarthEurope },
+  { value: 'map', icon: icons.faMap },
+  { value: 'tree', icon: icons.faTree },
+  { value: 'bed', icon: icons.faBed },
+  { value: 'infinity', icon: icons.faInfinity },
+  { value: 'umbrella-beach', icon: icons.faUmbrellaBeach },
+  { value: 'suitcase', icon: icons.faSuitcase },
+  { value: 'smoking', icon: icons.faSmoking },
+  { value: 'kit-medical', icon: icons.faMedkit },
+] as const satisfies readonly CategoryIconDef[];

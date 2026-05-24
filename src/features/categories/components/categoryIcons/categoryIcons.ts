@@ -1,4 +1,5 @@
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { useTranslation } from 'react-i18next';
 
 import { categoryIconsAccessibility } from './categoryIconsAccessibility';
 import { categoryIconsAlerts } from './categoryIconsAlerts';
@@ -16,31 +17,47 @@ import { categoryIconsShopping } from './categoryIconsShopping';
 import { categoryIconsTransportation } from './categoryIconsTransportation';
 import { categoryIconsTravel } from './categoryIconsTravel';
 
-export interface CategoryIcon {
+export interface CategoryIconDef {
   value: string;
-  label: string;
   icon: IconDefinition;
 }
 
-export const categoryIconsGroups = [
-  { group: 'Бизнес', icons: categoryIconsBusiness },
-  { group: 'Еда', icons: categoryIconsFood },
-  { group: 'Быт', icons: categoryIconsHousehold },
-  { group: 'Покупки', icons: categoryIconsShopping },
-  { group: 'Одежда и мода', icons: categoryIconsClothingFashion },
-  { group: 'Устройства', icons: categoryIconsDevices },
-  { group: 'Детство', icons: categoryIconsChildhood },
-  { group: 'Животные', icons: categoryIconsAnimals },
-  { group: 'Здания', icons: categoryIconsBuildings },
-  { group: 'Транспорт', icons: categoryIconsTransportation },
-  { group: 'Путешествия', icons: categoryIconsTravel },
-  { group: 'Доступность', icons: categoryIconsAccessibility },
-  { group: 'Оповещения', icons: categoryIconsAlerts },
-  { group: 'Формы', icons: categoryIconsShapes },
-  { group: 'Прочее', icons: categoryIconsOther },
-];
+const categoryIconDefsGroups = [
+  { groupKey: 'business', icons: categoryIconsBusiness },
+  { groupKey: 'food', icons: categoryIconsFood },
+  { groupKey: 'household', icons: categoryIconsHousehold },
+  { groupKey: 'shopping', icons: categoryIconsShopping },
+  { groupKey: 'clothingFashion', icons: categoryIconsClothingFashion },
+  { groupKey: 'devices', icons: categoryIconsDevices },
+  { groupKey: 'childhood', icons: categoryIconsChildhood },
+  { groupKey: 'animals', icons: categoryIconsAnimals },
+  { groupKey: 'buildings', icons: categoryIconsBuildings },
+  { groupKey: 'transportation', icons: categoryIconsTransportation },
+  { groupKey: 'travel', icons: categoryIconsTravel },
+  { groupKey: 'accessibility', icons: categoryIconsAccessibility },
+  { groupKey: 'alerts', icons: categoryIconsAlerts },
+  { groupKey: 'shapes', icons: categoryIconsShapes },
+  { groupKey: 'other', icons: categoryIconsOther },
+] as const;
 
-export const getIconByValue = (value: string) =>
-  categoryIconsGroups
-    .flatMap((group) => group.icons)
-    .find((icon) => icon.value === value)?.icon;
+export function useCategoryIconsGroups() {
+  const { t } = useTranslation('categories');
+  return categoryIconDefsGroups.map((group) => ({
+    group: t(`iconGroups.${group.groupKey}`),
+    icons: group.icons.map((icon) => ({
+      ...icon,
+      label: t(`iconLabels.${icon.value}`),
+    })),
+  }));
+}
+
+export const getIconByValue = (value: string): IconDefinition | undefined => {
+  for (const group of categoryIconDefsGroups) {
+    for (const icon of group.icons) {
+      if (icon.value === value) {
+        return icon.icon;
+      }
+    }
+  }
+  return undefined;
+};

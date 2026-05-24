@@ -20,7 +20,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { CategoryIconComp } from '~/features/categories/components/categoryIcons/CategoryIconComp';
-import { categoryIconsGroups } from '~/features/categories/components/categoryIcons/categoryIcons';
+import { useCategoryIconsGroups } from '~/features/categories/components/categoryIcons/categoryIcons';
 import {
   getCategoriesQueryOptions,
   useCreateCategory,
@@ -46,14 +46,6 @@ function categoryToFormValues(category: Category): CategoryFormValues {
   };
 }
 
-const iconSelectData = categoryIconsGroups.map((group) => ({
-  group: group.group,
-  items: group.icons.map((icon) => ({
-    value: icon.value,
-    label: icon.label,
-  })),
-}));
-
 export function CategorySidebarForm() {
   const { editingIdAtom, isNewCategoryAtom, formRefAtom, closeAtom } =
     useMolecule(CategorySidebarMolecule);
@@ -64,6 +56,14 @@ export function CategorySidebarForm() {
   const triggerFlash = useFlashTrigger(TableFlash.Categories);
   const store = useStore();
   const { t } = useTranslation('categories');
+
+  const iconSelectData = useCategoryIconsGroups().map((group) => ({
+    group: group.group,
+    items: group.icons.map((icon) => ({
+      value: icon.value,
+      label: icon.label,
+    })),
+  }));
 
   const { data: categories } = useQuery(getCategoriesQueryOptions());
   const currentCategory = useMemo(

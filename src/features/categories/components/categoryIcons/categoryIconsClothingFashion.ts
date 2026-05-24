@@ -1,7 +1,7 @@
 import * as icons from '@fortawesome/free-solid-svg-icons';
 
-import type { CategoryIcon } from './categoryIcons';
+import type { CategoryIconDef } from './categoryIcons';
 
-export const categoryIconsClothingFashion: CategoryIcon[] = [
-  { value: 'shirt', label: 'Рубашка', icon: icons.faTshirt },
-];
+export const categoryIconsClothingFashion = [
+  { value: 'shirt', icon: icons.faTshirt },
+] as const satisfies readonly CategoryIconDef[];

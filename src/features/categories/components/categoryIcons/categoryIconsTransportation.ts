@@ -1,19 +1,19 @@
 import * as icons from '@fortawesome/free-solid-svg-icons';
 
-import type { CategoryIcon } from './categoryIcons';
+import type { CategoryIconDef } from './categoryIcons';
 
-export const categoryIconsTransportation: CategoryIcon[] = [
-  { value: 'car', label: 'Автомобиль', icon: icons.faCar },
-  { value: 'truck', label: 'Грузовик', icon: icons.faTruck },
-  { value: 'car-side', label: 'Автомобиль сбоку', icon: icons.faCarSide },
-  { value: 'bicycle', label: 'Велосипед', icon: icons.faBicycle },
-  { value: 'motorcycle', label: 'Мотоцикл', icon: icons.faMotorcycle },
-  { value: 'taxi', label: 'Такси', icon: icons.faTaxi },
-  { value: 'gas-pump', label: 'Заправка', icon: icons.faGasPump },
-  { value: 'bus', label: 'Автобус', icon: icons.faBus },
-  { value: 'bus-simple', label: 'Автобус (простой)', icon: icons.faBusSimple },
-  { value: 'train', label: 'Поезд', icon: icons.faTrain },
-  { value: 'train-subway', label: 'Метро', icon: icons.faTrainSubway },
-  { value: 'plane', label: 'Самолет', icon: icons.faPlane },
-  { value: 'rocket', label: 'Ракета', icon: icons.faRocket },
-];
+export const categoryIconsTransportation = [
+  { value: 'car', icon: icons.faCar },
+  { value: 'truck', icon: icons.faTruck },
+  { value: 'car-side', icon: icons.faCarSide },
+  { value: 'bicycle', icon: icons.faBicycle },
+  { value: 'motorcycle', icon: icons.faMotorcycle },
+  { value: 'taxi', icon: icons.faTaxi },
+  { value: 'gas-pump', icon: icons.faGasPump },
+  { value: 'bus', icon: icons.faBus },
+  { value: 'bus-simple', icon: icons.faBusSimple },
+  { value: 'train', icon: icons.faTrain },
+  { value: 'train-subway', icon: icons.faTrainSubway },
+  { value: 'plane', icon: icons.faPlane },
+  { value: 'rocket', icon: icons.faRocket },
+] as const satisfies readonly CategoryIconDef[];
