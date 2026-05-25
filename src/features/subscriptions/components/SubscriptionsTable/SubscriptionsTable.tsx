@@ -60,6 +60,7 @@ export function SubscriptionsTable({ mode }: Props) {
   const table = useMantineReactTable({
     columns,
     data: filtered ?? [],
+    getRowId: (row) => String(row.id),
     enableGrouping: true,
     enableTopToolbar: false,
     enableBottomToolbar: false,

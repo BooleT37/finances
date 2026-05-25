@@ -23,6 +23,7 @@ export function SourcesTable() {
   const table = useMantineReactTable({
     columns,
     data: orderedSources ?? [],
+    getRowId: (row) => String(row.id),
     enableEditing: true,
     editDisplayMode: 'cell',
     enableRowOrdering: true,

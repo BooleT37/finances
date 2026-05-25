@@ -32,6 +32,7 @@ export function CategoriesTable() {
   const table = useMantineReactTable({
     columns,
     data: categoryTableItems ?? [],
+    getRowId: (row) => String(row.id),
     enableGrouping: true,
     enableTopToolbar: false,
     enableBottomToolbar: false,

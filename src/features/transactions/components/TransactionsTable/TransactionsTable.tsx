@@ -53,6 +53,7 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
   const table = useMantineReactTable({
     columns,
     data: items ?? [],
+    getRowId: (row) => String(row.id),
     enableGrouping: true,
     enableTopToolbar: false,
     enableBottomToolbar: false,
