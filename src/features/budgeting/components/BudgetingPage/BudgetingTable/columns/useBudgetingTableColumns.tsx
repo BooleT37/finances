@@ -140,7 +140,7 @@ export function useBudgetingTableColumns({
             const { value } = event.target;
             const parsed = new Decimal(value || 0);
             if (!parsed.isNaN() && row.original.categoryId !== null) {
-              savePlan(row, parsed.toNumber());
+              savePlan(row, Math.abs(parsed.toNumber()));
             }
           },
           onKeyDown: (event) => {
