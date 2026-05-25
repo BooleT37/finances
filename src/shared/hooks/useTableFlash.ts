@@ -40,7 +40,7 @@ function scrollToRow<TData extends MRT_RowData & { id: number }>(
   if (rowIndex >= 0) {
     container
       .querySelectorAll('tbody tr')
-      [rowIndex]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      [rowIndex]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 }
 
