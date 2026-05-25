@@ -1,17 +1,15 @@
 import dayjs from 'dayjs';
-import { useAtomValue } from 'jotai';
-import { useMemo } from 'react';
+import { atom } from 'jotai';
 
 import { getToday } from '~/shared/utils/today';
 import { selectedMonthKeyAtom } from '~/stores/month';
 
 import type { TransactionFormValues } from './transactionFormValues';
 
-export function useEmptyTransactionFormValues(): TransactionFormValues {
-  const selectedMonth = useAtomValue(selectedMonthKeyAtom);
-
-  return useMemo(
-    (): TransactionFormValues => ({
+export const emptyTransactionFormValuesAtom = atom(
+  (get): TransactionFormValues => {
+    const selectedMonth = get(selectedMonthKeyAtom);
+    return {
       components: [],
       cost: '',
       name: '',
@@ -28,7 +26,6 @@ export function useEmptyTransactionFormValues(): TransactionFormValues {
       savingSpendingCategoryId: null,
       savingSpendingId: null,
       transactionType: 'expense',
-    }),
-    [selectedMonth],
-  );
-}
+    };
+  },
+);

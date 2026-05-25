@@ -24,8 +24,8 @@ import type {
   TransactionFormValues,
   ValidatedTransactionFormValues,
 } from './transactionFormValues';
+import { emptyTransactionFormValuesAtom } from './TransactionSidebarForm.atoms';
 import { useTransactionToFormValues } from './transactionToFormValues';
-import { useEmptyTransactionFormValues } from './useEmptyTransactionFormValues';
 import { useFlashOnGroupChange } from './useFlashOnGroupChange';
 
 const costRegex = /^-?\d+(?:\.\d+)?$/;
@@ -85,7 +85,9 @@ export function TransactionSidebarForm() {
   );
 
   const transactionToFormValues = useTransactionToFormValues();
-  const emptyTransactionFormValues = useEmptyTransactionFormValues();
+  const emptyTransactionFormValues = useAtomValue(
+    emptyTransactionFormValuesAtom,
+  );
 
   const initialValues = useMemo((): TransactionFormValues => {
     if (!currentTransaction) {
