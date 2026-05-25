@@ -46,6 +46,7 @@ export function TreeSelect<T extends string>({
         allowClear
         notFoundContent={notFoundContent}
         disabled={disabled}
+        virtual={false}
       />
       {error && (
         <Text size="xs" c="red" mt={4}>
