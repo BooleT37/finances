@@ -1,4 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ru.js';
 
 import { expect, test } from './fixtures';
 import { testPrisma } from './db/client';
@@ -8,6 +10,10 @@ import {
   TODAY_MONTH,
   TODAY_YEAR,
 } from '../../src/shared/utils/today';
+
+// Matches the DatePickerInput default valueFormat under the ru DatesProvider locale.
+const formatDateInput = (date: dayjs.Dayjs) =>
+  date.locale('ru').format('MMMM D, YYYY');
 
 async function selectTreeOption(
   page: Page,
@@ -188,6 +194,34 @@ test.describe('Transaction creation', () => {
       name: 'прошлый месяц',
     });
     await expect(row.getByText('-€100.00')).toBeVisible();
+  });
+
+  // Regression: the sidebar form is mounted permanently (it only slides off-screen),
+  // so a new-transaction form used to keep the date of whichever month it was first
+  // opened on. Reopening after switching months must re-seed the autofilled date.
+  test('new-transaction date follows the selected month across reopen', async ({
+    page,
+  }) => {
+    const form = page.getByRole('form', { name: 'Форма транзакции' });
+    const dateField = form.getByLabel('Дата');
+
+    const today = dayjs(`${TODAY_YEAR}-${TODAY_MONTH + 1}-${TODAY_DAY}`);
+    const prevMonthStart = today.subtract(1, 'month').startOf('month');
+
+    // Open on the previous month: date autofills to the 1st of that month.
+    await page.getByRole('button', { name: 'Previous' }).click();
+    await page.waitForLoadState('networkidle');
+    await page.getByRole('button', { name: 'Добавить' }).click();
+    await expect(dateField).toHaveText(formatDateInput(prevMonthStart));
+
+    // Close, switch back to the current month, reopen.
+    await page.getByRole('button', { name: 'Закрыть' }).click();
+    await page.getByRole('button', { name: 'Next' }).click();
+    await page.waitForLoadState('networkidle');
+    await page.getByRole('button', { name: 'Добавить' }).click();
+
+    // The current month autofills to today (not the stale previous-month date).
+    await expect(dateField).toHaveText(formatDateInput(today));
   });
 });
 

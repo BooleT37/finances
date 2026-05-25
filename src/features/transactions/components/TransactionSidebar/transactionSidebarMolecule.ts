@@ -23,6 +23,7 @@ import type {
   TransactionFormType,
   TransformedTransactionFormValues,
 } from './TransactionSidebarForm/transactionFormValues';
+import { emptyTransactionFormValuesAtom } from './TransactionSidebarForm/TransactionSidebarForm.atoms';
 
 export const TransactionSidebarMolecule = molecule(() => {
   // ── Core state ──────────────────────────────────────────────────────────────
@@ -66,6 +67,16 @@ export const TransactionSidebarMolecule = molecule(() => {
         set(actualDateShownAtom, tx?.actualDate != null);
       } else {
         set(actualDateShownAtom, false);
+        // For the existing transaction path, we have the "key" workaround on the component,
+        // That remounts it on transaction id update. For the new transaction it won't work since the key
+        // is always "new". If we put the date or month in the key, it will remount on every date or month
+        // change respectfully, which we don't want. So to avoid bugs with initial transaction values not being
+        // reset after we close and reopen the sidebar, we need to do it manually
+        const form = get(_formAtom);
+        if (form) {
+          form.setInitialValues(get(emptyTransactionFormValuesAtom));
+          form.reset();
+        }
       }
       set(isOpenAtom, true);
     });
