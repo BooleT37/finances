@@ -45,7 +45,7 @@ export function RowActions({ id, parentExpenseId, name }: Props) {
   const doCopy = async ({ withComponents }: { withComponents: boolean }) => {
     const newId = await copyTx({ id, withComponents });
     if (newId !== undefined) {
-      triggerFlash([newId]);
+      triggerFlash([{ id: newId }]);
     }
   };
 

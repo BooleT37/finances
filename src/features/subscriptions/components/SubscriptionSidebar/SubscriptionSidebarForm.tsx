@@ -180,7 +180,7 @@ export function SubscriptionSidebarForm() {
     });
     form.reset();
     close();
-    triggerFlash([result.id]);
+    triggerFlash([{ id: result.id }]);
   });
 
   const costValue =

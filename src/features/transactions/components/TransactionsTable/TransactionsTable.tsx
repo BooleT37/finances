@@ -173,8 +173,8 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
           : 0,
     },
     localization: tableLocalization,
-    mantineTableBodyCellProps: ({ row }) => ({
-      style: withFlashingStyles(row, {
+    mantineTableBodyCellProps: ({ column, row }) => ({
+      style: withFlashingStyles(row, column.id, {
         color: row.original.isUpcomingSubscription ? 'darkgray' : undefined,
         background: getRowBgColor(row.depth),
         padding: '8px',

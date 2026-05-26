@@ -66,8 +66,8 @@ export function CategoriesTable() {
         maxWidth: 420,
       },
     },
-    mantineTableBodyCellProps: ({ row }) => ({
-      style: withFlashingStyles(row),
+    mantineTableBodyCellProps: ({ column, row }) => ({
+      style: withFlashingStyles(row, column.id),
     }),
     mantineRowDragHandleProps: ({ row, table: tbl }) => ({
       onDragEnd: () => persistCategoriesOrder(tbl, row.original.isIncome),

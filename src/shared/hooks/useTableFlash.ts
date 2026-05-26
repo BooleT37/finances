@@ -16,11 +16,24 @@ export enum TableFlash {
   Transactions = 'transactions',
 }
 
-const flashAtomRegistry = new Map<TableFlash, PrimitiveAtom<number[] | null>>();
+/**
+ * A row to flash. Omit `columns` to flash the whole row (used to locate a row
+ * after it moves or is created); provide `columns` (MRT column ids) to flash
+ * only those cells (used to highlight which fields an edit changed).
+ */
+export interface FlashTarget {
+  id: number;
+  columns?: string[];
+}
 
-function getFlashAtom(name: TableFlash): PrimitiveAtom<number[] | null> {
+const flashAtomRegistry = new Map<
+  TableFlash,
+  PrimitiveAtom<FlashTarget[] | null>
+>();
+
+function getFlashAtom(name: TableFlash): PrimitiveAtom<FlashTarget[] | null> {
   if (!flashAtomRegistry.has(name)) {
-    flashAtomRegistry.set(name, atom<number[] | null>(null));
+    flashAtomRegistry.set(name, atom<FlashTarget[] | null>(null));
   }
   return flashAtomRegistry.get(name)!;
 }
@@ -65,6 +78,9 @@ export function useFlashTrigger(tableName: TableFlash) {
   return useSetAtom(getFlashAtom(tableName));
 }
 
+/** `null` columns = flash the whole row; a Set = flash only those column ids. */
+type FlashColumns = Set<string> | null;
+
 export function useTableFlash<TData extends MRT_RowData & { id: number }>(
   tableName: TableFlash,
   options?: { fadeDuration?: number },
@@ -74,9 +90,9 @@ export function useTableFlash<TData extends MRT_RowData & { id: number }>(
   const tableRef = useRef<MRT_TableInstance<TData> | null>(null);
 
   const [flashState, setFlashState] = useState<{
-    ids: Set<number>;
+    targets: Map<number, FlashColumns>;
     fading: boolean;
-  }>({ ids: new Set(), fading: false });
+  }>({ targets: new Map(), fading: false });
 
   const trigger = useAtomValue(getFlashAtom(tableName));
 
@@ -84,26 +100,28 @@ export function useTableFlash<TData extends MRT_RowData & { id: number }>(
     if (!trigger) {
       return;
     }
-    const ids = new Set(trigger);
+    const targets = new Map<number, FlashColumns>(
+      trigger.map(({ id, columns }) => [id, columns ? new Set(columns) : null]),
+    );
     const table = tableRef.current;
     if (table) {
-      for (const id of ids) {
+      for (const id of targets.keys()) {
         expandParentsOf(table.getGroupedRowModel().rows, id);
       }
-      const firstId = [...ids][0];
+      const firstId = [...targets.keys()][0];
       if (firstId !== undefined) {
         setTimeout(() => scrollToRow(table, firstId), 50);
       }
     }
     // Sync flash state with the external atom trigger; timers below schedule fade/clear.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setFlashState({ ids, fading: false });
+    setFlashState({ targets, fading: false });
     const fadeTimer = setTimeout(
-      () => setFlashState({ ids, fading: true }),
+      () => setFlashState({ targets, fading: true }),
       300,
     );
     const clearTimer = setTimeout(
-      () => setFlashState({ ids: new Set(), fading: false }),
+      () => setFlashState({ targets: new Map(), fading: false }),
       fadeDuration + 300,
     );
     return () => {
@@ -116,14 +134,19 @@ export function useTableFlash<TData extends MRT_RowData & { id: number }>(
     tableRef.current = table;
   }, []);
 
-  const { ids: flashIds, fading } = flashState;
+  const { targets: flashTargets, fading } = flashState;
 
   const withFlashingStyles = useCallback(
     (
       row: MRT_Row<TData>,
+      columnId: string,
       extraStyles?: React.CSSProperties,
     ): React.CSSProperties => {
-      const isFlashing = !row.getIsGrouped() && flashIds.has(row.original.id);
+      const columns = row.getIsGrouped()
+        ? undefined
+        : flashTargets.get(row.original.id);
+      const isFlashing =
+        columns !== undefined && (columns === null || columns.has(columnId));
       if (!isFlashing) {
         return { background: undefined, transition: undefined, ...extraStyles };
       }
@@ -137,7 +160,7 @@ export function useTableFlash<TData extends MRT_RowData & { id: number }>(
           : undefined,
       };
     },
-    [flashIds, fading, fadeDuration],
+    [flashTargets, fading, fadeDuration],
   );
 
   return { withFlashingStyles, setTable };

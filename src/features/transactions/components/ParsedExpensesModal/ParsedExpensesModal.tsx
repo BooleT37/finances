@@ -205,7 +205,7 @@ export function ParsedExpensesModal({
     });
 
     const created = await importTransactions.mutateAsync(items);
-    triggerFlash(created.map((tx) => tx.id));
+    triggerFlash(created.map((tx) => ({ id: tx.id })));
     notifications.show({
       color: 'green',
       message: t('importModal.success', { count: created.length }),

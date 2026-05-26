@@ -19,7 +19,7 @@ export function SourcesPage() {
         onClick={() =>
           createSource.mutate(
             { name: t('newSourceName') },
-            { onSuccess: (source) => triggerFlash([source.id]) },
+            { onSuccess: (source) => triggerFlash([{ id: source.id }]) },
           )
         }
         loading={createSource.isPending}

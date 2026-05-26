@@ -56,8 +56,8 @@ export function SourcesTable() {
       onDragEnd: () => persistSourcesOrder(tbl),
     }),
     renderRowActions: ({ row }) => <RowActions row={row} />,
-    mantineTableBodyCellProps: ({ row }) => ({
-      style: withFlashingStyles(row),
+    mantineTableBodyCellProps: ({ column, row }) => ({
+      style: withFlashingStyles(row, column.id),
     }),
     localization: tableLocalization,
   });

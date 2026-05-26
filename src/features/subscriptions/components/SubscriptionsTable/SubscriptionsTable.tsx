@@ -101,8 +101,8 @@ export function SubscriptionsTable({ mode }: Props) {
           'var(--table-vertical-spacing) var(--table-horizontal-spacing, var(--mantine-spacing-xs))',
       },
     },
-    mantineTableBodyCellProps: ({ row }) => ({
-      style: withFlashingStyles(row, {
+    mantineTableBodyCellProps: ({ column, row }) => ({
+      style: withFlashingStyles(row, column.id, {
         background: getRowBgColor(row.depth),
       }),
     }),
