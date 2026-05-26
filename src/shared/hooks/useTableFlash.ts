@@ -154,7 +154,7 @@ export function useTableFlash<TData extends MRT_RowData & { id: number }>(
         ...extraStyles,
         background: fading
           ? (extraStyles?.background ?? 'transparent')
-          : '#fffde7',
+          : 'var(--mantine-primary-color-light)',
         transition: fading
           ? `background ${fadeDuration}ms ease-out`
           : undefined,
