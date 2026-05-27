@@ -2,6 +2,8 @@ import { createMRTColumnHelper } from 'mantine-react-table';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { useOrderedSources } from '~/features/sources/facets/orderedSources';
+
 import type { TransactionTableItem } from '../TransactionsTable.types';
 import { CostAggregatedCellRenderer } from './CostCellRenderer/CostAggregatedCellRenderer';
 import { CostCellRenderer } from './CostCellRenderer/CostCellRenderer';
@@ -12,6 +14,12 @@ const columnHelper = createMRTColumnHelper<TransactionTableItem>();
 export const useTransactionTableColumns = () => {
   const { t } = useTranslation('transactions');
   const costAggregationFn = useCostAggregationFn();
+  const sources = useOrderedSources();
+
+  const sourceFilterOptions = useMemo(
+    () => (sources ?? []).map((s) => s.name),
+    [sources],
+  );
 
   return useMemo(
     () => [
@@ -66,12 +74,18 @@ export const useTransactionTableColumns = () => {
         size: 130,
         header: t('columns.source'),
         enableGrouping: false,
+        filterVariant: 'select',
+        filterFn: 'equals',
+        mantineFilterSelectProps: {
+          data: sourceFilterOptions,
+          searchable: true,
+        },
       }),
       columnHelper.accessor('categoryId', {
         header: t('columns.category'),
         sortingFn: 'sortCategories' as never,
       }),
     ],
-    [costAggregationFn, t],
+    [costAggregationFn, sourceFilterOptions, t],
   );
 };
