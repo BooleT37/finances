@@ -7,6 +7,7 @@ import { useOrderedSources } from '~/features/sources/facets/orderedSources';
 import type { TransactionTableItem } from '../TransactionsTable.types';
 import { CostAggregatedCellRenderer } from './CostCellRenderer/CostAggregatedCellRenderer';
 import { CostCellRenderer } from './CostCellRenderer/CostCellRenderer';
+import { costFilterFn } from './utils/costFilterFn';
 import { useCostAggregationFn } from './utils/useCostAggregationFn';
 
 const columnHelper = createMRTColumnHelper<TransactionTableItem>();
@@ -38,6 +39,7 @@ export const useTransactionTableColumns = () => {
         size: 150,
         header: t('columns.cost'),
         enableGrouping: false,
+        filterFn: costFilterFn,
         aggregationFn: costAggregationFn,
         AggregatedCell: ({ cell, row }) => (
           <CostAggregatedCellRenderer
