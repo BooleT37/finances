@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
 export interface TreeNode {
   value: string;
   title: string;
+  icon?: string | null;
   children?: TreeNode[];
 }
 
@@ -18,6 +19,7 @@ interface Props<T extends string> {
   notFoundContent?: string;
   error?: ReactNode;
   disabled?: boolean;
+  titleRender?: (node: TreeNode) => ReactNode;
 }
 
 export function TreeSelect<T extends string>({
@@ -28,6 +30,7 @@ export function TreeSelect<T extends string>({
   notFoundContent,
   error,
   disabled,
+  titleRender,
 }: Props<T>) {
   return (
     <div>
@@ -47,6 +50,7 @@ export function TreeSelect<T extends string>({
         notFoundContent={notFoundContent}
         disabled={disabled}
         virtual={false}
+        treeTitleRender={titleRender}
       />
       {error && (
         <Text size="xs" c="red" mt={4}>

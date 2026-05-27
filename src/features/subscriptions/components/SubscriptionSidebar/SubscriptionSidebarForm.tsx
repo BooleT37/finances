@@ -20,6 +20,7 @@ import {
   buildCategorySubcategoryId,
   parseCategorySubcategoryId,
 } from '~/features/categories/categorySubcategoryId';
+import { renderCategoryTreeNodeTitle } from '~/features/categories/components/renderCategoryTreeNodeTitle';
 import { useCategoryTreeData } from '~/features/categories/facets/categoryTreeData';
 import { useOrderedSources } from '~/features/sources/facets/orderedSources';
 import { DatePickerWithTodayInput } from '~/shared/components/DatePickerWithTodayInput';
@@ -232,6 +233,7 @@ export function SubscriptionSidebarForm() {
         >
           <TreeSelect
             treeData={categoryTreeData ?? []}
+            titleRender={renderCategoryTreeNodeTitle}
             {...form.getInputProps('categoryId')}
           />
         </Input.Wrapper>

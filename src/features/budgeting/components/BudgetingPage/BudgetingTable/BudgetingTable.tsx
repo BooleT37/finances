@@ -92,6 +92,7 @@ export function BudgetingTable() {
             <NameWithOptionalIcon
               name={row.original.name}
               icon={row.original.icon}
+              reserveIconSpace={row.depth > 0}
             />
           </Group>
         ),

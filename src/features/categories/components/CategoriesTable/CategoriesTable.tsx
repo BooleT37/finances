@@ -97,6 +97,7 @@ export function CategoriesTable() {
               <NameWithOptionalIcon
                 name={row.original.name}
                 icon={row.original.icon}
+                reserveIconSpace
               />
             )}
           </Group>

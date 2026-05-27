@@ -128,6 +128,7 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
                 <NameWithOptionalIcon
                   name={row.original.category}
                   icon={row.original.categoryIcon}
+                  reserveIconSpace
                 />
               ) : (
                 (row.original.subcategory ?? t('columns.noSubcategory'))

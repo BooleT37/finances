@@ -11,6 +11,7 @@ function categoryToTreeNode(cat: Category): TreeNode {
   const node: TreeNode = {
     value: buildCategorySubcategoryId({ categoryId: cat.id }),
     title: cat.name,
+    icon: cat.icon,
   };
   if (cat.subcategories.length > 0) {
     node.children = cat.subcategories.map((sub) => ({

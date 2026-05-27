@@ -8,6 +8,7 @@ import {
   type CategorySubcategoryId,
   parseCategorySubcategoryId,
 } from '~/features/categories/categorySubcategoryId';
+import { renderCategoryTreeNodeTitle } from '~/features/categories/components/renderCategoryTreeNodeTitle';
 import { useCategoryTreeData } from '~/features/categories/facets/categoryTreeData';
 import { TreeSelect } from '~/shared/components/TreeSelect';
 
@@ -83,17 +84,18 @@ export function ParsedExpenseRow({ index, form }: Props) {
 
       <TextInput size="xs" disabled={!selected} {...getInputProps('amount')} />
 
-      <TreeSelect
+      <TreeSelect<CategorySubcategoryId>
         treeData={categoryTreeData ?? []}
-        value={row.categorySubcategoryId as CategorySubcategoryId | null}
+        value={row.categorySubcategoryId}
         onChange={(val) => {
           if (val) {
-            parseCategorySubcategoryId(val as CategorySubcategoryId);
+            parseCategorySubcategoryId(val);
           }
           form.setFieldValue(`expenses.${index}.categorySubcategoryId`, val);
         }}
         error={getInputProps('categorySubcategoryId').error}
         disabled={!selected}
+        titleRender={renderCategoryTreeNodeTitle}
       />
     </div>
   );

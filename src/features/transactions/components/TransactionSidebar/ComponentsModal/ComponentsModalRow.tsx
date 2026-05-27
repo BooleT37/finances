@@ -3,6 +3,7 @@ import type { UseFormReturnType } from '@mantine/form';
 import { IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 
+import { renderCategoryTreeNodeTitle } from '~/features/categories/components/renderCategoryTreeNodeTitle';
 import { useCategoryTreeData } from '~/features/categories/facets/categoryTreeData';
 import { TreeSelect } from '~/shared/components/TreeSelect';
 
@@ -53,6 +54,7 @@ export function ComponentsModalRow({
             treeData={treeData}
             placeholder={t('components.categoryRequired')}
             notFoundContent={t('components.categoryNotFound')}
+            titleRender={renderCategoryTreeNodeTitle}
             {...form.getInputProps(`components.${index}.categoryId`)}
           />
         </div>
