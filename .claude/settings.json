@@ -20,7 +20,8 @@
       "mcp__playwright__browser_wait_for",
       "mcp__playwright__browser_handle_dialog",
       "mcp__playwright__browser_network_requests",
-      "mcp__playwright__browser_press_key"
+      "mcp__playwright__browser_press_key",
+      "mcp__playwright__browser_hover"
     ]
   },
   "hooks": {
