@@ -15,6 +15,7 @@ import { AverageCell } from './AverageCell';
 import { GrandTotalSubscriptionBadge } from './GrandTotalSubscriptionBadge';
 import { isPlanCellLocked } from './isPlanCellLocked';
 import { PlanCell } from './PlanCell';
+import { ThisMonthCell } from './ThisMonthCell';
 
 const columnHelper = createMRTColumnHelper<BudgetingRow>();
 
@@ -161,13 +162,7 @@ export function useBudgetingTableColumns({
         enableEditing: false,
         enableSorting: false,
         Cell: ({ row }) => (
-          <CostWithDiffCellView
-            cost={row.original.thisMonthActual}
-            forecast={row.original.planSum}
-            isContinuous={row.original.isContinuous}
-            month={month}
-            year={year}
-          />
+          <ThisMonthCell row={row.original} month={month} year={year} />
         ),
         Footer: () => (
           <CostWithDiffCellView

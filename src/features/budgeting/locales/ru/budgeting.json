@@ -16,6 +16,10 @@
   "restRowTooltip": "Это фиктивная подкатегория, добавить комментарий к ней нельзя",
   "restSubcategory": "Остальное",
   "savings": "В сбережения",
+  "thisMonthTransactions": {
+    "noName": "[Имя отсутствует]",
+    "showMore": "Показать ещё {{count}}"
+  },
   "subscriptions": {
     "appliedSingle": "План заполнен: {{name}} — {{cost}}",
     "appliedGroup": "План заполнен из подписок — {{cost}} для {{count}} строк",

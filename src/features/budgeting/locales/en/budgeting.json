@@ -16,6 +16,10 @@
   "restRowTooltip": "This is a superficial subcategory, it's not possible to add a comment to it.",
   "restSubcategory": "Rest",
   "savings": "To savings",
+  "thisMonthTransactions": {
+    "noName": "[No name]",
+    "showMore": "Show {{count}} more"
+  },
   "subscriptions": {
     "appliedSingle": "Plan filled: {{name}} — {{cost}}",
     "appliedGroup": "Plan filled from subscriptions — {{cost}} across {{count}} rows",
