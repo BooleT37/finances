@@ -120,5 +120,13 @@
   "searchPlaceholder": "Найти...",
   "subscription": "Подписка",
   "upcomingSubscription": "Предстоящая подписка",
-  "upcomingSubscriptions": "Предстоящие подписки"
+  "upcomingSubscriptions": "Предстоящие подписки",
+  "upcomingBadge_one": "Ещё {{count}} подписка",
+  "upcomingBadge_few": "Ещё {{count}} подписки",
+  "upcomingBadge_many": "Ещё {{count}} подписок",
+  "upcomingTooltipTitle_one": "{{count}} подписка не заполнена",
+  "upcomingTooltipTitle_few": "{{count}} подписки не заполнены",
+  "upcomingTooltipTitle_many": "{{count}} подписок не заполнено",
+  "showInTable": "Показать в таблице",
+  "hideFromTable": "Скрыть в таблице"
 }

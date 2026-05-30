@@ -118,5 +118,11 @@
   "searchPlaceholder": "Search...",
   "subscription": "Subscription",
   "upcomingSubscription": "Upcoming subscription",
-  "upcomingSubscriptions": "Upcoming subscriptions"
+  "upcomingSubscriptions": "Upcoming subscriptions",
+  "upcomingBadge_one": "{{count}} more subscription",
+  "upcomingBadge_other": "{{count}} more subscriptions",
+  "upcomingTooltipTitle_one": "{{count}} subscription not filled in",
+  "upcomingTooltipTitle_other": "{{count}} subscriptions not filled in",
+  "showInTable": "Show in table",
+  "hideFromTable": "Hide from table"
 }

@@ -25,6 +25,7 @@ import {
   groupBySubcategoriesAtom,
   transactionSearchAtom,
 } from './TransactionsPage.atoms';
+import { UpcomingSubscriptionsBadge } from './UpcomingSubscriptionsBadge';
 import { useTransactionTableItems } from './useTransactionTableItems';
 
 const sidebarWidth = 300;
@@ -71,14 +72,13 @@ export function TransactionsPage() {
             </ActionIcon>
           </Tooltip>
           <Checkbox
-            label={t('upcomingSubscriptions')}
-            checked={showUpcoming}
-            onChange={(e) => setShowUpcoming(e.currentTarget.checked)}
-          />
-          <Checkbox
             label={t('groupBySubcategories')}
             checked={groupBySubcategories}
             onChange={(e) => setGroupBySubcategories(e.currentTarget.checked)}
+          />
+          <UpcomingSubscriptionsBadge
+            showUpcoming={showUpcoming}
+            onToggle={() => setShowUpcoming((prev) => !prev)}
           />
         </Group>
         <TextInput
