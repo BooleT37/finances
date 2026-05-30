@@ -6,8 +6,12 @@ import type { ReactNode } from 'react';
 
 export interface TreeNode {
   value: string;
-  title: string;
+  title: ReactNode;
   icon?: string | null;
+  /** Custom label shown in the selected-value box (defaults to `title`). */
+  selectionTitle?: ReactNode;
+  /** Plain-text used for searching when `title` is not a plain string. */
+  searchValue?: string;
   children?: TreeNode[];
 }
 
@@ -20,6 +24,10 @@ interface Props<T extends string> {
   error?: ReactNode;
   disabled?: boolean;
   titleRender?: (node: TreeNode) => ReactNode;
+  /** Node field rendered in the selected-value box. Ignored when `titleRender` is set. */
+  selectionProp?: 'selectionTitle';
+  /** Node field used for search filtering (default: `title`). */
+  searchProp?: 'title' | 'searchValue';
 }
 
 export function TreeSelect<T extends string>({
@@ -31,6 +39,8 @@ export function TreeSelect<T extends string>({
   error,
   disabled,
   titleRender,
+  selectionProp,
+  searchProp = 'title',
 }: Props<T>) {
   return (
     <div>
@@ -44,7 +54,8 @@ export function TreeSelect<T extends string>({
         treeData={treeData}
         placeholder={placeholder}
         showSearch
-        treeNodeFilterProp="title"
+        treeNodeFilterProp={searchProp}
+        treeNodeLabelProp={selectionProp}
         treeDefaultExpandAll
         allowClear
         notFoundContent={notFoundContent}

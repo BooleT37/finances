@@ -259,6 +259,7 @@ export const importTransactions = createServerFn({ method: 'POST' })
         date: new Date(item.date),
         categoryId: item.categoryId,
         subcategoryId: item.subcategoryId ?? null,
+        subscriptionId: item.subscriptionId ?? null,
         sourceId: item.sourceId,
         peHash: item.peHash,
         userId: user.id,

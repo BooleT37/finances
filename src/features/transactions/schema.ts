@@ -85,6 +85,7 @@ export const importTransactionItemSchema = z.object({
   date: z.string(),
   categoryId: z.number(),
   subcategoryId: z.number().nullable().optional(),
+  subscriptionId: z.number().nullable().optional(),
   sourceId: z.number(),
   peHash: z.string(),
 });

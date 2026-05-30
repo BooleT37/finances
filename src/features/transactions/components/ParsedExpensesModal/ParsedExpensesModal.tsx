@@ -8,16 +8,20 @@ import { useAtomValue } from 'jotai';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import {
-  type CategorySubcategoryId,
-  parseCategorySubcategoryId,
-} from '~/features/categories/categorySubcategoryId';
+import { parseCategorySubcategoryId } from '~/features/categories/categorySubcategoryId';
+import { getSubscriptionsQueryOptions } from '~/features/subscriptions/queries';
 import type { ParsedExpense } from '~/features/transactions/parsedExpense';
 import { getTransactionsQueryOptions } from '~/features/transactions/queries';
 import { useImportTransactions } from '~/features/transactions/queries';
 import { TableFlash, useFlashTrigger } from '~/shared/hooks/useTableFlash';
+import { findByIdOrThrow } from '~/shared/utils/getOrThrow';
 import { selectedYearAtom } from '~/stores/month';
 
+import {
+  isSubscriptionValue,
+  type ParsedExpenseCategoryValue,
+  parseSubscriptionValue,
+} from './parsedExpenseCategoryTree';
 import { ParsedExpenseRow } from './ParsedExpenseRow';
 import styles from './ParsedExpensesModal.module.css';
 
@@ -27,7 +31,7 @@ export interface ParsedExpenseRowValues {
   type: string;
   description: string;
   amount: string;
-  categorySubcategoryId: CategorySubcategoryId | null;
+  categorySubcategoryId: ParsedExpenseCategoryValue | null;
 }
 
 export interface ParsedExpenseFormValues {
@@ -62,6 +66,7 @@ export function ParsedExpensesModal({
   const { data: existingTransactions = [] } = useQuery(
     getTransactionsQueryOptions(selectedYear),
   );
+  const { data: subscriptions = [] } = useQuery(getSubscriptionsQueryOptions());
   const importTransactions = useImportTransactions();
   const triggerFlash = useFlashTrigger(TableFlash.Transactions);
 
@@ -185,15 +190,29 @@ export function ParsedExpensesModal({
     }
 
     const items = selected.map((e) => {
-      const { categoryId, subcategoryId } = parseCategorySubcategoryId(
-        e.categorySubcategoryId!,
-      );
+      const value = e.categorySubcategoryId!;
+      let categoryId: number;
+      let subcategoryId: number | null;
+      let subscriptionId: number | null = null;
+      if (isSubscriptionValue(value)) {
+        subscriptionId = parseSubscriptionValue(value);
+        const subscription = findByIdOrThrow(
+          subscriptions,
+          subscriptionId,
+          'Subscription',
+        );
+        categoryId = subscription.categoryId;
+        subcategoryId = subscription.subcategoryId;
+      } else {
+        ({ categoryId, subcategoryId } = parseCategorySubcategoryId(value));
+      }
       return {
         name: e.description,
         cost: new Decimal(e.amount).abs().toFixed(2),
         date: e.date!.format('YYYY-MM-DD'),
         categoryId,
         subcategoryId,
+        subscriptionId,
         sourceId,
         peHash:
           parsedExpenses.find(

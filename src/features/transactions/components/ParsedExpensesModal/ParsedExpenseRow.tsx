@@ -4,14 +4,12 @@ import type { UseFormReturnType } from '@mantine/form';
 import dayjs from 'dayjs';
 import { useEffect } from 'react';
 
-import {
-  type CategorySubcategoryId,
-  parseCategorySubcategoryId,
-} from '~/features/categories/categorySubcategoryId';
-import { renderCategoryTreeNodeTitle } from '~/features/categories/components/renderCategoryTreeNodeTitle';
-import { useCategoryTreeData } from '~/features/categories/facets/categoryTreeData';
 import { TreeSelect } from '~/shared/components/TreeSelect';
 
+import {
+  type ParsedExpenseCategoryValue,
+  useParsedExpenseCategoryTree,
+} from './parsedExpenseCategoryTree';
 import type { ParsedExpenseFormValues } from './ParsedExpensesModal';
 
 interface Props {
@@ -26,7 +24,9 @@ export function ParsedExpenseRow({ index, form }: Props) {
   const parsedAmount = parseFloat(amount);
   const amountIsNegative = !isNaN(parsedAmount) && parsedAmount < 0;
 
-  const categoryTreeData = useCategoryTreeData({ isIncome: !amountIsNegative });
+  const categoryTreeData = useParsedExpenseCategoryTree({
+    isIncome: !amountIsNegative,
+  });
 
   useEffect(() => {
     if (!row) {
@@ -84,18 +84,16 @@ export function ParsedExpenseRow({ index, form }: Props) {
 
       <TextInput size="xs" disabled={!selected} {...getInputProps('amount')} />
 
-      <TreeSelect<CategorySubcategoryId>
+      <TreeSelect<ParsedExpenseCategoryValue>
         treeData={categoryTreeData ?? []}
         value={row.categorySubcategoryId}
         onChange={(val) => {
-          if (val) {
-            parseCategorySubcategoryId(val);
-          }
           form.setFieldValue(`expenses.${index}.categorySubcategoryId`, val);
         }}
         error={getInputProps('categorySubcategoryId').error}
         disabled={!selected}
-        titleRender={renderCategoryTreeNodeTitle}
+        selectionProp="selectionTitle"
+        searchProp="searchValue"
       />
     </div>
   );
