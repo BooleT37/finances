@@ -50,6 +50,7 @@
     "price": "Цена",
     "firstDate": "Дата начала",
     "source": "Источник",
-    "monthlyTotal": "/ мес."
+    "monthlyTotal": "/ мес.",
+    "total": "Итого"
   }
 }

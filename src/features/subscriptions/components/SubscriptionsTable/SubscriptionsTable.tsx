@@ -99,6 +99,8 @@ export function SubscriptionsTable({ mode }: Props) {
       style: {
         padding:
           'var(--table-vertical-spacing) var(--table-horizontal-spacing, var(--mantine-spacing-xs))',
+        fontSize: 'inherit',
+        verticalAlign: 'middle',
       },
     },
     mantineTableBodyCellProps: ({ column, row }) => ({
@@ -129,6 +131,7 @@ export function SubscriptionsTable({ mode }: Props) {
               : row.original.name}
           </Group>
         ),
+        Footer: () => t('columns.total'),
       },
     },
     localization: tableLocalization,
