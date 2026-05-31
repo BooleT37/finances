@@ -17,8 +17,7 @@
   "restSubcategory": "Остальное",
   "savings": "В сбережения",
   "thisMonthTransactions": {
-    "noName": "[Имя отсутствует]",
-    "showMore": "Показать ещё {{count}}"
+    "noName": "[Имя отсутствует]"
   },
   "subscriptions": {
     "appliedSingle": "План заполнен: {{name}} — {{cost}}",

@@ -1,18 +1,9 @@
-import {
-  Badge,
-  Button,
-  Divider,
-  Group,
-  HoverCard,
-  Stack,
-  Text,
-} from '@mantine/core';
+import { Badge, Button, HoverCard, Stack } from '@mantine/core';
 import { IconEye, IconEyeClosed, IconRepeat } from '@tabler/icons-react';
-import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useAvailableSubscriptions } from '~/features/subscriptions/facets/availableSubscriptions';
-import { DATE_FORMAT } from '~/shared/constants';
+import { CostList } from '~/shared/components/CostList';
 
 interface UpcomingSubscriptionsBadgeProps {
   showUpcoming: boolean;
@@ -46,24 +37,17 @@ export function UpcomingSubscriptionsBadge({
       </HoverCard.Target>
       <HoverCard.Dropdown>
         <Stack gap={8}>
-          <Text size="sm" fw={600}>
-            {t('upcomingTooltipTitle', {
+          <CostList
+            title={t('upcomingTooltipTitle', {
               count: unfilledSubscriptions.length,
             })}
-          </Text>
-          <Stack gap={4}>
-            {unfilledSubscriptions.map((a, index) => (
-              <Fragment key={a.subscription.id}>
-                {index > 0 && <Divider />}
-                <Group justify="space-between" wrap="nowrap" gap="md">
-                  <Text size="sm">{a.subscription.name}</Text>
-                  <Text size="sm" c="dimmed">
-                    {a.firstDate.format(DATE_FORMAT)}
-                  </Text>
-                </Group>
-              </Fragment>
-            ))}
-          </Stack>
+            items={unfilledSubscriptions.map((a) => ({
+              key: String(a.subscription.id),
+              name: a.subscription.name,
+              cost: a.subscription.cost.abs(),
+              date: a.firstDate,
+            }))}
+          />
           <Button
             variant="subtle"
             size="xs"

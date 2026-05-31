@@ -33,9 +33,14 @@ async function hoverGrandTotalBadge(page: Page) {
   return page.locator('[data-testid="grand-total-subscription-tooltip"]');
 }
 
+// The confirm modal and an open HoverCard dropdown both expose role="dialog";
+// only the modal is aria-modal, so scope to that to disambiguate.
+function getConfirmModal(page: Page) {
+  return page.locator('[role="dialog"][aria-modal="true"]');
+}
+
 async function confirmFill(page: Page) {
-  await page
-    .getByRole('dialog')
+  await getConfirmModal(page)
     .getByRole('button', { name: 'Заполнить из подписок' })
     .click();
   await page.waitForLoadState('networkidle');
@@ -158,7 +163,7 @@ test.describe('Budgeting subscriptions', () => {
     await getSubscriptionBadge(getPlanCell(транспортRow))
       .getByRole('button')
       .click();
-    await expect(page.getByRole('dialog')).toBeVisible();
+    await expect(getConfirmModal(page)).toBeVisible();
     await confirmFill(page);
     await expect(getPlanCell(такси)).toContainText('-€299.00');
   });
@@ -182,7 +187,7 @@ test.describe('Budgeting subscriptions', () => {
     await getSubscriptionBadge(getPlanCell(расходыRow))
       .getByRole('button')
       .click();
-    await expect(page.getByRole('dialog')).toBeVisible();
+    await expect(getConfirmModal(page)).toBeVisible();
     await confirmFill(page);
 
     await expect(getPlanCell(getRow(page, 'Развлечения'))).toContainText(
@@ -213,7 +218,7 @@ test.describe('Budgeting subscriptions', () => {
 
     // Click → confirmation → fills all rows
     await getGrandTotalBadge(page).getByRole('button').click();
-    await expect(page.getByRole('dialog')).toBeVisible();
+    await expect(getConfirmModal(page)).toBeVisible();
     await confirmFill(page);
 
     await expect(getPlanCell(getRow(page, 'Развлечения'))).toContainText(

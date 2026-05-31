@@ -1,4 +1,4 @@
-import { ActionIcon, Group, List, Stack, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Box, Group, HoverCard, Stack, Text } from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { IconRepeat } from '@tabler/icons-react';
@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 import { getSourceMapQueryOptions } from '~/features/sources/facets/sourceMap';
 import type { AvailableSubscription } from '~/features/subscriptions/facets/availableSubscriptions';
+import { CostList } from '~/shared/components/CostList';
 import { costToString } from '~/shared/utils/costToString';
 import { decimalSum } from '~/shared/utils/decimalSum';
 
@@ -53,47 +54,6 @@ export function GrandTotalSubscriptionBadge({
     cost: costToString(grandTotal),
   });
 
-  const tooltipContent = (
-    <Stack gap={4} data-testid="grand-total-subscription-tooltip">
-      <Text size="xs" fw={600}>
-        {fromSubscriptions}
-      </Text>
-      <List size="xs">
-        {Array.from(groups.entries()).map(([sourceId, subs]) => {
-          const sourceName =
-            sourceId !== null && sourceMap
-              ? (sourceMap[sourceId]?.name ?? noSource)
-              : noSource;
-          const groupTotal = decimalSum(
-            ...subs.map((s) => s.subscription.cost.abs()),
-          );
-
-          return (
-            <List.Item key={String(sourceId)}>
-              <Text size="xs" fw={500}>
-                {sourceName} — {costToString(groupTotal)}
-              </Text>
-              <List size="xs">
-                {subs.map((s) => (
-                  <List.Item key={s.subscription.id}>
-                    <Text
-                      size="xs"
-                      c={s.transactionId !== null ? 'dimmed' : undefined}
-                    >
-                      {costToString(s.subscription.cost.abs())} —{' '}
-                      {s.subscription.name}
-                      {s.transactionId !== null ? ` (${paid})` : ''}
-                    </Text>
-                  </List.Item>
-                ))}
-              </List>
-            </List.Item>
-          );
-        })}
-      </List>
-    </Stack>
-  );
-
   function handleClick() {
     openConfirmModal({
       title: t('subscriptions.fillFromSubscriptions'),
@@ -121,30 +81,73 @@ export function GrandTotalSubscriptionBadge({
   }
 
   return (
-    <Tooltip label={tooltipContent} withArrow>
-      <Group
-        gap={2}
-        wrap="nowrap"
-        data-testid="subscription-badge"
-        style={{
-          border: '1px solid #ddd',
-          borderRadius: 4,
-          padding: '0 2px 0 0',
-        }}
-      >
-        <ActionIcon
-          variant="subtle"
-          size="xs"
-          color="gray"
-          onClick={handleClick}
-          aria-label={t('subscriptions.fillFromSubscriptions')}
+    <HoverCard width={300} position="bottom-start" withArrow shadow="md">
+      <HoverCard.Target>
+        <Group
+          gap={2}
+          wrap="nowrap"
+          data-testid="subscription-badge"
+          style={{
+            border: '1px solid #ddd',
+            borderRadius: 4,
+            padding: '0 2px 0 0',
+          }}
         >
-          <IconRepeat size={12} />
-        </ActionIcon>
-        <Text size="xs" c="dimmed">
-          {costToString(grandTotal)}
-        </Text>
-      </Group>
-    </Tooltip>
+          <ActionIcon
+            variant="subtle"
+            size="xs"
+            color="gray"
+            onClick={handleClick}
+            aria-label={t('subscriptions.fillFromSubscriptions')}
+          >
+            <IconRepeat size={12} />
+          </ActionIcon>
+          <Text size="xs" c="dimmed">
+            {costToString(grandTotal)}
+          </Text>
+        </Group>
+      </HoverCard.Target>
+      <HoverCard.Dropdown>
+        <Stack gap={8} data-testid="grand-total-subscription-tooltip">
+          <Text size="xs" fw={600}>
+            {fromSubscriptions}
+          </Text>
+          {Array.from(groups.entries()).map(([sourceId, subs]) => {
+            const sourceName =
+              sourceId !== null && sourceMap
+                ? (sourceMap[sourceId]?.name ?? noSource)
+                : noSource;
+            const groupTotal = decimalSum(
+              ...subs.map((s) => s.subscription.cost.abs()),
+            );
+            return (
+              <Stack key={String(sourceId)} gap={2}>
+                <Group justify="space-between" wrap="nowrap" gap="md">
+                  <Text size="xs" fw={500} truncate style={{ flex: 1 }}>
+                    {sourceName}
+                  </Text>
+                  <Text size="xs" fw={500} style={{ whiteSpace: 'nowrap' }}>
+                    {costToString(groupTotal)}
+                  </Text>
+                </Group>
+                <Box pl="sm">
+                  <CostList
+                    items={subs.map((s) => ({
+                      key: String(s.subscription.id),
+                      name: `${s.subscription.name}${
+                        s.transactionId !== null ? ` (${paid})` : ''
+                      }`,
+                      cost: s.subscription.cost.abs(),
+                      date: s.firstDate,
+                      secondary: s.transactionId !== null,
+                    }))}
+                  />
+                </Box>
+              </Stack>
+            );
+          })}
+        </Stack>
+      </HoverCard.Dropdown>
+    </HoverCard>
   );
 }

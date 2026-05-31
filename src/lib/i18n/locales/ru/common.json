@@ -2,5 +2,6 @@
   "forecast": {
     "plan": "План: {{value}}",
     "exceededBy": "Превышение на {{value}}"
-  }
+  },
+  "showMore": "Показать ещё {{count}}"
 }

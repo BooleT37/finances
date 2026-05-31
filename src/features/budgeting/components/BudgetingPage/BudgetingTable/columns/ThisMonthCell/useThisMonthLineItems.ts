@@ -1,21 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
-import type { Dayjs } from 'dayjs';
-import type Decimal from 'decimal.js';
 import { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { getTransactionsQueryOptions } from '~/features/transactions/queries';
 import type { Transaction } from '~/features/transactions/schema';
 import { costWithoutComponents } from '~/features/transactions/utils/costWithoutComponents';
 import { useFormatComponentName } from '~/features/transactions/utils/useFormatComponentName';
+import type { CostListItem } from '~/shared/components/CostList';
 
 import type { BudgetingRow } from '../../BudgetingTable.types';
-
-export interface ThisMonthLineItem {
-  key: string;
-  name: string;
-  cost: Decimal;
-  date: Dayjs;
-}
 
 /**
  * The line items that make up a "this month" cell total, using the same
@@ -27,7 +20,8 @@ export function useThisMonthLineItems(
   row: BudgetingRow,
   month: number,
   year: number,
-): ThisMonthLineItem[] {
+): CostListItem[] {
+  const { t } = useTranslation('budgeting');
   const formatComponentName = useFormatComponentName();
   const { data: monthTransactions = [] } = useQuery({
     ...getTransactionsQueryOptions(year),
@@ -65,10 +59,12 @@ export function useThisMonthLineItems(
       return subcategoryId === row.subcategoryId;
     };
 
+    const noName = t('thisMonthTransactions.noName');
+
     const transactionItems = monthTransactions.filter(matches).map(
-      (tx): ThisMonthLineItem => ({
+      (tx): CostListItem => ({
         key: `tx-${tx.id}`,
-        name: tx.name,
+        name: tx.name || noName,
         cost: costWithoutComponents(tx.cost, tx.components),
         date: tx.date,
       }),
@@ -76,9 +72,9 @@ export function useThisMonthLineItems(
 
     const componentItems = monthTransactions.flatMap((tx) =>
       tx.components.filter(matches).map(
-        (component): ThisMonthLineItem => ({
+        (component): CostListItem => ({
           key: `component-${component.id}`,
-          name: formatComponentName(component, tx),
+          name: formatComponentName(component, tx) || noName,
           cost: component.cost,
           date: tx.date,
         }),
@@ -88,5 +84,5 @@ export function useThisMonthLineItems(
     return [...transactionItems, ...componentItems].sort((a, b) =>
       b.cost.abs().comparedTo(a.cost.abs()),
     );
-  }, [monthTransactions, row, formatComponentName]);
+  }, [monthTransactions, row, formatComponentName, t]);
 }

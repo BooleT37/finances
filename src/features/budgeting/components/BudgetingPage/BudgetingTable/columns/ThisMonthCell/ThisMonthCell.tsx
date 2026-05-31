@@ -1,10 +1,12 @@
 import { HoverCard } from '@mantine/core';
 
 import { CostWithDiffCellView } from '~/components/CostWithDiffCellView';
+import { CostList } from '~/shared/components/CostList';
 
 import type { BudgetingRow } from '../../BudgetingTable.types';
-import { ThisMonthLineItemsList } from './ThisMonthLineItemsList';
 import { useThisMonthLineItems } from './useThisMonthLineItems';
+
+const MAX_VISIBLE = 5;
 
 interface Props {
   row: BudgetingRow;
@@ -41,7 +43,7 @@ export function ThisMonthCell({ row, month, year }: Props) {
         <div>{view}</div>
       </HoverCard.Target>
       <HoverCard.Dropdown>
-        <ThisMonthLineItemsList items={items} />
+        <CostList items={items} limit={MAX_VISIBLE} />
       </HoverCard.Dropdown>
     </HoverCard>
   );

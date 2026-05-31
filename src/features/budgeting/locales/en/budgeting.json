@@ -17,8 +17,7 @@
   "restSubcategory": "Rest",
   "savings": "To savings",
   "thisMonthTransactions": {
-    "noName": "[No name]",
-    "showMore": "Show {{count}} more"
+    "noName": "[No name]"
   },
   "subscriptions": {
     "appliedSingle": "Plan filled: {{name}} — {{cost}}",

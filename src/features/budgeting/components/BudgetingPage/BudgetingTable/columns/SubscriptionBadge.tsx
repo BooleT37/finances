@@ -1,11 +1,11 @@
-import { ActionIcon, Group, List, Stack, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Group, HoverCard, Stack, Text } from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { IconRepeat } from '@tabler/icons-react';
 import type { MRT_Row } from 'mantine-react-table';
 import { useTranslation } from 'react-i18next';
 
-import type { AvailableSubscription } from '~/features/subscriptions/facets/availableSubscriptions';
+import { CostList } from '~/shared/components/CostList';
 import { costToString } from '~/shared/utils/costToString';
 import { decimalSum } from '~/shared/utils/decimalSum';
 
@@ -21,48 +21,6 @@ interface Props {
   year: number;
 }
 
-function TooltipContent({
-  subs,
-  paid,
-  fromSubscriptions,
-}: {
-  subs: AvailableSubscription[];
-  paid: string;
-  fromSubscriptions: string;
-}) {
-  return (
-    <Stack gap={4} data-testid="subscription-tooltip">
-      <Text size="xs" fw={600}>
-        {fromSubscriptions}
-      </Text>
-      {subs.length === 1 ? (
-        <Text
-          size="xs"
-          c={subs[0]!.transactionId !== null ? 'dimmed' : undefined}
-        >
-          {subs[0]!.subscription.name}
-          {subs[0]!.transactionId !== null ? ` (${paid})` : ''}
-        </Text>
-      ) : (
-        <List size="xs">
-          {subs.map((s) => (
-            <List.Item key={s.subscription.id}>
-              <Text
-                size="xs"
-                c={s.transactionId !== null ? 'dimmed' : undefined}
-              >
-                {costToString(s.subscription.cost.abs())} —{' '}
-                {s.subscription.name}
-                {s.transactionId !== null ? ` (${paid})` : ''}
-              </Text>
-            </List.Item>
-          ))}
-        </List>
-      )}
-    </Stack>
-  );
-}
-
 export function SubscriptionBadge({ row, month, year }: Props) {
   const { t } = useTranslation('budgeting');
   const bulkSave = useBulkSaveForecastsSum(month, year);
@@ -73,6 +31,12 @@ export function SubscriptionBadge({ row, month, year }: Props) {
   }
 
   const total = decimalSum(...subs.map((s) => s.subscription.cost.abs()));
+  const paid = t('subscriptions.paid');
+  const fromSubscriptions = t('subscriptions.fromSubscriptions', {
+    cost: costToString(total),
+  });
+  const subscriptionName = (s: (typeof subs)[number]) =>
+    `${s.subscription.name}${s.transactionId !== null ? ` (${paid})` : ''}`;
 
   function applySubscriptions() {
     let items: BulkItem[];
@@ -121,41 +85,60 @@ export function SubscriptionBadge({ row, month, year }: Props) {
   }
 
   return (
-    <Tooltip
-      label={
-        <TooltipContent
-          subs={subs}
-          paid={t('subscriptions.paid')}
-          fromSubscriptions={t('subscriptions.fromSubscriptions', {
-            cost: costToString(total),
-          })}
-        />
-      }
-      withArrow
-    >
-      <Group
-        gap={2}
-        wrap="nowrap"
-        data-testid="subscription-badge"
-        style={{
-          border: '1px solid #ddd',
-          borderRadius: 4,
-          padding: '0 2px 0 0',
-        }}
-      >
-        <ActionIcon
-          variant="subtle"
-          size="xs"
-          color="gray"
-          onClick={handleClick}
-          aria-label={t('subscriptions.fillFromSubscriptions')}
+    <HoverCard width={280} position="bottom-start" withArrow shadow="md">
+      <HoverCard.Target>
+        <Group
+          gap={2}
+          wrap="nowrap"
+          data-testid="subscription-badge"
+          style={{
+            border: '1px solid #ddd',
+            borderRadius: 4,
+            padding: '0 2px 0 0',
+          }}
         >
-          <IconRepeat size={12} />
-        </ActionIcon>
-        <Text size="xs" c="dimmed">
-          {costToString(total)}
-        </Text>
-      </Group>
-    </Tooltip>
+          <ActionIcon
+            variant="subtle"
+            size="xs"
+            color="gray"
+            onClick={handleClick}
+            aria-label={t('subscriptions.fillFromSubscriptions')}
+          >
+            <IconRepeat size={12} />
+          </ActionIcon>
+          <Text size="xs" c="dimmed">
+            {costToString(total)}
+          </Text>
+        </Group>
+      </HoverCard.Target>
+      <HoverCard.Dropdown>
+        <div data-testid="subscription-tooltip">
+          {subs.length === 1 ? (
+            <Stack gap={4}>
+              <Text size="xs" fw={600}>
+                {fromSubscriptions}
+              </Text>
+              <Text
+                size="xs"
+                c={subs[0]!.transactionId !== null ? 'dimmed' : undefined}
+              >
+                {subscriptionName(subs[0]!)}
+              </Text>
+            </Stack>
+          ) : (
+            <CostList
+              title={fromSubscriptions}
+              items={subs.map((s) => ({
+                key: String(s.subscription.id),
+                name: subscriptionName(s),
+                cost: s.subscription.cost.abs(),
+                date: s.firstDate,
+                secondary: s.transactionId !== null,
+              }))}
+            />
+          )}
+        </div>
+      </HoverCard.Dropdown>
+    </HoverCard>
   );
 }
