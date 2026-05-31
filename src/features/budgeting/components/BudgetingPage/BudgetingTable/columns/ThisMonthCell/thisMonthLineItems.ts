@@ -1,11 +1,10 @@
 import type { Dayjs } from 'dayjs';
 import type Decimal from 'decimal.js';
+import { useMemo } from 'react';
 
-import type {
-  Transaction,
-  TransactionComponent,
-} from '~/features/transactions/schema';
+import type { Transaction } from '~/features/transactions/schema';
 import { costWithoutComponents } from '~/features/transactions/utils/costWithoutComponents';
+import { useFormatComponentName } from '~/features/transactions/utils/useFormatComponentName';
 
 export interface ThisMonthLineItem {
   key: string;
@@ -25,46 +24,53 @@ export interface ThisMonthSelection {
 }
 
 /**
- * Builds the list of line items that make up a "this month" cell total, using
- * the same attribution as `computePairTotal`: a matching transaction
- * contributes its cost minus its components (the remainder), and any matching
- * component contributes its own cost — mirroring the transactions table.
+ * Builds the line items that make up a "this month" cell total, using the same
+ * attribution as `computePairTotal`: a matching transaction contributes its
+ * cost minus its components (the remainder), and any matching component
+ * contributes its own cost — mirroring the transactions table.
  */
-export function buildThisMonthLineItems(
+export function useThisMonthLineItemsForSelection(
   monthTransactions: Transaction[],
-  selection: ThisMonthSelection,
-  formatComponentName: (
-    component: TransactionComponent,
-    parent: Transaction,
-  ) => string,
+  selection: ThisMonthSelection | null,
 ): ThisMonthLineItem[] {
-  const matches = (categoryId: number, subcategoryId: number | null): boolean =>
-    categoryId === selection.categoryId &&
-    (selection.subcategoryId === 'any' ||
-      subcategoryId === selection.subcategoryId);
+  const formatComponentName = useFormatComponentName();
 
-  const items: ThisMonthLineItem[] = [];
-
-  for (const tx of monthTransactions) {
-    if (matches(tx.categoryId, tx.subcategoryId)) {
-      items.push({
-        key: `tx-${tx.id}`,
-        name: tx.name,
-        cost: costWithoutComponents(tx.cost, tx.components),
-        date: tx.date,
-      });
+  return useMemo(() => {
+    if (!selection) {
+      return [];
     }
-    for (const component of tx.components) {
-      if (matches(component.categoryId, component.subcategoryId)) {
+
+    const matches = (
+      categoryId: number,
+      subcategoryId: number | null,
+    ): boolean =>
+      categoryId === selection.categoryId &&
+      (selection.subcategoryId === 'any' ||
+        subcategoryId === selection.subcategoryId);
+
+    const items: ThisMonthLineItem[] = [];
+
+    for (const tx of monthTransactions) {
+      if (matches(tx.categoryId, tx.subcategoryId)) {
         items.push({
-          key: `component-${component.id}`,
-          name: formatComponentName(component, tx),
-          cost: component.cost,
+          key: `tx-${tx.id}`,
+          name: tx.name,
+          cost: costWithoutComponents(tx.cost, tx.components),
           date: tx.date,
         });
       }
+      for (const component of tx.components) {
+        if (matches(component.categoryId, component.subcategoryId)) {
+          items.push({
+            key: `component-${component.id}`,
+            name: formatComponentName(component, tx),
+            cost: component.cost,
+            date: tx.date,
+          });
+        }
+      }
     }
-  }
 
-  return items.sort((a, b) => b.cost.abs().comparedTo(a.cost.abs()));
+    return items.sort((a, b) => b.cost.abs().comparedTo(a.cost.abs()));
+  }, [monthTransactions, selection, formatComponentName]);
 }

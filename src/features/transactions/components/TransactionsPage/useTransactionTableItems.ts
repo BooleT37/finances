@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import { useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { getCategoryMapQueryOptions } from '~/features/categories/facets/categoryMap';
 import type { Category } from '~/features/categories/schema';
@@ -26,6 +25,7 @@ import {
 
 import type { Transaction } from '../../schema';
 import { costWithoutComponents } from '../../utils/costWithoutComponents';
+import { useFormatComponentName } from '../../utils/useFormatComponentName';
 import {
   type TransactionTableItem,
   UPCOMING_SUBSCRIPTION_ID,
@@ -172,7 +172,7 @@ function mapSubscription(
 }
 
 function useMapComponents() {
-  const { t } = useTranslation('transactions');
+  const formatComponentName = useFormatComponentName();
 
   return useCallback(
     (
@@ -196,23 +196,9 @@ function useMapComponents() {
               )
             : null;
 
-        let name: string;
-        if (c.name && tx.name) {
-          name = t('componentWithParent', {
-            componentName: c.name,
-            parentName: tx.name,
-          });
-        } else if (c.name) {
-          name = c.name;
-        } else if (tx.name) {
-          name = t('componentOfExpense', { name: tx.name });
-        } else {
-          name = '';
-        }
-
         return {
           id: c.id,
-          name,
+          name: formatComponentName(c, tx),
           cost: {
             cost: c.cost,
             isSubscription: false,
@@ -236,7 +222,7 @@ function useMapComponents() {
         };
       });
     },
-    [t],
+    [formatComponentName],
   );
 }
 
