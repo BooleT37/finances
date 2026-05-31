@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { DATE_FORMAT } from '~/shared/constants';
 import { costToString } from '~/shared/utils/costToString';
 
-import type { ThisMonthLineItem } from './thisMonthLineItems';
+import type { ThisMonthLineItem } from './useThisMonthLineItems';
 
 const MAX_VISIBLE = 5;
 
