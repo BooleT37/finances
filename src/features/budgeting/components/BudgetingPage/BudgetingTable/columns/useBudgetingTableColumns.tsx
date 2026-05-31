@@ -15,7 +15,7 @@ import { AverageCell } from './AverageCell';
 import { GrandTotalSubscriptionBadge } from './GrandTotalSubscriptionBadge';
 import { isPlanCellLocked } from './isPlanCellLocked';
 import { PlanCell } from './PlanCell';
-import { ThisMonthCell } from './ThisMonthCell';
+import { ThisMonthCell } from './ThisMonthCell/ThisMonthCell';
 
 const columnHelper = createMRTColumnHelper<BudgetingRow>();
 
