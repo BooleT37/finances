@@ -1,4 +1,4 @@
-import { ActionIcon, Box, Loader, Paper, Title } from '@mantine/core';
+import { ActionIcon, Box, Group, Loader, Paper, Title } from '@mantine/core';
 import { IconX } from '@tabler/icons-react';
 import { Suspense, useMemo } from 'react';
 
@@ -7,10 +7,19 @@ interface Props {
   onClose: () => void;
   title: string;
   width: number;
+  /** Optional controls rendered next to the title (e.g. row navigation). */
+  titleActions?: React.ReactNode;
   children: React.ReactNode;
 }
 
-export function Sidebar({ isOpen, onClose, title, width, children }: Props) {
+export function Sidebar({
+  isOpen,
+  onClose,
+  title,
+  width,
+  titleActions,
+  children,
+}: Props) {
   const style = useMemo<React.CSSProperties>(
     () => ({
       position: 'fixed',
@@ -51,9 +60,10 @@ export function Sidebar({ isOpen, onClose, title, width, children }: Props) {
         >
           <IconX size={20} />
         </ActionIcon>
-        <Title order={4} mb="sm" pr={40}>
-          {title}
-        </Title>
+        <Group gap="xs" mb="sm" pr={40} wrap="nowrap">
+          <Title order={4}>{title}</Title>
+          {titleActions}
+        </Group>
         <Suspense fallback={<Loader size="sm" />}>{children}</Suspense>
       </Paper>
     </Box>

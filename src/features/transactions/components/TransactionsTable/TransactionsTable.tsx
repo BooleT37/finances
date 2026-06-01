@@ -1,4 +1,6 @@
 import { Group } from '@mantine/core';
+import { useMolecule } from 'bunshi/react';
+import { useAtomValue, useSetAtom } from 'jotai';
 import {
   MantineReactTable,
   MRT_ExpandAllButton,
@@ -13,12 +15,46 @@ import {
   useSortAllCategoriesById,
   useSortSubcategories,
 } from '~/features/categories/facets/categoriesOrder';
-import { TableFlash, useTableFlash } from '~/shared/hooks/useTableFlash';
+import {
+  expandParentsOf,
+  scrollToRow,
+  TableFlash,
+  useTableFlash,
+} from '~/shared/hooks/useTableFlash';
 import { useTableLocalization } from '~/shared/hooks/useTableLocalization';
 
+import { TransactionSidebarMolecule } from '../TransactionSidebar/transactionSidebarMolecule';
 import { useTransactionTableColumns } from './columns/useTransactionTableColumns';
 import { RowActions } from './RowActions';
 import type { TransactionTableItem } from './TransactionsTable.types';
+
+// Minimal structural row shape so this works with both Row and MRT_Row, which
+// TypeScript considers mutually non-assignable due to their columnDef types.
+interface NavRow {
+  original: TransactionTableItem;
+  getIsGrouped: () => boolean;
+  subRows?: NavRow[];
+}
+
+/** Leaf transaction rows the editing focus can land on / arrow-navigate to. */
+function isNavigable(row: NavRow): boolean {
+  return (
+    !row.getIsGrouped() &&
+    !row.original.isUpcomingSubscription &&
+    row.original.expenseId === null
+  );
+}
+
+function collectNavigableLeaves(rows: NavRow[], acc: NavRow[] = []): NavRow[] {
+  for (const row of rows) {
+    if (row.getIsGrouped()) {
+      collectNavigableLeaves(row.subRows ?? [], acc);
+    } else if (isNavigable(row)) {
+      acc.push(row);
+    }
+  }
+  return acc;
+}
 
 export const transactionNameCellClass = 'transaction-name-cell';
 
@@ -42,6 +78,16 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
   const columns = useTransactionTableColumns();
   const { sortAllCategoriesById } = useSortAllCategoriesById();
   const sortSubcategories = useSortSubcategories();
+
+  const { isOpenAtom, editingIdAtom, navTargetsAtom, scrollRequestAtom } =
+    useMolecule(TransactionSidebarMolecule);
+  const sidebarOpen = useAtomValue(isOpenAtom);
+  const editingId = useAtomValue(editingIdAtom);
+  const setNavTargets = useSetAtom(navTargetsAtom);
+  const scrollRequest = useAtomValue(scrollRequestAtom);
+  // Only highlight when editing an existing transaction (not create/closed).
+  const focusedId =
+    sidebarOpen && editingId != null && editingId >= 0 ? editingId : null;
 
   const { withFlashingStyles, setTable } = useTableFlash<TransactionTableItem>(
     TableFlash.Transactions,
@@ -174,13 +220,35 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
           : 0,
     },
     localization: tableLocalization,
-    mantineTableBodyCellProps: ({ column, row }) => ({
-      style: withFlashingStyles(row, column.id, {
-        color: row.original.isUpcomingSubscription ? 'darkgray' : undefined,
-        background: getRowBgColor(row.depth),
-        padding: '8px',
-      }),
-    }),
+    mantineTableBodyCellProps: ({ column, row, table: t2 }) => {
+      const isFocused = !row.getIsGrouped() && row.original.id === focusedId;
+      const leafColumns = t2.getVisibleLeafColumns();
+      const isFirst = column.id === leafColumns[0]?.id;
+      const isLast = column.id === leafColumns[leafColumns.length - 1]?.id;
+      // Draw the focus outline with inset box-shadows rather than borders: the
+      // table uses border-collapse, which drops the shared top/bottom borders
+      // between rows. Shadows aren't collapsed and don't affect layout. Top and
+      // bottom on every focused cell; left on the first column, right on the last.
+      const c = 'var(--mantine-primary-color-3)';
+      const boxShadow = isFocused
+        ? [
+            `inset 0 2px 0 0 ${c}`,
+            `inset 0 -2px 0 0 ${c}`,
+            isFirst ? `inset 2px 0 0 0 ${c}` : null,
+            isLast ? `inset -2px 0 0 0 ${c}` : null,
+          ]
+            .filter(Boolean)
+            .join(', ')
+        : undefined;
+      return {
+        style: withFlashingStyles(row, column.id, {
+          color: row.original.isUpcomingSubscription ? 'darkgray' : undefined,
+          background: getRowBgColor(row.depth),
+          padding: '8px',
+          boxShadow,
+        }),
+      };
+    },
   });
 
   useEffect(() => {
@@ -194,6 +262,58 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
       table.setGrouping(['isIncome', 'categoryId']);
     }
   }, [groupBySubcategories, table]);
+
+  // Publish the visible navigable rows adjacent to the focused one. When the
+  // focused row is hidden (filtered out / collapsed group), prev/next fall to
+  // the rows surrounding its visual position.
+  const rowModelRows = table.getRowModel().rows;
+  useEffect(() => {
+    if (focusedId === null) {
+      setNavTargets({ prevId: null, nextId: null });
+      return;
+    }
+    const leaves = collectNavigableLeaves(rowModelRows);
+    const index = leaves.findIndex((r) => r.original.id === focusedId);
+    if (index >= 0) {
+      setNavTargets({
+        prevId: index > 0 ? leaves[index - 1]!.original.id : null,
+        nextId:
+          index < leaves.length - 1 ? leaves[index + 1]!.original.id : null,
+      });
+      return;
+    }
+    // Focused row not currently visible: use its visual position among leaves.
+    const allLeaves = collectNavigableLeaves(table.getCoreRowModel().rows);
+    const visiblePos = (id: number) =>
+      leaves.findIndex((r) => r.original.id === id);
+    const coreIndex = allLeaves.findIndex((r) => r.original.id === focusedId);
+    let prevId: number | null = null;
+    let nextId: number | null = null;
+    for (let i = coreIndex - 1; i >= 0; i--) {
+      const candidate = allLeaves[i]!.original.id;
+      if (visiblePos(candidate) >= 0) {
+        prevId = candidate;
+        break;
+      }
+    }
+    for (let i = coreIndex + 1; i < allLeaves.length; i++) {
+      const candidate = allLeaves[i]!.original.id;
+      if (visiblePos(candidate) >= 0) {
+        nextId = candidate;
+        break;
+      }
+    }
+    setNavTargets({ prevId, nextId });
+  }, [focusedId, rowModelRows, table, setNavTargets]);
+
+  // Scroll the focused row into view on request (arrow nav, component edit, copy).
+  useEffect(() => {
+    if (!scrollRequest) {
+      return;
+    }
+    expandParentsOf(table.getGroupedRowModel().rows, scrollRequest.id);
+    setTimeout(() => scrollToRow(table, scrollRequest.id), 50);
+  }, [scrollRequest, table]);
 
   return <MantineReactTable table={table} />;
 }

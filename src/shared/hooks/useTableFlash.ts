@@ -38,7 +38,7 @@ function getFlashAtom(name: TableFlash): PrimitiveAtom<FlashTarget[] | null> {
   return flashAtomRegistry.get(name)!;
 }
 
-function scrollToRow<TData extends MRT_RowData & { id: number }>(
+export function scrollToRow<TData extends MRT_RowData & { id: number }>(
   table: MRT_TableInstance<TData>,
   id: number,
 ) {
@@ -57,7 +57,7 @@ function scrollToRow<TData extends MRT_RowData & { id: number }>(
   }
 }
 
-function expandParentsOf<TData extends { id: number }>(
+export function expandParentsOf<TData extends { id: number }>(
   rows: Row<TData>[],
   id: number,
 ): boolean {

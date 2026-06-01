@@ -49,6 +49,22 @@ export const TransactionSidebarMolecule = molecule(() => {
   const actualDateShownAtom = atom(false);
   const isOpenAtom = atom(false);
 
+  // ── Row navigation ────────────────────────────────────────────────────────
+  // The table publishes the visible leaf rows adjacent to the focused one so the
+  // sidebar's up/down buttons know where to go (null when there is none).
+  const navTargetsAtom = atom<{ prevId: number | null; nextId: number | null }>(
+    { prevId: null, nextId: null },
+  );
+  // Bumped to ask the table to scroll the focused row into view. Used for
+  // arrow-nav and component edits; a plain edit-click does not request a scroll.
+  const scrollRequestAtom = atom<{ id: number; token: number } | null>(null);
+  const requestScrollAtom = atom(null, (get, set, id: number) => {
+    set(scrollRequestAtom, {
+      id,
+      token: (get(scrollRequestAtom)?.token ?? 0) + 1,
+    });
+  });
+
   const _formAtom = atom<TransactionFormType | null>(null);
   const formRefAtom = atom(
     (get) => get(_formAtom),
@@ -108,10 +124,25 @@ export const TransactionSidebarMolecule = molecule(() => {
         set(isOpenAtom, true);
         set(componentsModalOpenAtom, true);
         set(highlightedComponentIdAtom, componentId);
+        set(requestScrollAtom, parentId);
         setTimeout(() => set(highlightedComponentIdAtom, null), 3500);
       });
     },
   );
+
+  // Move the edited transaction to an adjacent visible row (arrow buttons).
+  // Routes through the dirty-check so a dirty/invalid form prompts to confirm.
+  const navigateToTransactionAtom = atom(null, (get, set, id: number) => {
+    set(withDirtyCheckAtom, () => {
+      set(editingIdAtom, id);
+      const tx = get(transactionsMapAtom).data?.[id] ?? null;
+      set(actualDateShownAtom, tx?.actualDate != null);
+      set(componentsModalOpenAtom, false);
+      set(highlightedComponentIdAtom, null);
+      set(isOpenAtom, true);
+      set(requestScrollAtom, id);
+    });
+  });
 
   // ── Mutations ───────────────────────────────────────────────────────────────
   const addMutationAtom = atomWithMutation((get) =>
@@ -235,6 +266,7 @@ export const TransactionSidebarMolecule = molecule(() => {
       });
 
       set(openAtom, newTx.id);
+      set(requestScrollAtom, newTx.id);
       return newTx.id;
     },
   );
@@ -255,5 +287,8 @@ export const TransactionSidebarMolecule = molecule(() => {
     saveTransactionAtom,
     deleteTransactionAtom,
     copyTransactionAtom,
+    navTargetsAtom,
+    scrollRequestAtom,
+    navigateToTransactionAtom,
   };
 });
