@@ -43,6 +43,7 @@
       "firstDateRequired": "First date is required"
     },
     "add": "Add",
+    "cancel": "Cancel",
     "unsavedChanges": "Fix the errors above to save changes."
   },
   "columns": {
