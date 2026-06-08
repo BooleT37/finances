@@ -25,6 +25,8 @@ export interface TransactionTableItem {
   subcategory: string | null; // subcategory.name, or null
   subcategoryId: number | null;
   source: string; // source.name, or '' when source is null
+  sourceId: number | null;
+  subscriptionId: number | null; // set for upcoming subscription rows
   isUpcomingSubscription: boolean;
   isFromSavings: boolean;
   expenseId: number | null; // null for regular rows; parent id for components

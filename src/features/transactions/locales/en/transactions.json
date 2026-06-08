@@ -1,6 +1,7 @@
 {
   "actions": {
     "copy": "Copy",
+    "createFromSubscription": "Create transaction",
     "delete": "Delete",
     "edit": "Edit"
   },
