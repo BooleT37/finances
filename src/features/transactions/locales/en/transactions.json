@@ -81,7 +81,9 @@
     "source": "Source",
     "sourceLastEntry": "Last entry: {{date}}",
     "subcategory": "Subcategory",
-    "subscription": "Subscription"
+    "subscription": "Subscription",
+    "createSubscription": "Create subscription",
+    "createSubscriptionModalTitle": "Create subscription"
   },
   "sidebar": {
     "add": "Add transaction",

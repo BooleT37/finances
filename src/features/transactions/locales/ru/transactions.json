@@ -81,7 +81,9 @@
       "income": "Доход",
       "label": "Тип"
     },
-    "unsavedChanges": "Исправьте ошибки выше, чтобы сохранить изменения."
+    "unsavedChanges": "Исправьте ошибки выше, чтобы сохранить изменения.",
+    "createSubscription": "Создать подписку",
+    "createSubscriptionModalTitle": "Создать подписку"
   },
   "sidebar": {
     "add": "Добавить",
