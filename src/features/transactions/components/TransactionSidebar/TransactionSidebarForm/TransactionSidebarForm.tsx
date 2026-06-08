@@ -1,16 +1,28 @@
-import { Alert, Button, Stack, TextInput } from '@mantine/core';
+import {
+  ActionIcon,
+  Alert,
+  Button,
+  Stack,
+  TextInput,
+  Tooltip,
+} from '@mantine/core';
 import { isNotEmpty, matches, useForm } from '@mantine/form';
 import { useDebouncedCallback } from '@mantine/hooks';
+import { modals } from '@mantine/modals';
+import { IconRepeat } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useMolecule } from 'bunshi/react';
+import dayjs from 'dayjs';
 import { useAtomValue, useSetAtom, useStore } from 'jotai';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { buildCategorySubcategoryId } from '~/features/categories/categorySubcategoryId';
 import { getFromSavingsCategoryQueryOptions } from '~/features/categories/facets/categoriesByType';
 import { DatePickerWithTodayInput } from '~/shared/components/DatePickerWithTodayInput';
 
 import { TransactionSidebarMolecule } from '../transactionSidebarMolecule';
+import { CreateSubscriptionModal } from './CreateSubscriptionModal';
 import { ActualDateField } from './fields/ActualDateField';
 import { useActualDateValidator } from './fields/ActualDateField.validator';
 import { CategoryFields } from './fields/CategoryFields';
@@ -184,6 +196,52 @@ export function TransactionSidebarForm() {
     return () => window.removeEventListener('beforeunload', handler);
   }, [form]);
 
+  const handleCreateSubscription = () => {
+    const {
+      transactionType,
+      expenseCategory,
+      expenseSubcategory,
+      incomeCategory,
+      incomeSubcategory,
+      source,
+      cost,
+      name,
+      date,
+    } = form.values;
+    const activeCategory =
+      transactionType === 'income' ? incomeCategory : expenseCategory;
+    const activeSubcategory =
+      transactionType === 'income' ? incomeSubcategory : expenseSubcategory;
+
+    modals.open({
+      title: t('form.createSubscriptionModalTitle'),
+      children: (
+        <CreateSubscriptionModal
+          initialValues={{
+            name,
+            cost: cost.replace('-', ''),
+            period: '1',
+            categoryId:
+              activeCategory !== null
+                ? buildCategorySubcategoryId({
+                    categoryId: Number(activeCategory),
+                    subcategoryId:
+                      activeSubcategory !== null
+                        ? Number(activeSubcategory)
+                        : null,
+                  })
+                : null,
+            firstDate: date ? dayjs(date) : null,
+            sourceId: source,
+          }}
+          onSuccess={(subscriptionId) => {
+            form.setFieldValue('subscription', String(subscriptionId));
+          }}
+        />
+      ),
+    });
+  };
+
   const handleSubmit = form.onSubmit(
     async (prepared) => {
       if (!prepared) {
@@ -221,6 +279,17 @@ export function TransactionSidebarForm() {
             <>
               <CategoryFields form={form} />
               <SubscriptionField form={form} />
+              <Tooltip label={t('form.createSubscription')}>
+                <ActionIcon
+                  variant="subtle"
+                  color="gray"
+                  aria-label={t('form.createSubscription')}
+                  onClick={handleCreateSubscription}
+                  style={{ alignSelf: 'flex-start' }}
+                >
+                  <IconRepeat size={16} />
+                </ActionIcon>
+              </Tooltip>
             </>
           )}
 
