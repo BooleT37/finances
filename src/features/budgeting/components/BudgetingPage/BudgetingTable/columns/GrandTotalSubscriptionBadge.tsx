@@ -120,15 +120,25 @@ export function GrandTotalSubscriptionBadge({
             const groupTotal = decimalSum(
               ...subs.map((s) => s.subscription.cost.abs()),
             );
+            const groupRemaining = decimalSum(
+              ...subs
+                .filter((s) => s.transactionId === null)
+                .map((s) => s.subscription.cost.abs()),
+            );
             return (
               <Stack key={String(sourceId)} gap={2}>
                 <Group justify="space-between" wrap="nowrap" gap="md">
                   <Text size="xs" fw={500} truncate style={{ flex: 1 }}>
                     {sourceName}
                   </Text>
-                  <Text size="xs" fw={500} style={{ whiteSpace: 'nowrap' }}>
-                    {costToString(groupTotal)}
-                  </Text>
+                  <Group gap={4} wrap="nowrap" style={{ whiteSpace: 'nowrap' }}>
+                    <Text size="xs" fw={700}>
+                      {costToString(groupRemaining)}
+                    </Text>
+                    <Text size="xs" c="dimmed">
+                      / {costToString(groupTotal)}
+                    </Text>
+                  </Group>
                 </Group>
                 <Box pl="sm">
                   <CostList
