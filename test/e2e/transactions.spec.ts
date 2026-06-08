@@ -781,8 +781,9 @@ test.describe('Subscriptions', () => {
       .locator('xpath=ancestor::tr');
     await expect(развлеченияAggRow.getByText('-€50.00').first()).toBeVisible();
 
-    // Enable upcoming subscriptions
-    await page.getByLabel('Предстоящие подписки').click();
+    // Enable upcoming subscriptions — hover the badge to open the dropdown, then click the toggle
+    await page.getByText(/^Ещё/).hover();
+    await page.getByRole('button', { name: 'Показать в таблице' }).click();
 
     const upcomingRow = await findTransactionRow(page, {
       name: 'Спотифай',
@@ -806,7 +807,8 @@ test.describe('Subscriptions', () => {
     await expect(развлеченияAggRow.getByText('-€50.00').first()).toBeVisible();
 
     // Disable upcoming subscriptions — row disappears
-    await page.getByLabel('Предстоящие подписки').click();
+    await page.getByText(/^Ещё/).hover();
+    await page.getByRole('button', { name: 'Скрыть в таблице' }).click();
     await expect(
       page.locator(
         `.${transactionNameCellClass}[data-testing-category-id="${seedData.categoryIds.развлечения}"]`,
