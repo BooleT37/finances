@@ -34,7 +34,6 @@ export function collectBulkItems(row: MRT_Row<BudgetingRow>): BulkItem[] {
     const items: BulkItem[] = [];
     for (const subRow of row.subRows ?? []) {
       if (
-        subRow.original.isRestRow ||
         subRow.original.rowType !== 'subcategory' ||
         subRow.original.subscriptions.length === 0
       ) {
