@@ -28,6 +28,8 @@ interface Props<T extends string> {
   selectionProp?: 'selectionTitle';
   /** Node field used for search filtering (default: `title`). */
   searchProp?: 'title' | 'searchValue';
+  /** Whether to expand all tree nodes by default when the dropdown opens (default: `true`). */
+  defaultExpandAll?: boolean;
 }
 
 export function TreeSelect<T extends string>({
@@ -41,6 +43,7 @@ export function TreeSelect<T extends string>({
   titleRender,
   selectionProp,
   searchProp = 'title',
+  defaultExpandAll = true,
 }: Props<T>) {
   return (
     <div>
@@ -56,7 +59,7 @@ export function TreeSelect<T extends string>({
         showSearch
         treeNodeFilterProp={searchProp}
         treeNodeLabelProp={selectionProp}
-        treeDefaultExpandAll
+        treeDefaultExpandAll={defaultExpandAll}
         allowClear
         notFoundContent={notFoundContent}
         disabled={disabled}
