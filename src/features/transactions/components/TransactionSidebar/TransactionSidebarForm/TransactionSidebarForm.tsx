@@ -1,7 +1,9 @@
 import {
   ActionIcon,
   Alert,
+  Box,
   Button,
+  Group,
   Stack,
   TextInput,
   Tooltip,
@@ -12,7 +14,6 @@ import { modals } from '@mantine/modals';
 import { IconRepeat } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useMolecule } from 'bunshi/react';
-import dayjs from 'dayjs';
 import { useAtomValue, useSetAtom, useStore } from 'jotai';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -231,7 +232,7 @@ export function TransactionSidebarForm() {
                         : null,
                   })
                 : null,
-            firstDate: date ? dayjs(date) : null,
+            firstDate: date ? new Date(date) : null,
             sourceId: source,
           }}
           onSuccess={(subscriptionId) => {
@@ -279,21 +280,26 @@ export function TransactionSidebarForm() {
             <>
               <CategoryFields form={form} />
               <SubscriptionField form={form} />
+            </>
+          )}
+
+          <Group gap="xs" align="flex-end" wrap="nowrap">
+            <Box style={{ flex: 1 }}>
+              <CostField form={form} />
+            </Box>
+            {form.values.transactionType !== 'fromSavings' && (
               <Tooltip label={t('form.createSubscription')}>
                 <ActionIcon
                   variant="subtle"
                   color="gray"
                   aria-label={t('form.createSubscription')}
                   onClick={handleCreateSubscription}
-                  style={{ alignSelf: 'flex-start' }}
                 >
                   <IconRepeat size={16} />
                 </ActionIcon>
               </Tooltip>
-            </>
-          )}
-
-          <CostField form={form} />
+            )}
+          </Group>
 
           <TextInput
             label={t('form.comment')}

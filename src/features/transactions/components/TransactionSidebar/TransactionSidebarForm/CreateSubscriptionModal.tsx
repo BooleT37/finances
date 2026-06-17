@@ -13,14 +13,28 @@ import dayjs from 'dayjs';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import type { CategorySubcategoryId } from '~/features/categories/categorySubcategoryId';
 import { parseCategorySubcategoryId } from '~/features/categories/categorySubcategoryId';
 import { renderCategoryTreeNodeTitle } from '~/features/categories/components/renderCategoryTreeNodeTitle';
 import { useCategoryTreeData } from '~/features/categories/facets/categoryTreeData';
 import { useOrderedSources } from '~/features/sources/facets/orderedSources';
-import type { SubscriptionFormValues } from '~/features/subscriptions/components/SubscriptionSidebar/subscriptionFormValues';
 import { useCreateSubscription } from '~/features/subscriptions/queries';
 import { DatePickerWithTodayInput } from '~/shared/components/DatePickerWithTodayInput';
 import { TreeSelect } from '~/shared/components/TreeSelect';
+
+interface SubscriptionFormValues {
+  name: string;
+  cost: string;
+  period: '1' | '3' | '6' | '12';
+  categoryId: CategorySubcategoryId | null;
+  firstDate: Date | null;
+  sourceId: string | null;
+}
+
+interface ValidatedSubscriptionFormValues extends SubscriptionFormValues {
+  categoryId: CategorySubcategoryId;
+  firstDate: Date;
+}
 
 interface Props {
   initialValues: SubscriptionFormValues;
@@ -68,26 +82,31 @@ export function CreateSubscriptionModal({ initialValues, onSuccess }: Props) {
     },
   });
 
-  const handleSubmit = form.onSubmit(async (values) => {
+  const handleSubmit = form.onSubmit((values) => {
+    const validated = values as ValidatedSubscriptionFormValues;
     const { categoryId, subcategoryId } = parseCategorySubcategoryId(
-      values.categoryId!,
+      validated.categoryId,
     );
-    const result = await createSubscription.mutateAsync({
-      name: values.name,
-      cost: values.cost,
-      period: Number(values.period),
-      firstDate: values.firstDate!.format('YYYY-MM-DD'),
-      categoryId,
-      subcategoryId,
-      sourceId: values.sourceId !== null ? Number(values.sourceId) : null,
-      active: true,
-    });
-    modals.closeAll();
-    onSuccess(result.id);
+    createSubscription.mutate(
+      {
+        name: validated.name,
+        cost: validated.cost,
+        period: Number(validated.period),
+        firstDate: dayjs(validated.firstDate).format('YYYY-MM-DD'),
+        categoryId,
+        subcategoryId,
+        sourceId:
+          validated.sourceId !== null ? Number(validated.sourceId) : null,
+        active: true,
+      },
+      {
+        onSuccess: (result) => {
+          modals.closeAll();
+          onSuccess(result.id);
+        },
+      },
+    );
   });
-
-  const costValue =
-    form.values.cost === '' ? '' : (Number(form.values.cost) as number | '');
 
   return (
     <form onSubmit={handleSubmit}>
@@ -103,10 +122,8 @@ export function CreateSubscriptionModal({ initialValues, onSuccess }: Props) {
           required
           decimalScale={2}
           min={0}
-          value={costValue}
-          onChange={(val) =>
-            form.setFieldValue('cost', val === '' ? '' : String(val))
-          }
+          value={form.values.cost}
+          onChange={(val) => form.setFieldValue('cost', String(val))}
           error={form.errors.cost}
           rightSectionWidth={200}
           rightSection={
@@ -144,10 +161,8 @@ export function CreateSubscriptionModal({ initialValues, onSuccess }: Props) {
           label={t('form.firstDate')}
           required
           valueFormat="DD.MM.YYYY"
-          value={form.values.firstDate?.toDate() ?? null}
-          onChange={(val) =>
-            form.setFieldValue('firstDate', val ? dayjs(val) : null)
-          }
+          value={form.values.firstDate}
+          onChange={(val) => form.setFieldValue('firstDate', val)}
           error={form.errors.firstDate}
         />
 
