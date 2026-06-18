@@ -63,8 +63,10 @@ Push all the new commits at once:
 ```bash
 git push origin <branch>
 ```
-Capture each commit SHA you created (`git log` / from the commit step) to build links:
-`https://github.com/BooleT37/finances/commit/<sha>`.
+Capture each commit SHA you created (`git log` / from the commit step) to build PR-scoped links:
+`https://github.com/BooleT37/finances/pull/<PR>/commits/<full-sha>`.
+
+Use the full 40-character SHA (not a short hash) and the PR-scoped URL — not the repo-level commit URL (`/commit/<sha>`). The PR-scoped link keeps reviewers in context on the PR page.
 
 ## Step 7 — Publish screenshots to the `pr-screenshots` branch (visual fixes only)
 
