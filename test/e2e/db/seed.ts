@@ -133,17 +133,18 @@ export async function seed(): Promise<SeedData> {
   ];
   const incomeCategories = [зарплата];
 
+  // Source
+  const vivid = await testPrisma.source.create({
+    data: { name: 'Vivid', parser: 'VIVID', userId: user.id },
+  });
+
   await testPrisma.userSetting.create({
     data: {
       userId: user.id,
       expenseCategoriesOrder: expenseCategories.map((c) => c.id),
       incomeCategoriesOrder: incomeCategories.map((c) => c.id),
+      sourcesOrder: [vivid.id],
     },
-  });
-
-  // Source
-  const vivid = await testPrisma.source.create({
-    data: { name: 'Vivid', parser: 'VIVID', userId: user.id },
   });
 
   // Subscriptions
