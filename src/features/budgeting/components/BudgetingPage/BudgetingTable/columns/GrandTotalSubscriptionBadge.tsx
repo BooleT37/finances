@@ -47,9 +47,7 @@ export function GrandTotalSubscriptionBadge({
     }
   }
 
-  const grandTotal = decimalSum(
-    ...allDue.map((s) => s.subscription.cost.abs()),
-  );
+  const grandTotal = decimalSum(...allDue.map((s) => s.subscription.cost));
   const fromSubscriptions = t('subscriptions.fromSubscriptions', {
     cost: costToString(grandTotal),
   });
@@ -118,7 +116,12 @@ export function GrandTotalSubscriptionBadge({
                 ? (sourceMap[sourceId]?.name ?? noSource)
                 : noSource;
             const groupTotal = decimalSum(
-              ...subs.map((s) => s.subscription.cost.abs()),
+              ...subs.map((s) => s.subscription.cost),
+            );
+            const groupRemaining = decimalSum(
+              ...subs
+                .filter((s) => s.transactionId === null)
+                .map((s) => s.subscription.cost),
             );
             return (
               <Stack key={String(sourceId)} gap={2}>
@@ -126,9 +129,12 @@ export function GrandTotalSubscriptionBadge({
                   <Text size="xs" fw={500} truncate style={{ flex: 1 }}>
                     {sourceName}
                   </Text>
-                  <Text size="xs" fw={500} style={{ whiteSpace: 'nowrap' }}>
-                    {costToString(groupTotal)}
-                  </Text>
+                  <Group gap={4} wrap="nowrap" style={{ whiteSpace: 'nowrap' }}>
+                    <Text size="xs">{costToString(groupRemaining)}</Text>
+                    <Text size="xs" c="dimmed">
+                      / {costToString(groupTotal)}
+                    </Text>
+                  </Group>
                 </Group>
                 <Box pl="sm">
                   <CostList
@@ -137,7 +143,7 @@ export function GrandTotalSubscriptionBadge({
                       name: `${s.subscription.name}${
                         s.transactionId !== null ? ` (${paid})` : ''
                       }`,
-                      cost: s.subscription.cost.abs(),
+                      cost: s.subscription.cost,
                       date: s.firstDate,
                       secondary: s.transactionId !== null,
                     }))}
