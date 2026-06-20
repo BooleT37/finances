@@ -15,15 +15,20 @@ export const costFilterFn: MRT_FilterFn<TransactionTableItem> = (
   if (!raw) {
     return true;
   }
+  const value = row.getValue<CostColValue | null>(columnId);
+  if (!value) {
+    return false;
+  }
+  const normalizedRaw = raw.replace(/^-/, '');
+  const costStr = value.cost.abs().toFixed(2);
+  if (costStr.startsWith(normalizedRaw)) {
+    return true;
+  }
   let target: Decimal;
   try {
     target = new Decimal(raw);
   } catch {
     return true;
-  }
-  const value = row.getValue<CostColValue | null>(columnId);
-  if (!value) {
-    return false;
   }
   return value.cost.abs().equals(target.abs());
 };
