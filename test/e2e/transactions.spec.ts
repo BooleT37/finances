@@ -827,11 +827,7 @@ test.describe('Subscriptions', () => {
     await page.getByRole('button', { name: 'Добавить' }).click();
 
     // Fill in some fields before opening the modal
-    await selectTreeOption(
-      page,
-      form.locator('.treeSelect').first(),
-      'Развлечения',
-    );
+    await selectOption(page, 'Категория', 'Развлечения');
     await form.getByLabel('Комментарий').fill('Спотифай');
     await form.getByLabel('Сумма (€)').fill('9.99');
 
@@ -934,7 +930,8 @@ test.describe('Subscriptions', () => {
       .first()
       .click();
 
-    await selectOption(page, 'Источник', 'Vivid');
+    await modal.getByRole('textbox', { name: 'Источник' }).click();
+    await page.getByRole('option', { name: 'Vivid' }).click();
 
     await modal.getByRole('button', { name: 'Добавить' }).click();
     await page.waitForLoadState('networkidle');
@@ -942,7 +939,9 @@ test.describe('Subscriptions', () => {
     await expect(modal).not.toBeVisible();
 
     // Category and source from the modal are applied back to the sidebar form
-    await expect(form.locator('.treeSelect').first()).toContainText('Продукты');
+    await expect(form.getByRole('textbox', { name: 'Категория' })).toHaveValue(
+      'Продукты',
+    );
     await expect(form.getByRole('textbox', { name: 'Источник' })).toHaveValue(
       'Vivid',
     );

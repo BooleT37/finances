@@ -157,11 +157,16 @@ export function CreateSubscriptionModal({ initialValues, onSuccess }: Props) {
           rightSectionPointerEvents="all"
         />
 
-        <Input.Wrapper label={t('form.category')} required>
+        <Input.Wrapper
+          label={t('form.category')}
+          required
+          error={form.errors.categoryId}
+        >
           <TreeSelect
             treeData={categoryTreeData ?? []}
             titleRender={renderCategoryTreeNodeTitle}
-            {...form.getInputProps('categoryId')}
+            value={form.values.categoryId}
+            onChange={(v) => form.setFieldValue('categoryId', v)}
           />
         </Input.Wrapper>
 
