@@ -3,5 +3,11 @@
     "plan": "Plan: {{value}}",
     "exceededBy": "Exceeded by {{value}}"
   },
-  "showMore": "Show {{count}} more"
+  "showMore": "Show {{count}} more",
+  "confirmUnsavedChanges": {
+    "title": "Unsaved changes",
+    "message": "There are unsaved changes. Discard them?",
+    "confirm": "Discard",
+    "cancel": "Continue editing"
+  }
 }
