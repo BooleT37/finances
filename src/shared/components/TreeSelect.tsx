@@ -56,11 +56,11 @@ export function TreeSelect<T extends string>({
         showSearch
         treeNodeFilterProp={searchProp}
         treeNodeLabelProp={selectionProp}
-        treeDefaultExpandAll
         allowClear
         notFoundContent={notFoundContent}
         disabled={disabled}
         virtual={false}
+        listHeight={300}
         treeTitleRender={titleRender}
       />
       {error && (
