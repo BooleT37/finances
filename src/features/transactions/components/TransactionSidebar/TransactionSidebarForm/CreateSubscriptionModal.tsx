@@ -121,7 +121,7 @@ export function CreateSubscriptionModal({ initialValues, onSuccess }: Props) {
   });
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} noValidate>
       <Stack gap="sm">
         <TextInput
           label={t('form.name')}
