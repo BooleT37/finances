@@ -7,7 +7,6 @@ import {
   queryClientAtom,
 } from 'jotai-tanstack-query';
 
-import { DATE_FORMAT } from '~/shared/constants';
 import { selectedYearAtom } from '~/stores/month';
 import {
   sidebarFormRefAtom,
@@ -286,7 +285,7 @@ export const TransactionSidebarMolecule = molecule(() => {
       const newTx = await _get(addMutationAtom).mutateAsync({
         name: row.name,
         cost: row.cost.cost.abs().toString(),
-        date: dayjs(row.date, DATE_FORMAT).format('YYYY-MM-DD'),
+        date: row.date.split('.').reverse().join('-'),
         actualDate: null,
         categoryId: row.categoryId,
         subcategoryId: row.subcategoryId ?? null,

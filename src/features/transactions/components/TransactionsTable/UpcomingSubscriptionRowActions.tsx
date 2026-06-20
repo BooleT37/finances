@@ -1,4 +1,4 @@
-import { ActionIcon } from '@mantine/core';
+import { ActionIcon, Tooltip } from '@mantine/core';
 import { IconCalendarPlus } from '@tabler/icons-react';
 import { useMolecule } from 'bunshi/react';
 import { useSetAtom } from 'jotai';
@@ -29,12 +29,14 @@ export function UpcomingSubscriptionRowActions({ row }: Props) {
   };
 
   return (
-    <ActionIcon
-      variant="subtle"
-      aria-label={t('actions.createFromSubscription')}
-      onClick={() => void handleCreate()}
-    >
-      <IconCalendarPlus size={16} />
-    </ActionIcon>
+    <Tooltip label={t('actions.createFromSubscription')}>
+      <ActionIcon
+        variant="subtle"
+        aria-label={t('actions.createFromSubscription')}
+        onClick={() => void handleCreate()}
+      >
+        <IconCalendarPlus size={16} />
+      </ActionIcon>
+    </Tooltip>
   );
 }
