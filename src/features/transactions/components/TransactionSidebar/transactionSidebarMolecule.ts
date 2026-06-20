@@ -273,7 +273,6 @@ export const TransactionSidebarMolecule = molecule(() => {
     },
   );
 
-  // ── Create from subscription ─────────────────────────────────────────────────
   const createFromSubscriptionAtom = atom(
     null,
     async (
