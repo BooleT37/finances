@@ -283,7 +283,7 @@ export function TransactionSidebarForm() {
             </>
           )}
 
-          <Group gap="xs" align="center" wrap="nowrap">
+          <Group gap="xs" align="flex-end" wrap="nowrap">
             <Box style={{ flex: 1 }}>
               <CostField form={form} />
             </Box>
@@ -294,6 +294,7 @@ export function TransactionSidebarForm() {
                   color="gray"
                   aria-label={t('form.createSubscription')}
                   onClick={handleCreateSubscription}
+                  mb={4}
                 >
                   <IconRepeat size={16} />
                 </ActionIcon>
