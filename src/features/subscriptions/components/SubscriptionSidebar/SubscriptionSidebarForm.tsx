@@ -25,6 +25,7 @@ import { useCategoryTreeData } from '~/features/categories/facets/categoryTreeDa
 import { useOrderedSources } from '~/features/sources/facets/orderedSources';
 import { DatePickerWithTodayInput } from '~/shared/components/DatePickerWithTodayInput';
 import { TreeSelect } from '~/shared/components/TreeSelect';
+import { API_DATE_FORMAT } from '~/shared/constants';
 import { TableFlash, useFlashTrigger } from '~/shared/hooks/useTableFlash';
 
 import {
@@ -33,7 +34,10 @@ import {
   useUpdateSubscription,
 } from '../../queries';
 import type { Subscription } from '../../schema';
-import type { SubscriptionFormValues } from './subscriptionFormValues';
+import type {
+  SubscriptionFormValues,
+  ValidatedSubscriptionFormValues,
+} from './subscriptionFormValues';
 import { SubscriptionSidebarMolecule } from './subscriptionSidebarMolecule';
 
 function subscriptionToFormValues(s: Subscription): SubscriptionFormValues {
@@ -130,7 +134,7 @@ export function SubscriptionSidebarForm() {
         name: values.name,
         cost: values.cost,
         period: Number(values.period),
-        firstDate: values.firstDate.format('YYYY-MM-DD'),
+        firstDate: values.firstDate.format(API_DATE_FORMAT),
         categoryId,
         subcategoryId,
         sourceId: values.sourceId !== null ? Number(values.sourceId) : null,
@@ -166,22 +170,32 @@ export function SubscriptionSidebarForm() {
   }, [form, setFormRef]);
 
   const handleSubmit = form.onSubmit(async (values) => {
+    const validatedValues = values as ValidatedSubscriptionFormValues;
     const { categoryId, subcategoryId } = parseCategorySubcategoryId(
-      values.categoryId!,
+      validatedValues.categoryId,
     );
-    const result = await createSubscription.mutateAsync({
-      name: values.name,
-      cost: values.cost,
-      period: Number(values.period),
-      firstDate: values.firstDate!.format('YYYY-MM-DD'),
-      categoryId,
-      subcategoryId,
-      sourceId: values.sourceId !== null ? Number(values.sourceId) : null,
-      active: true,
-    });
-    form.reset();
-    close();
-    triggerFlash([{ id: result.id }]);
+    createSubscription.mutate(
+      {
+        name: validatedValues.name,
+        cost: validatedValues.cost,
+        period: Number(validatedValues.period),
+        firstDate: validatedValues.firstDate.format(API_DATE_FORMAT),
+        categoryId,
+        subcategoryId,
+        sourceId:
+          validatedValues.sourceId !== null
+            ? Number(validatedValues.sourceId)
+            : null,
+        active: true,
+      },
+      {
+        onSuccess: (result) => {
+          form.reset();
+          close();
+          triggerFlash([{ id: result.id }]);
+        },
+      },
+    );
   });
 
   const costValue =
