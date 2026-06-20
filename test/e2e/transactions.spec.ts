@@ -994,7 +994,7 @@ test.describe('Subscriptions', () => {
     await expect(form).toBeVisible();
 
     // Name is filled from subscription
-    await expect(form.getByLabel('Название')).toHaveValue('Спотифай');
+    await expect(form.getByLabel('Комментарий')).toHaveValue('Спотифай');
 
     // Cost is filled from subscription (expense, so positive magnitude in the field)
     await expect(form.getByLabel('Сумма (€)')).toHaveValue('9.99');
