@@ -18,6 +18,7 @@ import {
   useUpdateSubscription,
 } from '~/features/subscriptions/queries';
 import type { Subscription } from '~/features/subscriptions/schema';
+import { API_DATE_FORMAT } from '~/shared/constants';
 
 interface Props {
   row: MRT_Row<Subscription>;
@@ -49,7 +50,7 @@ export function RowActions({ row, mode }: Props) {
         name,
         cost: cost.abs().toString(),
         period,
-        firstDate: firstDate.format('YYYY-MM-DD'),
+        firstDate: firstDate.format(API_DATE_FORMAT),
         categoryId,
         subcategoryId,
         sourceId,
@@ -72,7 +73,7 @@ export function RowActions({ row, mode }: Props) {
         name,
         cost: cost.abs().toString(),
         period,
-        firstDate: firstDate.format('YYYY-MM-DD'),
+        firstDate: firstDate.format(API_DATE_FORMAT),
         categoryId,
         subcategoryId,
         sourceId,

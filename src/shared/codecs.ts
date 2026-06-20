@@ -2,6 +2,8 @@ import dayjs from 'dayjs';
 import Decimal from 'decimal.js';
 import { z } from 'zod';
 
+import { API_DATE_FORMAT } from './constants';
+
 /** Reusable Zod type for dayjs instances */
 export const dayjsSchema = z.custom<dayjs.Dayjs>((v) => dayjs.isDayjs(v));
 
@@ -16,7 +18,7 @@ export const decimalCodec = z.codec(
 );
 
 /**
- * Wire: 'YYYY-MM-DD' calendar-date string  ↔  Client: dayjs at local midnight.
+ * Wire: API_DATE_FORMAT ('YYYY-MM-DD') calendar-date string  ↔  Client: dayjs at local midnight.
  *
  * Every field using this codec maps to a Postgres `@db.Date` column, so the
  * value is a calendar date with no time/zone. Encoding via toISOString() would
@@ -25,5 +27,5 @@ export const decimalCodec = z.codec(
  */
 export const datetimeCodec = z.codec(z.string(), dayjsSchema, {
   decode: (s) => dayjs(s),
-  encode: (d) => d.format('YYYY-MM-DD'),
+  encode: (d) => d.format(API_DATE_FORMAT),
 });
