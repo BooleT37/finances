@@ -94,7 +94,6 @@ export function ParsedExpenseRow({ index, form }: Props) {
         disabled={!selected}
         selectionProp="selectionTitle"
         searchProp="searchValue"
-        defaultExpandAll={false}
       />
     </div>
   );
