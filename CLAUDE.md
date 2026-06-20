@@ -161,7 +161,7 @@ When auth is added, all server functions will need to resolve the current user f
 ## Notes
 
 - Run `npm run dev` to auto-generate routeTree.gen.ts when routes change
-- **Dates**: Use [dayjs](https://day.js.org/) for all date handling — never native `Date`. The `datetimeCodec` in `src/shared/codecs.ts` decodes ISO strings to `dayjs.Dayjs` objects. Prisma `where` clauses are the only exception (Prisma requires native `Date`).
+- **Dates**: Use [dayjs](https://day.js.org/) for all date handling — never native `Date`. The `datetimeCodec` in `src/shared/codecs.ts` decodes ISO strings to `dayjs.Dayjs` objects. Two exceptions where native `Date` is acceptable: Prisma `where` clauses (Prisma requires it), and Mantine form field values (Mantine's `DatePickerInput` works with native `Date`, so form state for date fields may use `Date | null`).
 - **Variable naming**: Never use `t` as a shorthand for a transaction — `t` is reserved for the i18n translation function from `useTranslation`. Use `tx` or the full name `transaction` instead.
 - **Entity map lookups**: Always use `getOrThrow(map, key, 'Label')` from `~/shared/utils/getOrThrow` when reading from an entity map (e.g. `categoryMap`, `sourceMap`). Never use optional chaining (`map?.[key]`) — a missing key is a data integrity error and should throw, not silently return `undefined`.
 - **Spell-checker warnings**: When the IDE reports spell-checker warnings for technical strings (CSS class names, XPath selectors, library prefixes, etc.), add the flagged words to `.vscode/spellright.dict` to suppress future noise. Do this in the same commit as the code that introduced them.

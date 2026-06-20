@@ -1,16 +1,32 @@
-import { Alert, Button, Stack, TextInput } from '@mantine/core';
+import {
+  ActionIcon,
+  Alert,
+  Box,
+  Button,
+  Group,
+  Stack,
+  TextInput,
+  Tooltip,
+} from '@mantine/core';
 import { isNotEmpty, matches, useForm } from '@mantine/form';
 import { useDebouncedCallback } from '@mantine/hooks';
+import { modals } from '@mantine/modals';
+import { IconRepeat } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useMolecule } from 'bunshi/react';
 import { useAtomValue, useSetAtom, useStore } from 'jotai';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import {
+  buildCategorySubcategoryId,
+  parseCategorySubcategoryId,
+} from '~/features/categories/categorySubcategoryId';
 import { getFromSavingsCategoryQueryOptions } from '~/features/categories/facets/categoriesByType';
 import { DatePickerWithTodayInput } from '~/shared/components/DatePickerWithTodayInput';
 
 import { TransactionSidebarMolecule } from '../transactionSidebarMolecule';
+import { CreateSubscriptionModal } from './CreateSubscriptionModal';
 import { ActualDateField } from './fields/ActualDateField';
 import { useActualDateValidator } from './fields/ActualDateField.validator';
 import { CategoryFields } from './fields/CategoryFields';
@@ -184,6 +200,79 @@ export function TransactionSidebarForm() {
     return () => window.removeEventListener('beforeunload', handler);
   }, [form]);
 
+  const handleCreateSubscription = useCallback(() => {
+    const {
+      transactionType,
+      expenseCategory,
+      expenseSubcategory,
+      incomeCategory,
+      incomeSubcategory,
+      source,
+      cost,
+      name,
+      date,
+    } = form.values;
+    const activeCategory =
+      transactionType === 'income' ? incomeCategory : expenseCategory;
+    const activeSubcategory =
+      transactionType === 'income' ? incomeSubcategory : expenseSubcategory;
+
+    modals.open({
+      title: t('form.createSubscriptionModalTitle'),
+      children: (
+        <CreateSubscriptionModal
+          initialValues={{
+            name,
+            cost: cost.replace(/^-/, ''),
+            period: '1',
+            categoryId:
+              activeCategory !== null
+                ? buildCategorySubcategoryId({
+                    categoryId: Number(activeCategory),
+                    subcategoryId:
+                      activeSubcategory !== null
+                        ? Number(activeSubcategory)
+                        : null,
+                  })
+                : null,
+            firstDate: date ? new Date(date) : null,
+            sourceId: source,
+          }}
+          onSuccess={({ subscriptionId, categoryId, sourceId, name }) => {
+            form.setFieldValue('subscription', String(subscriptionId));
+            if (name && !form.values.name) {
+              form.setFieldValue('name', name);
+            }
+            if (sourceId !== null && form.values.source === null) {
+              form.setFieldValue('source', sourceId);
+            }
+            if (categoryId !== null) {
+              const { categoryId: catId, subcategoryId } =
+                parseCategorySubcategoryId(categoryId);
+              if (form.values.transactionType === 'income') {
+                if (!form.values.incomeCategory) {
+                  form.setFieldValue('incomeCategory', String(catId));
+                  form.setFieldValue(
+                    'incomeSubcategory',
+                    subcategoryId !== null ? String(subcategoryId) : null,
+                  );
+                }
+              } else {
+                if (!form.values.expenseCategory) {
+                  form.setFieldValue('expenseCategory', String(catId));
+                  form.setFieldValue(
+                    'expenseSubcategory',
+                    subcategoryId !== null ? String(subcategoryId) : null,
+                  );
+                }
+              }
+            }
+          }}
+        />
+      ),
+    });
+  }, [form, t]);
+
   const handleSubmit = form.onSubmit(
     async (prepared) => {
       if (!prepared) {
@@ -224,7 +313,25 @@ export function TransactionSidebarForm() {
             </>
           )}
 
-          <CostField form={form} />
+          <Group gap="xs" align="flex-end" wrap="nowrap">
+            <Box style={{ flex: 1 }}>
+              <CostField form={form} />
+            </Box>
+            {form.values.transactionType !== 'fromSavings' &&
+              form.values.subscription === null && (
+                <Tooltip label={t('form.createSubscription')}>
+                  <ActionIcon
+                    variant="subtle"
+                    color="gray"
+                    aria-label={t('form.createSubscription')}
+                    onClick={handleCreateSubscription}
+                    mb={4}
+                  >
+                    <IconRepeat size={16} />
+                  </ActionIcon>
+                </Tooltip>
+              )}
+          </Group>
 
           <TextInput
             label={t('form.comment')}
