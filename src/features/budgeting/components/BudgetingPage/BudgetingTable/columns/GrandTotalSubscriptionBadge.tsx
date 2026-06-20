@@ -130,9 +130,7 @@ export function GrandTotalSubscriptionBadge({
                     {sourceName}
                   </Text>
                   <Group gap={4} wrap="nowrap" style={{ whiteSpace: 'nowrap' }}>
-                    <Text size="xs" fw={700}>
-                      {costToString(groupRemaining)}
-                    </Text>
+                    <Text size="xs">{costToString(groupRemaining)}</Text>
                     <Text size="xs" c="dimmed">
                       / {costToString(groupTotal)}
                     </Text>
