@@ -19,8 +19,9 @@ export const costFilterFn: MRT_FilterFn<TransactionTableItem> = (
   if (!value) {
     return false;
   }
+  const normalizedRaw = raw.replace(/^-/, '');
   const costStr = value.cost.abs().toFixed(2);
-  if (costStr.startsWith(raw)) {
+  if (costStr.startsWith(normalizedRaw)) {
     return true;
   }
   let target: Decimal;
