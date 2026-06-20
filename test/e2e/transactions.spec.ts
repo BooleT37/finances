@@ -816,6 +816,144 @@ test.describe('Subscriptions', () => {
       ),
     ).toHaveCount(0);
   });
+
+  test('create subscription from transaction: modal opens pre-filled, creates subscription and links it', async ({
+    page,
+    seedData,
+  }) => {
+    await page.goto('/transactions');
+
+    const form = page.getByRole('form', { name: 'Форма транзакции' });
+    await page.getByRole('button', { name: 'Добавить' }).click();
+
+    // Fill in some fields before opening the modal
+    await selectTreeOption(
+      page,
+      form.locator('.treeSelect').first(),
+      'Развлечения',
+    );
+    await form.getByLabel('Комментарий').fill('Спотифай');
+    await form.getByLabel('Сумма (€)').fill('9.99');
+
+    // "Create subscription" button is visible (no subscription selected yet)
+    const createSubBtn = form.getByRole('button', {
+      name: 'Создать подписку',
+    });
+    await expect(createSubBtn).toBeVisible();
+    await createSubBtn.click();
+
+    // Modal opens with fields pre-filled from the transaction form
+    const modal = page.getByRole('dialog');
+    await expect(modal).toBeVisible();
+    await expect(modal.getByLabel('Название')).toHaveValue('Спотифай');
+    await expect(modal.getByLabel('Цена')).toHaveValue('9.99');
+
+    // Pick today's date for "first date" via the calendar
+    await modal.getByLabel('Дата начала').click();
+    await page
+      .locator('button:not([data-direction]):not([data-outside])', {
+        hasText: new RegExp(`^${TODAY_DAY}$`),
+      })
+      .first()
+      .click();
+
+    await modal.getByRole('button', { name: 'Добавить' }).click();
+    await page.waitForLoadState('networkidle');
+
+    // Modal closes
+    await expect(modal).not.toBeVisible();
+
+    // Subscription field is now filled in the transaction form
+    await expect(form.getByRole('textbox', { name: 'Подписка' })).toHaveValue(
+      'Спотифай',
+    );
+
+    // "Create subscription" button is hidden once a subscription is linked
+    await expect(createSubBtn).not.toBeVisible();
+
+    // Verify the subscription was actually created in the DB
+    const created = await testPrisma.subscription.findFirst({
+      where: { name: 'Спотифай', userId: seedData.userId },
+    });
+    expect(created).not.toBeNull();
+    expect(created?.categoryId).toBe(seedData.categoryIds.развлечения);
+  });
+
+  test('create subscription from transaction: category validation error shown only once', async ({
+    page,
+  }) => {
+    await page.goto('/transactions');
+
+    const form = page.getByRole('form', { name: 'Форма транзакции' });
+    await page.getByRole('button', { name: 'Добавить' }).click();
+
+    // Open create subscription modal without filling any fields
+    await form.getByRole('button', { name: 'Создать подписку' }).click();
+
+    const modal = page.getByRole('dialog');
+    await expect(modal).toBeVisible();
+
+    // Submit without filling required fields to trigger validation
+    await modal.getByRole('button', { name: 'Добавить' }).click();
+
+    // Category validation message appears exactly once (not duplicated)
+    const categoryErrors = modal.getByText('Категория обязательна');
+    await expect(categoryErrors).toHaveCount(1);
+  });
+
+  test('create subscription from transaction: fields applied back to sidebar on success', async ({
+    page,
+    seedData,
+  }) => {
+    await page.goto('/transactions');
+
+    const form = page.getByRole('form', { name: 'Форма транзакции' });
+    await page.getByRole('button', { name: 'Добавить' }).click();
+
+    // Open modal without pre-filling category or source in the sidebar
+    await form.getByRole('button', { name: 'Создать подписку' }).click();
+
+    const modal = page.getByRole('dialog');
+    await expect(modal).toBeVisible();
+
+    // Fill all required fields in the modal, including category and source
+    await modal.getByLabel('Название').fill('Яндекс Музыка');
+    await modal.getByLabel('Цена').fill('169');
+
+    await selectTreeOption(
+      page,
+      modal.locator('.treeSelect').first(),
+      'Продукты',
+    );
+
+    await modal.getByLabel('Дата начала').click();
+    await page
+      .locator('button:not([data-direction]):not([data-outside])', {
+        hasText: new RegExp(`^${TODAY_DAY}$`),
+      })
+      .first()
+      .click();
+
+    await selectOption(page, 'Источник', 'Vivid');
+
+    await modal.getByRole('button', { name: 'Добавить' }).click();
+    await page.waitForLoadState('networkidle');
+
+    await expect(modal).not.toBeVisible();
+
+    // Category and source from the modal are applied back to the sidebar form
+    await expect(form.locator('.treeSelect').first()).toContainText('Продукты');
+    await expect(form.getByRole('textbox', { name: 'Источник' })).toHaveValue(
+      'Vivid',
+    );
+    // Comment/name is applied back too
+    await expect(form.getByLabel('Комментарий')).toHaveValue('Яндекс Музыка');
+
+    // Clean up
+    await testPrisma.subscription.deleteMany({
+      where: { name: 'Яндекс Музыка', userId: seedData.userId },
+    });
+  });
 });
 
 test.describe('Saving spendings', () => {
