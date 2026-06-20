@@ -1086,6 +1086,62 @@ test.describe('Subscriptions', () => {
     });
     expect(created).toBeNull();
   });
+
+  test('create transaction from subscription: unsaved changes confirmation appears only once when user confirms', async ({
+    page,
+    seedData,
+  }) => {
+    const firstDate = new Date(Date.UTC(TODAY_YEAR, TODAY_MONTH, 5));
+    await testPrisma.subscription.create({
+      data: {
+        name: 'Спотифай',
+        cost: 9.99,
+        categoryId: seedData.categoryIds.развлечения,
+        sourceId: seedData.sourceIds.вивид,
+        period: 1,
+        firstDate,
+        active: true,
+        userId: seedData.userId,
+      },
+    });
+    await page.goto('/transactions');
+
+    // Open sidebar and make it dirty
+    await page.getByRole('button', { name: 'Добавить' }).click();
+    const form = page.getByRole('form', { name: 'Форма транзакции' });
+    await form.getByLabel('Комментарий').fill('Черновик');
+
+    // Enable upcoming subscriptions
+    await page.getByText(/^Ещё/).hover();
+    await page.getByRole('button', { name: 'Показать в таблице' }).click();
+
+    const upcomingRow = await findTransactionRow(page, {
+      name: 'Спотифай',
+      categoryId: seedData.categoryIds.развлечения,
+    });
+
+    await upcomingRow
+      .getByRole('button', { name: 'Создать транзакцию' })
+      .dispatchEvent('click');
+
+    // Exactly one confirmation modal — not two
+    await expect(
+      page.getByRole('heading', { name: 'Несохранённые изменения' }),
+    ).toHaveCount(1);
+
+    // Confirm — discard unsaved changes and create the transaction.
+    // A hover tooltip overlays the button; dispatchEvent bypasses pointer-events.
+    await page.getByRole('button', { name: 'Отменить' }).dispatchEvent('click');
+    await page.waitForLoadState('networkidle');
+
+    // The new transaction is now open in the sidebar
+    await expect(form.getByLabel('Комментарий')).toHaveValue('Спотифай');
+
+    // Upcoming row replaced by a real transaction row (no upcoming icon)
+    await expect(
+      upcomingRow.getByRole('img', { name: 'Предстоящая подписка' }),
+    ).toHaveCount(0);
+  });
 });
 
 test.describe('Saving spendings', () => {
