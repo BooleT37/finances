@@ -953,6 +953,139 @@ test.describe('Subscriptions', () => {
       where: { name: 'Яндекс Музыка', userId: seedData.userId },
     });
   });
+
+  test('create transaction from upcoming subscription: transaction created with correct data and sidebar opens', async ({
+    page,
+    seedData,
+  }) => {
+    // Seed an upcoming subscription due this month
+    const firstDate = new Date(TODAY_YEAR, TODAY_MONTH, 5);
+    await testPrisma.subscription.create({
+      data: {
+        name: 'Спотифай',
+        cost: 9.99,
+        categoryId: seedData.categoryIds.развлечения,
+        sourceId: seedData.sourceIds.вивид,
+        period: 1,
+        firstDate,
+        active: true,
+        userId: seedData.userId,
+      },
+    });
+    await page.goto('/transactions');
+
+    // Enable upcoming subscriptions
+    await page.getByText(/^Ещё/).hover();
+    await page.getByRole('button', { name: 'Показать в таблице' }).click();
+
+    const upcomingRow = await findTransactionRow(page, {
+      name: 'Спотифай',
+      categoryId: seedData.categoryIds.развлечения,
+    });
+
+    // Click "Создать транзакцию" button
+    await upcomingRow
+      .getByRole('button', { name: 'Создать транзакцию' })
+      .click();
+    await page.waitForLoadState('networkidle');
+
+    // Sidebar opens with the newly created transaction
+    const form = page.getByRole('form', { name: 'Форма транзакции' });
+    await expect(form).toBeVisible();
+
+    // Name is filled from subscription
+    await expect(form.getByLabel('Название')).toHaveValue('Спотифай');
+
+    // Cost is filled from subscription (expense, so positive magnitude in the field)
+    await expect(form.getByLabel('Сумма (€)')).toHaveValue('9.99');
+
+    // Date is filled from subscription's firstDate, not January (regression: was always January)
+    const dateInput = form.getByLabel('Дата');
+    await expect(dateInput).toHaveValue(
+      new RegExp(`^0?5\\.0?${TODAY_MONTH + 1}\\.${TODAY_YEAR}$`),
+    );
+
+    // Row disappears from upcoming section (transaction now exists)
+    await expect(
+      page.locator(
+        `.${transactionNameCellClass}[data-testing-category-id="${seedData.categoryIds.развлечения}"]`,
+        { hasText: 'Спотифай' },
+      ),
+    ).toHaveCount(1);
+    // The row that remains is the real transaction (no upcoming badge)
+    const txRow = await findTransactionRow(page, {
+      name: 'Спотифай',
+      categoryId: seedData.categoryIds.развлечения,
+    });
+    await expect(
+      txRow.getByRole('img', { name: 'Предстоящая подписка' }),
+    ).toHaveCount(0);
+  });
+
+  test('create transaction from subscription: unsaved changes warning prevents transaction creation when user cancels', async ({
+    page,
+    seedData,
+  }) => {
+    const firstDate = new Date(TODAY_YEAR, TODAY_MONTH, 5);
+    await testPrisma.subscription.create({
+      data: {
+        name: 'Спотифай',
+        cost: 9.99,
+        categoryId: seedData.categoryIds.развлечения,
+        sourceId: seedData.sourceIds.вивид,
+        period: 1,
+        firstDate,
+        active: true,
+        userId: seedData.userId,
+      },
+    });
+    await page.goto('/transactions');
+
+    // Open sidebar and make it dirty by typing in the name field
+    await page.getByRole('button', { name: 'Добавить' }).click();
+    const form = page.getByRole('form', { name: 'Форма транзакции' });
+    await form.getByLabel('Комментарий').fill('Черновик');
+
+    // Enable upcoming subscriptions
+    await page.getByText(/^Ещё/).hover();
+    await page.getByRole('button', { name: 'Показать в таблице' }).click();
+
+    const upcomingRow = await findTransactionRow(page, {
+      name: 'Спотифай',
+      categoryId: seedData.categoryIds.развлечения,
+    });
+
+    // Click "Создать транзакцию" — the unsaved-changes dialog should appear.
+    // The open sidebar overlays the table, so we dispatch directly to bypass
+    // the pointer-events interception (same pattern as Mantine SegmentedControl).
+    await upcomingRow
+      .getByRole('button', { name: 'Создать транзакцию' })
+      .dispatchEvent('click');
+
+    await expect(
+      page.getByRole('heading', { name: 'Несохранённые изменения' }),
+    ).toBeVisible();
+
+    // Choose "Продолжить редактирование" — transaction must NOT be created
+    await page
+      .getByRole('button', { name: 'Продолжить редактирование' })
+      .click();
+    await page.waitForLoadState('networkidle');
+
+    // Sidebar still shows the draft (unsaved changes preserved)
+    await expect(form.getByLabel('Комментарий')).toHaveValue('Черновик');
+
+    // Upcoming row is still in the table (no transaction was created)
+    await expect(
+      upcomingRow.getByRole('img', { name: 'Предстоящая подписка' }),
+    ).toBeVisible();
+
+    // Confirm no transaction was created in the DB
+    const created = await testPrisma.expense.findFirst({
+      where: { name: 'Спотифай', userId: seedData.userId },
+    });
+    expect(created).toBeNull();
+  });
 });
 
 test.describe('Saving spendings', () => {
