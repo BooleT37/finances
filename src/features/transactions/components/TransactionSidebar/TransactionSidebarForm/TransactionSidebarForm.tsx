@@ -197,7 +197,7 @@ export function TransactionSidebarForm() {
     return () => window.removeEventListener('beforeunload', handler);
   }, [form]);
 
-  const handleCreateSubscription = () => {
+  const handleCreateSubscription = useCallback(() => {
     const {
       transactionType,
       expenseCategory,
@@ -220,7 +220,7 @@ export function TransactionSidebarForm() {
         <CreateSubscriptionModal
           initialValues={{
             name,
-            cost: cost.replace('-', ''),
+            cost: cost.replace(/^-/, ''),
             period: '1',
             categoryId:
               activeCategory !== null
@@ -241,7 +241,7 @@ export function TransactionSidebarForm() {
         />
       ),
     });
-  };
+  }, [form, t]);
 
   const handleSubmit = form.onSubmit(
     async (prepared) => {
@@ -283,7 +283,7 @@ export function TransactionSidebarForm() {
             </>
           )}
 
-          <Group gap="xs" align="flex-end" wrap="nowrap">
+          <Group gap="xs" align="center" wrap="nowrap">
             <Box style={{ flex: 1 }}>
               <CostField form={form} />
             </Box>
