@@ -77,26 +77,34 @@ export const TransactionSidebarMolecule = molecule(() => {
   );
 
   // ── Open / close ────────────────────────────────────────────────────────────
-  const openAtom = atom(null, (get, set, id: number | null) => {
-    set(withDirtyCheckAtom, () => {
-      set(editingIdAtom, id);
-      if (id !== null) {
-        const tx = get(transactionsMapAtom).data?.[id] ?? null;
-        set(actualDateShownAtom, tx?.actualDate != null);
-      } else {
-        set(actualDateShownAtom, false);
-        // For the existing transaction path, we have the "key" workaround on the component,
-        // That remounts it on transaction id update. For the new transaction it won't work since the key
-        // is always "new". If we put the date or month in the key, it will remount on every date or month
-        // change respectfully, which we don't want. So to avoid bugs with initial transaction values not being
-        // reset after we close and reopen the sidebar, we need to do it manually
-        const form = get(_formAtom);
-        if (form) {
-          form.setInitialValues(get(emptyTransactionFormValuesAtom));
-          form.reset();
-        }
+
+  // Inner open logic without a dirty check — used directly when the caller has
+  // already confirmed (or there is nothing to confirm), e.g. inside
+  // createFromSubscriptionAtom after the mutation completes.
+  const openDirectAtom = atom(null, (get, set, id: number | null) => {
+    set(editingIdAtom, id);
+    if (id !== null) {
+      const tx = get(transactionsMapAtom).data?.[id] ?? null;
+      set(actualDateShownAtom, tx?.actualDate != null);
+    } else {
+      set(actualDateShownAtom, false);
+      // For the existing transaction path, we have the "key" workaround on the component,
+      // That remounts it on transaction id update. For the new transaction it won't work since the key
+      // is always "new". If we put the date or month in the key, it will remount on every date or month
+      // change respectfully, which we don't want. So to avoid bugs with initial transaction values not being
+      // reset after we close and reopen the sidebar, we need to do it manually
+      const form = get(_formAtom);
+      if (form) {
+        form.setInitialValues(get(emptyTransactionFormValuesAtom));
+        form.reset();
       }
-      set(isOpenAtom, true);
+    }
+    set(isOpenAtom, true);
+  });
+
+  const openAtom = atom(null, (_get, set, id: number | null) => {
+    set(withDirtyCheckAtom, () => {
+      set(openDirectAtom, id);
     });
   });
 
@@ -302,7 +310,7 @@ export const TransactionSidebarMolecule = molecule(() => {
             savingSpendingCategoryId: null,
             components: undefined,
           });
-          set(openAtom, newTx.id);
+          set(openDirectAtom, newTx.id);
           set(requestScrollAtom, newTx.id);
           onCreated?.(newTx.id);
         })();
