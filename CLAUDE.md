@@ -93,9 +93,18 @@ Examples:
 - `test(e2e): add unsaved-changes confirm dialog test`
 - `chore: update dependencies`
 
-**Stop before each commit** to let the user verify the changes in the working directory
+**When to commit:**
+- Do not commit automatically if it's unclear whether the work is finished. If the conversation is shifting to a new topic but there are uncommitted changes, ask the user whether they want those changes committed first.
+- In general, prefer asking "should I commit this?" rather than committing without prompting.
+- Exception: skills that explicitly instruct committing as part of their workflow (e.g. `implement-ai-issues`, `fix-pr-comments`) should commit without asking — the skill description is the authorisation.
 
-**Never push** to the remote unless the user explicitly asks for it, or it is part of a skill's workflow. Committing locally is fine; `git push` requires an explicit instruction or skill context.
+**Keeping history clean (unpushed commits):**
+- If a commit exists locally but has not been pushed yet, and we decide to change the implementation, **squash the new changes into that commit** rather than adding a follow-up commit. Keep the history clean.
+- Keep commits scoped — do not bundle unrelated changes into one commit.
+
+**Pushing:**
+- **Never push** unless the user explicitly asks, or it is part of a skill's workflow.
+- Once commits have been pushed, **do not rewrite history** (no rebase, no amend, no force-push) unless the user explicitly asks for it.
 
 ## Testing
 
