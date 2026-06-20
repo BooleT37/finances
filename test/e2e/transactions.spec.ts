@@ -959,7 +959,9 @@ test.describe('Subscriptions', () => {
     seedData,
   }) => {
     // Seed an upcoming subscription due this month
-    const firstDate = new Date(TODAY_YEAR, TODAY_MONTH, 5);
+    const firstDate = dayjs(
+      `${TODAY_YEAR}-${String(TODAY_MONTH + 1).padStart(2, '0')}-05`,
+    );
     await testPrisma.subscription.create({
       data: {
         name: 'Спотифай',
@@ -967,7 +969,7 @@ test.describe('Subscriptions', () => {
         categoryId: seedData.categoryIds.развлечения,
         sourceId: seedData.sourceIds.вивид,
         period: 1,
-        firstDate,
+        firstDate: new Date(Date.UTC(TODAY_YEAR, TODAY_MONTH, 5)),
         active: true,
         userId: seedData.userId,
       },
@@ -997,13 +999,11 @@ test.describe('Subscriptions', () => {
     await expect(form.getByLabel('Комментарий')).toHaveValue('Спотифай');
 
     // Cost is filled from subscription (expense, so positive magnitude in the field)
-    await expect(form.getByLabel('Сумма (€)')).toHaveValue('9.99');
+    await expect(form.getByLabel('Сумма (€)')).toHaveValue('-9.99');
 
-    // Date is filled from subscription's firstDate, not January (regression: was always January)
+    // Date is filled from subscription's firstDate
     const dateInput = form.getByLabel('Дата');
-    await expect(dateInput).toHaveValue(
-      new RegExp(`^0?5\\.0?${TODAY_MONTH + 1}\\.${TODAY_YEAR}$`),
-    );
+    await expect(dateInput).toHaveText(formatDateInput(firstDate));
 
     // Row disappears from upcoming section (transaction now exists)
     await expect(
