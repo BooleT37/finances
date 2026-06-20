@@ -38,10 +38,10 @@ gh pr view <PR> --comments --json comments \
   --jq '.comments[] | {author: .author.login, body, createdAt}'
 ```
 
-For the top-level comments, also fetch their database IDs so you can reply to them:
+For the top-level comments, also fetch their database IDs and reactions so you can classify them:
 ```bash
 gh api repos/BooleT37/finances/issues/<PR>/comments \
-  --jq '.[] | {id, user: .user.login, body, created_at}'
+  --jq '.[] | {id, user: .user.login, body, created_at, reactions: .reactions}'
 ```
 
 ## Step 2 — Classify each thread
@@ -51,6 +51,7 @@ Work through every thread and every top-level comment. Classify each one before 
 ### Skip immediately (no action, no question)
 - `isResolved: true` — already resolved, skip.
 - `isOutdated: true` — diff context is gone, skip.
+- **Top-level comment marked as done** — if the comment has a 🎉 or 🚀 reaction from `BooleT37`, skip it. These reactions are the signal that the comment has been acknowledged and requires no further action.
 
 ### Determine the comment author type
 
@@ -58,7 +59,7 @@ For each **inline thread**, look at the first comment's author login:
 - If the author is `BooleT37` (the repo owner) → **human comment** — see human rules below.
 - If the author posted from the `🤖 AI Review` review block (body starts with `> 🤖`) → **AI comment** — see AI rules below.
 
-For **top-level PR comments** (from `gh pr view --comments`): apply human rules if author is `BooleT37`, AI rules if the body starts with `> 🤖`.
+For **top-level PR comments** (from `gh pr view --comments`): apply human rules if author is `BooleT37`, AI rules if the body starts with `> 🤖`. Check reactions before classifying — if already marked with 🎉 or 🚀, skip per the rule above.
 
 ---
 
@@ -98,14 +99,18 @@ Do not proceed past an ambiguous AI thread without an answer. Address it before 
 
 ## Step 3 — Group actionable threads into commits
 
-- **Default: one commit per fix** (per thread).
-- **Merge** multiple threads into one commit only when they are clearly the same underlying change (e.g. the same variable renamed on three lines, or two threads describing one bug). When in doubt, keep them separate.
+- **Default: one commit per thread.** Every fix gets its own atomic commit.
+- **Only merge** threads into one commit when they are literally the same change expressed in multiple places (e.g. the same variable renamed on three lines, or two threads that both point at a single root-cause bug whose fix touches the same lines). The test: could you revert one without affecting the other? If yes, they belong in separate commits.
+- **Never bundle** unrelated fixes — even if they are small or touch the same file. Different bugs, different concerns, different top-level comments → different commits.
+- When in doubt, split.
 
 Record the mapping **thread(s) → commit** so you can post the right link to each afterward.
 
 ## Step 4 — Get the branch (isolated)
 
 If you're not already in a worktree for this branch, create one with the **create-worktree** skill using the PR's `headRefName` (the branch already exists, so it checks it out). Do all edits there.
+
+**Important:** the worktree setup is just a prerequisite — do not stop here. Continue immediately to Step 5.
 
 ## Step 5 — Apply each fix
 
