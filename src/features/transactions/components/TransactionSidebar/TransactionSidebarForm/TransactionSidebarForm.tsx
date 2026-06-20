@@ -18,7 +18,10 @@ import { useAtomValue, useSetAtom, useStore } from 'jotai';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { buildCategorySubcategoryId } from '~/features/categories/categorySubcategoryId';
+import {
+  buildCategorySubcategoryId,
+  parseCategorySubcategoryId,
+} from '~/features/categories/categorySubcategoryId';
 import { getFromSavingsCategoryQueryOptions } from '~/features/categories/facets/categoriesByType';
 import { DatePickerWithTodayInput } from '~/shared/components/DatePickerWithTodayInput';
 
@@ -235,8 +238,31 @@ export function TransactionSidebarForm() {
             firstDate: date ? new Date(date) : null,
             sourceId: source,
           }}
-          onSuccess={(subscriptionId) => {
+          onSuccess={({ subscriptionId, categoryId, sourceId, name }) => {
             form.setFieldValue('subscription', String(subscriptionId));
+            if (name) {
+              form.setFieldValue('name', name);
+            }
+            if (sourceId !== null) {
+              form.setFieldValue('source', sourceId);
+            }
+            if (categoryId !== null) {
+              const { categoryId: catId, subcategoryId } =
+                parseCategorySubcategoryId(categoryId);
+              if (form.values.transactionType === 'income') {
+                form.setFieldValue('incomeCategory', String(catId));
+                form.setFieldValue(
+                  'incomeSubcategory',
+                  subcategoryId !== null ? String(subcategoryId) : null,
+                );
+              } else {
+                form.setFieldValue('expenseCategory', String(catId));
+                form.setFieldValue(
+                  'expenseSubcategory',
+                  subcategoryId !== null ? String(subcategoryId) : null,
+                );
+              }
+            }
           }}
         />
       ),
@@ -287,19 +313,20 @@ export function TransactionSidebarForm() {
             <Box style={{ flex: 1 }}>
               <CostField form={form} />
             </Box>
-            {form.values.transactionType !== 'fromSavings' && (
-              <Tooltip label={t('form.createSubscription')}>
-                <ActionIcon
-                  variant="subtle"
-                  color="gray"
-                  aria-label={t('form.createSubscription')}
-                  onClick={handleCreateSubscription}
-                  mb={4}
-                >
-                  <IconRepeat size={16} />
-                </ActionIcon>
-              </Tooltip>
-            )}
+            {form.values.transactionType !== 'fromSavings' &&
+              form.values.subscription === null && (
+                <Tooltip label={t('form.createSubscription')}>
+                  <ActionIcon
+                    variant="subtle"
+                    color="gray"
+                    aria-label={t('form.createSubscription')}
+                    onClick={handleCreateSubscription}
+                    mb={4}
+                  >
+                    <IconRepeat size={16} />
+                  </ActionIcon>
+                </Tooltip>
+              )}
           </Group>
 
           <TextInput

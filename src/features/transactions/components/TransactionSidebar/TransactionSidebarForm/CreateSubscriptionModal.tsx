@@ -36,9 +36,16 @@ interface ValidatedSubscriptionFormValues extends SubscriptionFormValues {
   firstDate: Date;
 }
 
+interface SubscriptionCreatedValues {
+  subscriptionId: number;
+  categoryId: CategorySubcategoryId | null;
+  sourceId: string | null;
+  name: string;
+}
+
 interface Props {
   initialValues: SubscriptionFormValues;
-  onSuccess: (subscriptionId: number) => void;
+  onSuccess: (values: SubscriptionCreatedValues) => void;
 }
 
 export function CreateSubscriptionModal({ initialValues, onSuccess }: Props) {
@@ -102,7 +109,12 @@ export function CreateSubscriptionModal({ initialValues, onSuccess }: Props) {
       {
         onSuccess: (result) => {
           modals.closeAll();
-          onSuccess(result.id);
+          onSuccess({
+            subscriptionId: result.id,
+            categoryId: validated.categoryId,
+            sourceId: validated.sourceId,
+            name: validated.name,
+          });
         },
       },
     );
@@ -145,11 +157,7 @@ export function CreateSubscriptionModal({ initialValues, onSuccess }: Props) {
           rightSectionPointerEvents="all"
         />
 
-        <Input.Wrapper
-          label={t('form.category')}
-          required
-          error={form.errors.categoryId}
-        >
+        <Input.Wrapper label={t('form.category')} required>
           <TreeSelect
             treeData={categoryTreeData ?? []}
             titleRender={renderCategoryTreeNodeTitle}
