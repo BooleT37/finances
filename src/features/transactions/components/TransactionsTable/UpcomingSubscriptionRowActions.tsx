@@ -21,11 +21,13 @@ export function UpcomingSubscriptionRowActions({ row }: Props) {
   const triggerFlash = useFlashTrigger(TableFlash.Transactions);
   const { t } = useTranslation('transactions');
 
-  const handleCreate = async () => {
-    const newId = await createFromSubscription(row);
-    if (newId !== undefined) {
-      triggerFlash([{ id: newId }]);
-    }
+  const handleCreate = () => {
+    createFromSubscription({
+      row,
+      onCreated: (id) => {
+        triggerFlash([{ id }]);
+      },
+    });
   };
 
   return (
@@ -33,7 +35,7 @@ export function UpcomingSubscriptionRowActions({ row }: Props) {
       <ActionIcon
         variant="subtle"
         aria-label={t('actions.createFromSubscription')}
-        onClick={() => void handleCreate()}
+        onClick={handleCreate}
       >
         <IconCalendarPlus size={16} />
       </ActionIcon>

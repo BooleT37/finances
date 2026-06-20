@@ -7,6 +7,7 @@ import {
   queryClientAtom,
 } from 'jotai-tanstack-query';
 
+import { DATE_FORMAT } from '~/shared/constants';
 import { selectedYearAtom } from '~/stores/month';
 import {
   sidebarFormRefAtom,
@@ -274,29 +275,37 @@ export const TransactionSidebarMolecule = molecule(() => {
 
   const createFromSubscriptionAtom = atom(
     null,
-    async (
+    (
       _get,
       set,
-      row: TransactionTableItem,
-    ): Promise<number | undefined> => {
+      {
+        row,
+        onCreated,
+      }: { row: TransactionTableItem; onCreated?: (id: number) => void },
+    ) => {
       if (!row.subscriptionId || !row.cost) {
-        return undefined;
+        return;
       }
-      const newTx = await _get(addMutationAtom).mutateAsync({
-        name: row.name,
-        cost: row.cost.cost.abs().toString(),
-        date: row.date.split('.').reverse().join('-'),
-        actualDate: null,
-        categoryId: row.categoryId,
-        subcategoryId: row.subcategoryId ?? null,
-        sourceId: row.sourceId ?? null,
-        subscriptionId: row.subscriptionId,
-        savingSpendingCategoryId: null,
-        components: undefined,
+      set(withDirtyCheckAtom, () => {
+        void _get(addMutationAtom)
+          .mutateAsync({
+            name: row.name,
+            cost: row.cost!.cost.abs().toString(),
+            date: dayjs(row.date, DATE_FORMAT).format('YYYY-MM-DD'),
+            actualDate: null,
+            categoryId: row.categoryId,
+            subcategoryId: row.subcategoryId ?? null,
+            sourceId: row.sourceId ?? null,
+            subscriptionId: row.subscriptionId!,
+            savingSpendingCategoryId: null,
+            components: undefined,
+          })
+          .then((newTx) => {
+            set(openAtom, newTx.id);
+            set(requestScrollAtom, newTx.id);
+            onCreated?.(newTx.id);
+          });
       });
-      set(openAtom, newTx.id);
-      set(requestScrollAtom, newTx.id);
-      return newTx.id;
     },
   );
 
