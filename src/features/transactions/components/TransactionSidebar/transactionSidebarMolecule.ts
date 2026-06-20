@@ -7,7 +7,7 @@ import {
   queryClientAtom,
 } from 'jotai-tanstack-query';
 
-import { DATE_FORMAT } from '~/shared/constants';
+import { API_DATE_FORMAT, DATE_FORMAT } from '~/shared/constants';
 import { selectedYearAtom } from '~/stores/month';
 import {
   sidebarFormRefAtom,
@@ -205,9 +205,9 @@ export const TransactionSidebarMolecule = molecule(() => {
         // Expense.date is @db.Date; serialize as a calendar date in the user's
         // local timezone so toISOString's UTC shift doesn't bump the row to
         // the previous day for positive-offset zones.
-        date: dayjs(values.date).format('YYYY-MM-DD'),
+        date: dayjs(values.date).format(API_DATE_FORMAT),
         actualDate: values.actualDate
-          ? dayjs(values.actualDate).format('YYYY-MM-DD')
+          ? dayjs(values.actualDate).format(API_DATE_FORMAT)
           : null,
         categoryId: Number(values.category),
         subcategoryId:
@@ -249,8 +249,10 @@ export const TransactionSidebarMolecule = molecule(() => {
       const newTx = await get(addMutationAtom).mutateAsync({
         name: tx.name,
         cost: tx.cost.abs().toString(),
-        date: tx.date.format('YYYY-MM-DD'),
-        actualDate: tx.actualDate ? tx.actualDate.format('YYYY-MM-DD') : null,
+        date: tx.date.format(API_DATE_FORMAT),
+        actualDate: tx.actualDate
+          ? tx.actualDate.format(API_DATE_FORMAT)
+          : null,
         categoryId: tx.categoryId,
         subcategoryId: tx.subcategoryId ?? null,
         sourceId: tx.sourceId ?? null,
@@ -283,15 +285,15 @@ export const TransactionSidebarMolecule = molecule(() => {
         onCreated,
       }: { row: TransactionTableItem; onCreated?: (id: number) => void },
     ) => {
-      if (!row.subscriptionId || !row.cost) {
-        return;
-      }
       set(withDirtyCheckAtom, () => {
-        void _get(addMutationAtom)
-          .mutateAsync({
+        if (!row.subscriptionId || !row.cost) {
+          return;
+        }
+        void (async () => {
+          const newTx = await _get(addMutationAtom).mutateAsync({
             name: row.name,
             cost: row.cost!.cost.abs().toString(),
-            date: dayjs(row.date, DATE_FORMAT).format('YYYY-MM-DD'),
+            date: dayjs(row.date, DATE_FORMAT).format(API_DATE_FORMAT),
             actualDate: null,
             categoryId: row.categoryId,
             subcategoryId: row.subcategoryId ?? null,
@@ -299,12 +301,11 @@ export const TransactionSidebarMolecule = molecule(() => {
             subscriptionId: row.subscriptionId!,
             savingSpendingCategoryId: null,
             components: undefined,
-          })
-          .then((newTx) => {
-            set(openAtom, newTx.id);
-            set(requestScrollAtom, newTx.id);
-            onCreated?.(newTx.id);
           });
+          set(openAtom, newTx.id);
+          set(requestScrollAtom, newTx.id);
+          onCreated?.(newTx.id);
+        })();
       });
     },
   );
