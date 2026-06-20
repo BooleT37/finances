@@ -60,6 +60,7 @@ export function TreeSelect<T extends string>({
         notFoundContent={notFoundContent}
         disabled={disabled}
         virtual={false}
+        listHeight={300}
         treeTitleRender={titleRender}
       />
       {error && (
