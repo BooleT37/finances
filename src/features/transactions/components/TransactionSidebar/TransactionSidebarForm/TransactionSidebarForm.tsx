@@ -240,27 +240,31 @@ export function TransactionSidebarForm() {
           }}
           onSuccess={({ subscriptionId, categoryId, sourceId, name }) => {
             form.setFieldValue('subscription', String(subscriptionId));
-            if (name) {
+            if (name && !form.values.name) {
               form.setFieldValue('name', name);
             }
-            if (sourceId !== null) {
+            if (sourceId !== null && form.values.source === null) {
               form.setFieldValue('source', sourceId);
             }
             if (categoryId !== null) {
               const { categoryId: catId, subcategoryId } =
                 parseCategorySubcategoryId(categoryId);
               if (form.values.transactionType === 'income') {
-                form.setFieldValue('incomeCategory', String(catId));
-                form.setFieldValue(
-                  'incomeSubcategory',
-                  subcategoryId !== null ? String(subcategoryId) : null,
-                );
+                if (!form.values.incomeCategory) {
+                  form.setFieldValue('incomeCategory', String(catId));
+                  form.setFieldValue(
+                    'incomeSubcategory',
+                    subcategoryId !== null ? String(subcategoryId) : null,
+                  );
+                }
               } else {
-                form.setFieldValue('expenseCategory', String(catId));
-                form.setFieldValue(
-                  'expenseSubcategory',
-                  subcategoryId !== null ? String(subcategoryId) : null,
-                );
+                if (!form.values.expenseCategory) {
+                  form.setFieldValue('expenseCategory', String(catId));
+                  form.setFieldValue(
+                    'expenseSubcategory',
+                    subcategoryId !== null ? String(subcategoryId) : null,
+                  );
+                }
               }
             }
           }}
