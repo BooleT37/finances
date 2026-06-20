@@ -9,7 +9,7 @@ Walks the backlog of `ai`-labeled issues and turns the clear ones into draft PRs
 
 **Operating decisions baked in (agreed with the repo owner):**
 - **Sequential** — one issue at a time. Never run two implementation subagents (or two dev servers) at once; the dev/test ports (3002 / 3001) and the shared Postgres collide otherwise.
-- **Draft PRs** — every PR is opened as a *draft*. The owner reviews before it goes ready.
+- **Open PRs** — every PR is opened in the standard open state (not draft). The owner reviews before merging.
 - **Ambiguous → comment, don't guess** — if an issue lacks enough detail to implement safely, post a comment on the issue with the specific open questions and skip it.
 - **Screenshots via the `pr-screenshots` branch** — host verification screenshots on one shared orphan branch and embed them by raw URL (see "Screenshots" below).
 
@@ -117,9 +117,9 @@ Use stable, descriptive filenames (`before.png`, `after.png`). If you ever re-ru
 
 ## Step 8 — Open a DRAFT PR
 
-Push the branch and open a **draft** PR:
+Push the branch and open a PR:
 ```bash
-gh pr create --repo BooleT37/finances --draft \
+gh pr create --repo BooleT37/finances \
   --base main --head <branch> \
   --title "<type>(<feature>): <concise summary>" \
   --body "$(cat <<'EOF'
@@ -140,18 +140,24 @@ EOF
 ```
 Append the standard footer the repo uses for AI-authored PRs.
 
-## Step 9 — Clean up & report
+## Step 9 — Run the code review skill
+
+Once the PR is open, run the **review** skill on it passing the PR number. This posts an automated 🤖 review with inline comments directly to the PR so the owner can triage findings before merging.
+
+The review skill needs the PR diff to be available on GitHub, so run it after the push in Step 8 completes (no extra delay needed — the API is available immediately after `gh pr create` returns).
+
+## Step 10 — Clean up & report
 
 - Remove the worktree (`git worktree remove ../finances-worktrees/<dir>`) — the branch is safe on the remote, and the **fix-pr-comments** skill recreates a worktree if review feedback comes in.
 - Move to the next issue.
 
 When the run finishes, print a summary:
-- **PRs opened** (issue → PR link),
+- **PRs opened** (issue → PR link → review link),
 - **Skipped as ambiguous** (issue → the comment you posted),
 - **Failed** (issue → what blocked it, worktree left in place for inspection).
 
 ## Never
 
-- Never push to `main` directly or open a non-draft PR.
+- Never push to `main` directly.
 - Never mark a PR ready, merge, or close an issue — the owner does that after review.
 - Never run two issues concurrently.
