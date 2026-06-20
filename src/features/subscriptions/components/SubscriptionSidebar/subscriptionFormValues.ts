@@ -12,4 +12,9 @@ export interface SubscriptionFormValues {
   sourceId: string | null;
 }
 
+export interface ValidatedSubscriptionFormValues extends SubscriptionFormValues {
+  firstDate: Dayjs;
+  categoryId: CategorySubcategoryId;
+}
+
 export type SubscriptionFormType = UseFormReturnType<SubscriptionFormValues>;

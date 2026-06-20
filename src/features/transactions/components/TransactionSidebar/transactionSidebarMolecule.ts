@@ -7,6 +7,7 @@ import {
   queryClientAtom,
 } from 'jotai-tanstack-query';
 
+import { API_DATE_FORMAT, DATE_FORMAT } from '~/shared/constants';
 import { selectedYearAtom } from '~/stores/month';
 import {
   sidebarFormRefAtom,
@@ -19,6 +20,7 @@ import {
   getDeleteTransactionMutationOptions,
   getUpdateTransactionMutationOptions,
 } from '../../queries';
+import type { TransactionTableItem } from '../TransactionsTable/TransactionsTable.types';
 import type {
   TransactionFormType,
   TransformedTransactionFormValues,
@@ -75,26 +77,34 @@ export const TransactionSidebarMolecule = molecule(() => {
   );
 
   // ── Open / close ────────────────────────────────────────────────────────────
-  const openAtom = atom(null, (get, set, id: number | null) => {
-    set(withDirtyCheckAtom, () => {
-      set(editingIdAtom, id);
-      if (id !== null) {
-        const tx = get(transactionsMapAtom).data?.[id] ?? null;
-        set(actualDateShownAtom, tx?.actualDate != null);
-      } else {
-        set(actualDateShownAtom, false);
-        // For the existing transaction path, we have the "key" workaround on the component,
-        // That remounts it on transaction id update. For the new transaction it won't work since the key
-        // is always "new". If we put the date or month in the key, it will remount on every date or month
-        // change respectfully, which we don't want. So to avoid bugs with initial transaction values not being
-        // reset after we close and reopen the sidebar, we need to do it manually
-        const form = get(_formAtom);
-        if (form) {
-          form.setInitialValues(get(emptyTransactionFormValuesAtom));
-          form.reset();
-        }
+
+  // Inner open logic without a dirty check — used directly when the caller has
+  // already confirmed (or there is nothing to confirm), e.g. inside
+  // createFromSubscriptionAtom after the mutation completes.
+  const openDirectAtom = atom(null, (get, set, id: number | null) => {
+    set(editingIdAtom, id);
+    if (id !== null) {
+      const tx = get(transactionsMapAtom).data?.[id] ?? null;
+      set(actualDateShownAtom, tx?.actualDate != null);
+    } else {
+      set(actualDateShownAtom, false);
+      // For the existing transaction path, we have the "key" workaround on the component,
+      // That remounts it on transaction id update. For the new transaction it won't work since the key
+      // is always "new". If we put the date or month in the key, it will remount on every date or month
+      // change respectfully, which we don't want. So to avoid bugs with initial transaction values not being
+      // reset after we close and reopen the sidebar, we need to do it manually
+      const form = get(_formAtom);
+      if (form) {
+        form.setInitialValues(get(emptyTransactionFormValuesAtom));
+        form.reset();
       }
-      set(isOpenAtom, true);
+    }
+    set(isOpenAtom, true);
+  });
+
+  const openAtom = atom(null, (_get, set, id: number | null) => {
+    set(withDirtyCheckAtom, () => {
+      set(openDirectAtom, id);
     });
   });
 
@@ -203,9 +213,9 @@ export const TransactionSidebarMolecule = molecule(() => {
         // Expense.date is @db.Date; serialize as a calendar date in the user's
         // local timezone so toISOString's UTC shift doesn't bump the row to
         // the previous day for positive-offset zones.
-        date: dayjs(values.date).format('YYYY-MM-DD'),
+        date: dayjs(values.date).format(API_DATE_FORMAT),
         actualDate: values.actualDate
-          ? dayjs(values.actualDate).format('YYYY-MM-DD')
+          ? dayjs(values.actualDate).format(API_DATE_FORMAT)
           : null,
         categoryId: Number(values.category),
         subcategoryId:
@@ -247,8 +257,10 @@ export const TransactionSidebarMolecule = molecule(() => {
       const newTx = await get(addMutationAtom).mutateAsync({
         name: tx.name,
         cost: tx.cost.abs().toString(),
-        date: tx.date.format('YYYY-MM-DD'),
-        actualDate: tx.actualDate ? tx.actualDate.format('YYYY-MM-DD') : null,
+        date: tx.date.format(API_DATE_FORMAT),
+        actualDate: tx.actualDate
+          ? tx.actualDate.format(API_DATE_FORMAT)
+          : null,
         categoryId: tx.categoryId,
         subcategoryId: tx.subcategoryId ?? null,
         sourceId: tx.sourceId ?? null,
@@ -271,6 +283,41 @@ export const TransactionSidebarMolecule = molecule(() => {
     },
   );
 
+  const createFromSubscriptionAtom = atom(
+    null,
+    (
+      _get,
+      set,
+      {
+        row,
+        onCreated,
+      }: { row: TransactionTableItem; onCreated?: (id: number) => void },
+    ) => {
+      set(withDirtyCheckAtom, () => {
+        if (!row.subscriptionId || !row.cost) {
+          return;
+        }
+        void (async () => {
+          const newTx = await _get(addMutationAtom).mutateAsync({
+            name: row.name,
+            cost: row.cost!.cost.abs().toString(),
+            date: dayjs(row.date, DATE_FORMAT).format(API_DATE_FORMAT),
+            actualDate: null,
+            categoryId: row.categoryId,
+            subcategoryId: row.subcategoryId ?? null,
+            sourceId: row.sourceId ?? null,
+            subscriptionId: row.subscriptionId!,
+            savingSpendingCategoryId: null,
+            components: undefined,
+          });
+          set(openDirectAtom, newTx.id);
+          set(requestScrollAtom, newTx.id);
+          onCreated?.(newTx.id);
+        })();
+      });
+    },
+  );
+
   return {
     editingIdAtom,
     isOpenAtom,
@@ -287,6 +334,7 @@ export const TransactionSidebarMolecule = molecule(() => {
     saveTransactionAtom,
     deleteTransactionAtom,
     copyTransactionAtom,
+    createFromSubscriptionAtom,
     navTargetsAtom,
     scrollRequestAtom,
     navigateToTransactionAtom,

@@ -27,6 +27,7 @@ import { TransactionSidebarMolecule } from '../TransactionSidebar/transactionSid
 import { useTransactionTableColumns } from './columns/useTransactionTableColumns';
 import { RowActions } from './RowActions';
 import type { TransactionTableItem } from './TransactionsTable.types';
+import { UpcomingSubscriptionRowActions } from './UpcomingSubscriptionRowActions';
 
 // Minimal structural row shape so this works with both Row and MRT_Row, which
 // TypeScript considers mutually non-assignable due to their columnDef types.
@@ -131,7 +132,7 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
     enableRowActions: true,
     renderRowActions: ({ row }) => {
       if (row.original.isUpcomingSubscription) {
-        return undefined;
+        return <UpcomingSubscriptionRowActions row={row.original} />;
       }
       return (
         <RowActions

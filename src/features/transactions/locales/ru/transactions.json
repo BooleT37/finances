@@ -1,6 +1,7 @@
 {
   "actions": {
     "copy": "Копировать",
+    "createFromSubscription": "Создать транзакцию",
     "delete": "Удалить",
     "edit": "Редактировать"
   },

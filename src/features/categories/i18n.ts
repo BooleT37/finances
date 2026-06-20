@@ -1,5 +1,5 @@
-import en from './locales/en/categories.json';
-import ru from './locales/ru/categories.json';
+import en from './locales/en/categories.json' with { type: 'json' };
+import ru from './locales/ru/categories.json' with { type: 'json' };
 
 export const i18nResources = {
   en: { categories: en },
