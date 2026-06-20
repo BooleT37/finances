@@ -9,10 +9,10 @@ import { i18nResources as sourcesResources } from '~/features/sources/i18n';
 import { i18nResources as subscriptionsResources } from '~/features/subscriptions/i18n';
 import { i18nResources as transactionsResources } from '~/features/transactions/i18n';
 
-import commonEn from './locales/en/common.json';
-import homeEn from './locales/en/home.json';
-import commonRu from './locales/ru/common.json';
-import homeRu from './locales/ru/home.json';
+import commonEn from './locales/en/common.json' with { type: 'json' };
+import homeEn from './locales/en/home.json' with { type: 'json' };
+import commonRu from './locales/ru/common.json' with { type: 'json' };
+import homeRu from './locales/ru/home.json' with { type: 'json' };
 
 export const resources = {
   en: {
