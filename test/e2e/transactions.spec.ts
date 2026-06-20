@@ -839,7 +839,7 @@ test.describe('Subscriptions', () => {
     await createSubBtn.click();
 
     // Modal opens with fields pre-filled from the transaction form
-    const modal = page.getByRole('dialog');
+    const modal = page.getByRole('dialog', { name: 'Создать подписку' });
     await expect(modal).toBeVisible();
     await expect(modal.getByLabel('Название')).toHaveValue('Спотифай');
     await expect(modal.getByLabel('Цена')).toHaveValue('9.99');
@@ -886,7 +886,7 @@ test.describe('Subscriptions', () => {
     // Open create subscription modal without filling any fields
     await form.getByRole('button', { name: 'Создать подписку' }).click();
 
-    const modal = page.getByRole('dialog');
+    const modal = page.getByRole('dialog', { name: 'Создать подписку' });
     await expect(modal).toBeVisible();
 
     // Submit without filling required fields to trigger validation
@@ -909,7 +909,7 @@ test.describe('Subscriptions', () => {
     // Open modal without pre-filling category or source in the sidebar
     await form.getByRole('button', { name: 'Создать подписку' }).click();
 
-    const modal = page.getByRole('dialog');
+    const modal = page.getByRole('dialog', { name: 'Создать подписку' });
     await expect(modal).toBeVisible();
 
     // Fill all required fields in the modal, including category and source
@@ -939,9 +939,9 @@ test.describe('Subscriptions', () => {
     await expect(modal).not.toBeVisible();
 
     // Category and source from the modal are applied back to the sidebar form
-    await expect(form.getByRole('textbox', { name: 'Категория' })).toHaveValue(
-      'Продукты',
-    );
+    await expect(
+      form.getByRole('textbox', { name: 'Категория', exact: true }),
+    ).toHaveValue('Продукты');
     await expect(form.getByRole('textbox', { name: 'Источник' })).toHaveValue(
       'Vivid',
     );
