@@ -56,21 +56,14 @@ export function TransactionsPage() {
     >
       <Group justify="space-between">
         <Group gap="sm">
-          <Button
-            leftSection={<IconPlus size={16} />}
-            onClick={() => openSidebar(null)}
-          >
-            {t('add')}
-          </Button>
-          <Tooltip label={t('import')}>
-            <ActionIcon
-              variant="default"
-              size="lg"
-              onClick={() => setImportOpen(true)}
-            >
-              <IconFileImport size={16} />
-            </ActionIcon>
-          </Tooltip>
+          <TextInput
+            leftSection={<IconSearch size={16} />}
+            placeholder={t('searchPlaceholder')}
+            value={search}
+            onChange={(e) => {
+              setSearch(e.currentTarget.value);
+            }}
+          />
           <Checkbox
             label={t('groupBySubcategories')}
             checked={groupBySubcategories}
@@ -81,14 +74,23 @@ export function TransactionsPage() {
             onToggle={() => setShowUpcoming((prev) => !prev)}
           />
         </Group>
-        <TextInput
-          leftSection={<IconSearch size={16} />}
-          placeholder={t('searchPlaceholder')}
-          value={search}
-          onChange={(e) => {
-            setSearch(e.currentTarget.value);
-          }}
-        />
+        <Group gap="sm">
+          <Tooltip label={t('import')}>
+            <ActionIcon
+              variant="default"
+              size="lg"
+              onClick={() => setImportOpen(true)}
+            >
+              <IconFileImport size={16} />
+            </ActionIcon>
+          </Tooltip>
+          <Button
+            leftSection={<IconPlus size={16} />}
+            onClick={() => openSidebar(null)}
+          >
+            {t('add')}
+          </Button>
+        </Group>
       </Group>
       {/*
           // we need to fetch all the orders from user settings
