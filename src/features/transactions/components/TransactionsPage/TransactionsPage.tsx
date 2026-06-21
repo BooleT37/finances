@@ -3,7 +3,6 @@ import {
   Button,
   Checkbox,
   Group,
-  Loader,
   Stack,
   TextInput,
   Tooltip,
@@ -25,6 +24,7 @@ import {
   groupBySubcategoriesAtom,
   transactionSearchAtom,
 } from './TransactionsPage.atoms';
+import { TransactionsTableSkeleton } from './TransactionsTableSkeleton';
 import { UpcomingSubscriptionsBadge } from './UpcomingSubscriptionsBadge';
 import { useTransactionTableItems } from './useTransactionTableItems';
 
@@ -101,7 +101,7 @@ export function TransactionsPage() {
           groupBySubcategories={groupBySubcategories}
         />
       ) : (
-        <Loader />
+        <TransactionsTableSkeleton />
       )}
 
       <TransactionSidebar width={sidebarWidth} />
