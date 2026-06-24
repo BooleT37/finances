@@ -12,5 +12,7 @@
   "settings": "Settings",
   "categories": "Categories",
   "sources": "Sources",
-  "subscriptions": "Subscriptions"
+  "subscriptions": "Subscriptions",
+  "collapseSidebar": "Collapse sidebar",
+  "expandSidebar": "Expand sidebar"
 }

@@ -24,12 +24,14 @@ import {
   Scripts,
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { useAtomValue } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
 import { queryClientAtom } from 'jotai-tanstack-query';
 import { I18nextProvider, useTranslation } from 'react-i18next';
 
 import { AppHeader } from '~/features/nav/components/AppHeader';
-import { AppNav } from '~/features/nav/components/AppNav';
+import { AppNav } from '~/features/nav/components/AppNav/AppNav';
+import { navCollapsedAtom } from '~/features/nav/navCollapsed.atom';
 import i18n from '~/lib/i18n';
 import { trpc, trpcClient } from '~/lib/trpc/client';
 
@@ -90,28 +92,35 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   );
 }
 
+const NAV_WIDTH_EXPANDED = 200;
+const NAV_WIDTH_COLLAPSED = 60;
+
 function AppContent() {
   const { i18n: i18nInstance } = useTranslation();
+  const navCollapsed = useAtomValue(navCollapsedAtom);
 
   return (
     <DatesProvider settings={{ locale: i18nInstance.language }}>
       <Notifications />
       <AppShell
         header={{ height: 40 }}
-        navbar={{ width: 200, breakpoint: 'sm' }}
+        navbar={{
+          width: navCollapsed ? NAV_WIDTH_COLLAPSED : NAV_WIDTH_EXPANDED,
+          breakpoint: 'xs',
+        }}
         padding={{ base: 10, sm: 15, lg: 'md' }}
       >
         <AppShell.Header>
           <AppHeader />
         </AppShell.Header>
-        <AppShell.Navbar>
+        <AppShell.Navbar style={{ transition: 'width 0.25s ease' }}>
           <AppNav />
         </AppShell.Navbar>
-        <AppShell.Main>
+        <AppShell.Main style={{ transition: 'padding-left 0.25s ease' }}>
           <Outlet />
         </AppShell.Main>
       </AppShell>
-      <TanStackRouterDevtools />
+      <TanStackRouterDevtools position="bottom-right" />
     </DatesProvider>
   );
 }

@@ -12,5 +12,7 @@
   "settings": "Настройки",
   "categories": "Категории",
   "sources": "Источники",
-  "subscriptions": "Подписки"
+  "subscriptions": "Подписки",
+  "collapseSidebar": "Свернуть меню",
+  "expandSidebar": "Развернуть меню"
 }
