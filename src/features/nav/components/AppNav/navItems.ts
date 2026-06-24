@@ -10,7 +10,7 @@ import {
   IconTag,
 } from '@tabler/icons-react';
 
-import type { i18nResources } from './i18n';
+import type { i18nResources } from '../../i18n';
 
 export type NavLabelKey = keyof (typeof i18nResources)['ru']['nav'];
 

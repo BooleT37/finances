@@ -8,7 +8,7 @@ import { confirmUnsavedChanges } from '~/stores/sidebar/confirmUnsavedChanges';
 import { sidebarFormRefAtom } from '~/stores/sidebar/sidebarStore';
 
 import { navCollapsedAtom } from '../../navCollapsed.atom';
-import { type NavItem } from '../../navItems';
+import { type NavItem } from './navItems';
 
 interface AppNavItemProps {
   item: NavItem;

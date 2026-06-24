@@ -2,9 +2,9 @@ import { Box, Stack } from '@mantine/core';
 import { useAtom } from 'jotai';
 
 import { navCollapsedAtom } from '../../navCollapsed.atom';
-import { navItems } from '../../navItems';
 import { AppNavItem } from './AppNavItem';
 import { NavCollapseToggle } from './NavCollapseToggle';
+import { navItems } from './navItems';
 
 export function AppNav() {
   const [collapsed, setCollapsed] = useAtom(navCollapsedAtom);
