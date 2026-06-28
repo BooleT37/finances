@@ -40,13 +40,14 @@ Prefer this skill over the Agent tool's built-in `isolation: "worktree"` when th
      [ -e "$item" ] && cp -R "$item" ../finances-worktrees/<dir>/
    done
    ```
-   `cp -R` over the git-tracked `.claude` is harmless — it just overlays any local-only files (e.g. `settings.local.json`). Do **not** copy `node_modules` — install fresh in the next step.
+   `cp -R` over the git-tracked `.claude` is harmless — it just overlays any local-only files (e.g. `settings.local.json`). **`.env` is required** — `prisma generate` (step 5) reads `DATABASE_URL` from it and fails without it. Do **not** copy `node_modules` — install fresh in the next step.
 
-5. **Install dependencies** in the worktree:
+5. **Install dependencies and generate Prisma client** in the worktree:
    ```bash
    npm ci --prefix ../finances-worktrees/<dir>
+   npm run db:generate --prefix ../finances-worktrees/<dir>
    ```
-   (`npm ci` is correct here — the worktree starts with no `node_modules` and we want the lockfile-exact tree.)
+   (`npm ci` is correct here — the worktree starts with no `node_modules` and we want the lockfile-exact tree. `db:generate` runs `prisma generate` to produce the typed client and enums under `src/generated/prisma/`; without it the dev server and typecheck fail immediately.)
 
 6. **Confirm it builds.** Run a fast check from inside the worktree:
    ```bash
