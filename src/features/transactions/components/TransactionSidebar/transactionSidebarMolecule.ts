@@ -310,9 +310,15 @@ export const TransactionSidebarMolecule = molecule(() => {
             savingSpendingCategoryId: null,
             components: undefined,
           });
-          set(openDirectAtom, newTx.id);
-          set(requestScrollAtom, newTx.id);
-          onCreated?.(newTx.id);
+          // React Query's notifyManager dispatches observer updates via setTimeout(0),
+          // so transactionsMapAtom is not yet updated when mutateAsync resolves.
+          // Deferring to the next tick ensures the form initializes with the new
+          // transaction's data rather than empty values.
+          setTimeout(() => {
+            set(openDirectAtom, newTx.id);
+            set(requestScrollAtom, newTx.id);
+            onCreated?.(newTx.id);
+          }, 0);
         })();
       });
     },
