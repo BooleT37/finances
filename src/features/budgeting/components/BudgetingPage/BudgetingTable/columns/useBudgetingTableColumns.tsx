@@ -37,8 +37,6 @@ export function useBudgetingTableColumns({
   const { t } = useTranslation('budgeting');
 
   return useMemo(() => {
-    const lastMonthVal = month === 0 ? 11 : month - 1;
-    const lastMonthYear = month === 0 ? year - 1 : year;
     const zero = new Decimal(0);
 
     return [
@@ -71,23 +69,12 @@ export function useBudgetingTableColumns({
         enableEditing: false,
         enableSorting: false,
         Cell: ({ row }) => (
-          <CostWithDiffCellView
-            cost={row.original.lastMonthActual}
-            forecast={row.original.lastMonthPlanSum}
-            isContinuous={row.original.isContinuous}
-            month={lastMonthVal}
-            year={lastMonthYear}
-            showPlanTooltip
-          />
+          <Text size="sm">{costToString(row.original.lastMonthActual)}</Text>
         ),
         Footer: () => (
-          <CostWithDiffCellView
-            cost={grandTotal?.lastMonthActual ?? zero}
-            forecast={grandTotal?.lastMonthPlanSum ?? zero}
-            isContinuous={false}
-            month={lastMonthVal}
-            year={lastMonthYear}
-          />
+          <Text size="sm" fw={600}>
+            {costToString(grandTotal?.lastMonthActual ?? zero)}
+          </Text>
         ),
         mantineTableBodyCellProps: {
           'data-testing-column': 'lastMonth',

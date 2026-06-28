@@ -11,7 +11,6 @@ export interface BudgetingGrandTotal {
   monthCount: number;
   /** Estimated surplus: Σ(income planSums) + Σ(expense planSums) + Σ(savings planSums). */
   planSum: Decimal;
-  lastMonthPlanSum: Decimal;
   /** All available subscriptions due this month */
   subscriptions: AvailableSubscription[];
 }
@@ -33,8 +32,6 @@ export interface BudgetingRow {
   isContinuous: boolean;
   /** Precomputed plan sum at every level. Negative for expense rows (adaptCost applied). */
   planSum: Decimal;
-  /** Precomputed plan sum for the previous month. */
-  lastMonthPlanSum: Decimal;
   /** '' if no DB record exists. Always '' for Rest and typeGroup rows. */
   comment: string;
   /** Signed actual total for the selected month. */
