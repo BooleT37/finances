@@ -25,6 +25,18 @@
     ]
   },
   "hooks": {
+    "WorktreeCreate": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "MAIN=$(git rev-parse --git-common-dir); cp \"$MAIN/../.env\" .env 2>/dev/null || true; ([ ! -d node_modules ] && npm install || true) && npm run db:generate",
+            "statusMessage": "Installing dependencies and generating Prisma client...",
+            "timeout": 120
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write",
