@@ -1,6 +1,7 @@
 import './TreeSelect.css';
 
-import { Text } from '@mantine/core';
+import { Input, Text } from '@mantine/core';
+import { ClientOnly } from '@tanstack/react-router';
 import RcTreeSelect from 'rc-tree-select';
 import type { ReactNode } from 'react';
 
@@ -44,25 +45,31 @@ export function TreeSelect<T extends string>({
 }: Props<T>) {
   return (
     <div>
-      <RcTreeSelect
-        className={`treeSelect${error ? ' error' : ''}`}
-        dropdownClassName="treeSelectDropdown"
-        value={value ?? undefined}
-        onChange={(v: string | undefined) => {
-          onChange((v as T) ?? null);
-        }}
-        treeData={treeData}
-        placeholder={placeholder}
-        showSearch
-        treeNodeFilterProp={searchProp}
-        treeNodeLabelProp={selectionProp}
-        allowClear
-        notFoundContent={notFoundContent}
-        disabled={disabled}
-        virtual={false}
-        listHeight={300}
-        treeTitleRender={titleRender}
-      />
+      {/* rc-tree-select renders something SSR can't type-check correctly
+          (throws "Element type is invalid" during server rendering on a
+          real browser's first request) — render it client-only and fall
+          back to a plain disabled input during SSR/hydration. */}
+      <ClientOnly fallback={<Input disabled placeholder={placeholder} />}>
+        <RcTreeSelect
+          className={`treeSelect${error ? ' error' : ''}`}
+          dropdownClassName="treeSelectDropdown"
+          value={value ?? undefined}
+          onChange={(v: string | undefined) => {
+            onChange((v as T) ?? null);
+          }}
+          treeData={treeData}
+          placeholder={placeholder}
+          showSearch
+          treeNodeFilterProp={searchProp}
+          treeNodeLabelProp={selectionProp}
+          allowClear
+          notFoundContent={notFoundContent}
+          disabled={disabled}
+          virtual={false}
+          listHeight={300}
+          treeTitleRender={titleRender}
+        />
+      </ClientOnly>
       {error && (
         <Text size="xs" c="red" mt={4}>
           {error}
