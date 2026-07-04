@@ -13,11 +13,14 @@ import { getCategoryMapQueryOptions } from '~/features/categories/facets/categor
 import { TableFlash, useTableFlash } from '~/shared/hooks/useTableFlash';
 import { useTableLocalization } from '~/shared/hooks/useTableLocalization';
 import { getOrThrow } from '~/shared/utils/getOrThrow';
+import { expandRowEditableProps } from '~/shared/utils/table/expandRowEditableProps';
 
 import { useSortedSubscriptions } from '../../facets/sortedSubscriptions';
 import type { Subscription } from '../../schema';
 import { useSubscriptionTableColumns } from './columns/useSubscriptionTableColumns';
 import { RowActions } from './RowActions';
+import { SubscriptionNameCellEdit } from './SubscriptionNameCellEdit';
+import classes from './SubscriptionsTable.module.css';
 
 function getRowBgColor(depth: number) {
   if (depth === 0) {
@@ -62,6 +65,8 @@ export function SubscriptionsTable({ mode }: Props) {
     data: filtered ?? [],
     getRowId: (row) => String(row.id),
     enableGrouping: true,
+    enableEditing: true,
+    editDisplayMode: 'cell',
     enableTopToolbar: false,
     enableBottomToolbar: false,
     enablePagination: false,
@@ -119,18 +124,28 @@ export function SubscriptionsTable({ mode }: Props) {
       'mrt-row-expand': {
         header: t('columns.name'),
         size: 220,
-        Cell: ({ row, table: tbl }) => (
-          <Group align="center" gap="xs" wrap="nowrap" w="100%">
-            <MRT_ExpandButton row={row} table={tbl} />
-            {row.getIsGrouped()
-              ? getOrThrow(
-                  categoryMap,
-                  Number(row.getGroupingValue('categoryId')),
-                  'Category',
-                ).name
-              : row.original.name}
-          </Group>
-        ),
+        ...expandRowEditableProps<Subscription>({
+          enableEditing: (row) => !row.getIsGrouped(),
+          className: classes.editableNameCell,
+          Cell: ({ row, table: tbl }) => (
+            <Group align="center" gap="xs" wrap="nowrap" w="100%">
+              <MRT_ExpandButton row={row} table={tbl} />
+              {row.getIsGrouped()
+                ? getOrThrow(
+                    categoryMap,
+                    Number(row.getGroupingValue('categoryId')),
+                    'Category',
+                  ).name
+                : row.original.name}
+            </Group>
+          ),
+          Edit: ({ row, table: tbl }) => (
+            <Group align="center" gap="xs" wrap="nowrap" w="100%">
+              <MRT_ExpandButton row={row} table={tbl} />
+              <SubscriptionNameCellEdit row={row.original} table={tbl} />
+            </Group>
+          ),
+        }),
         Footer: () => t('columns.total'),
       },
     },

@@ -1,5 +1,7 @@
 import { createQueryKeys } from '@lukemorales/query-key-factory';
 import {
+  mutationOptions,
+  type QueryClient,
   queryOptions,
   useMutation,
   useQueryClient,
@@ -42,14 +44,19 @@ export function useCreateSubscription() {
   });
 }
 
-export function useUpdateSubscription() {
-  const queryClient = useQueryClient();
-  return useMutation({
+export const getUpdateSubscriptionMutationOptions = (
+  queryClient: QueryClient,
+) =>
+  mutationOptions({
     mutationFn: (input: UpdateSubscriptionInput) =>
       updateSubscription({ data: input }),
     onSuccess: () =>
       queryClient.invalidateQueries(getSubscriptionsQueryOptions()),
   });
+
+export function useUpdateSubscription() {
+  const queryClient = useQueryClient();
+  return useMutation(getUpdateSubscriptionMutationOptions(queryClient));
 }
 
 export function useDeleteSubscription() {

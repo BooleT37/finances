@@ -26,6 +26,7 @@
     "unarchiveSuccess": "«{{name}}» восстановлена"
   },
   "form": {
+    "ariaLabel": "Форма подписки",
     "name": "Название",
     "price": "Цена",
     "period": "Период",

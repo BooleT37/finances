@@ -26,6 +26,7 @@
     "unarchiveSuccess": "\"{{name}}\" restored"
   },
   "form": {
+    "ariaLabel": "Subscription form",
     "name": "Name",
     "price": "Price",
     "period": "Period",

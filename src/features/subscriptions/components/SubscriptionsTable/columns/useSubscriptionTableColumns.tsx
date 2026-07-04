@@ -8,6 +8,9 @@ import { getSourceMapQueryOptions } from '~/features/sources/facets/sourceMap';
 import { costToString } from '~/shared/utils/costToString';
 
 import type { Subscription } from '../../../schema';
+import { SubscriptionDateCellEdit } from './SubscriptionDateCellEdit';
+import { SubscriptionPriceCellEdit } from './SubscriptionPriceCellEdit';
+import { SubscriptionSourceCellEdit } from './SubscriptionSourceCellEdit';
 
 export function useSubscriptionTableColumns(
   grandTotal: Decimal | null,
@@ -45,6 +48,14 @@ export function useSubscriptionTableColumns(
         },
         header: t('columns.price'),
         aggregationFn: 'sum',
+        enableEditing: (row) => !row.getIsGrouped(),
+        mantineTableBodyCellProps: ({ row, cell, table }) => ({
+          onClick: () => {
+            if (!row.getIsGrouped()) {
+              table.setEditingCell(cell);
+            }
+          },
+        }),
         Cell: ({ row }) =>
           `${costToString(row.original.cost.abs())} / ${getPeriodLabel(row.original.period)}`,
         AggregatedCell: ({ cell }) =>
@@ -55,17 +66,43 @@ export function useSubscriptionTableColumns(
           }
           return `${costToString(grandTotal)} ${t('columns.monthlyTotal')}`;
         },
+        Edit: ({ row, table }) => (
+          <SubscriptionPriceCellEdit row={row.original} table={table} />
+        ),
       },
       {
         accessorKey: 'firstDate',
         header: t('columns.firstDate'),
         enableSorting: false,
+        enableEditing: (row) => !row.getIsGrouped(),
+        mantineTableBodyCellProps: ({ row, cell, table }) => ({
+          onClick: () => {
+            if (!row.getIsGrouped()) {
+              table.setEditingCell(cell);
+            }
+          },
+        }),
         Cell: ({ row }) => row.original.firstDate.format('DD.MM.YYYY'),
+        Edit: ({ cell, row, table }) => (
+          <SubscriptionDateCellEdit
+            value={cell.getValue<Subscription['firstDate']>()}
+            row={row.original}
+            table={table}
+          />
+        ),
       },
       {
         accessorKey: 'sourceId',
         header: t('columns.source'),
         enableSorting: false,
+        enableEditing: (row) => !row.getIsGrouped(),
+        mantineTableBodyCellProps: ({ row, cell, table }) => ({
+          onClick: () => {
+            if (!row.getIsGrouped()) {
+              table.setEditingCell(cell);
+            }
+          },
+        }),
         Cell: ({ row }) => {
           const { sourceId } = row.original;
           if (sourceId === null) {
@@ -74,6 +111,13 @@ export function useSubscriptionTableColumns(
           const source = sourceMap[sourceId];
           return source?.name ?? '';
         },
+        Edit: ({ cell, row, table }) => (
+          <SubscriptionSourceCellEdit
+            value={cell.getValue<Subscription['sourceId']>()}
+            row={row.original}
+            table={table}
+          />
+        ),
       },
     ];
   }, [t, sourceMap, grandTotal]);

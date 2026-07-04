@@ -202,7 +202,7 @@ export function SubscriptionSidebarForm() {
     form.values.cost === '' ? '' : (Number(form.values.cost) as number | '');
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form aria-label={t('form.ariaLabel')} onSubmit={handleSubmit}>
       <Stack gap="sm" pr={16}>
         <TextInput
           label={t('form.name')}
