@@ -1,0 +1,6 @@
+/* Matches mantine-react-table's own `root-editable-hover` cell style, which
+   only applies to data columns — the name column is a display column
+   (`mrt-row-expand`), so it needs this replicated by hand. */
+.editableNameCell:hover {
+  outline: 1px solid var(--mantine-color-gray-7);
+}

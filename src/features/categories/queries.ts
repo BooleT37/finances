@@ -1,5 +1,7 @@
 import { createQueryKeys } from '@lukemorales/query-key-factory';
 import {
+  mutationOptions,
+  type QueryClient,
   queryOptions,
   useMutation,
   useQueryClient,
@@ -50,12 +52,15 @@ export function useCreateCategory() {
   });
 }
 
-export function useUpdateCategory() {
-  const queryClient = useQueryClient();
-  return useMutation({
+export const getUpdateCategoryMutationOptions = (queryClient: QueryClient) =>
+  mutationOptions({
     mutationFn: (input: UpdateCategoryInput) => updateCategory({ data: input }),
     onSuccess: () => queryClient.invalidateQueries(getCategoriesQueryOptions()),
   });
+
+export function useUpdateCategory() {
+  const queryClient = useQueryClient();
+  return useMutation(getUpdateCategoryMutationOptions(queryClient));
 }
 
 export function useUpdateCategoryOrder() {

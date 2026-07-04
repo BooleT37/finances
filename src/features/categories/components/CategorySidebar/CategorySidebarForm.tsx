@@ -160,7 +160,7 @@ export function CategorySidebarForm() {
   const subcategoryFields = form.getValues().subcategories;
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form aria-label={t('form.ariaLabel')} onSubmit={handleSubmit}>
       <Stack gap="sm" pr={16}>
         <Select
           label={t('form.icon')}

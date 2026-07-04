@@ -12,7 +12,10 @@ import { useCategoryTableItems } from '~/features/categories/facets/categoryTabl
 import type { Category } from '~/features/categories/schema';
 import { TableFlash, useTableFlash } from '~/shared/hooks/useTableFlash';
 import { useTableLocalization } from '~/shared/hooks/useTableLocalization';
+import { expandRowEditableProps } from '~/shared/utils/table/expandRowEditableProps';
 
+import classes from './CategoriesTable.module.css';
+import { CategoryNameCellEdit } from './CategoryNameCellEdit';
 import { useCategoriesTableColumns } from './columns/useCategoriesTableColumns';
 import { usePersistCategoriesOrder } from './hooks/usePersistCategoriesOrder';
 import { RowActions } from './RowActions';
@@ -34,6 +37,8 @@ export function CategoriesTable() {
     data: categoryTableItems ?? [],
     getRowId: (row) => String(row.id),
     enableGrouping: true,
+    enableEditing: true,
+    editDisplayMode: 'cell',
     enableTopToolbar: false,
     enableBottomToolbar: false,
     enablePagination: false,
@@ -84,24 +89,34 @@ export function CategoriesTable() {
       'mrt-row-expand': {
         header: t('form.name'),
         size: 280,
-        Cell: ({ row, table: tbl }) => (
-          <Group align="center" gap="xs" wrap="nowrap" w="100%">
-            <MRT_ExpandButton row={row} table={tbl} />
-            {row.getIsGrouped() ? (
-              row.getGroupingValue('isIncome') ? (
-                t('form.typeIncome')
+        ...expandRowEditableProps<Category>({
+          enableEditing: (row) => !row.getIsGrouped(),
+          className: classes.editableNameCell,
+          Cell: ({ row, table: tbl }) => (
+            <Group align="center" gap="xs" wrap="nowrap" w="100%">
+              <MRT_ExpandButton row={row} table={tbl} />
+              {row.getIsGrouped() ? (
+                row.getGroupingValue('isIncome') ? (
+                  t('form.typeIncome')
+                ) : (
+                  t('form.typeExpense')
+                )
               ) : (
-                t('form.typeExpense')
-              )
-            ) : (
-              <NameWithOptionalIcon
-                name={row.original.name}
-                icon={row.original.icon}
-                reserveIconSpace
-              />
-            )}
-          </Group>
-        ),
+                <NameWithOptionalIcon
+                  name={row.original.name}
+                  icon={row.original.icon}
+                  reserveIconSpace
+                />
+              )}
+            </Group>
+          ),
+          Edit: ({ row, table: tbl }) => (
+            <Group align="center" gap="xs" wrap="nowrap" w="100%">
+              <MRT_ExpandButton row={row} table={tbl} />
+              <CategoryNameCellEdit row={row.original} table={tbl} />
+            </Group>
+          ),
+        }),
       },
     },
     localization: tableLocalization,
