@@ -21,7 +21,7 @@ export function EditableCellInput({
 
   const commit = () => {
     onClose();
-    if (invalid) {
+    if (invalid || draft === initialValue) {
       return;
     }
     void onSave(draft);
