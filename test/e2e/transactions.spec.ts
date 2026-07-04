@@ -2,9 +2,10 @@ import type { Locator, Page } from '@playwright/test';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru.js';
 
+import '../../src/lib/dayjs';
 import { expect, test } from './fixtures';
 import { testPrisma } from './db/client';
-import { transactionNameCellClass } from '../../src/features/transactions/components/TransactionsTable/TransactionsTable';
+import { transactionNameCellClass } from '../../src/features/transactions/components/TransactionsTable/TransactionsTable.constants';
 import {
   TODAY_DAY,
   TODAY_MONTH,
@@ -581,6 +582,189 @@ test.describe('Transaction editing', () => {
         { hasText: 'Правка и удаление' },
       ),
     ).toHaveCount(0);
+  });
+});
+
+test.describe('Inline cell editing', () => {
+  test('editing cost, name, date, and source inline updates the table and syncs the open sidebar form', async ({
+    page,
+    seedData,
+  }) => {
+    await testPrisma.expense.create({
+      data: {
+        name: 'Инлайн правка',
+        cost: -40,
+        // Prisma serializes a Date for a `@db.Date` column via its UTC
+        // getters, so a plain `new Date(y, m, d)` (local time) can land on
+        // the wrong calendar day depending on the test runner's timezone.
+        // Date.UTC pins it to the exact intended day regardless of TZ.
+        date: new Date(Date.UTC(TODAY_YEAR, TODAY_MONTH, TODAY_DAY)),
+        categoryId: seedData.categoryIds.продукты,
+        userId: seedData.userId,
+      },
+    });
+    await page.goto('/transactions');
+
+    const row = await findTransactionRow(page, {
+      categoryId: seedData.categoryIds.продукты,
+      name: 'Инлайн правка',
+    });
+
+    // Open the sidebar on this same transaction so we can verify inline edits
+    // keep it in sync, not just the table.
+    await row.getByRole('button', { name: 'Редактировать' }).click();
+    const form = page.getByRole('form', { name: 'Форма транзакции' });
+
+    // --- Cost ---
+    await row.getByText('-€40.00').click();
+    await page.getByRole('textbox', { name: 'Сумма', exact: true }).fill('65');
+    await page.keyboard.press('Enter');
+    await expect(row.getByText('-€65.00')).toBeVisible();
+    await expect(form.getByLabel('Сумма (€)')).toHaveValue('-65');
+
+    // --- Name ---
+    await page
+      .locator(`.${transactionNameCellClass}`, { hasText: 'Инлайн правка' })
+      .click();
+    await page.getByRole('textbox', { name: 'Имя' }).fill('Инлайн правка 2');
+    await page.keyboard.press('Enter');
+    await expect(
+      page.locator(`.${transactionNameCellClass}`, {
+        hasText: 'Инлайн правка 2',
+      }),
+    ).toBeVisible();
+    await expect(form.getByLabel('Комментарий')).toHaveValue('Инлайн правка 2');
+
+    // --- Date ---
+    // TODAY_DAY is frozen at 15 in test mode (see today.ts) — 10 is a safe,
+    // distinct target day within the same month.
+    const today = dayjs(`${TODAY_YEAR}-${TODAY_MONTH + 1}-${TODAY_DAY}`);
+    const targetDay = 10;
+    const targetDate = today.date(targetDay);
+    await row.getByText(today.format('DD.MM.YYYY')).click();
+    await page
+      .locator('button:not([data-direction]):not([data-outside])', {
+        hasText: new RegExp(`^${targetDay}$`),
+      })
+      .first()
+      .click();
+    await expect(row.getByText(targetDate.format('DD.MM.YYYY'))).toBeVisible();
+    await expect(form.getByLabel('Дата')).toHaveText(
+      formatDateInput(targetDate),
+    );
+
+    // --- Source ---
+    // The cell starts empty (no source set), so it can't be targeted by text.
+    // Scoped to `row` — the sidebar's own Источник field is also on screen.
+    await row.locator('td').nth(3).click();
+    await row.getByRole('textbox', { name: 'Источник' }).click();
+    await page.getByRole('option', { name: 'Vivid' }).click();
+    await expect(row.getByText('Vivid')).toBeVisible();
+    await expect(form.getByRole('textbox', { name: 'Источник' })).toHaveValue(
+      'Vivid',
+    );
+  });
+
+  test('inline editing an invalid cost value is not saved', async ({
+    page,
+    seedData,
+  }) => {
+    await testPrisma.expense.create({
+      data: {
+        name: 'Проверка валидации',
+        cost: -40,
+        date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
+        categoryId: seedData.categoryIds.продукты,
+        userId: seedData.userId,
+      },
+    });
+    await page.goto('/transactions');
+
+    const row = await findTransactionRow(page, {
+      categoryId: seedData.categoryIds.продукты,
+      name: 'Проверка валидации',
+    });
+
+    await row.getByText('-€40.00').click();
+    const input = page.getByRole('textbox', { name: 'Сумма', exact: true });
+    await input.fill('not-a-number');
+    await expect(input).toHaveAttribute('aria-invalid', 'true');
+
+    // Escape discards the invalid draft instead of saving it.
+    await page.keyboard.press('Escape');
+    await expect(row.getByText('-€40.00')).toBeVisible();
+  });
+
+  test('components branch: inline editing a component cost updates the parent remainder; editing its name only changes its own display', async ({
+    page,
+    seedData,
+  }) => {
+    await testPrisma.expense.create({
+      data: {
+        name: 'Родитель',
+        cost: 100,
+        date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
+        categoryId: seedData.categoryIds.продукты,
+        userId: seedData.userId,
+        components: {
+          create: [
+            {
+              name: 'Составляющая',
+              cost: 30,
+              categoryId: seedData.categoryIds.транспорт,
+            },
+          ],
+        },
+      },
+    });
+    await page.goto('/transactions');
+
+    const parentRow = await findTransactionRow(page, {
+      categoryId: seedData.categoryIds.продукты,
+      name: 'Родитель',
+    });
+    // Parent's own remainder: 100 - 30 = 70
+    await expect(parentRow.getByText('-€70.00')).toBeVisible();
+
+    const componentRow = await findTransactionRow(page, {
+      categoryId: seedData.categoryIds.транспорт,
+      name: 'Составляющая',
+    });
+
+    // --- Inline-edit the component's cost: 30 → 50 ---
+    await componentRow.getByText('-€30.00').click();
+    await page.getByRole('textbox', { name: 'Сумма', exact: true }).fill('50');
+    await page.keyboard.press('Enter');
+    await expect(componentRow.getByText('-€50.00')).toBeVisible();
+
+    // Parent remainder recalculates: 100 - 50 = 50
+    const updatedParentRow = await findTransactionRow(page, {
+      categoryId: seedData.categoryIds.продукты,
+      name: 'Родитель',
+    });
+    await expect(updatedParentRow.getByText('-€50.00')).toBeVisible();
+    await expect(updatedParentRow.getByText('(-€100.00)')).toBeVisible();
+
+    // --- Inline-edit the component's name: only its own display changes ---
+    await page
+      .locator(`.${transactionNameCellClass}`, { hasText: 'Составляющая' })
+      .click();
+    await page.getByRole('textbox', { name: 'Имя' }).fill('Новое имя');
+    await page.keyboard.press('Enter');
+    await expect(
+      page.locator(`.${transactionNameCellClass}`, {
+        hasText: 'Новое имя (составляющая',
+      }),
+    ).toBeVisible();
+
+    // Parent's own name is untouched. Exact match — the component's new
+    // composite display ("Новое имя (составляющая "Родитель")") also
+    // contains "Родитель" as a substring.
+    await expect(
+      page.locator(`.${transactionNameCellClass}`, {
+        hasText: /^Родитель$/,
+      }),
+    ).toBeVisible();
   });
 });
 

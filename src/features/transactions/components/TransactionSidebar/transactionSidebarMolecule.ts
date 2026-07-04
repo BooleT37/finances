@@ -330,6 +330,7 @@ export const TransactionSidebarMolecule = molecule(() => {
     isNewTransactionAtom,
     currentTransactionAtom,
     transactionsMapAtom,
+    updateMutationAtom,
     componentsModalOpenAtom,
     actualDateShownAtom,
     formRefAtom,

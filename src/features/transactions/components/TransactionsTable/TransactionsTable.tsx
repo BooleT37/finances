@@ -24,8 +24,12 @@ import {
 import { useTableLocalization } from '~/shared/hooks/useTableLocalization';
 
 import { TransactionSidebarMolecule } from '../TransactionSidebar/transactionSidebarMolecule';
+import { ComponentNameCellEdit } from './columns/NameCellRenderer/ComponentNameCellEdit';
+import { TransactionNameCellEdit } from './columns/NameCellRenderer/TransactionNameCellEdit';
 import { useTransactionTableColumns } from './columns/useTransactionTableColumns';
 import { RowActions } from './RowActions';
+import { transactionNameCellClass } from './TransactionsTable.constants';
+import classes from './TransactionsTable.module.css';
 import type { TransactionTableItem } from './TransactionsTable.types';
 import { UpcomingSubscriptionRowActions } from './UpcomingSubscriptionRowActions';
 
@@ -56,8 +60,6 @@ function collectNavigableLeaves(rows: NavRow[], acc: NavRow[] = []): NavRow[] {
   }
   return acc;
 }
-
-export const transactionNameCellClass = 'transaction-name-cell';
 
 function getRowBgColor(depth: number) {
   if (depth === 0) {
@@ -102,6 +104,8 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
     data: items ?? [],
     getRowId: (row) => String(row.id),
     enableGrouping: true,
+    enableEditing: true,
+    editDisplayMode: 'cell',
     enableTopToolbar: false,
     enableBottomToolbar: false,
     enableColumnDragging: false,
@@ -151,51 +155,80 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
             <div>{t('columns.name')}</div>
           </Group>
         ),
-        Cell: ({ row, table: t2 }) => (
-          <Group
-            align="center"
-            gap="xs"
-            wrap="nowrap"
-            className={transactionNameCellClass}
-            data-testing-depth={row.depth}
-            data-testing-category-id={
-              row.getIsGrouped() ? undefined : row.original.categoryId
-            }
-            data-testing-subcategory-id={
-              !row.getIsGrouped() && row.original.subcategoryId !== null
-                ? row.original.subcategoryId
-                : undefined
-            }
-          >
-            <MRT_ExpandButton row={row} table={t2} />
-            {row.getIsGrouped() ? (
-              row.depth === 0 ? (
-                (row.getGroupingValue('isIncome') as string)
-              ) : row.depth === 1 ? (
-                <NameWithOptionalIcon
-                  name={row.original.category}
-                  icon={row.original.categoryIcon}
-                  reserveIconSpace
-                />
+        // MRT's Edit machinery only applies to regular data columns, not this
+        // display column, so the edit/display toggle here is handled by hand:
+        // reading editingCell state directly and reusing the same
+        // setEditingCell(cell) click-to-edit pattern as other columns.
+        // enableEditing is still set (even though nothing reads it for the
+        // actual toggle) purely so MRT applies its usual cursor/hover styling
+        // to this cell, consistent with the other editable columns.
+        enableEditing: (row) => !row.original.isUpcomingSubscription,
+        mantineTableBodyCellProps: ({ row, cell, table: t2 }) => {
+          const isEditable =
+            !row.getIsGrouped() && !row.original.isUpcomingSubscription;
+          return {
+            className: isEditable ? classes.editableNameCell : undefined,
+            onClick: () => {
+              if (isEditable) {
+                t2.setEditingCell(cell);
+              }
+            },
+          };
+        },
+        Cell: ({ row, cell, table: t2 }) => {
+          const isEditingThisCell = t2.getState().editingCell?.id === cell.id;
+          return (
+            <Group
+              align="center"
+              gap="xs"
+              wrap="nowrap"
+              className={transactionNameCellClass}
+              data-testing-depth={row.depth}
+              data-testing-category-id={
+                row.getIsGrouped() ? undefined : row.original.categoryId
+              }
+              data-testing-subcategory-id={
+                !row.getIsGrouped() && row.original.subcategoryId !== null
+                  ? row.original.subcategoryId
+                  : undefined
+              }
+            >
+              <MRT_ExpandButton row={row} table={t2} />
+              {row.getIsGrouped() ? (
+                row.depth === 0 ? (
+                  (row.getGroupingValue('isIncome') as string)
+                ) : row.depth === 1 ? (
+                  <NameWithOptionalIcon
+                    name={row.original.category}
+                    icon={row.original.categoryIcon}
+                    reserveIconSpace
+                  />
+                ) : (
+                  (row.original.subcategory ?? t('columns.noSubcategory'))
+                )
+              ) : isEditingThisCell ? (
+                row.original.expenseId !== null ? (
+                  <ComponentNameCellEdit row={row.original} table={t2} />
+                ) : (
+                  <TransactionNameCellEdit row={row.original} table={t2} />
+                )
               ) : (
-                (row.original.subcategory ?? t('columns.noSubcategory'))
-              )
-            ) : (
-              <span
-                title={row.original.name}
-                style={{
-                  maxWidth: 300,
-                  display: 'inline-block',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {row.original.name}
-              </span>
-            )}
-          </Group>
-        ),
+                <span
+                  title={row.original.name}
+                  style={{
+                    maxWidth: 300,
+                    display: 'inline-block',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {row.original.name}
+                </span>
+              )}
+            </Group>
+          );
+        },
         GroupedCell: ({ row }) => row.original.name,
         size: 200,
       },
