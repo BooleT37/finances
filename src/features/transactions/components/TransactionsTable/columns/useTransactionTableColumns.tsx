@@ -114,8 +114,12 @@ export const useTransactionTableColumns = () => {
             }
           },
         }),
-        Edit: ({ row, table }) => (
-          <TransactionDateCellEdit row={row.original} table={table} />
+        Edit: ({ cell, row, table }) => (
+          <TransactionDateCellEdit
+            value={cell.getValue()}
+            row={row.original}
+            table={table}
+          />
         ),
       }),
       columnHelper.accessor('source', {

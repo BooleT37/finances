@@ -1,5 +1,5 @@
 import { useMolecule } from 'bunshi/react';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import type { MRT_TableInstance } from 'mantine-react-table';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,10 +19,9 @@ export function TransactionNameCellEdit({
   table,
 }: TransactionNameCellEditProps) {
   const { t } = useTranslation('transactions');
-  const { transactionsMapAtom, updateInlineTransactionFieldAtom } = useMolecule(
+  const { updateInlineTransactionFieldAtom } = useMolecule(
     TransactionInlineEditMolecule,
   );
-  const tx = useAtomValue(transactionsMapAtom).data?.[row.id];
   const updateInlineTransactionField = useSetAtom(
     updateInlineTransactionFieldAtom,
   );
@@ -38,14 +37,10 @@ export function TransactionNameCellEdit({
     [row.id, updateInlineTransactionField],
   );
 
-  if (!tx) {
-    return null;
-  }
-
   return (
     <EditableCellInput
       aria-label={t('columns.name')}
-      initialValue={tx.name}
+      initialValue={row.rawName}
       onClose={() => table.setEditingCell(null)}
       onSave={handleSave}
     />

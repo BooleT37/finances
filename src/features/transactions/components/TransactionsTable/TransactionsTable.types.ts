@@ -16,6 +16,7 @@ export interface CostColValue {
 export interface TransactionTableItem {
   id: number;
   name: string;
+  rawName: string;
   cost: CostColValue | null;
   date: string; // formatted with DATE_FORMAT, e.g. '15.02.2026'
   category: string; // category.name

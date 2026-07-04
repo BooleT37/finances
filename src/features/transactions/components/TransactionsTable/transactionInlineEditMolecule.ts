@@ -174,7 +174,6 @@ export const TransactionInlineEditMolecule = molecule((mol) => {
   );
 
   return {
-    transactionsMapAtom,
     updateInlineTransactionFieldAtom,
     updateInlineComponentFieldAtom,
   };

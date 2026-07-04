@@ -22,6 +22,7 @@ import {
   useTableFlash,
 } from '~/shared/hooks/useTableFlash';
 import { useTableLocalization } from '~/shared/hooks/useTableLocalization';
+import { expandRowEditableProps } from '~/shared/utils/table/expandRowEditableProps';
 
 import { TransactionSidebarMolecule } from '../TransactionSidebar/transactionSidebarMolecule';
 import { ComponentNameCellEdit } from './columns/NameCellRenderer/ComponentNameCellEdit';
@@ -102,11 +103,6 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
   const table = useMantineReactTable({
     columns,
     data: items ?? [],
-    // `id` alone isn't unique across row kinds: Expense and ExpenseComponent
-    // have independent auto-increment sequences (and every upcoming
-    // subscription row shares the same placeholder id), so two unrelated rows
-    // can report the same `id` and corrupt MRT's row/cell lookup (e.g.
-    // editingCell jumping to the wrong row after a save).
     getRowId: (row) => {
       if (row.isUpcomingSubscription) {
         return `subscription-${row.subscriptionId}`;
@@ -168,29 +164,11 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
             <div>{t('columns.name')}</div>
           </Group>
         ),
-        // MRT's Edit machinery only applies to regular data columns, not this
-        // display column, so the edit/display toggle here is handled by hand:
-        // reading editingCell state directly and reusing the same
-        // setEditingCell(cell) click-to-edit pattern as other columns.
-        // enableEditing is still set (even though nothing reads it for the
-        // actual toggle) purely so MRT applies its usual cursor/hover styling
-        // to this cell, consistent with the other editable columns.
-        enableEditing: (row) => !row.original.isUpcomingSubscription,
-        mantineTableBodyCellProps: ({ row, cell, table: t2 }) => {
-          const isEditable =
-            !row.getIsGrouped() && !row.original.isUpcomingSubscription;
-          return {
-            className: isEditable ? classes.editableNameCell : undefined,
-            onClick: () => {
-              if (isEditable) {
-                t2.setEditingCell(cell);
-              }
-            },
-          };
-        },
-        Cell: ({ row, cell, table: t2 }) => {
-          const isEditingThisCell = t2.getState().editingCell?.id === cell.id;
-          return (
+        ...expandRowEditableProps<TransactionTableItem>({
+          enableEditing: (row) =>
+            !row.getIsGrouped() && !row.original.isUpcomingSubscription,
+          className: classes.editableNameCell,
+          Cell: ({ row, table: t2 }) => (
             <Group
               align="center"
               gap="xs"
@@ -219,12 +197,6 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
                 ) : (
                   (row.original.subcategory ?? t('columns.noSubcategory'))
                 )
-              ) : isEditingThisCell ? (
-                row.original.expenseId !== null ? (
-                  <ComponentNameCellEdit row={row.original} table={t2} />
-                ) : (
-                  <TransactionNameCellEdit row={row.original} table={t2} />
-                )
               ) : (
                 <span
                   title={row.original.name}
@@ -240,8 +212,28 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
                 </span>
               )}
             </Group>
-          );
-        },
+          ),
+          Edit: ({ row, table: t2 }) => (
+            <Group
+              align="center"
+              gap="xs"
+              wrap="nowrap"
+              className={transactionNameCellClass}
+              data-testing-depth={row.depth}
+              data-testing-category-id={row.original.categoryId}
+              data-testing-subcategory-id={
+                row.original.subcategoryId ?? undefined
+              }
+            >
+              <MRT_ExpandButton row={row} table={t2} />
+              {row.original.expenseId !== null ? (
+                <ComponentNameCellEdit row={row.original} table={t2} />
+              ) : (
+                <TransactionNameCellEdit row={row.original} table={t2} />
+              )}
+            </Group>
+          ),
+        }),
         GroupedCell: ({ row }) => row.original.name,
         size: 200,
       },
