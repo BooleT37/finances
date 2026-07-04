@@ -102,7 +102,20 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
   const table = useMantineReactTable({
     columns,
     data: items ?? [],
-    getRowId: (row) => String(row.id),
+    // `id` alone isn't unique across row kinds: Expense and ExpenseComponent
+    // have independent auto-increment sequences (and every upcoming
+    // subscription row shares the same placeholder id), so two unrelated rows
+    // can report the same `id` and corrupt MRT's row/cell lookup (e.g.
+    // editingCell jumping to the wrong row after a save).
+    getRowId: (row) => {
+      if (row.isUpcomingSubscription) {
+        return `subscription-${row.subscriptionId}`;
+      }
+      if (row.expenseId !== null) {
+        return `component-${row.id}`;
+      }
+      return `transaction-${row.id}`;
+    },
     enableGrouping: true,
     enableEditing: true,
     editDisplayMode: 'cell',
