@@ -16,15 +16,17 @@ import {
 import { DatesProvider } from '@mantine/dates';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { QueryClient } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import {
-  createRootRoute,
+  createRootRouteWithContext,
   HeadContent,
   Outlet,
   Scripts,
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
-import { useAtomValue } from 'jotai';
+import type { createStore } from 'jotai';
+import { Provider as JotaiProvider, useAtomValue } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
 import { queryClientAtom } from 'jotai-tanstack-query';
 import { I18nextProvider, useTranslation } from 'react-i18next';
@@ -38,7 +40,11 @@ import { trpc, trpcClient } from '~/lib/trpc/client';
 const theme = createTheme({
   cursorType: 'pointer',
 });
-const queryClient = new QueryClient();
+
+interface RouterContext {
+  queryClient: QueryClient;
+  jotaiStore: ReturnType<typeof createStore>;
+}
 
 function RootErrorComponent({ error }: { error: unknown }) {
   const message = error instanceof Error ? error.message : String(error);
@@ -64,7 +70,7 @@ function RootErrorComponent({ error }: { error: unknown }) {
   );
 }
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({
     meta: [
       { charSet: 'utf-8' },
@@ -125,26 +131,36 @@ function AppContent() {
   );
 }
 
-function HydrateAtoms({ children }: { children: React.ReactNode }) {
+function HydrateAtoms({
+  queryClient,
+  children,
+}: {
+  queryClient: QueryClient;
+  children: React.ReactNode;
+}) {
   useHydrateAtoms([[queryClientAtom, queryClient]]);
   return <>{children}</>;
 }
 
 function RootComponent() {
+  const { queryClient, jotaiStore } = Route.useRouteContext();
+
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <HydrateAtoms>
-          <RootDocument>
-            <I18nextProvider i18n={i18n}>
-              <MantineProvider defaultColorScheme="light" theme={theme}>
-                <ModalsProvider>
-                  <AppContent />
-                </ModalsProvider>
-              </MantineProvider>
-            </I18nextProvider>
-          </RootDocument>
-        </HydrateAtoms>
+        <JotaiProvider store={jotaiStore}>
+          <HydrateAtoms queryClient={queryClient}>
+            <RootDocument>
+              <I18nextProvider i18n={i18n}>
+                <MantineProvider defaultColorScheme="light" theme={theme}>
+                  <ModalsProvider>
+                    <AppContent />
+                  </ModalsProvider>
+                </MantineProvider>
+              </I18nextProvider>
+            </RootDocument>
+          </HydrateAtoms>
+        </JotaiProvider>
       </QueryClientProvider>
     </trpc.Provider>
   );
