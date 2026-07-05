@@ -30,6 +30,9 @@ export function useSourcesTableColumns(): MRT_ColumnDef<Source>[] {
         accessorKey: 'name',
         header: t('columns.name'),
         enableEditing: true,
+        mantineTableBodyCellProps: ({ cell, table }) => ({
+          onClick: () => table.setEditingCell(cell),
+        }),
         mantineEditTextInputProps: ({ row }) => ({
           onBlur: (e) => {
             const newName = e.target.value.trim();
