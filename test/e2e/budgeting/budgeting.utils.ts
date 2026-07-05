@@ -24,13 +24,13 @@ export function expandRow(row: Locator) {
 }
 
 export async function editPlanCell(row: Locator, value: string) {
-  await getPlanCell(row).dblclick();
+  await getPlanCell(row).click();
   await row.locator('input[type="number"]').fill(value);
   await row.locator('input[type="number"]').press('Enter');
 }
 
 export async function editCommentCell(row: Locator, value: string) {
-  await getCommentCell(row).dblclick();
+  await getCommentCell(row).click();
   await getCommentCell(row).locator('input').fill(value);
   await getCommentCell(row).locator('input').press('Enter');
 }
