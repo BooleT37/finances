@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import { CostWithDiffCellView } from '~/components/CostWithDiffCellView';
 import { costToString } from '~/shared/utils/costToString';
+import { openCellForEditing } from '~/shared/utils/table/openCellForEditing';
 
 import type {
   BudgetingGrandTotal,
@@ -148,7 +149,7 @@ export function useBudgetingTableColumns({
           'data-testing-column': 'plan',
           onClick: () => {
             if (canEditPlanCell(row)) {
-              table.setEditingCell(cell);
+              openCellForEditing(table, cell);
             }
           },
         }),
@@ -218,7 +219,7 @@ export function useBudgetingTableColumns({
           'data-testing-column': 'comment',
           onClick: () => {
             if (canEditCommentCell(row)) {
-              table.setEditingCell(cell);
+              openCellForEditing(table, cell);
             }
           },
         }),

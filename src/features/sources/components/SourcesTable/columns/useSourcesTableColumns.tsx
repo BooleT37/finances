@@ -10,6 +10,7 @@ import {
 } from '~/features/sources/queries';
 import type { Source } from '~/features/sources/schema';
 import { ExpensesParser } from '~/generated/prisma/enums';
+import { openCellForEditing } from '~/shared/utils/table/openCellForEditing';
 
 export function useSourcesTableColumns(): MRT_ColumnDef<Source>[] {
   const { t } = useTranslation('sources');
@@ -31,7 +32,7 @@ export function useSourcesTableColumns(): MRT_ColumnDef<Source>[] {
         header: t('columns.name'),
         enableEditing: true,
         mantineTableBodyCellProps: ({ cell, table }) => ({
-          onClick: () => table.setEditingCell(cell),
+          onClick: () => openCellForEditing(table, cell),
         }),
         mantineEditTextInputProps: ({ row }) => ({
           onBlur: (e) => {
