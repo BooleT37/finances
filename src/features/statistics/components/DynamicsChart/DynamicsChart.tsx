@@ -119,6 +119,7 @@ export function DynamicsChart() {
       ) : (
         <LineChart
           h={400}
+          px="lg"
           data={chartData}
           dataKey="month"
           series={series}
