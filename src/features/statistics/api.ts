@@ -2,16 +2,39 @@ import { createServerFn } from '@tanstack/react-start';
 import dayjs from 'dayjs';
 
 import { categorySchema } from '~/features/categories/schema';
+import { Prisma } from '~/generated/prisma/client';
 import { prisma } from '~/server/db';
 import { adaptCost } from '~/shared/utils/adaptCost';
 
 import {
   comparisonCategoryDataSchema,
+  dynamicsMonthDataSchema,
   type FetchComparisonDataInput,
   fetchComparisonDataInputSchema,
+  type FetchDynamicsDataInput,
+  fetchDynamicsDataInputSchema,
 } from './schema';
 import type { DatedTx } from './utils/aggregateComparisonData';
 import { aggregateComparisonData } from './utils/aggregateComparisonData';
+import { aggregateDynamicsData } from './utils/aggregateDynamicsData';
+
+type ExpenseWithComponents = Prisma.ExpenseGetPayload<{
+  include: { category: true; components: { include: { category: true } } };
+}>;
+
+function toDatedTx(e: ExpenseWithComponents): DatedTx {
+  return {
+    date: dayjs(e.date),
+    cost: adaptCost(e.cost, e.category.isIncome),
+    categoryId: e.categoryId,
+    subcategoryId: e.subcategoryId,
+    components: e.components.map((c) => ({
+      cost: adaptCost(c.cost, c.category.isIncome),
+      categoryId: c.categoryId,
+      subcategoryId: c.subcategoryId,
+    })),
+  };
+}
 
 export const fetchComparisonData = createServerFn({ method: 'GET' })
   .inputValidator((input: FetchComparisonDataInput) =>
@@ -53,22 +76,37 @@ export const fetchComparisonData = createServerFn({ method: 'GET' })
       prisma.category.findMany({ include: { subcategories: true } }),
     ]);
 
-    const transactions: DatedTx[] = expenses.map((e) => ({
-      date: dayjs(e.date),
-      cost: adaptCost(e.cost, e.category.isIncome),
-      categoryId: e.categoryId,
-      subcategoryId: e.subcategoryId,
-      components: e.components.map((c) => ({
-        cost: adaptCost(c.cost, c.category.isIncome),
-        categoryId: c.categoryId,
-        subcategoryId: c.subcategoryId,
-      })),
-    }));
-
     return aggregateComparisonData(
-      transactions,
+      expenses.map(toDatedTx),
       categories.map((c) => categorySchema.encode(c)),
       period1,
       period2,
     ).map((row) => comparisonCategoryDataSchema.encode(row));
+  });
+
+export const fetchDynamicsData = createServerFn({ method: 'GET' })
+  .inputValidator((input: FetchDynamicsDataInput) =>
+    fetchDynamicsDataInputSchema.parse(input),
+  )
+  .handler(async ({ data }) => {
+    const [expenses, categories] = await Promise.all([
+      prisma.expense.findMany({
+        where: {
+          date: { gte: new Date(data.from), lte: new Date(data.to) },
+        },
+        include: {
+          category: true,
+          components: { include: { category: true } },
+        },
+      }),
+      prisma.category.findMany({ include: { subcategories: true } }),
+    ]);
+
+    return aggregateDynamicsData(
+      expenses.map(toDatedTx),
+      categories.map((c) => categorySchema.encode(c)),
+      dayjs(data.from),
+      dayjs(data.to),
+      data.categoryIds,
+    ).map((row) => dynamicsMonthDataSchema.encode(row));
   });
