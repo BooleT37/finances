@@ -1,4 +1,5 @@
 import { Group } from '@mantine/core';
+import { useMolecule } from 'bunshi/react';
 import {
   MantineReactTable,
   MRT_ExpandButton,
@@ -12,8 +13,14 @@ import { useCategoryTableItems } from '~/features/categories/facets/categoryTabl
 import type { Category } from '~/features/categories/schema';
 import { TableFlash, useTableFlash } from '~/shared/hooks/useTableFlash';
 import { useTableLocalization } from '~/shared/hooks/useTableLocalization';
+import {
+  syncNavTargets,
+  syncScrollRequest,
+  useTableSidebarNavigation,
+} from '~/shared/hooks/useTableSidebarNavigation';
 import { expandRowEditableProps } from '~/shared/utils/table/expandRowEditableProps';
 
+import { CategorySidebarMolecule } from '../CategorySidebar/categorySidebarMolecule';
 import classes from './CategoriesTable.module.css';
 import { CategoryNameCellEdit } from './CategoryNameCellEdit';
 import { useCategoriesTableColumns } from './columns/useCategoriesTableColumns';
@@ -26,9 +33,20 @@ export function CategoriesTable() {
   const categoryTableItems = useCategoryTableItems();
   const persistCategoriesOrder = usePersistCategoriesOrder();
 
+  const { isOpenAtom, editingIdAtom, navTargetsAtom, scrollRequestAtom } =
+    useMolecule(CategorySidebarMolecule);
+
   const { withFlashingStyles, setTable } = useTableFlash<Category>(
     TableFlash.Categories,
   );
+
+  const { focusedId, withNavigationStyles, setNavTargets, scrollRequest } =
+    useTableSidebarNavigation({
+      isOpenAtom,
+      editingIdAtom,
+      navTargetsAtom,
+      scrollRequestAtom,
+    });
 
   const tableLocalization = useTableLocalization();
 
@@ -72,7 +90,10 @@ export function CategoriesTable() {
       },
     },
     mantineTableBodyCellProps: ({ column, row }) => ({
-      style: withFlashingStyles(row, column.id),
+      style: {
+        ...withFlashingStyles(row, column.id),
+        ...withNavigationStyles(row, column.id),
+      },
     }),
     mantineRowDragHandleProps: ({ row, table: tbl }) => ({
       onDragEnd: () => persistCategoriesOrder(tbl, row.original.isIncome),
@@ -125,6 +146,15 @@ export function CategoriesTable() {
   useEffect(() => {
     setTable(table);
   });
+
+  const rowModelRows = table.getRowModel().rows;
+  useEffect(() => {
+    syncNavTargets(table, focusedId, setNavTargets);
+  }, [focusedId, rowModelRows, table, setNavTargets]);
+
+  useEffect(() => {
+    syncScrollRequest(table, scrollRequest);
+  }, [scrollRequest, table]);
 
   return <MantineReactTable table={table} />;
 }

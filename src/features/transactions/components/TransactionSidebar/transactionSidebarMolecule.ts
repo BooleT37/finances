@@ -8,6 +8,10 @@ import {
 } from 'jotai-tanstack-query';
 
 import { API_DATE_FORMAT, DATE_FORMAT } from '~/shared/constants';
+import type {
+  NavTargets,
+  ScrollRequest,
+} from '~/shared/hooks/useTableSidebarNavigation';
 import { selectedYearAtom } from '~/stores/month';
 import {
   sidebarFormRefAtom,
@@ -54,12 +58,10 @@ export const TransactionSidebarMolecule = molecule(() => {
   // ── Row navigation ────────────────────────────────────────────────────────
   // The table publishes the visible leaf rows adjacent to the focused one so the
   // sidebar's up/down buttons know where to go (null when there is none).
-  const navTargetsAtom = atom<{ prevId: number | null; nextId: number | null }>(
-    { prevId: null, nextId: null },
-  );
+  const navTargetsAtom = atom<NavTargets>({ prevId: null, nextId: null });
   // Bumped to ask the table to scroll the focused row into view. Used for
   // arrow-nav and component edits; a plain edit-click does not request a scroll.
-  const scrollRequestAtom = atom<{ id: number; token: number } | null>(null);
+  const scrollRequestAtom = atom<ScrollRequest | null>(null);
   const requestScrollAtom = atom(null, (get, set, id: number) => {
     set(scrollRequestAtom, {
       id,

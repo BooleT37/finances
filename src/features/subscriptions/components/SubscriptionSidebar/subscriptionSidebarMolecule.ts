@@ -1,6 +1,10 @@
 import { molecule } from 'bunshi';
 import { atom } from 'jotai';
 
+import type {
+  NavTargets,
+  ScrollRequest,
+} from '~/shared/hooks/useTableSidebarNavigation';
 import {
   sidebarFormRefAtom,
   withDirtyCheckAtom,
@@ -21,6 +25,19 @@ export const SubscriptionSidebarMolecule = molecule(() => {
     },
   );
 
+  // ── Row navigation ────────────────────────────────────────────────────────
+  // The table publishes the visible leaf rows adjacent to the focused one so the
+  // sidebar's up/down buttons know where to go (null when there is none).
+  const navTargetsAtom = atom<NavTargets>({ prevId: null, nextId: null });
+  // Bumped to ask the table to scroll the focused row into view.
+  const scrollRequestAtom = atom<ScrollRequest | null>(null);
+  const requestScrollAtom = atom(null, (get, set, id: number) => {
+    set(scrollRequestAtom, {
+      id,
+      token: (get(scrollRequestAtom)?.token ?? 0) + 1,
+    });
+  });
+
   const openAtom = atom(null, (_, set, id: number | null) => {
     set(withDirtyCheckAtom, () => {
       set(editingIdAtom, id);
@@ -36,6 +53,16 @@ export const SubscriptionSidebarMolecule = molecule(() => {
     });
   });
 
+  // Move the edited subscription to an adjacent visible row (arrow buttons).
+  // Routes through the dirty-check so a dirty/invalid form prompts to confirm.
+  const navigateToSubscriptionAtom = atom(null, (_get, set, id: number) => {
+    set(withDirtyCheckAtom, () => {
+      set(editingIdAtom, id);
+      set(isOpenAtom, true);
+      set(requestScrollAtom, id);
+    });
+  });
+
   const isNewSubscriptionAtom = atom((get) => get(editingIdAtom) === null);
 
   return {
@@ -45,5 +72,8 @@ export const SubscriptionSidebarMolecule = molecule(() => {
     openAtom,
     closeAtom,
     isNewSubscriptionAtom,
+    navTargetsAtom,
+    scrollRequestAtom,
+    navigateToSubscriptionAtom,
   };
 });

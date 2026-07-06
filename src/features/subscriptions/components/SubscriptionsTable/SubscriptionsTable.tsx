@@ -1,5 +1,6 @@
 import { Group } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
+import { useMolecule } from 'bunshi/react';
 import Decimal from 'decimal.js';
 import {
   MantineReactTable,
@@ -12,11 +13,17 @@ import { useTranslation } from 'react-i18next';
 import { getCategoryMapQueryOptions } from '~/features/categories/facets/categoryMap';
 import { TableFlash, useTableFlash } from '~/shared/hooks/useTableFlash';
 import { useTableLocalization } from '~/shared/hooks/useTableLocalization';
+import {
+  syncNavTargets,
+  syncScrollRequest,
+  useTableSidebarNavigation,
+} from '~/shared/hooks/useTableSidebarNavigation';
 import { getOrThrow } from '~/shared/utils/getOrThrow';
 import { expandRowEditableProps } from '~/shared/utils/table/expandRowEditableProps';
 
 import { useSortedSubscriptions } from '../../facets/sortedSubscriptions';
 import type { Subscription } from '../../schema';
+import { SubscriptionSidebarMolecule } from '../SubscriptionSidebar/subscriptionSidebarMolecule';
 import { useSubscriptionTableColumns } from './columns/useSubscriptionTableColumns';
 import { RowActions } from './RowActions';
 import { SubscriptionNameCellEdit } from './SubscriptionNameCellEdit';
@@ -54,9 +61,20 @@ export function SubscriptionsTable({ mode }: Props) {
 
   const columns = useSubscriptionTableColumns(grandTotal);
 
+  const { isOpenAtom, editingIdAtom, navTargetsAtom, scrollRequestAtom } =
+    useMolecule(SubscriptionSidebarMolecule);
+
   const { withFlashingStyles, setTable } = useTableFlash<Subscription>(
     TableFlash.Subscriptions,
   );
+
+  const { focusedId, withNavigationStyles, setNavTargets, scrollRequest } =
+    useTableSidebarNavigation({
+      isOpenAtom,
+      editingIdAtom,
+      navTargetsAtom,
+      scrollRequestAtom,
+    });
 
   const tableLocalization = useTableLocalization();
 
@@ -109,9 +127,12 @@ export function SubscriptionsTable({ mode }: Props) {
       },
     },
     mantineTableBodyCellProps: ({ column, row }) => ({
-      style: withFlashingStyles(row, column.id, {
-        background: getRowBgColor(row.depth),
-      }),
+      style: {
+        ...withFlashingStyles(row, column.id, {
+          background: getRowBgColor(row.depth),
+        }),
+        ...withNavigationStyles(row, column.id),
+      },
     }),
     renderRowActions: ({ row }) => {
       if (row.getIsGrouped()) {
@@ -155,6 +176,15 @@ export function SubscriptionsTable({ mode }: Props) {
   useEffect(() => {
     setTable(table);
   });
+
+  const rowModelRows = table.getRowModel().rows;
+  useEffect(() => {
+    syncNavTargets(table, focusedId, setNavTargets);
+  }, [focusedId, rowModelRows, table, setNavTargets]);
+
+  useEffect(() => {
+    syncScrollRequest(table, scrollRequest);
+  }, [scrollRequest, table]);
 
   return <MantineReactTable table={table} />;
 }

@@ -1,10 +1,9 @@
-import { ActionIcon, Group, Tooltip } from '@mantine/core';
-import { IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 import { useMolecule } from 'bunshi/react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
 import { Sidebar } from '~/shared/components/Sidebar';
+import { SidebarRowNavButtons } from '~/shared/components/SidebarRowNavButtons';
 
 import { TransactionSidebarForm } from './TransactionSidebarForm/TransactionSidebarForm';
 import { TransactionSidebarMolecule } from './transactionSidebarMolecule';
@@ -27,34 +26,13 @@ export function TransactionSidebar({ width }: { width: number }) {
   const isEditing = editingId !== null && editingId !== undefined;
 
   const titleActions = isEditing ? (
-    <Group gap={4} wrap="nowrap">
-      <Tooltip label={t('sidebar.previous')}>
-        <ActionIcon
-          variant="subtle"
-          color="gray"
-          aria-label={t('sidebar.previous')}
-          disabled={navTargets.prevId === null}
-          onClick={() =>
-            navTargets.prevId !== null && navigate(navTargets.prevId)
-          }
-        >
-          <IconChevronUp size={18} />
-        </ActionIcon>
-      </Tooltip>
-      <Tooltip label={t('sidebar.next')}>
-        <ActionIcon
-          variant="subtle"
-          color="gray"
-          aria-label={t('sidebar.next')}
-          disabled={navTargets.nextId === null}
-          onClick={() =>
-            navTargets.nextId !== null && navigate(navTargets.nextId)
-          }
-        >
-          <IconChevronDown size={18} />
-        </ActionIcon>
-      </Tooltip>
-    </Group>
+    <SidebarRowNavButtons
+      prevId={navTargets.prevId}
+      nextId={navTargets.nextId}
+      onNavigate={navigate}
+      previousLabel={t('sidebar.previous')}
+      nextLabel={t('sidebar.next')}
+    />
   ) : undefined;
 
   return (

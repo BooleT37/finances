@@ -5,7 +5,9 @@
   "back": "Back",
   "sidebar": {
     "add": "Add subscription",
-    "edit": "Edit subscription"
+    "edit": "Edit subscription",
+    "previous": "Previous subscription",
+    "next": "Next subscription"
   },
   "actions": {
     "edit": "Edit",
