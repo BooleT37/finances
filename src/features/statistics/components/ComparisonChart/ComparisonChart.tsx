@@ -202,6 +202,10 @@ export function ComparisonChart() {
       </Group>
       {samePeriod ? (
         <Alert color="yellow">{t('comparison.samePeriodWarning')}</Alert>
+      ) : comparisonData && categoryMap && chartData.length === 0 ? (
+        <Text c="dimmed" p="md">
+          {t('comparison.emptyState')}
+        </Text>
       ) : (
         <BarChart
           h={600}

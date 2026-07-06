@@ -17,7 +17,8 @@
     },
     "includeIncome": "Including income",
     "expensesOnly": "Expenses only",
-    "samePeriodWarning": "Please select different periods above"
+    "samePeriodWarning": "Please select different periods above",
+    "emptyState": "No data for the selected periods"
   },
   "dynamics": {
     "title": "Dynamics",
