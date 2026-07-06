@@ -209,6 +209,7 @@ export function ComparisonChart() {
       ) : (
         <BarChart
           h={600}
+          px="lg"
           data={chartData}
           dataKey="category"
           orientation="vertical"
