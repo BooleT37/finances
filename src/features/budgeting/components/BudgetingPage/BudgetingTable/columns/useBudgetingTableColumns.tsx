@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import { CostWithDiffCellView } from '~/components/CostWithDiffCellView';
 import { costToString } from '~/shared/utils/costToString';
+import { openCellForEditing } from '~/shared/utils/table/openCellForEditing';
 
 import type {
   BudgetingGrandTotal,
@@ -18,6 +19,12 @@ import { PlanCell } from './PlanCell';
 import { ThisMonthCell } from './ThisMonthCell/ThisMonthCell';
 
 const columnHelper = createMRTColumnHelper<BudgetingRow>();
+
+const canEditPlanCell = (row: MRT_Row<BudgetingRow>) =>
+  row.original.rowType !== 'typeGroup' && !isPlanCellLocked(row.original);
+
+const canEditCommentCell = (row: MRT_Row<BudgetingRow>) =>
+  row.original.rowType !== 'typeGroup' && !row.original.isRestRow;
 
 interface Params {
   month: number;
@@ -84,9 +91,7 @@ export function useBudgetingTableColumns({
       columnHelper.accessor((row) => row.planSum?.abs().toNumber() ?? 0, {
         id: 'planSum',
         header: t('columns.plan'),
-        enableEditing: (row) =>
-          row.original.rowType !== 'typeGroup' &&
-          !isPlanCellLocked(row.original),
+        enableEditing: canEditPlanCell,
         Cell: ({ row }) => <PlanCell row={row} month={month} year={year} />,
         Footer: ({ table }) => {
           const surplus = grandTotal?.planSum ?? zero;
@@ -140,7 +145,14 @@ export function useBudgetingTableColumns({
             }
           },
         }),
-        mantineTableBodyCellProps: { 'data-testing-column': 'plan' } as object,
+        mantineTableBodyCellProps: ({ row, cell, table }) => ({
+          'data-testing-column': 'plan',
+          onClick: () => {
+            if (canEditPlanCell(row)) {
+              openCellForEditing(table, cell);
+            }
+          },
+        }),
         size: 120,
       }),
       columnHelper.display({
@@ -168,8 +180,7 @@ export function useBudgetingTableColumns({
       columnHelper.accessor('comment', {
         header: t('columns.comment'),
         enableSorting: false,
-        enableEditing: (row) =>
-          row.original.rowType !== 'typeGroup' && !row.original.isRestRow,
+        enableEditing: canEditCommentCell,
         Cell: ({ row }) => {
           if (row.original.rowType === 'typeGroup') {
             return null;
@@ -204,9 +215,14 @@ export function useBudgetingTableColumns({
             }
           },
         }),
-        mantineTableBodyCellProps: {
+        mantineTableBodyCellProps: ({ row, cell, table }) => ({
           'data-testing-column': 'comment',
-        } as object,
+          onClick: () => {
+            if (canEditCommentCell(row)) {
+              openCellForEditing(table, cell);
+            }
+          },
+        }),
         size: 200,
       }),
     ];

@@ -22,8 +22,8 @@ test.describe('Budgeting inline editing', () => {
     // Транспорт has a subscription badge so we check containment, not exact text
     await expect(getPlanCell(транспортRow)).toContainText('€0.00');
 
-    // Double-click plan cell → edit input pre-populated with absolute magnitude
-    await getPlanCell(транспортRow).dblclick();
+    // Click plan cell → edit input pre-populated with absolute magnitude
+    await getPlanCell(транспортRow).click();
     const input = транспортRow.locator('input[type="number"]');
     await expect(input).toBeVisible();
     await expect(input).toHaveValue('0');
@@ -57,7 +57,7 @@ test.describe('Budgeting inline editing', () => {
     await expect(getPlanCell(остальноеRow)).toHaveText('-€100.00');
 
     // Parent is editable before any subcategory is filled
-    await getPlanCell(продуктыRow).dblclick();
+    await getPlanCell(продуктыRow).click();
     await expect(продуктыRow.locator('input[type="number"]')).toBeVisible();
     await продуктыRow.locator('input[type="number"]').press('Escape');
 
@@ -67,8 +67,8 @@ test.describe('Budgeting inline editing', () => {
     await expect(getPlanCell(остальноеRow)).toHaveText('-€100.00');
     await expect(getPlanCell(продуктыRow)).toHaveText('-€130.00');
 
-    // Parent is now locked — double-clicking shows tooltip, no input opens
-    await getPlanCell(продуктыRow).dblclick();
+    // Parent is now locked — clicking shows tooltip, no input opens
+    await getPlanCell(продуктыRow).click();
     await expect(продуктыRow.locator('input[type="number"]')).toHaveCount(0);
     await expect(page.getByRole('tooltip')).toBeVisible();
 

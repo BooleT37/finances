@@ -101,7 +101,13 @@ export function SubscriptionBadge({ row, month, year }: Props) {
             variant="subtle"
             size="xs"
             color="gray"
-            onClick={handleClick}
+            onClick={(event) => {
+              // Without this, the click also bubbles to the parent plan
+              // cell, whose own onClick opens the cell for editing right
+              // after this button fills it, hiding the freshly-applied value.
+              event.stopPropagation();
+              handleClick();
+            }}
             aria-label={t('subscriptions.fillFromSubscriptions')}
           >
             <IconRepeat size={12} />
