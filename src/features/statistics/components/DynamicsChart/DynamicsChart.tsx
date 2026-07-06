@@ -102,7 +102,11 @@ export function DynamicsChart() {
         />
         <MultiSelect
           label={t('dynamics.categoriesLabel')}
-          placeholder={t('dynamics.categoriesPlaceholder')}
+          placeholder={
+            categoryIds.length === 0
+              ? t('dynamics.categoriesPlaceholder')
+              : undefined
+          }
           data={categoryOptions}
           value={categoryIds}
           onChange={setCategoryIds}
