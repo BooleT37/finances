@@ -91,17 +91,17 @@ export function DynamicsChart() {
   return (
     <Stack gap="sm">
       <Title order={3}>{t('dynamics.title')}</Title>
-      <Group align="center">
+      <Group align="flex-end">
         <MonthPickerInput
           type="range"
-          aria-label={t('dynamics.rangeLabel')}
+          label={t('dynamics.rangeLabel')}
           value={range}
           onChange={setRange}
           valueFormat={MONTH_DATE_FORMAT}
           w={260}
         />
         <MultiSelect
-          aria-label={t('dynamics.categoriesLabel')}
+          label={t('dynamics.categoriesLabel')}
           placeholder={t('dynamics.categoriesPlaceholder')}
           data={categoryOptions}
           value={categoryIds}

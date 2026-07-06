@@ -39,7 +39,7 @@ interface PeriodPickerProps {
   quarter: number;
   onDateChange: (date: Date) => void;
   onQuarterChange: (quarter: number) => void;
-  'aria-label': string;
+  label: string;
 }
 
 function PeriodPicker({
@@ -48,12 +48,12 @@ function PeriodPicker({
   quarter,
   onDateChange,
   onQuarterChange,
-  'aria-label': ariaLabel,
+  label,
 }: PeriodPickerProps) {
   if (granularity === 'month') {
     return (
       <MonthPickerInput
-        aria-label={ariaLabel}
+        label={label}
         value={date}
         onChange={(value) => value && onDateChange(value)}
         w={160}
@@ -63,7 +63,7 @@ function PeriodPicker({
   if (granularity === 'year') {
     return (
       <YearPickerInput
-        aria-label={ariaLabel}
+        label={label}
         value={date}
         onChange={(value) => value && onDateChange(value)}
         w={100}
@@ -72,7 +72,7 @@ function PeriodPicker({
   }
   return (
     <QuarterPickerInput
-      aria-label={ariaLabel}
+      label={label}
       year={date}
       quarter={quarter}
       onYearChange={onDateChange}
@@ -150,9 +150,9 @@ export function ComparisonChart() {
   return (
     <Stack gap="sm">
       <Title order={3}>{t('comparison.title')}</Title>
-      <Group align="center">
+      <Group align="flex-end">
         <Select
-          aria-label={t('comparison.granularity.label')}
+          label={t('comparison.granularity.label')}
           value={granularity}
           onChange={(value) => value && setGranularity(value as Granularity)}
           data={[
@@ -163,16 +163,16 @@ export function ComparisonChart() {
           w={130}
         />
         <PeriodPicker
-          aria-label={t('comparison.period1Label')}
+          label={t('comparison.period1Label')}
           granularity={granularity}
           date={period1Date}
           quarter={period1Quarter}
           onDateChange={setPeriod1Date}
           onQuarterChange={setPeriod1Quarter}
         />
-        <Text>–</Text>
+        <Text pb={8}>–</Text>
         <PeriodPicker
-          aria-label={t('comparison.period2Label')}
+          label={t('comparison.period2Label')}
           granularity={granularity}
           date={period2Date}
           quarter={period2Quarter}
@@ -180,7 +180,7 @@ export function ComparisonChart() {
           onQuarterChange={setPeriod2Quarter}
         />
         <Select
-          aria-label={t('comparison.sortBy.label')}
+          label={t('comparison.sortBy.label')}
           value={sortBy}
           onChange={(value) => value && setSortBy(value as SortOption)}
           data={[

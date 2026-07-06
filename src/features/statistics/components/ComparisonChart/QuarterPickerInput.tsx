@@ -1,4 +1,4 @@
-import { Group, SegmentedControl } from '@mantine/core';
+import { Group, Input, SegmentedControl } from '@mantine/core';
 import { YearPickerInput } from '@mantine/dates';
 
 const quarterOptions = [
@@ -13,7 +13,7 @@ interface QuarterPickerInputProps {
   quarter: number;
   onYearChange: (year: Date) => void;
   onQuarterChange: (quarter: number) => void;
-  'aria-label'?: string;
+  label: string;
 }
 
 export function QuarterPickerInput({
@@ -21,28 +21,30 @@ export function QuarterPickerInput({
   quarter,
   onYearChange,
   onQuarterChange,
-  'aria-label': ariaLabel,
+  label,
 }: QuarterPickerInputProps) {
   return (
-    <Group gap="xs" wrap="nowrap">
-      <YearPickerInput
-        aria-label={ariaLabel}
-        value={year}
-        onChange={(value) => {
-          if (value) {
-            onYearChange(value);
-          }
-        }}
-        w={100}
-      />
-      <SegmentedControl
-        aria-label={ariaLabel}
-        value={quarter.toString()}
-        onChange={(value) => {
-          onQuarterChange(Number(value));
-        }}
-        data={quarterOptions}
-      />
-    </Group>
+    <Input.Wrapper label={label}>
+      <Group gap="xs" wrap="nowrap">
+        <YearPickerInput
+          aria-label={label}
+          value={year}
+          onChange={(value) => {
+            if (value) {
+              onYearChange(value);
+            }
+          }}
+          w={100}
+        />
+        <SegmentedControl
+          aria-label={label}
+          value={quarter.toString()}
+          onChange={(value) => {
+            onQuarterChange(Number(value));
+          }}
+          data={quarterOptions}
+        />
+      </Group>
+    </Input.Wrapper>
   );
 }
