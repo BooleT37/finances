@@ -6,6 +6,7 @@ import { i18nResources as categoriesResources } from '~/features/categories/i18n
 import { i18nResources as navResources } from '~/features/nav/i18n';
 import { i18nResources as savingSpendingsResources } from '~/features/savingSpendings/i18n';
 import { i18nResources as sourcesResources } from '~/features/sources/i18n';
+import { i18nResources as statisticsResources } from '~/features/statistics/i18n';
 import { i18nResources as subscriptionsResources } from '~/features/subscriptions/i18n';
 import { i18nResources as transactionsResources } from '~/features/transactions/i18n';
 
@@ -25,6 +26,7 @@ export const resources = {
     ...categoriesResources.en,
     ...sourcesResources.en,
     ...subscriptionsResources.en,
+    ...statisticsResources.en,
   },
   ru: {
     common: commonRu,
@@ -36,6 +38,7 @@ export const resources = {
     ...categoriesResources.ru,
     ...sourcesResources.ru,
     ...subscriptionsResources.ru,
+    ...statisticsResources.ru,
   },
 } as const;
 

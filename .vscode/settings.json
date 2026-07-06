@@ -9,7 +9,8 @@
     "src/features/savingSpendings/locales",
     "src/features/categories/locales",
     "src/features/sources/locales",
-    "src/features/subscriptions/locales"
+    "src/features/subscriptions/locales",
+    "src/features/statistics/locales"
   ],
   "i18n-ally.namespace": true,
   "i18n-ally.defaultNamespace": "home",

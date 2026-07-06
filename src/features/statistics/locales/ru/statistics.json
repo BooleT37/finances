@@ -1,0 +1,29 @@
+{
+  "comparison": {
+    "title": "Сравнение с предыдущим периодом",
+    "granularity": {
+      "label": "Гранулярность",
+      "month": "Месяц",
+      "quarter": "Квартал",
+      "year": "Год"
+    },
+    "period1Label": "Первый период",
+    "period2Label": "Второй период",
+    "sortBy": {
+      "label": "Сортировать",
+      "category": "По категории",
+      "period1": "По первому периоду",
+      "period2": "По второму периоду"
+    },
+    "includeIncome": "Включая доходы",
+    "expensesOnly": "Только расходы",
+    "samePeriodWarning": "Пожалуйста, выберите различные периоды сверху"
+  },
+  "dynamics": {
+    "title": "Динамика",
+    "rangeLabel": "Период",
+    "categoriesLabel": "Категории",
+    "categoriesPlaceholder": "Все категории",
+    "samePeriodWarning": "Пожалуйста, выберите более широкий период сверху"
+  }
+}

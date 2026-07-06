@@ -1,0 +1,29 @@
+{
+  "comparison": {
+    "title": "Comparison with previous period",
+    "granularity": {
+      "label": "Granularity",
+      "month": "Month",
+      "quarter": "Quarter",
+      "year": "Year"
+    },
+    "period1Label": "First period",
+    "period2Label": "Second period",
+    "sortBy": {
+      "label": "Sort by",
+      "category": "Category",
+      "period1": "First period",
+      "period2": "Second period"
+    },
+    "includeIncome": "Including income",
+    "expensesOnly": "Expenses only",
+    "samePeriodWarning": "Please select different periods above"
+  },
+  "dynamics": {
+    "title": "Dynamics",
+    "rangeLabel": "Date range",
+    "categoriesLabel": "Categories",
+    "categoriesPlaceholder": "All categories",
+    "samePeriodWarning": "Please select a wider date range above"
+  }
+}
