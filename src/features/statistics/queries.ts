@@ -19,6 +19,7 @@ export const getComparisonDataQueryOptions = (
 ) =>
   queryOptions({
     ...statisticsKeys.comparison(input),
+    staleTime: 0,
     queryFn: async () => {
       const rows = await fetchComparisonData({ data: input });
       return rows.map((row) => comparisonCategoryDataSchema.decode(row));
@@ -28,6 +29,7 @@ export const getComparisonDataQueryOptions = (
 export const getDynamicsDataQueryOptions = (input: FetchDynamicsDataInput) =>
   queryOptions({
     ...statisticsKeys.dynamics(input),
+    staleTime: 0,
     queryFn: async () => {
       const rows = await fetchDynamicsData({ data: input });
       return rows.map((row) => dynamicsMonthDataSchema.decode(row));
