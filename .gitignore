@@ -26,3 +26,6 @@ playwright/.auth/
 
 # Local sample data
 data/sample pdfs/
+/.local-db-backups/
+/scripts/
+.tanstack/
