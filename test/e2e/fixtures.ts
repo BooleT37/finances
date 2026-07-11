@@ -12,6 +12,11 @@ export type { SeedData };
 // `seedData` is test-scoped and auto-used: it truncates all data and
 // re-seeds before each test. Tests that need seeded IDs can destructure
 // `{ seedData }` from `test`.
+//
+// The seeded session's cookie is injected into every test's browser context
+// so specs land straight on authenticated pages without going through the
+// login form. Specs that need to exercise the real login UI (test/e2e/auth/)
+// should not rely on this — see login.spec.ts, which clears cookies first.
 export const test = base.extend<{ seedData: SeedData }>({
   seedData: [
     async ({}, use) => {
@@ -20,6 +25,11 @@ export const test = base.extend<{ seedData: SeedData }>({
     },
     { auto: true },
   ],
+
+  context: async ({ context, seedData }, use) => {
+    await context.addCookies(seedData.sessionCookies);
+    await use(context);
+  },
 
   page: async ({ page }, use) => {
     const originalGoto = page.goto.bind(page);

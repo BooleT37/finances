@@ -102,7 +102,7 @@ test.describe('Budgeting subscriptions', () => {
         categoryId: seedData.categoryIds.развлечения,
         sourceId: seedData.sourceIds.вивид,
         subscriptionId: seedData.subscriptionIds.нетфликс,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
       },
     });
 
@@ -242,7 +242,7 @@ test.describe('Budgeting subscriptions', () => {
         period: 1,
         firstDate: new Date('2024-01-01'),
         active: true,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
       },
     });
 
