@@ -4,7 +4,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { ComparisonChart } from '~/features/statistics/components/ComparisonChart/ComparisonChart';
 import { DynamicsChart } from '~/features/statistics/components/DynamicsChart/DynamicsChart';
 
-export const Route = createFileRoute('/statistics')({
+export const Route = createFileRoute('/_authenticated/statistics')({
   component: StatisticsPage,
 });
 

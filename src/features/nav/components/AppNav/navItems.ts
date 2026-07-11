@@ -8,6 +8,7 @@ import {
   IconSettings,
   IconTable,
   IconTag,
+  IconUsers,
 } from '@tabler/icons-react';
 
 import type { i18nResources } from '../../i18n';
@@ -19,6 +20,7 @@ export interface NavItem {
   labelKey: NavLabelKey;
   icon: Icon;
   children?: NavItem[];
+  adminOnly?: boolean;
 }
 
 export const navItems: NavItem[] = [
@@ -42,9 +44,25 @@ export const navItems: NavItem[] = [
         labelKey: 'subscriptions',
         icon: IconRepeat,
       },
+      {
+        to: '/settings/users',
+        labelKey: 'users',
+        icon: IconUsers,
+        adminOnly: true,
+      },
     ],
   },
 ];
+
+export function filterNavItems(items: NavItem[], isAdmin: boolean): NavItem[] {
+  return items
+    .filter((item) => !item.adminOnly || isAdmin)
+    .map((item) =>
+      item.children
+        ? { ...item, children: filterNavItems(item.children, isAdmin) }
+        : item,
+    );
+}
 
 export function findBreadcrumbTrail(
   pathname: string,

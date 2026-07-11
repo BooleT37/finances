@@ -13,6 +13,8 @@
   "categories": "Категории",
   "sources": "Источники",
   "subscriptions": "Подписки",
+  "users": "Пользователи",
+  "signOut": "Выйти",
   "collapseSidebar": "Свернуть меню",
   "expandSidebar": "Развернуть меню"
 }

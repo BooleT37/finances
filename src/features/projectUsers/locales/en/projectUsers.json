@@ -1,0 +1,48 @@
+{
+  "pageTitle": "Project users",
+  "addUser": "Add user",
+  "columns": {
+    "name": "Name",
+    "email": "Email",
+    "role": "Role"
+  },
+  "roles": {
+    "user": "User",
+    "admin": "Admin"
+  },
+  "actions": {
+    "resetPassword": "Reset password",
+    "delete": "Remove"
+  },
+  "modal": {
+    "addTitle": "Add user",
+    "resetPasswordTitle": "Reset password for {{name}}",
+    "save": "Save"
+  },
+  "form": {
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "tempPassword": "Temporary password",
+    "tempPasswordDescription": "Share this password with them directly — they can sign in with it or via Google using the same email."
+  },
+  "validation": {
+    "nameRequired": "Name is required",
+    "emailInvalid": "Enter a valid email",
+    "passwordTooShort": "Password must be at least 8 characters"
+  },
+  "notifications": {
+    "created": "User added",
+    "createError": "Failed to add user",
+    "passwordReset": "Password reset",
+    "passwordResetError": "Failed to reset password"
+  },
+  "delete": {
+    "confirmTitle": "Remove user",
+    "confirmMessage": "Remove \"{{name}}\" from this project? They will immediately lose access.",
+    "confirm": "Remove",
+    "cancel": "Cancel",
+    "successMessage": "\"{{name}}\" removed",
+    "errorMessage": "Failed to remove user"
+  }
+}

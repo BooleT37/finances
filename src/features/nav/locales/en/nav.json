@@ -13,6 +13,8 @@
   "categories": "Categories",
   "sources": "Sources",
   "subscriptions": "Subscriptions",
+  "users": "Users",
+  "signOut": "Sign out",
   "collapseSidebar": "Collapse sidebar",
   "expandSidebar": "Expand sidebar"
 }
