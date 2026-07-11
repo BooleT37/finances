@@ -2,16 +2,18 @@ import { createServerFn } from '@tanstack/react-start';
 import Decimal from 'decimal.js';
 import { z } from 'zod';
 
+import { authMiddleware } from '~/middlewares/authMiddleware';
 import { prisma } from '~/server/db';
 import { adaptCost } from '~/shared/utils/adaptCost';
 
 import { forecastSchema } from './schema';
 
 export const fetchForecastsByYear = createServerFn({ method: 'GET' })
+  .middleware([authMiddleware])
   .inputValidator((year: number) => year)
-  .handler(async ({ data: year }) => {
+  .handler(async ({ data: year, context }) => {
     const forecasts = await prisma.forecast.findMany({
-      where: { year },
+      where: { year, projectId: context.projectId },
       include: { category: true },
     });
     return forecasts.map((f) =>
@@ -33,19 +35,17 @@ const upsertForecastInputSchema = z.object({
 
 export type UpsertForecastInput = z.infer<typeof upsertForecastInputSchema>;
 
-// TODO: replace userId with actual user from auth once auth is implemented
 const upsertBulkForecastsInputSchema = z.array(upsertForecastInputSchema);
 export type UpsertBulkForecastsInput = z.infer<
   typeof upsertBulkForecastsInputSchema
 >;
 
 export const upsertBulkForecasts = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .inputValidator((input: UpsertBulkForecastsInput) =>
     upsertBulkForecastsInputSchema.parse(input),
   )
-  .handler(async ({ data }) => {
-    const user = await prisma.user.findFirstOrThrow();
-
+  .handler(async ({ data, context }) => {
     const results = await prisma.$transaction(async (tx) => {
       const output = [];
       for (const item of data) {
@@ -55,7 +55,7 @@ export const upsertBulkForecasts = createServerFn({ method: 'POST' })
             subcategoryId: item.subcategoryId,
             month: item.month,
             year: item.year,
-            userId: user.id,
+            projectId: context.projectId,
           },
         });
 
@@ -76,7 +76,7 @@ export const upsertBulkForecasts = createServerFn({ method: 'POST' })
               subcategoryId: item.subcategoryId,
               month: item.month,
               year: item.year,
-              userId: user.id,
+              projectId: context.projectId,
               sum:
                 item.sum !== undefined
                   ? new Decimal(item.sum).abs()
@@ -100,20 +100,18 @@ export const upsertBulkForecasts = createServerFn({ method: 'POST' })
   });
 
 export const upsertForecast = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .inputValidator((input: UpsertForecastInput) =>
     upsertForecastInputSchema.parse(input),
   )
-  .handler(async ({ data }) => {
-    // TODO: replace with actual user from auth
-    const user = await prisma.user.findFirstOrThrow();
-
+  .handler(async ({ data, context }) => {
     const existing = await prisma.forecast.findFirst({
       where: {
         categoryId: data.categoryId,
         subcategoryId: data.subcategoryId,
         month: data.month,
         year: data.year,
-        userId: user.id,
+        projectId: context.projectId,
       },
     });
 
@@ -138,7 +136,7 @@ export const upsertForecast = createServerFn({ method: 'POST' })
         subcategoryId: data.subcategoryId,
         month: data.month,
         year: data.year,
-        userId: user.id,
+        projectId: context.projectId,
         sum:
           data.sum !== undefined ? new Decimal(data.sum).abs() : new Decimal(0),
         comment: data.comment ?? '',

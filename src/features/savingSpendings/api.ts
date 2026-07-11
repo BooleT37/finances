@@ -1,7 +1,9 @@
 import { createServerFn } from '@tanstack/react-start';
 import Decimal from 'decimal.js';
 
+import { authMiddleware } from '~/middlewares/authMiddleware';
 import { prisma } from '~/server/db';
+import { assertOwnedByProject } from '~/shared/utils/assertOwnedByProject';
 
 import {
   type CreateSavingSpendingInput,
@@ -13,46 +15,53 @@ import {
 
 export const fetchAllSavingSpendings = createServerFn({
   method: 'GET',
-}).handler(async () => {
-  const [savingSpendings, actuals] = await Promise.all([
-    prisma.savingSpending.findMany({ include: { categories: true } }),
-    prisma.expense.groupBy({
-      by: ['savingSpendingCategoryId'],
-      _sum: { cost: true },
-      where: { savingSpendingCategoryId: { not: null } },
-    }),
-  ]);
+})
+  .middleware([authMiddleware])
+  .handler(async ({ context }) => {
+    const [savingSpendings, actuals] = await Promise.all([
+      prisma.savingSpending.findMany({
+        where: { projectId: context.projectId },
+        include: { categories: true },
+      }),
+      prisma.expense.groupBy({
+        by: ['savingSpendingCategoryId'],
+        _sum: { cost: true },
+        where: {
+          projectId: context.projectId,
+          savingSpendingCategoryId: { not: null },
+        },
+      }),
+    ]);
 
-  const actualMap = new Map(
-    actuals.map((r) => [
-      r.savingSpendingCategoryId,
-      new Decimal(r._sum.cost?.toString() ?? '0'),
-    ]),
-  );
+    const actualMap = new Map(
+      actuals.map((r) => [
+        r.savingSpendingCategoryId,
+        new Decimal(r._sum.cost?.toString() ?? '0'),
+      ]),
+    );
 
-  return savingSpendings.map((s) =>
-    savingSpendingSchema.encode({
-      ...s,
-      categories: s.categories.map((cat) => ({
-        ...cat,
-        actual: actualMap.get(cat.id) ?? new Decimal(0),
-      })),
-    }),
-  );
-});
+    return savingSpendings.map((s) =>
+      savingSpendingSchema.encode({
+        ...s,
+        categories: s.categories.map((cat) => ({
+          ...cat,
+          actual: actualMap.get(cat.id) ?? new Decimal(0),
+        })),
+      }),
+    );
+  });
 
-// TODO: replace userId with actual user from auth once auth is implemented
 export const createSavingSpending = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .inputValidator((input: CreateSavingSpendingInput) =>
     createSavingSpendingSchema.parse(input),
   )
-  .handler(async ({ data }) => {
-    const user = await prisma.user.findFirstOrThrow();
+  .handler(async ({ data, context }) => {
     await prisma.savingSpending.create({
       data: {
         name: data.name,
         completed: false,
-        userId: user.id,
+        projectId: context.projectId,
         categories: {
           createMany: {
             data: data.categories.map((cat) => ({
@@ -67,11 +76,19 @@ export const createSavingSpending = createServerFn({ method: 'POST' })
   });
 
 export const updateSavingSpending = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .inputValidator((input: UpdateSavingSpendingInput) =>
     updateSavingSpendingSchema.parse(input),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const { id, name, categories } = data;
+
+    await assertOwnedByProject(
+      prisma.savingSpending,
+      id,
+      context.projectId,
+      'Saving spending',
+    );
 
     await prisma.$transaction(async (db) => {
       const keptIds = categories
@@ -113,14 +130,28 @@ export const updateSavingSpending = createServerFn({ method: 'POST' })
   });
 
 export const deleteSavingSpending = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .inputValidator((id: number) => id)
-  .handler(async ({ data: id }) => {
+  .handler(async ({ data: id, context }) => {
+    await assertOwnedByProject(
+      prisma.savingSpending,
+      id,
+      context.projectId,
+      'Saving spending',
+    );
     await prisma.savingSpending.delete({ where: { id } });
   });
 
 export const archiveSavingSpending = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .inputValidator((id: number) => id)
-  .handler(async ({ data: id }) => {
+  .handler(async ({ data: id, context }) => {
+    await assertOwnedByProject(
+      prisma.savingSpending,
+      id,
+      context.projectId,
+      'Saving spending',
+    );
     await prisma.savingSpending.update({
       where: { id },
       data: { completed: true },
@@ -128,8 +159,15 @@ export const archiveSavingSpending = createServerFn({ method: 'POST' })
   });
 
 export const unarchiveSavingSpending = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .inputValidator((id: number) => id)
-  .handler(async ({ data: id }) => {
+  .handler(async ({ data: id, context }) => {
+    await assertOwnedByProject(
+      prisma.savingSpending,
+      id,
+      context.projectId,
+      'Saving spending',
+    );
     await prisma.savingSpending.update({
       where: { id },
       data: { completed: false },

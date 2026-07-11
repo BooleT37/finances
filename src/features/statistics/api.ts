@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 
 import { categorySchema } from '~/features/categories/schema';
 import { Prisma } from '~/generated/prisma/client';
+import { authMiddleware } from '~/middlewares/authMiddleware';
 import { prisma } from '~/server/db';
 import { adaptCost } from '~/shared/utils/adaptCost';
 
@@ -37,10 +38,11 @@ function toDatedTx(e: ExpenseWithComponents): DatedTx {
 }
 
 export const fetchComparisonData = createServerFn({ method: 'GET' })
+  .middleware([authMiddleware])
   .inputValidator((input: FetchComparisonDataInput) =>
     fetchComparisonDataInputSchema.parse(input),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const period1 = {
       start: dayjs(data.period1.start),
       end: dayjs(data.period1.end),
@@ -53,6 +55,7 @@ export const fetchComparisonData = createServerFn({ method: 'GET' })
     const [expenses, categories] = await Promise.all([
       prisma.expense.findMany({
         where: {
+          projectId: context.projectId,
           OR: [
             {
               date: {
@@ -73,7 +76,10 @@ export const fetchComparisonData = createServerFn({ method: 'GET' })
           components: { include: { category: true } },
         },
       }),
-      prisma.category.findMany({ include: { subcategories: true } }),
+      prisma.category.findMany({
+        where: { projectId: context.projectId },
+        include: { subcategories: true },
+      }),
     ]);
 
     return aggregateComparisonData(
@@ -85,13 +91,15 @@ export const fetchComparisonData = createServerFn({ method: 'GET' })
   });
 
 export const fetchDynamicsData = createServerFn({ method: 'GET' })
+  .middleware([authMiddleware])
   .inputValidator((input: FetchDynamicsDataInput) =>
     fetchDynamicsDataInputSchema.parse(input),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const [expenses, categories] = await Promise.all([
       prisma.expense.findMany({
         where: {
+          projectId: context.projectId,
           date: { gte: new Date(data.from), lte: new Date(data.to) },
         },
         include: {
@@ -99,7 +107,10 @@ export const fetchDynamicsData = createServerFn({ method: 'GET' })
           components: { include: { category: true } },
         },
       }),
-      prisma.category.findMany({ include: { subcategories: true } }),
+      prisma.category.findMany({
+        where: { projectId: context.projectId },
+        include: { subcategories: true },
+      }),
     ]);
 
     return aggregateDynamicsData(

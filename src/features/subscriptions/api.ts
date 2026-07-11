@@ -3,8 +3,10 @@ import dayjs from 'dayjs';
 import Decimal from 'decimal.js';
 
 import { type Prisma } from '~/generated/prisma/client';
+import { authMiddleware } from '~/middlewares/authMiddleware';
 import { prisma } from '~/server/db';
 import { adaptCost } from '~/shared/utils/adaptCost';
+import { assertOwnedByProject } from '~/shared/utils/assertOwnedByProject';
 
 import {
   type CreateSubscriptionInput,
@@ -26,23 +28,23 @@ function encodeSubscription(s: SubscriptionWithCategory) {
   });
 }
 
-export const fetchAllSubscriptions = createServerFn({ method: 'GET' }).handler(
-  async () => {
+export const fetchAllSubscriptions = createServerFn({ method: 'GET' })
+  .middleware([authMiddleware])
+  .handler(async ({ context }) => {
     const subscriptions = await prisma.subscription.findMany({
+      where: { projectId: context.projectId },
       orderBy: { name: 'asc' },
       include: { category: true },
     });
     return subscriptions.map(encodeSubscription);
-  },
-);
+  });
 
-// TODO: replace userId with actual user from auth once auth is implemented
 export const createSubscription = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .inputValidator((input: CreateSubscriptionInput) =>
     createSubscriptionSchema.parse(input),
   )
-  .handler(async ({ data }) => {
-    const user = await prisma.user.findFirstOrThrow();
+  .handler(async ({ data, context }) => {
     const subscription = await prisma.subscription.create({
       data: {
         name: data.name,
@@ -53,7 +55,7 @@ export const createSubscription = createServerFn({ method: 'POST' })
         categoryId: data.categoryId,
         subcategoryId: data.subcategoryId,
         sourceId: data.sourceId,
-        userId: user.id,
+        projectId: context.projectId,
       },
       include: { category: true },
     });
@@ -61,11 +63,18 @@ export const createSubscription = createServerFn({ method: 'POST' })
   });
 
 export const updateSubscription = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .inputValidator((input: UpdateSubscriptionInput) =>
     updateSubscriptionSchema.parse(input),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const { id, ...fields } = data;
+    await assertOwnedByProject(
+      prisma.subscription,
+      id,
+      context.projectId,
+      'Subscription',
+    );
     const subscription = await prisma.subscription.update({
       where: { id },
       data: {
@@ -84,7 +93,14 @@ export const updateSubscription = createServerFn({ method: 'POST' })
   });
 
 export const deleteSubscription = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .inputValidator((id: number) => id)
-  .handler(async ({ data: id }) => {
+  .handler(async ({ data: id, context }) => {
+    await assertOwnedByProject(
+      prisma.subscription,
+      id,
+      context.projectId,
+      'Subscription',
+    );
     await prisma.subscription.delete({ where: { id } });
   });
