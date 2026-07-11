@@ -1,9 +1,11 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
+import { i18nResources as authResources } from '~/features/auth/i18n';
 import { i18nResources as budgetingResources } from '~/features/budgeting/i18n';
 import { i18nResources as categoriesResources } from '~/features/categories/i18n';
 import { i18nResources as navResources } from '~/features/nav/i18n';
+import { i18nResources as projectUsersResources } from '~/features/projectUsers/i18n';
 import { i18nResources as savingSpendingsResources } from '~/features/savingSpendings/i18n';
 import { i18nResources as sourcesResources } from '~/features/sources/i18n';
 import { i18nResources as statisticsResources } from '~/features/statistics/i18n';
@@ -27,6 +29,8 @@ export const resources = {
     ...sourcesResources.en,
     ...subscriptionsResources.en,
     ...statisticsResources.en,
+    ...authResources.en,
+    ...projectUsersResources.en,
   },
   ru: {
     common: commonRu,
@@ -39,6 +43,8 @@ export const resources = {
     ...sourcesResources.ru,
     ...subscriptionsResources.ru,
     ...statisticsResources.ru,
+    ...authResources.ru,
+    ...projectUsersResources.ru,
   },
 } as const;
 

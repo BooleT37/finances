@@ -1,0 +1,48 @@
+{
+  "pageTitle": "Пользователи проекта",
+  "addUser": "Добавить пользователя",
+  "columns": {
+    "name": "Имя",
+    "email": "Email",
+    "role": "Роль"
+  },
+  "roles": {
+    "user": "Пользователь",
+    "admin": "Админ"
+  },
+  "actions": {
+    "resetPassword": "Сбросить пароль",
+    "delete": "Удалить"
+  },
+  "modal": {
+    "addTitle": "Добавить пользователя",
+    "resetPasswordTitle": "Сбросить пароль для {{name}}",
+    "save": "Сохранить"
+  },
+  "form": {
+    "name": "Имя",
+    "email": "Email",
+    "role": "Роль",
+    "tempPassword": "Временный пароль",
+    "tempPasswordDescription": "Сообщите этот пароль пользователю напрямую — он сможет войти по нему или через Google с тем же email."
+  },
+  "validation": {
+    "nameRequired": "Укажите имя",
+    "emailInvalid": "Введите корректный email",
+    "passwordTooShort": "Пароль должен быть не короче 8 символов"
+  },
+  "notifications": {
+    "created": "Пользователь добавлен",
+    "createError": "Не удалось добавить пользователя",
+    "passwordReset": "Пароль сброшен",
+    "passwordResetError": "Не удалось сбросить пароль"
+  },
+  "delete": {
+    "confirmTitle": "Удалить пользователя",
+    "confirmMessage": "Удалить «{{name}}» из проекта? Доступ будет закрыт немедленно.",
+    "confirm": "Удалить",
+    "cancel": "Отмена",
+    "successMessage": "«{{name}}» удалён",
+    "errorMessage": "Не удалось удалить пользователя"
+  }
+}

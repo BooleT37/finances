@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/settings/subscriptions')({
+export const Route = createFileRoute('/_authenticated/savings-spendings')({
   component: Outlet,
 });

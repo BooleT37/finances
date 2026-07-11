@@ -1,20 +1,33 @@
-import { Breadcrumbs, Group, Text } from '@mantine/core';
-import { useRouterState } from '@tanstack/react-router';
+import { ActionIcon, Breadcrumbs, Group, Text, Tooltip } from '@mantine/core';
+import { IconLogout } from '@tabler/icons-react';
+import {
+  useNavigate,
+  useRouteContext,
+  useRouterState,
+} from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 import { LanguageSwitcher } from '~/components/LanguageSwitcher';
 import { MonthNavigator } from '~/features/nav/components/MonthNavigator';
+import { authClient } from '~/lib/auth/client';
 
 import { findBreadcrumbTrail } from './AppNav/navItems';
 
 export function AppHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { t } = useTranslation('nav');
+  const navigate = useNavigate();
+  const { session } = useRouteContext({ from: '/_authenticated' });
 
   const showNavigator =
     pathname === '/transactions' || pathname === '/budgeting';
 
   const trail = findBreadcrumbTrail(pathname);
+
+  async function handleSignOut() {
+    await authClient.signOut();
+    void navigate({ to: '/login' });
+  }
 
   return (
     <Group h="100%" px="md" justify="space-between" align="center">
@@ -31,7 +44,21 @@ export function AppHeader() {
 
       {showNavigator && <MonthNavigator />}
 
-      <LanguageSwitcher />
+      <Group gap="sm">
+        <Text size="sm" c="dimmed">
+          {session.email}
+        </Text>
+        <LanguageSwitcher />
+        <Tooltip label={t('signOut')}>
+          <ActionIcon
+            variant="subtle"
+            aria-label={t('signOut')}
+            onClick={handleSignOut}
+          >
+            <IconLogout size={16} />
+          </ActionIcon>
+        </Tooltip>
+      </Group>
     </Group>
   );
 }

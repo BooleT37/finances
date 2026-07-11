@@ -6,14 +6,7 @@ import 'mantine-react-table/styles.css';
 import 'dayjs/locale/ru';
 import '~/lib/dayjs';
 
-import {
-  AppShell,
-  Code,
-  createTheme,
-  MantineProvider,
-  Text,
-  Title,
-} from '@mantine/core';
+import { Code, createTheme, MantineProvider, Text, Title } from '@mantine/core';
 import { DatesProvider } from '@mantine/dates';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
@@ -27,14 +20,11 @@ import {
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import type { createStore } from 'jotai';
-import { Provider as JotaiProvider, useAtomValue } from 'jotai';
+import { Provider as JotaiProvider } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
 import { queryClientAtom } from 'jotai-tanstack-query';
 import { I18nextProvider, useTranslation } from 'react-i18next';
 
-import { AppHeader } from '~/features/nav/components/AppHeader';
-import { AppNav } from '~/features/nav/components/AppNav/AppNav';
-import { navCollapsedAtom } from '~/features/nav/navCollapsed.atom';
 import i18n from '~/lib/i18n';
 import { trpc, trpcClient } from '~/lib/trpc/client';
 
@@ -99,34 +89,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   );
 }
 
-const NAV_WIDTH_EXPANDED = 200;
-const NAV_WIDTH_COLLAPSED = 60;
-
 function AppContent() {
   const { i18n: i18nInstance } = useTranslation();
-  const navCollapsed = useAtomValue(navCollapsedAtom);
 
   return (
     <DatesProvider settings={{ locale: i18nInstance.language }}>
       <Notifications />
-      <AppShell
-        header={{ height: 40 }}
-        navbar={{
-          width: navCollapsed ? NAV_WIDTH_COLLAPSED : NAV_WIDTH_EXPANDED,
-          breakpoint: 'xs',
-        }}
-        padding={{ base: 10, sm: 15, lg: 'md' }}
-      >
-        <AppShell.Header>
-          <AppHeader />
-        </AppShell.Header>
-        <AppShell.Navbar style={{ transition: 'width 0.25s ease' }}>
-          <AppNav />
-        </AppShell.Navbar>
-        <AppShell.Main style={{ transition: 'padding-left 0.25s ease' }}>
-          <Outlet />
-        </AppShell.Main>
-      </AppShell>
+      <Outlet />
       <TanStackRouterDevtools position="bottom-right" />
     </DatesProvider>
   );

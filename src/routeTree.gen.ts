@@ -9,136 +9,178 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TransactionsRouteImport } from './routes/transactions'
-import { Route as StatisticsRouteImport } from './routes/statistics'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as SavingsSpendingsRouteImport } from './routes/savings-spendings'
-import { Route as BudgetingRouteImport } from './routes/budgeting'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as SavingsSpendingsIndexRouteImport } from './routes/savings-spendings.index'
-import { Route as SettingsSubscriptionsRouteImport } from './routes/settings.subscriptions'
-import { Route as SettingsSourcesRouteImport } from './routes/settings.sources'
-import { Route as SettingsCategoriesRouteImport } from './routes/settings.categories'
-import { Route as SavingsSpendingsArchiveRouteImport } from './routes/savings-spendings.archive'
-import { Route as SettingsSubscriptionsIndexRouteImport } from './routes/settings.subscriptions.index'
-import { Route as SettingsSubscriptionsArchiveRouteImport } from './routes/settings.subscriptions.archive'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated.index'
+import { Route as AuthenticatedTransactionsRouteImport } from './routes/_authenticated.transactions'
+import { Route as AuthenticatedStatisticsRouteImport } from './routes/_authenticated.statistics'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
+import { Route as AuthenticatedSavingsSpendingsRouteImport } from './routes/_authenticated.savings-spendings'
+import { Route as AuthenticatedBudgetingRouteImport } from './routes/_authenticated.budgeting'
+import { Route as AuthenticatedSavingsSpendingsIndexRouteImport } from './routes/_authenticated.savings-spendings.index'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as AuthenticatedSettingsUsersRouteImport } from './routes/_authenticated.settings.users'
+import { Route as AuthenticatedSettingsSubscriptionsRouteImport } from './routes/_authenticated.settings.subscriptions'
+import { Route as AuthenticatedSettingsSourcesRouteImport } from './routes/_authenticated.settings.sources'
+import { Route as AuthenticatedSettingsCategoriesRouteImport } from './routes/_authenticated.settings.categories'
+import { Route as AuthenticatedSavingsSpendingsArchiveRouteImport } from './routes/_authenticated.savings-spendings.archive'
+import { Route as AuthenticatedSettingsSubscriptionsIndexRouteImport } from './routes/_authenticated.settings.subscriptions.index'
+import { Route as AuthenticatedSettingsSubscriptionsArchiveRouteImport } from './routes/_authenticated.settings.subscriptions.archive'
 
-const TransactionsRoute = TransactionsRouteImport.update({
-  id: '/transactions',
-  path: '/transactions',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const StatisticsRoute = StatisticsRouteImport.update({
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTransactionsRoute =
+  AuthenticatedTransactionsRouteImport.update({
+    id: '/transactions',
+    path: '/transactions',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStatisticsRoute = AuthenticatedStatisticsRouteImport.update({
   id: '/statistics',
   path: '/statistics',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
-const SettingsRoute = SettingsRouteImport.update({
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
-const SavingsSpendingsRoute = SavingsSpendingsRouteImport.update({
-  id: '/savings-spendings',
-  path: '/savings-spendings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BudgetingRoute = BudgetingRouteImport.update({
+const AuthenticatedSavingsSpendingsRoute =
+  AuthenticatedSavingsSpendingsRouteImport.update({
+    id: '/savings-spendings',
+    path: '/savings-spendings',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedBudgetingRoute = AuthenticatedBudgetingRouteImport.update({
   id: '/budgeting',
   path: '/budgeting',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SavingsSpendingsIndexRoute = SavingsSpendingsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => SavingsSpendingsRoute,
-} as any)
-const SettingsSubscriptionsRoute = SettingsSubscriptionsRouteImport.update({
-  id: '/subscriptions',
-  path: '/subscriptions',
-  getParentRoute: () => SettingsRoute,
-} as any)
-const SettingsSourcesRoute = SettingsSourcesRouteImport.update({
-  id: '/sources',
-  path: '/sources',
-  getParentRoute: () => SettingsRoute,
-} as any)
-const SettingsCategoriesRoute = SettingsCategoriesRouteImport.update({
-  id: '/categories',
-  path: '/categories',
-  getParentRoute: () => SettingsRoute,
-} as any)
-const SavingsSpendingsArchiveRoute = SavingsSpendingsArchiveRouteImport.update({
-  id: '/archive',
-  path: '/archive',
-  getParentRoute: () => SavingsSpendingsRoute,
-} as any)
-const SettingsSubscriptionsIndexRoute =
-  SettingsSubscriptionsIndexRouteImport.update({
+const AuthenticatedSavingsSpendingsIndexRoute =
+  AuthenticatedSavingsSpendingsIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => SettingsSubscriptionsRoute,
+    getParentRoute: () => AuthenticatedSavingsSpendingsRoute,
   } as any)
-const SettingsSubscriptionsArchiveRoute =
-  SettingsSubscriptionsArchiveRouteImport.update({
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedSettingsUsersRoute =
+  AuthenticatedSettingsUsersRouteImport.update({
+    id: '/users',
+    path: '/users',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
+const AuthenticatedSettingsSubscriptionsRoute =
+  AuthenticatedSettingsSubscriptionsRouteImport.update({
+    id: '/subscriptions',
+    path: '/subscriptions',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
+const AuthenticatedSettingsSourcesRoute =
+  AuthenticatedSettingsSourcesRouteImport.update({
+    id: '/sources',
+    path: '/sources',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
+const AuthenticatedSettingsCategoriesRoute =
+  AuthenticatedSettingsCategoriesRouteImport.update({
+    id: '/categories',
+    path: '/categories',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
+const AuthenticatedSavingsSpendingsArchiveRoute =
+  AuthenticatedSavingsSpendingsArchiveRouteImport.update({
     id: '/archive',
     path: '/archive',
-    getParentRoute: () => SettingsSubscriptionsRoute,
+    getParentRoute: () => AuthenticatedSavingsSpendingsRoute,
+  } as any)
+const AuthenticatedSettingsSubscriptionsIndexRoute =
+  AuthenticatedSettingsSubscriptionsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedSettingsSubscriptionsRoute,
+  } as any)
+const AuthenticatedSettingsSubscriptionsArchiveRoute =
+  AuthenticatedSettingsSubscriptionsArchiveRouteImport.update({
+    id: '/archive',
+    path: '/archive',
+    getParentRoute: () => AuthenticatedSettingsSubscriptionsRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/budgeting': typeof BudgetingRoute
-  '/savings-spendings': typeof SavingsSpendingsRouteWithChildren
-  '/settings': typeof SettingsRouteWithChildren
-  '/statistics': typeof StatisticsRoute
-  '/transactions': typeof TransactionsRoute
-  '/savings-spendings/archive': typeof SavingsSpendingsArchiveRoute
-  '/settings/categories': typeof SettingsCategoriesRoute
-  '/settings/sources': typeof SettingsSourcesRoute
-  '/settings/subscriptions': typeof SettingsSubscriptionsRouteWithChildren
-  '/savings-spendings/': typeof SavingsSpendingsIndexRoute
-  '/settings/subscriptions/archive': typeof SettingsSubscriptionsArchiveRoute
-  '/settings/subscriptions/': typeof SettingsSubscriptionsIndexRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/login': typeof LoginRoute
+  '/budgeting': typeof AuthenticatedBudgetingRoute
+  '/savings-spendings': typeof AuthenticatedSavingsSpendingsRouteWithChildren
+  '/settings': typeof AuthenticatedSettingsRouteWithChildren
+  '/statistics': typeof AuthenticatedStatisticsRoute
+  '/transactions': typeof AuthenticatedTransactionsRoute
+  '/savings-spendings/archive': typeof AuthenticatedSavingsSpendingsArchiveRoute
+  '/settings/categories': typeof AuthenticatedSettingsCategoriesRoute
+  '/settings/sources': typeof AuthenticatedSettingsSourcesRoute
+  '/settings/subscriptions': typeof AuthenticatedSettingsSubscriptionsRouteWithChildren
+  '/settings/users': typeof AuthenticatedSettingsUsersRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/savings-spendings/': typeof AuthenticatedSavingsSpendingsIndexRoute
+  '/settings/subscriptions/archive': typeof AuthenticatedSettingsSubscriptionsArchiveRoute
+  '/settings/subscriptions/': typeof AuthenticatedSettingsSubscriptionsIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/budgeting': typeof BudgetingRoute
-  '/settings': typeof SettingsRouteWithChildren
-  '/statistics': typeof StatisticsRoute
-  '/transactions': typeof TransactionsRoute
-  '/savings-spendings/archive': typeof SavingsSpendingsArchiveRoute
-  '/settings/categories': typeof SettingsCategoriesRoute
-  '/settings/sources': typeof SettingsSourcesRoute
-  '/savings-spendings': typeof SavingsSpendingsIndexRoute
-  '/settings/subscriptions/archive': typeof SettingsSubscriptionsArchiveRoute
-  '/settings/subscriptions': typeof SettingsSubscriptionsIndexRoute
+  '/login': typeof LoginRoute
+  '/budgeting': typeof AuthenticatedBudgetingRoute
+  '/settings': typeof AuthenticatedSettingsRouteWithChildren
+  '/statistics': typeof AuthenticatedStatisticsRoute
+  '/transactions': typeof AuthenticatedTransactionsRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/savings-spendings/archive': typeof AuthenticatedSavingsSpendingsArchiveRoute
+  '/settings/categories': typeof AuthenticatedSettingsCategoriesRoute
+  '/settings/sources': typeof AuthenticatedSettingsSourcesRoute
+  '/settings/users': typeof AuthenticatedSettingsUsersRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/savings-spendings': typeof AuthenticatedSavingsSpendingsIndexRoute
+  '/settings/subscriptions/archive': typeof AuthenticatedSettingsSubscriptionsArchiveRoute
+  '/settings/subscriptions': typeof AuthenticatedSettingsSubscriptionsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/budgeting': typeof BudgetingRoute
-  '/savings-spendings': typeof SavingsSpendingsRouteWithChildren
-  '/settings': typeof SettingsRouteWithChildren
-  '/statistics': typeof StatisticsRoute
-  '/transactions': typeof TransactionsRoute
-  '/savings-spendings/archive': typeof SavingsSpendingsArchiveRoute
-  '/settings/categories': typeof SettingsCategoriesRoute
-  '/settings/sources': typeof SettingsSourcesRoute
-  '/settings/subscriptions': typeof SettingsSubscriptionsRouteWithChildren
-  '/savings-spendings/': typeof SavingsSpendingsIndexRoute
-  '/settings/subscriptions/archive': typeof SettingsSubscriptionsArchiveRoute
-  '/settings/subscriptions/': typeof SettingsSubscriptionsIndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/login': typeof LoginRoute
+  '/_authenticated/budgeting': typeof AuthenticatedBudgetingRoute
+  '/_authenticated/savings-spendings': typeof AuthenticatedSavingsSpendingsRouteWithChildren
+  '/_authenticated/settings': typeof AuthenticatedSettingsRouteWithChildren
+  '/_authenticated/statistics': typeof AuthenticatedStatisticsRoute
+  '/_authenticated/transactions': typeof AuthenticatedTransactionsRoute
+  '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/savings-spendings/archive': typeof AuthenticatedSavingsSpendingsArchiveRoute
+  '/_authenticated/settings/categories': typeof AuthenticatedSettingsCategoriesRoute
+  '/_authenticated/settings/sources': typeof AuthenticatedSettingsSourcesRoute
+  '/_authenticated/settings/subscriptions': typeof AuthenticatedSettingsSubscriptionsRouteWithChildren
+  '/_authenticated/settings/users': typeof AuthenticatedSettingsUsersRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/_authenticated/savings-spendings/': typeof AuthenticatedSavingsSpendingsIndexRoute
+  '/_authenticated/settings/subscriptions/archive': typeof AuthenticatedSettingsSubscriptionsArchiveRoute
+  '/_authenticated/settings/subscriptions/': typeof AuthenticatedSettingsSubscriptionsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/login'
     | '/budgeting'
     | '/savings-spendings'
     | '/settings'
@@ -148,195 +190,261 @@ export interface FileRouteTypes {
     | '/settings/categories'
     | '/settings/sources'
     | '/settings/subscriptions'
+    | '/settings/users'
+    | '/api/auth/$'
     | '/savings-spendings/'
     | '/settings/subscriptions/archive'
     | '/settings/subscriptions/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
+    | '/login'
     | '/budgeting'
     | '/settings'
     | '/statistics'
     | '/transactions'
+    | '/'
     | '/savings-spendings/archive'
     | '/settings/categories'
     | '/settings/sources'
+    | '/settings/users'
+    | '/api/auth/$'
     | '/savings-spendings'
     | '/settings/subscriptions/archive'
     | '/settings/subscriptions'
   id:
     | '__root__'
-    | '/'
-    | '/budgeting'
-    | '/savings-spendings'
-    | '/settings'
-    | '/statistics'
-    | '/transactions'
-    | '/savings-spendings/archive'
-    | '/settings/categories'
-    | '/settings/sources'
-    | '/settings/subscriptions'
-    | '/savings-spendings/'
-    | '/settings/subscriptions/archive'
-    | '/settings/subscriptions/'
+    | '/_authenticated'
+    | '/login'
+    | '/_authenticated/budgeting'
+    | '/_authenticated/savings-spendings'
+    | '/_authenticated/settings'
+    | '/_authenticated/statistics'
+    | '/_authenticated/transactions'
+    | '/_authenticated/'
+    | '/_authenticated/savings-spendings/archive'
+    | '/_authenticated/settings/categories'
+    | '/_authenticated/settings/sources'
+    | '/_authenticated/settings/subscriptions'
+    | '/_authenticated/settings/users'
+    | '/api/auth/$'
+    | '/_authenticated/savings-spendings/'
+    | '/_authenticated/settings/subscriptions/archive'
+    | '/_authenticated/settings/subscriptions/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  BudgetingRoute: typeof BudgetingRoute
-  SavingsSpendingsRoute: typeof SavingsSpendingsRouteWithChildren
-  SettingsRoute: typeof SettingsRouteWithChildren
-  StatisticsRoute: typeof StatisticsRoute
-  TransactionsRoute: typeof TransactionsRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/transactions': {
-      id: '/transactions'
-      path: '/transactions'
-      fullPath: '/transactions'
-      preLoaderRoute: typeof TransactionsRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/statistics': {
-      id: '/statistics'
-      path: '/statistics'
-      fullPath: '/statistics'
-      preLoaderRoute: typeof StatisticsRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/savings-spendings': {
-      id: '/savings-spendings'
-      path: '/savings-spendings'
-      fullPath: '/savings-spendings'
-      preLoaderRoute: typeof SavingsSpendingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/budgeting': {
-      id: '/budgeting'
-      path: '/budgeting'
-      fullPath: '/budgeting'
-      preLoaderRoute: typeof BudgetingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
+    '/_authenticated/': {
+      id: '/_authenticated/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/savings-spendings/': {
-      id: '/savings-spendings/'
+    '/_authenticated/transactions': {
+      id: '/_authenticated/transactions'
+      path: '/transactions'
+      fullPath: '/transactions'
+      preLoaderRoute: typeof AuthenticatedTransactionsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/statistics': {
+      id: '/_authenticated/statistics'
+      path: '/statistics'
+      fullPath: '/statistics'
+      preLoaderRoute: typeof AuthenticatedStatisticsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/savings-spendings': {
+      id: '/_authenticated/savings-spendings'
+      path: '/savings-spendings'
+      fullPath: '/savings-spendings'
+      preLoaderRoute: typeof AuthenticatedSavingsSpendingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/budgeting': {
+      id: '/_authenticated/budgeting'
+      path: '/budgeting'
+      fullPath: '/budgeting'
+      preLoaderRoute: typeof AuthenticatedBudgetingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/savings-spendings/': {
+      id: '/_authenticated/savings-spendings/'
       path: '/'
       fullPath: '/savings-spendings/'
-      preLoaderRoute: typeof SavingsSpendingsIndexRouteImport
-      parentRoute: typeof SavingsSpendingsRoute
+      preLoaderRoute: typeof AuthenticatedSavingsSpendingsIndexRouteImport
+      parentRoute: typeof AuthenticatedSavingsSpendingsRoute
     }
-    '/settings/subscriptions': {
-      id: '/settings/subscriptions'
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/settings/users': {
+      id: '/_authenticated/settings/users'
+      path: '/users'
+      fullPath: '/settings/users'
+      preLoaderRoute: typeof AuthenticatedSettingsUsersRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
+    '/_authenticated/settings/subscriptions': {
+      id: '/_authenticated/settings/subscriptions'
       path: '/subscriptions'
       fullPath: '/settings/subscriptions'
-      preLoaderRoute: typeof SettingsSubscriptionsRouteImport
-      parentRoute: typeof SettingsRoute
+      preLoaderRoute: typeof AuthenticatedSettingsSubscriptionsRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
     }
-    '/settings/sources': {
-      id: '/settings/sources'
+    '/_authenticated/settings/sources': {
+      id: '/_authenticated/settings/sources'
       path: '/sources'
       fullPath: '/settings/sources'
-      preLoaderRoute: typeof SettingsSourcesRouteImport
-      parentRoute: typeof SettingsRoute
+      preLoaderRoute: typeof AuthenticatedSettingsSourcesRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
     }
-    '/settings/categories': {
-      id: '/settings/categories'
+    '/_authenticated/settings/categories': {
+      id: '/_authenticated/settings/categories'
       path: '/categories'
       fullPath: '/settings/categories'
-      preLoaderRoute: typeof SettingsCategoriesRouteImport
-      parentRoute: typeof SettingsRoute
+      preLoaderRoute: typeof AuthenticatedSettingsCategoriesRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
     }
-    '/savings-spendings/archive': {
-      id: '/savings-spendings/archive'
+    '/_authenticated/savings-spendings/archive': {
+      id: '/_authenticated/savings-spendings/archive'
       path: '/archive'
       fullPath: '/savings-spendings/archive'
-      preLoaderRoute: typeof SavingsSpendingsArchiveRouteImport
-      parentRoute: typeof SavingsSpendingsRoute
+      preLoaderRoute: typeof AuthenticatedSavingsSpendingsArchiveRouteImport
+      parentRoute: typeof AuthenticatedSavingsSpendingsRoute
     }
-    '/settings/subscriptions/': {
-      id: '/settings/subscriptions/'
+    '/_authenticated/settings/subscriptions/': {
+      id: '/_authenticated/settings/subscriptions/'
       path: '/'
       fullPath: '/settings/subscriptions/'
-      preLoaderRoute: typeof SettingsSubscriptionsIndexRouteImport
-      parentRoute: typeof SettingsSubscriptionsRoute
+      preLoaderRoute: typeof AuthenticatedSettingsSubscriptionsIndexRouteImport
+      parentRoute: typeof AuthenticatedSettingsSubscriptionsRoute
     }
-    '/settings/subscriptions/archive': {
-      id: '/settings/subscriptions/archive'
+    '/_authenticated/settings/subscriptions/archive': {
+      id: '/_authenticated/settings/subscriptions/archive'
       path: '/archive'
       fullPath: '/settings/subscriptions/archive'
-      preLoaderRoute: typeof SettingsSubscriptionsArchiveRouteImport
-      parentRoute: typeof SettingsSubscriptionsRoute
+      preLoaderRoute: typeof AuthenticatedSettingsSubscriptionsArchiveRouteImport
+      parentRoute: typeof AuthenticatedSettingsSubscriptionsRoute
     }
   }
 }
 
-interface SavingsSpendingsRouteChildren {
-  SavingsSpendingsArchiveRoute: typeof SavingsSpendingsArchiveRoute
-  SavingsSpendingsIndexRoute: typeof SavingsSpendingsIndexRoute
+interface AuthenticatedSavingsSpendingsRouteChildren {
+  AuthenticatedSavingsSpendingsArchiveRoute: typeof AuthenticatedSavingsSpendingsArchiveRoute
+  AuthenticatedSavingsSpendingsIndexRoute: typeof AuthenticatedSavingsSpendingsIndexRoute
 }
 
-const SavingsSpendingsRouteChildren: SavingsSpendingsRouteChildren = {
-  SavingsSpendingsArchiveRoute: SavingsSpendingsArchiveRoute,
-  SavingsSpendingsIndexRoute: SavingsSpendingsIndexRoute,
-}
+const AuthenticatedSavingsSpendingsRouteChildren: AuthenticatedSavingsSpendingsRouteChildren =
+  {
+    AuthenticatedSavingsSpendingsArchiveRoute:
+      AuthenticatedSavingsSpendingsArchiveRoute,
+    AuthenticatedSavingsSpendingsIndexRoute:
+      AuthenticatedSavingsSpendingsIndexRoute,
+  }
 
-const SavingsSpendingsRouteWithChildren =
-  SavingsSpendingsRoute._addFileChildren(SavingsSpendingsRouteChildren)
-
-interface SettingsSubscriptionsRouteChildren {
-  SettingsSubscriptionsArchiveRoute: typeof SettingsSubscriptionsArchiveRoute
-  SettingsSubscriptionsIndexRoute: typeof SettingsSubscriptionsIndexRoute
-}
-
-const SettingsSubscriptionsRouteChildren: SettingsSubscriptionsRouteChildren = {
-  SettingsSubscriptionsArchiveRoute: SettingsSubscriptionsArchiveRoute,
-  SettingsSubscriptionsIndexRoute: SettingsSubscriptionsIndexRoute,
-}
-
-const SettingsSubscriptionsRouteWithChildren =
-  SettingsSubscriptionsRoute._addFileChildren(
-    SettingsSubscriptionsRouteChildren,
+const AuthenticatedSavingsSpendingsRouteWithChildren =
+  AuthenticatedSavingsSpendingsRoute._addFileChildren(
+    AuthenticatedSavingsSpendingsRouteChildren,
   )
 
-interface SettingsRouteChildren {
-  SettingsCategoriesRoute: typeof SettingsCategoriesRoute
-  SettingsSourcesRoute: typeof SettingsSourcesRoute
-  SettingsSubscriptionsRoute: typeof SettingsSubscriptionsRouteWithChildren
+interface AuthenticatedSettingsSubscriptionsRouteChildren {
+  AuthenticatedSettingsSubscriptionsArchiveRoute: typeof AuthenticatedSettingsSubscriptionsArchiveRoute
+  AuthenticatedSettingsSubscriptionsIndexRoute: typeof AuthenticatedSettingsSubscriptionsIndexRoute
 }
 
-const SettingsRouteChildren: SettingsRouteChildren = {
-  SettingsCategoriesRoute: SettingsCategoriesRoute,
-  SettingsSourcesRoute: SettingsSourcesRoute,
-  SettingsSubscriptionsRoute: SettingsSubscriptionsRouteWithChildren,
+const AuthenticatedSettingsSubscriptionsRouteChildren: AuthenticatedSettingsSubscriptionsRouteChildren =
+  {
+    AuthenticatedSettingsSubscriptionsArchiveRoute:
+      AuthenticatedSettingsSubscriptionsArchiveRoute,
+    AuthenticatedSettingsSubscriptionsIndexRoute:
+      AuthenticatedSettingsSubscriptionsIndexRoute,
+  }
+
+const AuthenticatedSettingsSubscriptionsRouteWithChildren =
+  AuthenticatedSettingsSubscriptionsRoute._addFileChildren(
+    AuthenticatedSettingsSubscriptionsRouteChildren,
+  )
+
+interface AuthenticatedSettingsRouteChildren {
+  AuthenticatedSettingsCategoriesRoute: typeof AuthenticatedSettingsCategoriesRoute
+  AuthenticatedSettingsSourcesRoute: typeof AuthenticatedSettingsSourcesRoute
+  AuthenticatedSettingsSubscriptionsRoute: typeof AuthenticatedSettingsSubscriptionsRouteWithChildren
+  AuthenticatedSettingsUsersRoute: typeof AuthenticatedSettingsUsersRoute
 }
 
-const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
-  SettingsRouteChildren,
+const AuthenticatedSettingsRouteChildren: AuthenticatedSettingsRouteChildren = {
+  AuthenticatedSettingsCategoriesRoute: AuthenticatedSettingsCategoriesRoute,
+  AuthenticatedSettingsSourcesRoute: AuthenticatedSettingsSourcesRoute,
+  AuthenticatedSettingsSubscriptionsRoute:
+    AuthenticatedSettingsSubscriptionsRouteWithChildren,
+  AuthenticatedSettingsUsersRoute: AuthenticatedSettingsUsersRoute,
+}
+
+const AuthenticatedSettingsRouteWithChildren =
+  AuthenticatedSettingsRoute._addFileChildren(
+    AuthenticatedSettingsRouteChildren,
+  )
+
+interface AuthenticatedRouteChildren {
+  AuthenticatedBudgetingRoute: typeof AuthenticatedBudgetingRoute
+  AuthenticatedSavingsSpendingsRoute: typeof AuthenticatedSavingsSpendingsRouteWithChildren
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRouteWithChildren
+  AuthenticatedStatisticsRoute: typeof AuthenticatedStatisticsRoute
+  AuthenticatedTransactionsRoute: typeof AuthenticatedTransactionsRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedBudgetingRoute: AuthenticatedBudgetingRoute,
+  AuthenticatedSavingsSpendingsRoute:
+    AuthenticatedSavingsSpendingsRouteWithChildren,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRouteWithChildren,
+  AuthenticatedStatisticsRoute: AuthenticatedStatisticsRoute,
+  AuthenticatedTransactionsRoute: AuthenticatedTransactionsRoute,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
 )
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  BudgetingRoute: BudgetingRoute,
-  SavingsSpendingsRoute: SavingsSpendingsRouteWithChildren,
-  SettingsRoute: SettingsRouteWithChildren,
-  StatisticsRoute: StatisticsRoute,
-  TransactionsRoute: TransactionsRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  LoginRoute: LoginRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

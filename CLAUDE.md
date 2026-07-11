@@ -44,6 +44,7 @@ Each feature has a dedicated documentation file at `src/features/{feature}/{FEAT
 - [Sources](src/features/sources/SOURCES.md)
 - [Subscriptions](src/features/subscriptions/SUBSCRIPTIONS.md)
 - [Saving Spendings](src/features/savingSpendings/SAVING_SPENDINGS.md)
+- [Project Users](src/features/projectUsers/PROJECT_USERS.md)
 
 ## Development
 
@@ -149,14 +150,15 @@ Required env vars (set on Vercel for production, in `.env` for local):
 
 Currently `distinctId` is hardcoded (matches the value used in `finances-t3` so events keep flowing under the same user). Replace it with the real session user id once auth is implemented.
 
-## Authentication
+## Authentication & Projects
 
-**Not yet implemented.** The `Expense` (and other) Prisma models have a required `userId` field, but no auth system is in place yet. Current workarounds:
+Auth is implemented via [Better Auth](https://better-auth.com) (`src/server/auth.ts`), self-hosted with a Prisma adapter — email/password (invite-only, no public sign-up) and Google OAuth (auto-links to an existing account by email match).
 
-- Read queries (e.g. `fetchTransactionsByYear`) do not filter by `userId` — they return all records.
-- Write mutations (e.g. `createTransaction`) use `prisma.user.findFirstOrThrow()` as a placeholder and mark the call with `// TODO: replace with actual user from auth`.
-
-When auth is added, all server functions will need to resolve the current user from the session and apply `where: { userId }` filters.
+- **`Project` is the ownership boundary, not `User`.** A `User` belongs to exactly one `Project` for life (`User.projectId`, no join table, no project switching). Every domain model (`Category`, `Source`, `SavingSpending`, `Subscription`, `Expense`, `Forecast`) has `projectId`, not `userId`. `ProjectSetting` (renamed from `UserSetting`) is 1:1 with `Project`.
+- **Every protected `createServerFn` must attach `.middleware([authMiddleware])`** (`src/middlewares/authMiddleware.ts`) explicitly — a route's `beforeLoad` guard only protects the UI, never the underlying RPC (server functions are directly callable regardless of which route renders them). The middleware resolves the session and injects `{ userId, projectId, role }` into `context`; handlers filter/stamp all Prisma calls with `context.projectId`.
+- **Single-row `update`/`delete` calls** (`prisma.<model>.update/delete({ where: { id } })`) can't fold `projectId` into that `where` clause (Prisma only accepts unique fields there). Use `assertOwnedByProject` (`~/shared/utils/assertOwnedByProject`) as a guard before the call — it throws if the row's `projectId` doesn't match the caller's.
+- **`role` (`user`/`admin`) only gates the project-users page** (`/settings/users`, admin-only via `adminMiddleware`) — every other feature is equally accessible to any project member regardless of role. See [Project Users](src/features/projectUsers/PROJECT_USERS.md).
+- **Bootstrapping a new environment** (fresh `Project` + first admin `User` + `ProjectSetting`) is done via the gitignored `scripts/bootstrap-project.ts`, never through the UI (sign-up is closed). Migrating an existing pre-auth database (real data, no `Project` yet) uses `scripts/migrate-legacy-db.ts` instead — see that file's header comment.
 
 ## Notes
 
