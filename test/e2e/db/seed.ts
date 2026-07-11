@@ -1,10 +1,16 @@
+import type { TestCookie } from 'better-auth/plugins';
+
 import { TODAY_MONTH, TODAY_YEAR } from '../../../src/shared/utils/today';
 import { testPrisma } from './client';
+import { testAuth } from './testAuth';
 
 export const TEST_USER_ID = 'test-user';
+export const TEST_PROJECT_ID = 'test-project';
 
 export interface SeedData {
   userId: string;
+  projectId: string;
+  sessionCookies: TestCookie[];
   categoryIds: {
     продукты: number;
     транспорт: number;
@@ -48,8 +54,22 @@ export interface SeedData {
 }
 
 export async function seed(): Promise<SeedData> {
-  const user = await testPrisma.user.create({
-    data: { id: TEST_USER_ID },
+  const project = await testPrisma.project.create({
+    data: { id: TEST_PROJECT_ID, name: 'E2E Test Project' },
+  });
+
+  const ctx = await testAuth.$context;
+  const user = ctx.test.createUser({
+    id: TEST_USER_ID,
+    email: 'test-admin@example.com',
+    name: 'Test Admin',
+    projectId: project.id,
+    role: 'admin',
+    emailVerified: true,
+  });
+  await ctx.test.saveUser(user);
+  const { cookies: sessionCookies } = await ctx.test.login({
+    userId: user.id,
   });
 
   // Categories
@@ -59,7 +79,7 @@ export async function seed(): Promise<SeedData> {
       shortname: 'Продукты',
       isIncome: false,
       isContinuous: false,
-      userId: user.id,
+      projectId: project.id,
     },
   });
   const рынок = await testPrisma.subcategory.create({
@@ -72,7 +92,7 @@ export async function seed(): Promise<SeedData> {
       shortname: 'Транспорт',
       isIncome: false,
       isContinuous: false,
-      userId: user.id,
+      projectId: project.id,
     },
   });
   const такси = await testPrisma.subcategory.create({
@@ -85,7 +105,7 @@ export async function seed(): Promise<SeedData> {
       shortname: 'Развлечения',
       isIncome: false,
       isContinuous: false,
-      userId: user.id,
+      projectId: project.id,
     },
   });
 
@@ -96,7 +116,7 @@ export async function seed(): Promise<SeedData> {
       isIncome: false,
       isContinuous: false,
       type: 'FROM_SAVINGS',
-      userId: user.id,
+      projectId: project.id,
     },
   });
 
@@ -107,7 +127,7 @@ export async function seed(): Promise<SeedData> {
       isIncome: false,
       isContinuous: false,
       type: 'TO_SAVINGS',
-      userId: user.id,
+      projectId: project.id,
     },
   });
 
@@ -117,7 +137,7 @@ export async function seed(): Promise<SeedData> {
       shortname: 'Зарплата',
       isIncome: true,
       isContinuous: false,
-      userId: user.id,
+      projectId: project.id,
     },
   });
   const основная = await testPrisma.subcategory.create({
@@ -135,12 +155,12 @@ export async function seed(): Promise<SeedData> {
 
   // Source
   const vivid = await testPrisma.source.create({
-    data: { name: 'Vivid', parser: 'VIVID', userId: user.id },
+    data: { name: 'Vivid', parser: 'VIVID', projectId: project.id },
   });
 
-  await testPrisma.userSetting.create({
+  await testPrisma.projectSetting.create({
     data: {
-      userId: user.id,
+      projectId: project.id,
       expenseCategoriesOrder: expenseCategories.map((c) => c.id),
       incomeCategoriesOrder: incomeCategories.map((c) => c.id),
       sourcesOrder: [vivid.id],
@@ -157,7 +177,7 @@ export async function seed(): Promise<SeedData> {
       period: 1,
       firstDate: new Date('2024-01-01'),
       active: true,
-      userId: user.id,
+      projectId: project.id,
     },
   });
 
@@ -172,7 +192,7 @@ export async function seed(): Promise<SeedData> {
       period: 3,
       firstDate: new Date('2024-03-01'),
       active: true,
-      userId: user.id,
+      projectId: project.id,
     },
   });
 
@@ -186,7 +206,7 @@ export async function seed(): Promise<SeedData> {
       period: 1,
       firstDate: new Date('2024-01-01'),
       active: false,
-      userId: user.id,
+      projectId: project.id,
     },
   });
 
@@ -201,7 +221,7 @@ export async function seed(): Promise<SeedData> {
       period: 1,
       firstDate: new Date('2024-01-01'),
       active: true,
-      userId: user.id,
+      projectId: project.id,
     },
   });
 
@@ -215,7 +235,7 @@ export async function seed(): Promise<SeedData> {
       year: TODAY_YEAR,
       sum: 100,
       comment: '',
-      userId: user.id,
+      projectId: project.id,
     },
   });
 
@@ -235,7 +255,7 @@ export async function seed(): Promise<SeedData> {
       date: new Date(`${TODAY_YEAR}-${currentMonthStr}-01T12:00:00.000Z`),
       categoryId: транспорт.id,
       subcategoryId: null,
-      userId: user.id,
+      projectId: project.id,
     },
   });
 
@@ -246,7 +266,7 @@ export async function seed(): Promise<SeedData> {
       date: new Date(`${lastMonthYear}-${lastMonthStr}-01T12:00:00.000Z`),
       categoryId: транспорт.id,
       subcategoryId: null,
-      userId: user.id,
+      projectId: project.id,
     },
   });
 
@@ -254,7 +274,7 @@ export async function seed(): Promise<SeedData> {
     data: {
       name: 'Отпуск Рим 2025',
       completed: false,
-      userId: user.id,
+      projectId: project.id,
       categories: {
         create: [{ name: 'Общее', forecast: 0, comment: '' }],
       },
@@ -266,7 +286,7 @@ export async function seed(): Promise<SeedData> {
     data: {
       name: 'Переезд 2026',
       completed: false,
-      userId: user.id,
+      projectId: project.id,
       categories: {
         create: [
           { name: 'Залог', forecast: 0, comment: '' },
@@ -281,7 +301,7 @@ export async function seed(): Promise<SeedData> {
     data: {
       name: 'Новый телевизор',
       completed: true,
-      userId: user.id,
+      projectId: project.id,
       categories: {
         create: [{ name: 'Электроника', forecast: 0, comment: '' }],
       },
@@ -291,6 +311,8 @@ export async function seed(): Promise<SeedData> {
 
   return {
     userId: user.id,
+    projectId: project.id,
+    sessionCookies,
     categoryIds: {
       продукты: продукты.id,
       транспорт: транспорт.id,

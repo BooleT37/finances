@@ -12,7 +12,10 @@ export async function resetDb(): Promise<SeedData> {
   await testPrisma.source.deleteMany();
   await testPrisma.subcategory.deleteMany();
   await testPrisma.category.deleteMany();
-  await testPrisma.userSetting.deleteMany();
+  await testPrisma.projectSetting.deleteMany();
+  await testPrisma.session.deleteMany();
+  await testPrisma.account.deleteMany();
   await testPrisma.user.deleteMany();
+  await testPrisma.project.deleteMany();
   return seed();
 }

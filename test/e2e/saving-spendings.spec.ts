@@ -89,7 +89,7 @@ test.describe('Saving Spendings', () => {
           date: new Date('2022-06-01T12:00:00Z'),
           categoryId: seedData.categoryIds.изСбережений,
           savingSpendingCategoryId: seedData.savingSpendingCategoryIds.залог,
-          userId: seedData.userId,
+          projectId: seedData.projectId,
         },
         {
           name: 'Залог 2023',
@@ -97,7 +97,7 @@ test.describe('Saving Spendings', () => {
           date: new Date('2023-06-01T12:00:00Z'),
           categoryId: seedData.categoryIds.изСбережений,
           savingSpendingCategoryId: seedData.savingSpendingCategoryIds.залог,
-          userId: seedData.userId,
+          projectId: seedData.projectId,
         },
         {
           name: 'Залог 2024',
@@ -105,7 +105,7 @@ test.describe('Saving Spendings', () => {
           date: new Date('2024-06-01T12:00:00Z'),
           categoryId: seedData.categoryIds.изСбережений,
           savingSpendingCategoryId: seedData.savingSpendingCategoryIds.залог,
-          userId: seedData.userId,
+          projectId: seedData.projectId,
         },
         {
           name: 'Транспорт 2022',
@@ -114,7 +114,7 @@ test.describe('Saving Spendings', () => {
           categoryId: seedData.categoryIds.изСбережений,
           savingSpendingCategoryId:
             seedData.savingSpendingCategoryIds.транспорт,
-          userId: seedData.userId,
+          projectId: seedData.projectId,
         },
         {
           name: 'Транспорт 2024',
@@ -123,7 +123,7 @@ test.describe('Saving Spendings', () => {
           categoryId: seedData.categoryIds.изСбережений,
           savingSpendingCategoryId:
             seedData.savingSpendingCategoryIds.транспорт,
-          userId: seedData.userId,
+          projectId: seedData.projectId,
         },
       ],
     });
@@ -229,7 +229,7 @@ test.describe('Saving Spendings', () => {
         date: new Date('2024-01-15T12:00:00Z'),
         categoryId: seedData.categoryIds.изСбережений,
         savingSpendingCategoryId: seedData.savingSpendingCategoryIds.залог,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
       },
     });
 

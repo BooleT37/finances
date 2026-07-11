@@ -310,7 +310,7 @@ test.describe('Transaction components', () => {
         cost: 100,
         date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
         categoryId: seedData.categoryIds.продукты,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
         components: {
           create: [
             {
@@ -388,7 +388,7 @@ test.describe('Transaction components', () => {
         cost: 100,
         date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
         categoryId: seedData.categoryIds.продукты,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
         components: {
           create: [
             {
@@ -443,7 +443,7 @@ test.describe('Transaction editing', () => {
         cost: 50, // positive income cost
         date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
         categoryId: seedData.categoryIds.зарплата,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
       },
     });
     await page.goto('/transactions');
@@ -481,7 +481,7 @@ test.describe('Transaction editing', () => {
         cost: -50,
         date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
         categoryId: seedData.categoryIds.продукты,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
       },
     });
     await page.goto('/transactions');
@@ -537,7 +537,7 @@ test.describe('Transaction editing', () => {
         date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
         categoryId: seedData.categoryIds.продукты,
         sourceId: seedData.sourceIds.вивид,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
       },
     });
     await page.goto('/transactions');
@@ -600,7 +600,7 @@ test.describe('Inline cell editing', () => {
         // Date.UTC pins it to the exact intended day regardless of TZ.
         date: new Date(Date.UTC(TODAY_YEAR, TODAY_MONTH, TODAY_DAY)),
         categoryId: seedData.categoryIds.продукты,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
       },
     });
     await page.goto('/transactions');
@@ -675,7 +675,7 @@ test.describe('Inline cell editing', () => {
         cost: -40,
         date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
         categoryId: seedData.categoryIds.продукты,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
       },
     });
     await page.goto('/transactions');
@@ -705,7 +705,7 @@ test.describe('Inline cell editing', () => {
         cost: 100,
         date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
         categoryId: seedData.categoryIds.продукты,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
         components: {
           create: [
             {
@@ -782,7 +782,7 @@ test.describe('Subscriptions', () => {
         period: 1,
         firstDate: new Date(TODAY_YEAR, TODAY_MONTH, 1),
         active: true,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
       },
     });
     await page.goto('/transactions');
@@ -826,7 +826,7 @@ test.describe('Subscriptions', () => {
         period: 1,
         firstDate: new Date(TODAY_YEAR, TODAY_MONTH, 1),
         active: true,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
       },
     });
     await page.goto('/transactions');
@@ -864,7 +864,7 @@ test.describe('Subscriptions', () => {
         period: 1,
         firstDate,
         active: true,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
       },
     });
     await testPrisma.subscription.create({
@@ -876,7 +876,7 @@ test.describe('Subscriptions', () => {
         period: 1,
         firstDate,
         active: true,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
       },
     });
     await testPrisma.expense.create({
@@ -887,7 +887,7 @@ test.describe('Subscriptions', () => {
         categoryId: seedData.categoryIds.развлечения,
         sourceId: seedData.sourceIds.вивид,
         subscriptionId: sub1.id,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
       },
     });
     await page.goto('/transactions');
@@ -929,7 +929,7 @@ test.describe('Subscriptions', () => {
         cost: -50,
         date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
         categoryId: seedData.categoryIds.развлечения,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
       },
     });
     await testPrisma.subscription.create({
@@ -941,7 +941,7 @@ test.describe('Subscriptions', () => {
         period: 1,
         firstDate,
         active: true,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
       },
     });
     await page.goto('/transactions');
@@ -1053,7 +1053,7 @@ test.describe('Subscriptions', () => {
 
     // Verify the subscription was actually created in the DB
     const created = await testPrisma.subscription.findFirst({
-      where: { name: 'Спотифай', userId: seedData.userId },
+      where: { name: 'Спотифай', projectId: seedData.projectId },
     });
     expect(created).not.toBeNull();
     expect(created?.categoryId).toBe(seedData.categoryIds.развлечения);
@@ -1134,7 +1134,7 @@ test.describe('Subscriptions', () => {
 
     // Clean up
     await testPrisma.subscription.deleteMany({
-      where: { name: 'Яндекс Музыка', userId: seedData.userId },
+      where: { name: 'Яндекс Музыка', projectId: seedData.projectId },
     });
   });
 
@@ -1155,7 +1155,7 @@ test.describe('Subscriptions', () => {
         period: 1,
         firstDate: new Date(Date.UTC(TODAY_YEAR, TODAY_MONTH, 5)),
         active: true,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
       },
     });
     await page.goto('/transactions');
@@ -1220,7 +1220,7 @@ test.describe('Subscriptions', () => {
         period: 1,
         firstDate,
         active: true,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
       },
     });
     await page.goto('/transactions');
@@ -1266,7 +1266,7 @@ test.describe('Subscriptions', () => {
 
     // Confirm no transaction was created in the DB
     const created = await testPrisma.expense.findFirst({
-      where: { name: 'Спотифай', userId: seedData.userId },
+      where: { name: 'Спотифай', projectId: seedData.projectId },
     });
     expect(created).toBeNull();
   });
@@ -1285,7 +1285,7 @@ test.describe('Subscriptions', () => {
         period: 1,
         firstDate,
         active: true,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
       },
     });
     await page.goto('/transactions');
@@ -1346,7 +1346,7 @@ test.describe('Saving spendings', () => {
         date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
         categoryId: seedData.categoryIds.изСбережений,
         savingSpendingCategoryId: seedData.savingSpendingCategoryIds.общее,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
       },
     });
     await testPrisma.expense.create({
@@ -1355,7 +1355,7 @@ test.describe('Saving spendings', () => {
         cost: -50,
         date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
         categoryId: seedData.categoryIds.продукты,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
       },
     });
     await page.goto('/transactions');
@@ -1465,7 +1465,7 @@ test.describe('Saving spendings', () => {
         categoryId: seedData.categoryIds.изСбережений,
         savingSpendingCategoryId:
           seedData.savingSpendingCategoryIds.электроника,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
       },
     });
     await page.goto('/transactions');
@@ -1517,7 +1517,7 @@ test.describe('Saving spendings', () => {
         date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
         categoryId: seedData.categoryIds.изСбережений,
         savingSpendingCategoryId: seedData.savingSpendingCategoryIds.общее,
-        userId: seedData.userId,
+        projectId: seedData.projectId,
       },
     });
     await page.goto('/transactions');

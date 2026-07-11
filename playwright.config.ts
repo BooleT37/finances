@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-import { TEST_DB_URL } from './test/e2e/db/client';
+import { TEST_BETTER_AUTH_SECRET, TEST_DB_URL } from './test/e2e/db/client';
 
 export default defineConfig({
   testDir: './test/e2e',
@@ -25,6 +25,11 @@ export default defineConfig({
     command: 'npm run dev -- --port 3001',
     url: 'http://localhost:3001',
     reuseExistingServer: false, // always fresh — tests must use the test DB, not the dev DB
-    env: { DATABASE_URL: TEST_DB_URL, NODE_ENV: 'test' },
+    env: {
+      DATABASE_URL: TEST_DB_URL,
+      NODE_ENV: 'test',
+      BETTER_AUTH_SECRET: TEST_BETTER_AUTH_SECRET,
+      BETTER_AUTH_URL: 'http://localhost:3001',
+    },
   },
 });
