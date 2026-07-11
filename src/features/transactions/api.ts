@@ -2,8 +2,10 @@ import { createServerFn } from '@tanstack/react-start';
 import dayjs from 'dayjs';
 import Decimal from 'decimal.js';
 
+import { authMiddleware } from '~/middlewares/authMiddleware';
 import { prisma } from '~/server/db';
 import { adaptCost } from '~/shared/utils/adaptCost';
+import { assertOwnedByProject } from '~/shared/utils/assertOwnedByProject';
 
 import {
   type ImportTransactionsInput,
@@ -18,10 +20,12 @@ import {
 } from './schema';
 
 export const fetchTransactionsByYear = createServerFn({ method: 'GET' })
+  .middleware([authMiddleware])
   .inputValidator((year: number) => year)
-  .handler(async ({ data: year }) => {
+  .handler(async ({ data: year, context }) => {
     const transactions = await prisma.expense.findMany({
       where: {
+        projectId: context.projectId,
         date: {
           gte: new Date(`${year}-01-01`),
           lt: new Date(`${year + 1}-01-01`),
@@ -48,15 +52,12 @@ export const fetchTransactionsByYear = createServerFn({ method: 'GET' })
     );
   });
 
-// TODO: replace userId with actual user from auth once auth is implemented
 export const createTransaction = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .inputValidator((input: NewTransactionInput) =>
     newTransactionSchema.parse(input),
   )
-  .handler(async ({ data }) => {
-    // TODO: replace with actual user from auth
-    const user = await prisma.user.findFirstOrThrow();
-
+  .handler(async ({ data, context }) => {
     const tx = await prisma.expense.create({
       data: {
         name: data.name,
@@ -68,7 +69,7 @@ export const createTransaction = createServerFn({ method: 'POST' })
         sourceId: data.sourceId ?? null,
         subscriptionId: data.subscriptionId ?? null,
         savingSpendingCategoryId: data.savingSpendingCategoryId ?? null,
-        userId: user.id,
+        projectId: context.projectId,
         components: data.components?.length
           ? {
               createMany: {
@@ -101,17 +102,32 @@ export const createTransaction = createServerFn({ method: 'POST' })
   });
 
 export const deleteTransaction = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .inputValidator((id: number) => id)
-  .handler(async ({ data: id }) => {
+  .handler(async ({ data: id, context }) => {
+    await assertOwnedByProject(
+      prisma.expense,
+      id,
+      context.projectId,
+      'Transaction',
+    );
     await prisma.expense.delete({ where: { id } });
   });
 
 export const updateTransaction = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .inputValidator((input: UpdateTransactionInput) =>
     updateTransactionSchema.parse(input),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const { id, components, ...fields } = data;
+
+    await assertOwnedByProject(
+      prisma.expense,
+      id,
+      context.projectId,
+      'Transaction',
+    );
 
     const keptIds = components
       ?.filter((c) => c.id !== undefined)
@@ -194,6 +210,7 @@ export const updateTransaction = createServerFn({ method: 'POST' })
   });
 
 export const parsePdfExpenses = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .inputValidator((input: ParsePdfExpensesInput) =>
     parsePdfExpensesSchema.parse(input),
   )
@@ -247,11 +264,11 @@ export const parsePdfExpenses = createServerFn({ method: 'POST' })
   });
 
 export const importTransactions = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .inputValidator((input: ImportTransactionsInput) =>
     importTransactionsSchema.parse(input),
   )
-  .handler(async ({ data }) => {
-    const user = await prisma.user.findFirstOrThrow();
+  .handler(async ({ data, context }) => {
     const created = await prisma.expense.createManyAndReturn({
       data: data.map((item) => ({
         name: item.name,
@@ -262,7 +279,7 @@ export const importTransactions = createServerFn({ method: 'POST' })
         subscriptionId: item.subscriptionId ?? null,
         sourceId: item.sourceId,
         peHash: item.peHash,
-        userId: user.id,
+        projectId: context.projectId,
       })),
       include: { category: true },
     });

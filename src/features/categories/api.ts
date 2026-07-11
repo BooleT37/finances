@@ -1,6 +1,8 @@
 import { createServerFn } from '@tanstack/react-start';
 
+import { authMiddleware } from '~/middlewares/authMiddleware';
 import { prisma } from '~/server/db';
+import { assertOwnedByProject } from '~/shared/utils/assertOwnedByProject';
 
 import {
   categorySchema,
@@ -12,24 +14,23 @@ import {
   updateCategorySchema,
 } from './schema';
 
-export const fetchAllCategories = createServerFn({ method: 'GET' }).handler(
-  async () => {
+export const fetchAllCategories = createServerFn({ method: 'GET' })
+  .middleware([authMiddleware])
+  .handler(async ({ context }) => {
     const categories = await prisma.category.findMany({
+      where: { projectId: context.projectId },
       orderBy: { name: 'asc' },
       include: { subcategories: { orderBy: { id: 'asc' } } },
     });
     return categories.map((c) => categorySchema.encode(c));
-  },
-);
+  });
 
-// TODO: replace userId with actual user from auth once auth is implemented
 export const createCategory = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .inputValidator((input: CreateCategoryInput) =>
     createCategorySchema.parse(input),
   )
-  .handler(async ({ data }) => {
-    const user = await prisma.user.findFirstOrThrow();
-
+  .handler(async ({ data, context }) => {
     const category = await prisma.category.create({
       data: {
         name: data.name,
@@ -37,7 +38,7 @@ export const createCategory = createServerFn({ method: 'POST' })
         icon: data.icon,
         isIncome: data.isIncome,
         isContinuous: data.isContinuous,
-        userId: user.id,
+        projectId: context.projectId,
         subcategories: {
           createMany: {
             data: data.subcategories.map((s) => ({ name: s.name })),
@@ -47,8 +48,8 @@ export const createCategory = createServerFn({ method: 'POST' })
       include: { subcategories: { orderBy: { id: 'asc' } } },
     });
 
-    const settings = await prisma.userSetting.findFirst({
-      where: { userId: user.id },
+    const settings = await prisma.projectSetting.findFirst({
+      where: { projectId: context.projectId },
     });
     if (settings) {
       const orderField = data.isIncome
@@ -57,8 +58,8 @@ export const createCategory = createServerFn({ method: 'POST' })
       const currentOrder = data.isIncome
         ? settings.incomeCategoriesOrder
         : settings.expenseCategoriesOrder;
-      await prisma.userSetting.update({
-        where: { userId: user.id },
+      await prisma.projectSetting.update({
+        where: { projectId: context.projectId },
         data: { [orderField]: [...currentOrder, category.id] },
       });
     }
@@ -67,11 +68,19 @@ export const createCategory = createServerFn({ method: 'POST' })
   });
 
 export const updateCategory = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .inputValidator((input: UpdateCategoryInput) =>
     updateCategorySchema.parse(input),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const { id, subcategories, ...fields } = data;
+
+    await assertOwnedByProject(
+      prisma.category,
+      id,
+      context.projectId,
+      'Category',
+    );
 
     const existingIds = subcategories
       .filter((s) => s.id !== undefined)
@@ -105,24 +114,32 @@ export const updateCategory = createServerFn({ method: 'POST' })
   });
 
 export const updateCategoryOrder = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .inputValidator((input: UpdateCategoryOrderInput) =>
     updateCategoryOrderSchema.parse(input),
   )
-  .handler(async ({ data }) => {
-    const user = await prisma.user.findFirstOrThrow();
+  .handler(async ({ data, context }) => {
     const orderField = data.isIncome
       ? 'incomeCategoriesOrder'
       : 'expenseCategoriesOrder';
-    await prisma.userSetting.upsert({
-      where: { userId: user.id },
-      create: { userId: user.id, [orderField]: data.categoryIds },
+    await prisma.projectSetting.upsert({
+      where: { projectId: context.projectId },
+      create: { projectId: context.projectId, [orderField]: data.categoryIds },
       update: { [orderField]: data.categoryIds },
     });
   });
 
 export const deleteCategory = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .inputValidator((id: number) => id)
-  .handler(async ({ data: id }) => {
+  .handler(async ({ data: id, context }) => {
+    await assertOwnedByProject(
+      prisma.category,
+      id,
+      context.projectId,
+      'Category',
+    );
+
     await prisma.$transaction(async (tx) => {
       const category = await tx.category.findUniqueOrThrow({ where: { id } });
 
@@ -133,9 +150,8 @@ export const deleteCategory = createServerFn({ method: 'POST' })
       await tx.category.delete({ where: { id } });
 
       // Remove from the order array
-      const user = await tx.user.findFirstOrThrow();
-      const settings = await tx.userSetting.findFirst({
-        where: { userId: user.id },
+      const settings = await tx.projectSetting.findFirst({
+        where: { projectId: context.projectId },
       });
       if (settings) {
         const orderField = category.isIncome
@@ -144,8 +160,8 @@ export const deleteCategory = createServerFn({ method: 'POST' })
         const currentOrder = category.isIncome
           ? settings.incomeCategoriesOrder
           : settings.expenseCategoriesOrder;
-        await tx.userSetting.update({
-          where: { userId: user.id },
+        await tx.projectSetting.update({
+          where: { projectId: context.projectId },
           data: {
             [orderField]: currentOrder.filter((cId: number) => cId !== id),
           },
