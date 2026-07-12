@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --port 3002",
     "build": "prisma generate && vite build",
-    "vercel-build": "npm run db:migrate && npm run test:unit && npm run build",
+    "vercel-build": "npm run db:migrate && npm run db:generate && npm run test:unit && npm run build",
     "start": "node .output/server/index.mjs",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate deploy",
