@@ -50,6 +50,7 @@ export default defineConfig(
       'src/generated/**',
       'test/e2e/**',
       '*.cjs',
+      'scripts/**',
     ],
   },
 );
