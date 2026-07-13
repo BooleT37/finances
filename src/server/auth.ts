@@ -8,15 +8,24 @@ import { prisma } from '~/server/db';
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
   secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: process.env.BETTER_AUTH_URL,
+  // On Vercel (`VERCEL` is set for every deployment — preview or
+  // production), derive the base URL from each incoming request's host
+  // instead of a fixed value: every branch/PR gets its own unique
+  // *.vercel.app hostname, so a static BETTER_AUTH_URL would only ever match
+  // one of them. This also auto-populates trustedOrigins with the same
+  // wildcard (see getTrustedOrigins in better-auth's context helpers), so no
+  // separate trustedOrigins entry is needed for Vercel. Locally, fall back
+  // to a plain string from .env.
+  baseURL: process.env.VERCEL
+    ? { allowedHosts: ['*.vercel.app'], protocol: 'https' as const }
+    : process.env.BETTER_AUTH_URL,
   // Dev runs the app on different ports depending on how it's launched
   // (`npm run dev` defaults to 3002; the Claude Code preview tool uses
   // whatever port is set in .claude/launch.json, currently 3010) — trust
   // both so login doesn't break depending on which one is used.
-  trustedOrigins:
-    process.env.NODE_ENV === 'production'
-      ? undefined
-      : ['http://localhost:3002', 'http://localhost:3010'],
+  trustedOrigins: process.env.VERCEL
+    ? undefined
+    : ['http://localhost:3002', 'http://localhost:3010'],
   emailAndPassword: {
     enabled: true,
     // Sign-up is invite-only: an admin creates accounts via the admin plugin's
