@@ -6,6 +6,10 @@ import { PrismaClient } from '../../../src/generated/prisma/client';
 export const TEST_DB_URL =
   'postgresql://postgres:postgres@localhost:5435/finances_test';
 
+// Shared by playwright.config.ts's webServer config and testAuth.ts below —
+// both need the same origin the actual test server runs on.
+export const TEST_BASE_URL = 'http://localhost:3001';
+
 // Shared between the webServer's Better Auth instance (src/server/auth.ts,
 // via playwright.config.ts's webServer.env) and the test-only instance used
 // to mint sessions in db/seed.ts — both must sign with the same secret for
