@@ -17,7 +17,7 @@ export function AppHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { t } = useTranslation('nav');
   const navigate = useNavigate();
-  const { session } = useRouteContext({ from: '/_authenticated' });
+  const { session, queryClient } = useRouteContext({ from: '/_authenticated' });
 
   const showNavigator =
     pathname === '/transactions' || pathname === '/budgeting';
@@ -26,6 +26,10 @@ export function AppHeader() {
 
   async function handleSignOut() {
     await authClient.signOut();
+    // Query keys aren't scoped by project, so cached data from this session
+    // would otherwise survive into the next user's session if they sign in
+    // in the same tab without a full page reload.
+    queryClient.clear();
     void navigate({ to: '/login' });
   }
 
