@@ -2,7 +2,7 @@ import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { admin, testUtils } from 'better-auth/plugins';
 
-import { TEST_BETTER_AUTH_SECRET, testPrisma } from './client';
+import { TEST_BASE_URL, TEST_BETTER_AUTH_SECRET, testPrisma } from './client';
 
 // Separate test-only Better Auth instance (per Better Auth's own testUtils
 // docs) so `ctx.test` stays typed without adding the plugin to the real
@@ -16,6 +16,7 @@ import { TEST_BETTER_AUTH_SECRET, testPrisma } from './client';
 export const testAuth = betterAuth({
   database: prismaAdapter(testPrisma, { provider: 'postgresql' }),
   secret: TEST_BETTER_AUTH_SECRET,
+  baseURL: TEST_BASE_URL,
   emailAndPassword: {
     enabled: true,
     disableSignUp: true,
