@@ -31,7 +31,17 @@ export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL:
     allowedHosts && allowedHosts.length > 0
-      ? { allowedHosts, protocol: 'auto' as const }
+      ? {
+          allowedHosts,
+          protocol: 'auto' as const,
+          // Scripts (bootstrap-project.ts, reset-password.ts) call auth.api.*
+          // with no request/headers at all, so there's no host to derive a
+          // baseURL from. Better Auth requires either a source or a fallback
+          // for dynamic baseURL configs; this value is never surfaced to a
+          // real HTTP request (those always carry a Host header matched
+          // against allowedHosts above).
+          fallback: 'http://localhost',
+        }
       : process.env.BETTER_AUTH_URL,
   emailAndPassword: {
     enabled: true,
