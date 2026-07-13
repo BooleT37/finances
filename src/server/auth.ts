@@ -5,27 +5,35 @@ import { tanstackStartCookies } from 'better-auth/tanstack-start';
 
 import { prisma } from '~/server/db';
 
+// Preview-only escape hatch: every branch/PR deployment gets a unique
+// *.vercel.app hostname, so a static BETTER_AUTH_URL would only ever match
+// one of them. Set BETTER_AUTH_ALLOWED_HOSTS (comma-separated wildcard host
+// patterns, e.g. "*.vercel.app") on Vercel's Preview environment ONLY —
+// never on Production — to derive the base URL from each incoming request's
+// host instead, validated against this allowlist. This also auto-populates
+// trustedOrigins with the same wildcard (see getTrustedOrigins in
+// better-auth's context helpers), so no separate trustedOrigins entry is
+// needed for it. Leave this unset on Production and locally: both use a
+// plain BETTER_AUTH_URL string instead.
+const allowedHosts = process.env.BETTER_AUTH_ALLOWED_HOSTS?.split(',')
+  .map((host) => host.trim())
+  .filter(Boolean);
+
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
   secret: process.env.BETTER_AUTH_SECRET,
-  // On Vercel (`VERCEL` is set for every deployment — preview or
-  // production), derive the base URL from each incoming request's host
-  // instead of a fixed value: every branch/PR gets its own unique
-  // *.vercel.app hostname, so a static BETTER_AUTH_URL would only ever match
-  // one of them. This also auto-populates trustedOrigins with the same
-  // wildcard (see getTrustedOrigins in better-auth's context helpers), so no
-  // separate trustedOrigins entry is needed for Vercel. Locally, fall back
-  // to a plain string from .env.
-  baseURL: process.env.VERCEL
-    ? { allowedHosts: ['*.vercel.app'], protocol: 'https' as const }
-    : process.env.BETTER_AUTH_URL,
+  baseURL:
+    allowedHosts && allowedHosts.length > 0
+      ? { allowedHosts, protocol: 'https' as const }
+      : process.env.BETTER_AUTH_URL,
   // Dev runs the app on different ports depending on how it's launched
   // (`npm run dev` defaults to 3002; the Claude Code preview tool uses
   // whatever port is set in .claude/launch.json, currently 3010) — trust
-  // both so login doesn't break depending on which one is used.
-  trustedOrigins: process.env.VERCEL
-    ? undefined
-    : ['http://localhost:3002', 'http://localhost:3010'],
+  // both so login doesn't break depending on which one is used. Only set
+  // BETTER_AUTH_TRUST_LOCALHOST in local .env — never on Vercel.
+  trustedOrigins: process.env.BETTER_AUTH_TRUST_LOCALHOST
+    ? ['http://localhost:3002', 'http://localhost:3010']
+    : undefined,
   emailAndPassword: {
     enabled: true,
     // Sign-up is invite-only: an admin creates accounts via the admin plugin's
