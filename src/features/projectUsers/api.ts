@@ -72,20 +72,23 @@ export const deleteProjectUser = createServerFn({ method: 'POST' })
   .middleware([adminMiddleware])
   .inputValidator((userId: string) => userId)
   .handler(async ({ data: targetUserId, context }) => {
-    const target = await prisma.user.findFirst({
-      where: { id: targetUserId, projectId: context.projectId },
-    });
-    if (!target) {
-      throw new Error('User not found in this project');
-    }
-    if (target.role === 'admin') {
-      const adminCount = await prisma.user.count({
-        where: { projectId: context.projectId, role: 'admin' },
+    await prisma.$transaction(async (tx) => {
+      const target = await tx.user.findFirst({
+        where: { id: targetUserId, projectId: context.projectId },
       });
-      if (adminCount <= 1) {
-        throw new Error('Cannot remove the last admin of a project');
+      if (!target) {
+        throw new Error('User not found in this project');
       }
-    }
+      if (target.role === 'admin') {
+        const adminCount = await tx.user.count({
+          where: { projectId: context.projectId, role: 'admin' },
+        });
+        if (adminCount <= 1) {
+          throw new Error('Cannot remove the last admin of a project');
+        }
+      }
+    });
+
     const request = getRequest();
     await auth.api.removeUser({
       body: { userId: targetUserId },
