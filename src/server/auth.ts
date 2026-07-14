@@ -23,8 +23,6 @@ export const auth = betterAuth({
     : undefined,
   emailAndPassword: {
     enabled: true,
-    // Sign-up is invite-only: an admin creates accounts via the admin plugin's
-    // createUser API. The public /sign-up/email endpoint must stay disabled.
     disableSignUp: true,
   },
   socialProviders: {
