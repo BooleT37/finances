@@ -19,6 +19,8 @@ export async function assertOwnedByProject(
 ): Promise<void> {
   const row = await delegate.findFirst({ where: { id, projectId } });
   if (!row) {
-    throw new Error(`${label ?? 'Record'} with id ${id} not found`);
+    throw new Error(
+      `${label ?? 'Record'} with id ${id} not found in project with id '${projectId}'`,
+    );
   }
 }
