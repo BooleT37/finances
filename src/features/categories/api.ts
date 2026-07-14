@@ -41,7 +41,10 @@ export const createCategory = createServerFn({ method: 'POST' })
         projectId: context.projectId,
         subcategories: {
           createMany: {
-            data: data.subcategories.map((s) => ({ name: s.name })),
+            data: data.subcategories.map((s) => ({
+              name: s.name,
+              projectId: context.projectId,
+            })),
           },
         },
       },
@@ -82,30 +85,17 @@ export const updateCategory = createServerFn({ method: 'POST' })
       'Category',
     );
 
-    // Subcategory has no projectId of its own — ownership is transitive via
-    // categoryId, so verify every referenced id actually belongs to this
-    // (already project-verified) category. Without this, the upsert below
-    // would happily update a subcategory belonging to a different category
-    // (and thus potentially a different project) by id alone.
-    const ownedSubcategoryIds = new Set(
-      (
-        await prisma.subcategory.findMany({
-          where: { categoryId: id },
-          select: { id: true },
-        })
-      ).map((s) => s.id),
-    );
-
     const existingIds = subcategories
       .filter((s) => s.id !== undefined)
       .map((s) => s.id as number);
 
     for (const subcategoryId of existingIds) {
-      if (!ownedSubcategoryIds.has(subcategoryId)) {
-        throw new Error(
-          `Subcategory with id ${subcategoryId} not found in category with id ${id}`,
-        );
-      }
+      await assertOwnedByProject(
+        prisma.subcategory,
+        subcategoryId,
+        context.projectId,
+        'Subcategory',
+      );
     }
 
     await prisma.$transaction(async (tx) => {
@@ -119,7 +109,11 @@ export const updateCategory = createServerFn({ method: 'POST' })
         await tx.subcategory.upsert({
           where: { id: s.id ?? 0 },
           update: { name: s.name },
-          create: { name: s.name, categoryId: id },
+          create: {
+            name: s.name,
+            categoryId: id,
+            projectId: context.projectId,
+          },
         });
       }
 

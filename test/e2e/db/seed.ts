@@ -83,7 +83,7 @@ export async function seed(): Promise<SeedData> {
     },
   });
   const рынок = await testPrisma.subcategory.create({
-    data: { name: 'Рынок', categoryId: продукты.id },
+    data: { name: 'Рынок', categoryId: продукты.id, projectId: project.id },
   });
 
   const транспорт = await testPrisma.category.create({
@@ -96,7 +96,7 @@ export async function seed(): Promise<SeedData> {
     },
   });
   const такси = await testPrisma.subcategory.create({
-    data: { name: 'Такси', categoryId: транспорт.id },
+    data: { name: 'Такси', categoryId: транспорт.id, projectId: project.id },
   });
 
   const развлечения = await testPrisma.category.create({
@@ -141,7 +141,7 @@ export async function seed(): Promise<SeedData> {
     },
   });
   const основная = await testPrisma.subcategory.create({
-    data: { name: 'Основная', categoryId: зарплата.id },
+    data: { name: 'Основная', categoryId: зарплата.id, projectId: project.id },
   });
 
   const expenseCategories = [

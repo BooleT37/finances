@@ -20,6 +20,7 @@ model Project {
   subscriptions   Subscription[]
   expenses        Expense[]
   forecasts       Forecast[]
+  subcategories   Subcategory[]
 }
 
 model User {
@@ -96,6 +97,8 @@ model Subcategory {
   name              String
   category          Category?          @relation(fields: [categoryId], references: [id])
   categoryId        Int?
+  project           Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId         String
   expenses          Expense[]
   expenseComponents ExpenseComponent[]
   forecasts         Forecast[]
