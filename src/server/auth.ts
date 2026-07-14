@@ -29,6 +29,10 @@ export const auth = betterAuth({
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID ?? '',
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
+      // Sign-up is invite-only, same as emailAndPassword above: Google
+      // sign-in may only link to an existing account by email, never
+      // implicitly create a new one.
+      disableImplicitSignUp: true,
     },
   },
   account: {
