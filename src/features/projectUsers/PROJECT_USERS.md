@@ -11,6 +11,8 @@ Admin-only management of who has access to the current project (household). Ever
 
 Sign-up is closed — there is no public registration. An admin adds a user here with an email, name, and a temporary password (shown/typed once by the admin, not emailed). The new user can sign in immediately with that password, or via Google using the same email (Better Auth auto-links by email match).
 
+Our Google OAuth consent screen is in "Testing" publishing mode, so Google sign-in only works for emails explicitly added as test users in the Google Cloud Console project — a new user must be added there too before Google sign-in works for them (the password sign-in above works regardless).
+
 ## Resetting a password
 
 There is no self-service "forgot password" flow. If a user forgets their password, an admin resets it from this page the same way a new user is created — the reset password is a new temporary password shared out-of-band.
