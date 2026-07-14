@@ -16,8 +16,6 @@ export default async function globalSetup() {
   console.log('PostgreSQL test container started');
 
   execSync('npx prisma migrate deploy', {
-    // prisma.config.ts reads DIRECT_DATABASE_URL (see its comment) — no
-    // pooler distinction locally/in tests, so both point at the same DB.
     env: {
       ...process.env,
       DATABASE_URL: TEST_DB_URL,
