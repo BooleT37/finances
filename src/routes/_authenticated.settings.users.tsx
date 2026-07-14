@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 
-import { ProjectUsersTable } from '~/features/projectUsers/components/ProjectUsersTable';
+import { ProjectUsersTable } from '~/features/projectUsers/components/ProjectUsersTable/ProjectUsersTable';
 
 export const Route = createFileRoute('/_authenticated/settings/users')({
   beforeLoad: ({ context }) => {
