@@ -33,19 +33,17 @@ export default defineConfig({
       DATABASE_URL: TEST_DB_URL,
       NODE_ENV: 'test',
       BETTER_AUTH_SECRET: TEST_BETTER_AUTH_SECRET,
-      BETTER_AUTH_URL: TEST_BASE_URL,
       // Dummy values, not meant to work — Better Auth only warns
       // ("Social provider google is missing clientId or clientSecret") when
       // clientId is falsy (see create-context.mjs), it doesn't validate the
       // credential. No test exercises real Google sign-in.
       GOOGLE_CLIENT_ID: 'test-google-client-id',
       GOOGLE_CLIENT_SECRET: 'test-google-client-secret',
-      // Explicitly clear: child processes inherit the parent's full env, so
-      // a local .env's BETTER_AUTH_ALLOWED_HOSTS (e.g. "localhost:3002,...")
-      // would otherwise leak in and reject this server's own port (3001)
-      // since it's not in that list. auth.ts's .filter(Boolean) treats ''
-      // the same as unset, falling back to BETTER_AUTH_URL above.
-      BETTER_AUTH_ALLOWED_HOSTS: '',
+      // Overrides (not clears): child processes inherit the parent's full
+      // env, so a local .env's BETTER_AUTH_ALLOWED_HOSTS (e.g.
+      // "localhost:3002,...") would otherwise leak in and reject this
+      // server's own port (3001) since it's not in that list.
+      BETTER_AUTH_ALLOWED_HOSTS: 'localhost:3001',
     },
   },
 });

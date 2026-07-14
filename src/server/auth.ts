@@ -5,23 +5,6 @@ import { tanstackStartCookies } from 'better-auth/tanstack-start';
 
 import { prisma } from '~/server/db';
 
-// Escape hatch for any environment with more than one valid host: every
-// Vercel Preview branch/PR deployment gets a unique *.vercel.app hostname
-// (a static BETTER_AUTH_URL would only ever match one of them), and locally
-// the app runs on different ports depending on how it's launched (`npm run
-// dev` defaults to 3002; the Claude Code preview tool uses whatever port is
-// set in .claude/launch.json, currently 3010). Set BETTER_AUTH_ALLOWED_HOSTS
-// (comma-separated host patterns, wildcards allowed — e.g. "*.vercel.app" or
-// "localhost:3002,localhost:3010") to derive the base URL from each incoming
-// request's host instead, validated against this allowlist. `protocol:
-// 'auto'` reads the actual request's own scheme first and falls back to
-// preferring http for loopback hosts (localhost/127.*/::1), so the same
-// config correctly derives https for Preview and http for local — see
-// getProtocolFromSource in better-auth's url utils. This also auto-populates
-// trustedOrigins with the same host patterns (see getTrustedOrigins in
-// better-auth's context helpers), so no separate trustedOrigins entry is
-// needed. Leave this unset on Production: it should use a fixed, known
-// origin via a plain BETTER_AUTH_URL string instead, not a wildcard.
 const allowedHosts = process.env.BETTER_AUTH_ALLOWED_HOSTS?.split(',')
   .map((host) => host.trim())
   .filter(Boolean);
@@ -29,20 +12,15 @@ const allowedHosts = process.env.BETTER_AUTH_ALLOWED_HOSTS?.split(',')
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
   secret: process.env.BETTER_AUTH_SECRET,
-  baseURL:
-    allowedHosts && allowedHosts.length > 0
-      ? {
-          allowedHosts,
-          protocol: 'auto' as const,
-          // Scripts (bootstrap-project.ts, reset-password.ts) call auth.api.*
-          // with no request/headers at all, so there's no host to derive a
-          // baseURL from. Better Auth requires either a source or a fallback
-          // for dynamic baseURL configs; this value is never surfaced to a
-          // real HTTP request (those always carry a Host header matched
-          // against allowedHosts above).
-          fallback: 'http://localhost',
-        }
-      : process.env.BETTER_AUTH_URL,
+  baseURL: allowedHosts?.length
+    ? {
+        allowedHosts,
+        protocol: 'auto' as const,
+        // For scripts (bootstrap-project.ts, reset-password.ts) we can't
+        // derive baseURL from request/headers
+        fallback: 'http://localhost',
+      }
+    : undefined,
   emailAndPassword: {
     enabled: true,
     // Sign-up is invite-only: an admin creates accounts via the admin plugin's
