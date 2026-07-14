@@ -24,7 +24,8 @@
     "email": "Email",
     "role": "Роль",
     "tempPassword": "Временный пароль",
-    "tempPasswordDescription": "Сообщите этот пароль пользователю напрямую — он сможет войти по нему или через Google с тем же email."
+    "tempPasswordDescription": "Сообщите этот пароль пользователю напрямую — он сможет войти по нему или через Google с тем же email.",
+    "newPasswordDescriptionSelf": "Введите новый пароль"
   },
   "validation": {
     "nameRequired": "Укажите имя",

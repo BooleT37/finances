@@ -24,7 +24,8 @@
     "email": "Email",
     "role": "Role",
     "tempPassword": "Temporary password",
-    "tempPasswordDescription": "Share this password with them directly — they can sign in with it or via Google using the same email."
+    "tempPasswordDescription": "Share this password with them directly — they can sign in with it or via Google using the same email.",
+    "newPasswordDescriptionSelf": "Enter your new password"
   },
   "validation": {
     "nameRequired": "Name is required",
