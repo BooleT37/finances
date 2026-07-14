@@ -1,6 +1,7 @@
 import { Button, Modal, PasswordInput, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
+import { useRouteContext } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 import { useResetProjectUserPassword } from '../queries';
@@ -14,6 +15,8 @@ interface Props {
 export function ResetPasswordModal({ user, onClose }: Props) {
   const { t } = useTranslation('projectUsers');
   const resetMutation = useResetProjectUserPassword();
+  const { session } = useRouteContext({ from: '/_authenticated' });
+  const isSelf = user !== null && user.id === session.userId;
 
   const form = useForm({
     initialValues: { password: '' },
@@ -57,7 +60,11 @@ export function ResetPasswordModal({ user, onClose }: Props) {
         <Stack gap="md">
           <PasswordInput
             label={t('form.tempPassword')}
-            description={t('form.tempPasswordDescription')}
+            description={
+              isSelf
+                ? t('form.newPasswordDescriptionSelf')
+                : t('form.tempPasswordDescription')
+            }
             required
             {...form.getInputProps('password')}
           />
