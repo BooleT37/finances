@@ -8,19 +8,21 @@ datasource db {
 }
 
 model Project {
-  id              String           @id @default(cuid())
-  name            String
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  users           User[]
-  setting         ProjectSetting?
-  categories      Category[]
-  sources         Source[]
-  savingSpendings SavingSpending[]
-  subscriptions   Subscription[]
-  expenses        Expense[]
-  forecasts       Forecast[]
-  subcategories   Subcategory[]
+  id                       String                   @id @default(cuid())
+  name                     String
+  createdAt                DateTime                 @default(now())
+  updatedAt                DateTime                 @updatedAt
+  users                    User[]
+  setting                  ProjectSetting?
+  categories               Category[]
+  sources                  Source[]
+  savingSpendings          SavingSpending[]
+  subscriptions            Subscription[]
+  expenses                 Expense[]
+  forecasts                Forecast[]
+  subcategories            Subcategory[]
+  savingSpendingCategories SavingSpendingCategory[]
+  expenseComponents        ExpenseComponent[]
 }
 
 model User {
@@ -103,6 +105,8 @@ model Subcategory {
   expenseComponents ExpenseComponent[]
   forecasts         Forecast[]
   subscriptions     Subscription[]
+
+  @@unique([id, projectId])
 }
 
 enum CategoryType {
@@ -127,6 +131,7 @@ model Category {
   expenseComponents ExpenseComponent[]
 
   @@unique([name, projectId])
+  @@unique([id, projectId])
 }
 
 enum ExpensesParser {
@@ -134,13 +139,15 @@ enum ExpensesParser {
 }
 
 model Source {
-  id            Int            @id @default(autoincrement())
+  id            Int             @id @default(autoincrement())
   name          String
   parser        ExpensesParser?
   subscriptions Subscription[]
   expenses      Expense[]
-  project       Project        @relation(fields: [projectId], references: [id])
+  project       Project         @relation(fields: [projectId], references: [id])
   projectId     String
+
+  @@unique([id, projectId])
 }
 
 model SavingSpending {
@@ -150,6 +157,8 @@ model SavingSpending {
   categories SavingSpendingCategory[]
   project    Project                  @relation(fields: [projectId], references: [id])
   projectId  String
+
+  @@unique([id, projectId])
 }
 
 model SavingSpendingCategory {
@@ -157,27 +166,36 @@ model SavingSpendingCategory {
   name             String
   forecast         Decimal         @db.Decimal(9, 2)
   comment          String
-  savingSpending   SavingSpending? @relation(fields: [savingSpendingId], references: [id], onDelete: Cascade)
+  savingSpending   SavingSpending? @relation(fields: [savingSpendingId, projectId], references: [id, projectId], onDelete: Cascade)
   savingSpendingId Int?
+  project          Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId        String
   expenses         Expense[]
+
+  @@unique([id, projectId])
 }
 
 model Subscription {
   id            Int          @id @default(autoincrement())
   name          String
   cost          Decimal      @db.Decimal(9, 2)
-  category      Category     @relation(fields: [categoryId], references: [id])
+  category      Category     @relation(fields: [categoryId, projectId], references: [id, projectId])
   period        Int          @db.SmallInt
   firstDate     DateTime     @db.Date
-  source        Source?      @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+  // Restrict, not SetNull: with a composite FK, SetNull would try to null out
+  // both sourceId AND projectId, but projectId is required — deleteSource
+  // nulls sourceId explicitly (in the same transaction) before the delete.
+  source        Source?      @relation(fields: [sourceId, projectId], references: [id, projectId], onDelete: Restrict)
   active        Boolean
   categoryId    Int
-  subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
+  subcategory   Subcategory? @relation(fields: [subcategoryId, projectId], references: [id, projectId])
   subcategoryId Int?
   sourceId      Int?
   Expenses      Expense[]
   project       Project      @relation(fields: [projectId], references: [id], onDelete: Restrict)
   projectId     String
+
+  @@unique([id, projectId])
 }
 
 model Expense {
@@ -186,14 +204,15 @@ model Expense {
   cost                     Decimal                 @db.Decimal(9, 2)
   date                     DateTime                @db.Date
   actualDate               DateTime?               @db.Date
-  category                 Category                @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  category                 Category                @relation(fields: [categoryId, projectId], references: [id, projectId], onDelete: Restrict)
   categoryId               Int
-  subcategory              Subcategory?            @relation(fields: [subcategoryId], references: [id])
-  source                   Source?                 @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+  subcategory              Subcategory?            @relation(fields: [subcategoryId, projectId], references: [id, projectId])
+  // Restrict, not SetNull — see the same note on Subscription.source above.
+  source                   Source?                 @relation(fields: [sourceId, projectId], references: [id, projectId], onDelete: Restrict)
   sourceId                 Int?
-  subscription             Subscription?           @relation(fields: [subscriptionId], references: [id])
+  subscription             Subscription?           @relation(fields: [subscriptionId, projectId], references: [id, projectId])
   subscriptionId           Int?
-  savingSpendingCategory   SavingSpendingCategory? @relation(fields: [savingSpendingCategoryId], references: [id])
+  savingSpendingCategory   SavingSpendingCategory? @relation(fields: [savingSpendingCategoryId, projectId], references: [id, projectId])
   savingSpendingCategoryId Int?
   subcategoryId            Int?
   components               ExpenseComponent[]
@@ -201,27 +220,31 @@ model Expense {
   project                  Project                 @relation(fields: [projectId], references: [id])
   projectId                String
   createdAt                DateTime                @default(now())
+
+  @@unique([id, projectId])
 }
 
 model ExpenseComponent {
   id            Int          @id @default(autoincrement())
   name          String
   cost          Decimal      @db.Decimal(9, 2)
-  category      Category     @relation(fields: [categoryId], references: [id])
+  category      Category     @relation(fields: [categoryId, projectId], references: [id, projectId])
   categoryId    Int
-  subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
+  subcategory   Subcategory? @relation(fields: [subcategoryId, projectId], references: [id, projectId])
   subcategoryId Int?
-  expense       Expense      @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  expense       Expense      @relation(fields: [expenseId, projectId], references: [id, projectId], onDelete: Cascade)
   expenseId     Int
+  project       Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId     String
 
   @@map("ExpenseComponent")
 }
 
 model Forecast {
   id            Int          @id @default(autoincrement())
-  category      Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category      Category     @relation(fields: [categoryId, projectId], references: [id, projectId], onDelete: Cascade)
   categoryId    Int
-  subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
+  subcategory   Subcategory? @relation(fields: [subcategoryId, projectId], references: [id, projectId], onDelete: Cascade)
   subcategoryId Int?
   month         Int          @db.SmallInt
   year          Int          @db.SmallInt
