@@ -242,6 +242,7 @@ export function CategorySidebarForm() {
                   variant="subtle"
                   color="red"
                   mt={4}
+                  aria-label={t('form.deleteSubcategory')}
                   onClick={() => form.removeListItem('subcategories', index)}
                 >
                   <IconTrash size={16} />
