@@ -182,9 +182,7 @@ model Subscription {
   category      Category     @relation(fields: [categoryId, projectId], references: [id, projectId])
   period        Int          @db.SmallInt
   firstDate     DateTime     @db.Date
-  // Restrict, not SetNull: with a composite FK, SetNull would try to null out
-  // both sourceId AND projectId, but projectId is required — deleteSource
-  // nulls sourceId explicitly (in the same transaction) before the delete.
+  // Restrict, not SetNull: composite FK — deleteSource nulls sourceId first.
   source        Source?      @relation(fields: [sourceId, projectId], references: [id, projectId], onDelete: Restrict)
   active        Boolean
   categoryId    Int
@@ -207,7 +205,7 @@ model Expense {
   category                 Category                @relation(fields: [categoryId, projectId], references: [id, projectId], onDelete: Restrict)
   categoryId               Int
   subcategory              Subcategory?            @relation(fields: [subcategoryId, projectId], references: [id, projectId])
-  // Restrict, not SetNull — see the same note on Subscription.source above.
+  // Restrict, not SetNull: composite FK — deleteSource nulls sourceId first.
   source                   Source?                 @relation(fields: [sourceId, projectId], references: [id, projectId], onDelete: Restrict)
   sourceId                 Int?
   subscription             Subscription?           @relation(fields: [subscriptionId, projectId], references: [id, projectId])

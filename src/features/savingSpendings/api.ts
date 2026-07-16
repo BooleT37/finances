@@ -40,8 +40,7 @@ export const fetchAllSavingSpendings = createServerFn({
         new Decimal(r._sum.cost?.toString() ?? '0'),
       ]),
     );
-    // Counted separately from the sum: a category whose expenses happen to sum
-    // to zero still has expenses, and so still can't be deleted.
+    // Count, not sum: a category summing to zero still has expenses.
     const expensesCountMap = new Map(
       actuals.map((r) => [r.savingSpendingCategoryId, r._count._all]),
     );
@@ -102,8 +101,7 @@ export const updateSavingSpending = createServerFn({ method: 'POST' })
         .filter((c) => c.id !== undefined)
         .map((c) => c.id!);
 
-      // A category with expenses attached can't be removed — the form disables
-      // its delete button, but the rule has to hold for direct RPC calls too.
+      // The form disables this, but the rule must hold for direct RPC calls.
       const removedWithExpenses = await db.savingSpendingCategory.findFirst({
         where: {
           savingSpendingId: id,
@@ -165,9 +163,7 @@ export const deleteSavingSpending = createServerFn({ method: 'POST' })
     );
 
     await prisma.$transaction(async (tx) => {
-      // Deleting the event cascades to its categories, so it would otherwise be
-      // a way around the "can't remove a category that has expenses" rule
-      // enforced in updateSavingSpending.
+      // Cascades to its categories, so the same rule applies.
       const categoryWithExpenses = await tx.savingSpendingCategory.findFirst({
         where: {
           savingSpendingId: id,
