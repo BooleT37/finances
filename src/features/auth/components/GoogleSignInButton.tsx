@@ -5,7 +5,11 @@ import { useTranslation } from 'react-i18next';
 
 import { authClient } from '~/lib/auth/client';
 
-export function GoogleSignInButton() {
+interface Props {
+  callbackURL: string;
+}
+
+export function GoogleSignInButton({ callbackURL }: Props) {
   const { t } = useTranslation('auth');
   const [isPending, setIsPending] = useState(false);
 
@@ -13,7 +17,7 @@ export function GoogleSignInButton() {
     setIsPending(true);
     await authClient.signIn.social({
       provider: 'google',
-      callbackURL: '/transactions',
+      callbackURL,
     });
   }
 
