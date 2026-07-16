@@ -99,6 +99,32 @@ export const updateCategory = createServerFn({ method: 'POST' })
     }
 
     await prisma.$transaction(async (tx) => {
+      const removedIds = (
+        await tx.subcategory.findMany({
+          where: { categoryId: id, id: { notIn: existingIds } },
+          select: { id: true },
+        })
+      ).map((s) => s.id);
+
+      if (removedIds.length > 0) {
+        // Composite FK (subcategoryId, projectId) can't use onDelete: SetNull —
+        // projectId is required, so the DB can't null just one column. Null
+        // subcategoryId out explicitly before deleting the subcategories.
+        const where = {
+          subcategoryId: { in: removedIds },
+          projectId: context.projectId,
+        };
+        await tx.expense.updateMany({ where, data: { subcategoryId: null } });
+        await tx.subscription.updateMany({
+          where,
+          data: { subcategoryId: null },
+        });
+        await tx.expenseComponent.updateMany({
+          where,
+          data: { subcategoryId: null },
+        });
+      }
+
       // Delete subcategories removed from the list
       await tx.subcategory.deleteMany({
         where: { categoryId: id, id: { notIn: existingIds } },
