@@ -104,9 +104,7 @@ export const deleteSource = createServerFn({ method: 'POST' })
     await assertOwnedByProject(prisma.source, id, context.projectId, 'Source');
 
     await prisma.$transaction(async (tx) => {
-      // Composite FK (sourceId, projectId) can't use onDelete: SetNull —
-      // projectId is required, so the DB can't null just one column. Null
-      // sourceId out explicitly before deleting the source.
+      // Composite FK can't SetNull — null the references first.
       await tx.subscription.updateMany({
         where: { sourceId: id, projectId: context.projectId },
         data: { sourceId: null },

@@ -15,10 +15,7 @@ import {
   updateCategorySchema,
 } from './schema';
 
-// Composite FK (subcategoryId, projectId) can't use onDelete: SetNull —
-// projectId is required, so the DB can't null just one column. Referencing
-// rows must have subcategoryId nulled explicitly before the subcategories
-// they point at are deleted.
+// Composite FK can't SetNull — call before deleting subcategories.
 async function clearSubcategoryReferences(
   tx: Prisma.TransactionClient,
   subcategoryIds: number[],

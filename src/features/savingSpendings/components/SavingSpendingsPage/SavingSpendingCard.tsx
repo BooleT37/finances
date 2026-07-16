@@ -38,8 +38,7 @@ export function SavingSpendingCard({
 }: Props) {
   const { t } = useTranslation('savingSpendings');
   const singleCategory = item.categories.length === 1;
-  // Deleting the event cascades to its categories, so it's blocked for the same
-  // reason removing a single category with expenses is.
+  // Cascades to its categories, so the same rule applies.
   const hasExpenses = item.categories.some((cat) => cat.expensesCount > 0);
 
   function handleDelete() {
