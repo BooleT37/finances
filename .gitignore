@@ -28,3 +28,6 @@ playwright/.auth/
 data/sample pdfs/
 /.local-db-backups/
 .tanstack/
+
+# One-off scripts that aren't reusable tooling
+scripts/*.local.ts
