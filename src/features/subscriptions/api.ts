@@ -102,5 +102,15 @@ export const deleteSubscription = createServerFn({ method: 'POST' })
       context.projectId,
       'Subscription',
     );
-    await prisma.subscription.delete({ where: { id } });
+
+    await prisma.$transaction(async (tx) => {
+      // Composite FK (subscriptionId, projectId) can't use onDelete: SetNull —
+      // projectId is required, so the DB can't null just one column. Null
+      // subscriptionId out explicitly before deleting the subscription.
+      await tx.expense.updateMany({
+        where: { subscriptionId: id, projectId: context.projectId },
+        data: { subscriptionId: null },
+      });
+      await tx.subscription.delete({ where: { id } });
+    });
   });
