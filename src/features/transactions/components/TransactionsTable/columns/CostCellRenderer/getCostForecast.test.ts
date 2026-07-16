@@ -104,6 +104,7 @@ const mockSavingSpendings: SavingSpending[] = [
         comment: '',
         savingSpendingId: 1,
         actual: new Decimal('0'),
+        expensesCount: 0,
       },
       {
         id: 2,
@@ -112,6 +113,7 @@ const mockSavingSpendings: SavingSpending[] = [
         comment: '',
         savingSpendingId: 1,
         actual: new Decimal('0'),
+        expensesCount: 0,
       },
     ],
   },
@@ -127,6 +129,7 @@ const mockSavingSpendings: SavingSpending[] = [
         comment: '',
         savingSpendingId: 2,
         actual: new Decimal('0'),
+        expensesCount: 0,
       },
     ],
   },

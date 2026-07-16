@@ -9,6 +9,7 @@ export const savingSpendingCategorySchema = z.object({
   comment: z.string(),
   savingSpendingId: z.number().nullable(),
   actual: decimalCodec,
+  expensesCount: z.number(),
 });
 
 export type SavingSpendingCategoryWire = z.input<

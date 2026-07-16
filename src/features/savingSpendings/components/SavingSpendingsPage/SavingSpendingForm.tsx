@@ -44,8 +44,8 @@ export function SavingSpendingForm({ editItem, onClose }: Props) {
 
   const isEditing = editItem !== null;
 
-  const actualMap = new Map(
-    editItem?.categories.map((cat) => [cat.id, cat.actual]) ?? [],
+  const expensesCountMap = new Map(
+    editItem?.categories.map((cat) => [cat.id, cat.expensesCount]) ?? [],
   );
 
   const form = useForm<FormValues>({
@@ -137,8 +137,7 @@ export function SavingSpendingForm({ editItem, onClose }: Props) {
       <Stack gap="xs">
         {form.values.categories.map((row, index) => {
           const hasExpenses =
-            row.id !== undefined &&
-            (actualMap.get(row.id)?.greaterThan(0) ?? false);
+            row.id !== undefined && (expensesCountMap.get(row.id) ?? 0) > 0;
           return (
             <Group key={index} align="flex-start" gap="sm">
               <TextInput
