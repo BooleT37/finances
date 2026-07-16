@@ -95,6 +95,26 @@ export const updateSavingSpending = createServerFn({ method: 'POST' })
         .filter((c) => c.id !== undefined)
         .map((c) => c.id!);
 
+      const removedIds = (
+        await db.savingSpendingCategory.findMany({
+          where: { savingSpendingId: id, id: { notIn: keptIds } },
+          select: { id: true },
+        })
+      ).map((c) => c.id);
+
+      if (removedIds.length > 0) {
+        // Composite FK (savingSpendingCategoryId, projectId) can't use
+        // onDelete: SetNull — projectId is required, so the DB can't null just
+        // one column. Null it out explicitly before deleting the categories.
+        await db.expense.updateMany({
+          where: {
+            savingSpendingCategoryId: { in: removedIds },
+            projectId: context.projectId,
+          },
+          data: { savingSpendingCategoryId: null },
+        });
+      }
+
       await db.savingSpendingCategory.deleteMany({
         where: { savingSpendingId: id, id: { notIn: keptIds } },
       });
@@ -139,7 +159,31 @@ export const deleteSavingSpending = createServerFn({ method: 'POST' })
       context.projectId,
       'Saving spending',
     );
-    await prisma.savingSpending.delete({ where: { id } });
+
+    await prisma.$transaction(async (tx) => {
+      // Deleting the saving spending cascades to its categories, but Expense's
+      // composite FK (savingSpendingCategoryId, projectId) is Restrict — it
+      // can't null just one column since projectId is required — so that
+      // cascade is blocked while any expense still points at a category.
+      const categoryIds = (
+        await tx.savingSpendingCategory.findMany({
+          where: { savingSpendingId: id, projectId: context.projectId },
+          select: { id: true },
+        })
+      ).map((c) => c.id);
+
+      if (categoryIds.length > 0) {
+        await tx.expense.updateMany({
+          where: {
+            savingSpendingCategoryId: { in: categoryIds },
+            projectId: context.projectId,
+          },
+          data: { savingSpendingCategoryId: null },
+        });
+      }
+
+      await tx.savingSpending.delete({ where: { id } });
+    });
   });
 
 export const archiveSavingSpending = createServerFn({ method: 'POST' })
