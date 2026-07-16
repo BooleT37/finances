@@ -1,11 +1,26 @@
 import dayjs from 'dayjs';
 
+import { testPrisma } from './db/client';
 import { expect, test } from './fixtures';
 
 test.describe('Subscriptions inline editing', () => {
-  test('editing name, price, date, and source inline updates the table and syncs the open sidebar form', async ({
+  test('editing name, price, date, and source inline updates the table and syncs the open sidebar form; deleting it keeps its transactions', async ({
     page,
+    seedData,
   }) => {
+    // Link a transaction to Netflix so the delete at the end exercises the
+    // "keep the transaction, drop the link" path.
+    const tx = await testPrisma.expense.create({
+      data: {
+        name: 'Netflix апрель',
+        cost: 15.99,
+        date: new Date('2024-04-10T12:00:00Z'),
+        categoryId: seedData.categoryIds.развлечения,
+        subscriptionId: seedData.subscriptionIds.нетфликс,
+        projectId: seedData.projectId,
+      },
+    });
+
     await page.goto('/settings/subscriptions');
 
     const row = page.locator('tr', { hasText: 'Netflix' });
@@ -69,6 +84,31 @@ test.describe('Subscriptions inline editing', () => {
     await expect(form.getByRole('textbox', { name: 'Источник' })).toHaveValue(
       'Vivid',
     );
+
+    // --- Deleting a subscription that a transaction still points at ---
+    await row.getByRole('button', { name: 'Удалить' }).click();
+    // The confirm button carries the same label as the row action, so scope
+    // it to the dialog.
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Удалить' })
+      .click();
+    await page.waitForLoadState('networkidle');
+
+    await expect
+      .poll(() =>
+        testPrisma.subscription.count({
+          where: { id: seedData.subscriptionIds.нетфликс },
+        }),
+      )
+      .toBe(0);
+
+    // The transaction survived, just unlinked — it must not have been blocked
+    // by the FK or deleted along with the subscription.
+    const kept = await testPrisma.expense.findUnique({ where: { id: tx.id } });
+    expect(kept).not.toBeNull();
+    expect(kept?.subscriptionId).toBeNull();
+    expect(kept?.categoryId).toBe(seedData.categoryIds.развлечения);
   });
 
   test('inline editing an invalid price value is not saved', async ({
