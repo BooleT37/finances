@@ -1,5 +1,6 @@
 import { createServerFn } from '@tanstack/react-start';
 
+import { type Prisma } from '~/generated/prisma/client';
 import { authMiddleware } from '~/middlewares/authMiddleware';
 import { prisma } from '~/server/db';
 import { assertOwnedByProject } from '~/shared/utils/assertOwnedByProject';
@@ -13,6 +14,27 @@ import {
   updateCategoryOrderSchema,
   updateCategorySchema,
 } from './schema';
+
+// Composite FK (subcategoryId, projectId) can't use onDelete: SetNull —
+// projectId is required, so the DB can't null just one column. Referencing
+// rows must have subcategoryId nulled explicitly before the subcategories
+// they point at are deleted.
+async function clearSubcategoryReferences(
+  tx: Prisma.TransactionClient,
+  subcategoryIds: number[],
+  projectId: string,
+) {
+  if (subcategoryIds.length === 0) {
+    return;
+  }
+  const where = { subcategoryId: { in: subcategoryIds }, projectId };
+  await tx.expense.updateMany({ where, data: { subcategoryId: null } });
+  await tx.subscription.updateMany({ where, data: { subcategoryId: null } });
+  await tx.expenseComponent.updateMany({
+    where,
+    data: { subcategoryId: null },
+  });
+}
 
 export const fetchAllCategories = createServerFn({ method: 'GET' })
   .middleware([authMiddleware])
@@ -105,25 +127,7 @@ export const updateCategory = createServerFn({ method: 'POST' })
           select: { id: true },
         })
       ).map((s) => s.id);
-
-      if (removedIds.length > 0) {
-        // Composite FK (subcategoryId, projectId) can't use onDelete: SetNull —
-        // projectId is required, so the DB can't null just one column. Null
-        // subcategoryId out explicitly before deleting the subcategories.
-        const where = {
-          subcategoryId: { in: removedIds },
-          projectId: context.projectId,
-        };
-        await tx.expense.updateMany({ where, data: { subcategoryId: null } });
-        await tx.subscription.updateMany({
-          where,
-          data: { subcategoryId: null },
-        });
-        await tx.expenseComponent.updateMany({
-          where,
-          data: { subcategoryId: null },
-        });
-      }
+      await clearSubcategoryReferences(tx, removedIds, context.projectId);
 
       // Delete subcategories removed from the list
       await tx.subcategory.deleteMany({
@@ -186,6 +190,13 @@ export const deleteCategory = createServerFn({ method: 'POST' })
       const category = await tx.category.findUniqueOrThrow({ where: { id } });
 
       // Delete subcategories first (categoryId is nullable — no cascade)
+      const subcategoryIds = (
+        await tx.subcategory.findMany({
+          where: { categoryId: id },
+          select: { id: true },
+        })
+      ).map((s) => s.id);
+      await clearSubcategoryReferences(tx, subcategoryIds, context.projectId);
       await tx.subcategory.deleteMany({ where: { categoryId: id } });
 
       // Delete the category — will throw if expenses/forecasts/subscriptions exist
