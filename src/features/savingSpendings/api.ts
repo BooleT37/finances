@@ -26,6 +26,7 @@ export const fetchAllSavingSpendings = createServerFn({
       prisma.expense.groupBy({
         by: ['savingSpendingCategoryId'],
         _sum: { cost: true },
+        _count: { _all: true },
         where: {
           projectId: context.projectId,
           savingSpendingCategoryId: { not: null },
@@ -39,6 +40,11 @@ export const fetchAllSavingSpendings = createServerFn({
         new Decimal(r._sum.cost?.toString() ?? '0'),
       ]),
     );
+    // Counted separately from the sum: a category whose expenses happen to sum
+    // to zero still has expenses, and so still can't be deleted.
+    const expensesCountMap = new Map(
+      actuals.map((r) => [r.savingSpendingCategoryId, r._count._all]),
+    );
 
     return savingSpendings.map((s) =>
       savingSpendingSchema.encode({
@@ -46,6 +52,7 @@ export const fetchAllSavingSpendings = createServerFn({
         categories: s.categories.map((cat) => ({
           ...cat,
           actual: actualMap.get(cat.id) ?? new Decimal(0),
+          expensesCount: expensesCountMap.get(cat.id) ?? 0,
         })),
       }),
     );

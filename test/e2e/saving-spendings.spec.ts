@@ -217,7 +217,7 @@ test.describe('Saving Spendings', () => {
     ).toBeVisible();
   });
 
-  test('deleting a category is disabled when the category has expenses attached', async ({
+  test('deleting a category — and the event containing it — is disabled when the category has expenses attached', async ({
     page,
     seedData,
   }) => {
@@ -234,6 +234,19 @@ test.describe('Saving Spendings', () => {
     });
 
     await page.goto('/savings-spendings');
+
+    // Deleting the whole event cascades to its categories, so it's blocked for
+    // the same reason — while an event with no expenses stays deletable.
+    const eventDelete = getCard(page, 'Переезд 2026').getByRole('button', {
+      name: 'Удалить',
+    });
+    await expect(eventDelete).toBeDisabled();
+    await eventDelete.hover({ force: true });
+    await expect(page.getByText('Нельзя удалить: есть расходы')).toBeVisible();
+
+    await expect(
+      getCard(page, 'Отпуск Рим 2025').getByRole('button', { name: 'Удалить' }),
+    ).not.toBeDisabled();
 
     // Open edit modal for Переезд 2026 (seeded with Залог + Транспорт)
     await getCard(page, 'Переезд 2026')

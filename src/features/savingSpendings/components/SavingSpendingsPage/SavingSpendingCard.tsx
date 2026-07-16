@@ -38,6 +38,9 @@ export function SavingSpendingCard({
 }: Props) {
   const { t } = useTranslation('savingSpendings');
   const singleCategory = item.categories.length === 1;
+  // Deleting the event cascades to its categories, so it's blocked for the same
+  // reason removing a single category with expenses is.
+  const hasExpenses = item.categories.some((cat) => cat.expensesCount > 0);
 
   function handleDelete() {
     openConfirmModal({
@@ -89,10 +92,15 @@ export function SavingSpendingCard({
               </ActionIcon>
             </Tooltip>
           )}
-          <Tooltip label={t('actions.delete')}>
+          <Tooltip
+            label={
+              hasExpenses ? t('actions.deleteDisabled') : t('actions.delete')
+            }
+          >
             <ActionIcon
               variant="subtle"
               color="red"
+              disabled={hasExpenses}
               aria-label={t('actions.delete')}
               onClick={handleDelete}
             >

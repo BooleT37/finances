@@ -8,7 +8,8 @@
     "edit": "Edit",
     "archive": "Archive",
     "unarchive": "Unarchive",
-    "delete": "Delete"
+    "delete": "Delete",
+    "deleteDisabled": "Cannot delete: has expenses"
   },
   "modal": {
     "createTitle": "New Saving Event",
