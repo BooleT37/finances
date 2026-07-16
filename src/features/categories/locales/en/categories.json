@@ -17,6 +17,7 @@
     "add": "Add",
     "addSubcategory": "Add subcategory",
     "ariaLabel": "Category form",
+    "deleteSubcategory": "Delete subcategory",
     "errors": {
       "nameRequired": "Name is required",
       "nameTaken": "A category with this name already exists",
