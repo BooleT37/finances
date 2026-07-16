@@ -95,24 +95,21 @@ export const updateSavingSpending = createServerFn({ method: 'POST' })
         .filter((c) => c.id !== undefined)
         .map((c) => c.id!);
 
-      const removedIds = (
-        await db.savingSpendingCategory.findMany({
-          where: { savingSpendingId: id, id: { notIn: keptIds } },
-          select: { id: true },
-        })
-      ).map((c) => c.id);
-
-      if (removedIds.length > 0) {
-        // Composite FK (savingSpendingCategoryId, projectId) can't use
-        // onDelete: SetNull — projectId is required, so the DB can't null just
-        // one column. Null it out explicitly before deleting the categories.
-        await db.expense.updateMany({
-          where: {
-            savingSpendingCategoryId: { in: removedIds },
-            projectId: context.projectId,
-          },
-          data: { savingSpendingCategoryId: null },
-        });
+      // A category with expenses attached can't be removed — the form disables
+      // its delete button, but the rule has to hold for direct RPC calls too.
+      const removedWithExpenses = await db.savingSpendingCategory.findFirst({
+        where: {
+          savingSpendingId: id,
+          projectId: context.projectId,
+          id: { notIn: keptIds },
+          expenses: { some: {} },
+        },
+        select: { name: true },
+      });
+      if (removedWithExpenses) {
+        throw new Error(
+          `Cannot remove category '${removedWithExpenses.name}' because it has expenses attached`,
+        );
       }
 
       await db.savingSpendingCategory.deleteMany({
@@ -161,25 +158,21 @@ export const deleteSavingSpending = createServerFn({ method: 'POST' })
     );
 
     await prisma.$transaction(async (tx) => {
-      // Deleting the saving spending cascades to its categories, but Expense's
-      // composite FK (savingSpendingCategoryId, projectId) is Restrict — it
-      // can't null just one column since projectId is required — so that
-      // cascade is blocked while any expense still points at a category.
-      const categoryIds = (
-        await tx.savingSpendingCategory.findMany({
-          where: { savingSpendingId: id, projectId: context.projectId },
-          select: { id: true },
-        })
-      ).map((c) => c.id);
-
-      if (categoryIds.length > 0) {
-        await tx.expense.updateMany({
-          where: {
-            savingSpendingCategoryId: { in: categoryIds },
-            projectId: context.projectId,
-          },
-          data: { savingSpendingCategoryId: null },
-        });
+      // Deleting the event cascades to its categories, so it would otherwise be
+      // a way around the "can't remove a category that has expenses" rule
+      // enforced in updateSavingSpending.
+      const categoryWithExpenses = await tx.savingSpendingCategory.findFirst({
+        where: {
+          savingSpendingId: id,
+          projectId: context.projectId,
+          expenses: { some: {} },
+        },
+        select: { name: true },
+      });
+      if (categoryWithExpenses) {
+        throw new Error(
+          `Cannot delete this saving spending because its category '${categoryWithExpenses.name}' has expenses attached`,
+        );
       }
 
       await tx.savingSpending.delete({ where: { id } });
