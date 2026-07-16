@@ -33,9 +33,10 @@ function LoginPage() {
   const { t } = useTranslation('auth');
   const navigate = useNavigate();
   const search = Route.useSearch();
+  const redirectTo = sanitizeRedirect(search.redirect);
 
   function handleSuccess() {
-    void navigate({ to: sanitizeRedirect(search.redirect) });
+    void navigate({ to: redirectTo });
   }
 
   return (
@@ -47,7 +48,7 @@ function LoginPage() {
           </Title>
           <LoginForm onSuccess={handleSuccess} />
           <Divider label={t('form.or')} />
-          <GoogleSignInButton />
+          <GoogleSignInButton callbackURL={redirectTo} />
         </Stack>
       </Paper>
     </Center>
