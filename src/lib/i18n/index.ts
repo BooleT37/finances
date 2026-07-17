@@ -6,6 +6,7 @@ import { i18nResources as authResources } from '~/features/auth/i18n';
 import { i18nResources as budgetingResources } from '~/features/budgeting/i18n';
 import { i18nResources as categoriesResources } from '~/features/categories/i18n';
 import { i18nResources as navResources } from '~/features/nav/i18n';
+import { i18nResources as projectResources } from '~/features/project/i18n';
 import { i18nResources as projectUsersResources } from '~/features/projectUsers/i18n';
 import { i18nResources as savingSpendingsResources } from '~/features/savingSpendings/i18n';
 import { i18nResources as sourcesResources } from '~/features/sources/i18n';
@@ -33,6 +34,7 @@ export const resources = {
     ...authResources.en,
     ...projectUsersResources.en,
     ...accountResources.en,
+    ...projectResources.en,
   },
   ru: {
     common: commonRu,
@@ -48,6 +50,7 @@ export const resources = {
     ...authResources.ru,
     ...projectUsersResources.ru,
     ...accountResources.ru,
+    ...projectResources.ru,
   },
 } as const;
 

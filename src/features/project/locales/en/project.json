@@ -1,0 +1,11 @@
+{
+  "pageTitle": "Project",
+  "form": {
+    "name": "Project name",
+    "save": "Save"
+  },
+  "notifications": {
+    "renamed": "Project renamed",
+    "renameError": "Failed to rename project"
+  }
+}

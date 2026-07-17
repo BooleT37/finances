@@ -23,6 +23,8 @@ export interface NavItem {
   icon: Icon;
   children?: NavItem[];
   adminOnly?: boolean;
+  /** Group items with children are plain (non-navigating) labels by default. */
+  clickable?: boolean;
 }
 
 export const navItems: NavItem[] = [
@@ -50,6 +52,7 @@ export const navItems: NavItem[] = [
         to: '/settings/project',
         labelKey: 'project',
         icon: IconUsers,
+        clickable: true,
         children: [
           {
             to: '/settings/users',

@@ -13,7 +13,8 @@
     "src/features/statistics/locales",
     "src/features/auth/locales",
     "src/features/projectUsers/locales",
-    "src/features/account/locales"
+    "src/features/account/locales",
+    "src/features/project/locales"
   ],
   "i18n-ally.namespace": true,
   "i18n-ally.defaultNamespace": "home",

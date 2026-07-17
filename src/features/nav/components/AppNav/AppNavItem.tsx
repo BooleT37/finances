@@ -81,11 +81,21 @@ export function AppNavItem({ item, depth = 0 }: AppNavItemProps) {
     return (
       <Fragment>
         <NavLink
+          component={item.clickable ? Link : undefined}
+          to={item.clickable ? item.to : undefined}
           label={t(item.labelKey)}
           leftSection={leftSection}
           active={isActive}
-          style={{ ...itemStyle, cursor: 'default' }}
+          style={{
+            ...itemStyle,
+            cursor: item.clickable ? undefined : 'default',
+          }}
           styles={labelStyles}
+          onClick={
+            item.clickable
+              ? (e: React.MouseEvent) => handleNavClick(e, item.to)
+              : undefined
+          }
         />
         {item.children?.map((child) => (
           <AppNavItem key={child.to} item={child} depth={depth + 1} />
