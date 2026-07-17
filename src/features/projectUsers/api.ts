@@ -1,16 +1,16 @@
 import { createServerFn } from '@tanstack/react-start';
 import { getRequest } from '@tanstack/react-start/server';
+import { generateRandomString } from 'better-auth/crypto';
 
 import { adminMiddleware } from '~/middlewares/adminMiddleware';
 import { auth } from '~/server/auth';
 import { prisma } from '~/server/db';
 
 import {
+  type CreatedProjectUser,
   type CreateProjectUserInput,
   createProjectUserSchema,
   type ProjectUser,
-  type ResetProjectUserPasswordInput,
-  resetProjectUserPasswordSchema,
 } from './schema';
 
 export const fetchProjectUsers = createServerFn({ method: 'GET' })
@@ -29,13 +29,14 @@ export const createProjectUser = createServerFn({ method: 'POST' })
   .inputValidator((input: CreateProjectUserInput) =>
     createProjectUserSchema.parse(input),
   )
-  .handler(async ({ data, context }) => {
+  .handler(async ({ data, context }): Promise<CreatedProjectUser> => {
+    const password = generateRandomString(20, 'a-z', 'A-Z', '0-9');
     const request = getRequest();
     const result = await auth.api.createUser({
       body: {
         email: data.email,
         name: data.name,
-        password: data.password,
+        password,
         role: data.role,
         data: { projectId: context.projectId, emailVerified: true },
       },
@@ -46,26 +47,8 @@ export const createProjectUser = createServerFn({ method: 'POST' })
       name: result.user.name,
       email: result.user.email,
       role: data.role,
+      password,
     };
-  });
-
-export const resetProjectUserPassword = createServerFn({ method: 'POST' })
-  .middleware([adminMiddleware])
-  .inputValidator((input: ResetProjectUserPasswordInput) =>
-    resetProjectUserPasswordSchema.parse(input),
-  )
-  .handler(async ({ data, context }) => {
-    const target = await prisma.user.findFirst({
-      where: { id: data.userId, projectId: context.projectId },
-    });
-    if (!target) {
-      throw new Error('User not found in this project');
-    }
-    const request = getRequest();
-    await auth.api.setUserPassword({
-      body: { userId: data.userId, newPassword: data.password },
-      headers: request.headers,
-    });
   });
 
 export const deleteProjectUser = createServerFn({ method: 'POST' })

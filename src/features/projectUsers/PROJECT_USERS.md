@@ -5,17 +5,17 @@ Admin-only management of who has access to the current project (household). Ever
 ## Roles
 
 - `user` — default role, full access to all app features except this page.
-- `admin` — everything a `user` can do, plus access to `/settings/users` to add, reset the password of, or remove other project members. Role does not gate anything else in the app.
+- `admin` — everything a `user` can do, plus access to `/settings/users` to add or remove other project members. Role does not gate anything else in the app.
 
 ## Adding a user
 
-Sign-up is closed — there is no public registration. An admin adds a user here with an email, name, and a temporary password (shown/typed once by the admin, not emailed). The new user can sign in immediately with that password, or via Google using the same email (Better Auth auto-links by email match).
+Sign-up is closed — there is no public registration. An admin adds a user here with just an email, name, and role — the server generates a random temporary password and returns it once in the response. The modal shows it with a copy button and cannot be dismissed accidentally (no click-outside/Escape close) while it's visible; once closed, it is only ever stored hashed and cannot be retrieved again in plaintext, by anyone, through the app. The new user can sign in immediately with that password, or via Google using the same email (Better Auth auto-links by email match).
 
 Our Google OAuth consent screen is in "Testing" publishing mode, so Google sign-in only works for emails explicitly added as test users in the Google Cloud Console project — a new user must be added there too before Google sign-in works for them (the password sign-in above works regardless).
 
-## Resetting a password
+## Passwords and account settings
 
-There is no self-service "forgot password" flow. If a user forgets their password, an admin resets it from this page the same way a new user is created — the reset password is a new temporary password shared out-of-band.
+Nobody — not even an admin — can set or reset another user's password from the app. Every user (any role) manages their own name and password from **My Account** (`/settings/account`, `~/features/account`), reachable via the nav's Project group alongside this page — not gated by role, since regular users can't reach this admin-only table. Password changes require the current password (Better Auth's built-in `changePassword` endpoint, called directly from the client via `ChangePasswordForm` in `~/features/auth`); email is not editable there. There is no self-service "forgot password" flow: if a user forgets their password and can't sign in to change it, the only recourse is `scripts/reset-password.ts`, run directly against the database by someone with infra access.
 
 ## Removing a user
 

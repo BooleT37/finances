@@ -3,15 +3,12 @@ import { useDisclosure } from '@mantine/hooks';
 import { IconPlus } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { MantineReactTable, useMantineReactTable } from 'mantine-react-table';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useTableLocalization } from '~/shared/hooks/useTableLocalization';
 
 import { getProjectUsersQueryOptions } from '../../queries';
-import type { ProjectUser } from '../../schema';
 import { CreateProjectUserModal } from '../CreateProjectUserModal';
-import { ResetPasswordModal } from '../ResetPasswordModal';
 import { useProjectUsersTableColumns } from './columns/useProjectUsersTableColumns';
 import { RowActions } from './RowActions';
 
@@ -20,8 +17,6 @@ export function ProjectUsersTable() {
   const { data: users } = useQuery(getProjectUsersQueryOptions());
   const [createOpened, { open: openCreate, close: closeCreate }] =
     useDisclosure(false);
-  const [resetPasswordUser, setResetPasswordUser] =
-    useState<ProjectUser | null>(null);
 
   const columns = useProjectUsersTableColumns();
   const tableLocalization = useTableLocalization();
@@ -45,9 +40,7 @@ export function ProjectUsersTable() {
     displayColumnDefOptions: {
       'mrt-row-actions': { header: '', size: 100 },
     },
-    renderRowActions: ({ row }) => (
-      <RowActions row={row} onResetPassword={setResetPasswordUser} />
-    ),
+    renderRowActions: ({ row }) => <RowActions row={row} />,
     localization: tableLocalization,
   });
 
@@ -63,10 +56,6 @@ export function ProjectUsersTable() {
       <MantineReactTable table={table} />
 
       <CreateProjectUserModal opened={createOpened} onClose={closeCreate} />
-      <ResetPasswordModal
-        user={resetPasswordUser}
-        onClose={() => setResetPasswordUser(null)}
-      />
     </>
   );
 }

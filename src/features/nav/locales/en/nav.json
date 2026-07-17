@@ -13,7 +13,9 @@
   "categories": "Categories",
   "sources": "Sources",
   "subscriptions": "Subscriptions",
+  "project": "Project",
   "users": "Users",
+  "account": "Account",
   "signOut": "Sign out",
   "collapseSidebar": "Collapse sidebar",
   "expandSidebar": "Expand sidebar"

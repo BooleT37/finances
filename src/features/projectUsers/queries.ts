@@ -5,16 +5,8 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 
-import {
-  createProjectUser,
-  deleteProjectUser,
-  fetchProjectUsers,
-  resetProjectUserPassword,
-} from './api';
-import type {
-  CreateProjectUserInput,
-  ResetProjectUserPasswordInput,
-} from './schema';
+import { createProjectUser, deleteProjectUser, fetchProjectUsers } from './api';
+import type { CreateProjectUserInput } from './schema';
 
 const projectUserKeys = createQueryKeys('projectUsers', {
   all: { queryKey: null },
@@ -34,13 +26,6 @@ export function useCreateProjectUser() {
       createProjectUser({ data: input }),
     onSuccess: () =>
       queryClient.invalidateQueries(getProjectUsersQueryOptions()),
-  });
-}
-
-export function useResetProjectUserPassword() {
-  return useMutation({
-    mutationFn: (input: ResetProjectUserPasswordInput) =>
-      resetProjectUserPassword({ data: input }),
   });
 }
 

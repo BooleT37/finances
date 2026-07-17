@@ -1,0 +1,18 @@
+{
+  "pageTitle": "My account",
+  "sections": {
+    "name": "Name",
+    "password": "Password"
+  },
+  "form": {
+    "name": "Name",
+    "save": "Save"
+  },
+  "validation": {
+    "nameRequired": "Name is required"
+  },
+  "notifications": {
+    "nameUpdated": "Name updated",
+    "nameUpdateError": "Failed to update name"
+  }
+}

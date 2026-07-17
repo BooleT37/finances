@@ -5,44 +5,44 @@ test.describe('Project users', () => {
     await page.goto('/settings/users');
   });
 
-  test('shows the seeded admin, resets passwords (self vs. other), adds a user, and removes a non-admin user', async ({
+  test('shows the seeded admin, adds a user via a one-time generated password, and removes a non-admin user', async ({
     page,
   }) => {
     const adminRow = page.locator('tr', { hasText: 'test-admin@example.com' });
     await expect(adminRow).toBeVisible();
     await expect(adminRow.getByText('Админ')).toBeVisible();
 
-    // Resetting your own password shows a simplified label, not the
-    // "share this with them" copy meant for other users.
-    await adminRow.getByRole('button', { name: 'Сбросить пароль' }).click();
-    const selfResetDialog = page.getByRole('dialog');
+    // Password/name changes live on the dedicated Account page, not here.
     await expect(
-      selfResetDialog.getByText('Введите новый пароль'),
-    ).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(selfResetDialog).not.toBeVisible();
+      adminRow.getByRole('button', { name: 'Сменить пароль' }),
+    ).toHaveCount(0);
 
-    // Add a new (non-admin) user
+    // Add a new (non-admin) user — no password field, the server generates one.
     await page.getByRole('button', { name: 'Добавить пользователя' }).click();
     const addDialog = page.getByRole('dialog');
     await addDialog.getByLabel('Имя').fill('QA New User');
     await addDialog.getByLabel('Email').fill('qa-new-user@example.com');
-    await addDialog.getByLabel('Временный пароль').fill('temp-password-123');
     await addDialog.getByRole('button', { name: 'Сохранить' }).click();
+
+    // Success view shows the generated password once, and can't be
+    // dismissed accidentally via click-outside/Escape.
+    const createdDialog = page.getByRole('dialog');
+    await expect(
+      createdDialog.getByText('Пользователь добавлен'),
+    ).toBeVisible();
+    const passwordField = createdDialog.getByLabel('Временный пароль');
+    await expect(passwordField).not.toHaveValue('');
+    await page.keyboard.press('Escape');
+    await expect(createdDialog).toBeVisible();
+
+    await createdDialog.getByRole('button', { name: 'Готово' }).click();
+    await expect(createdDialog).not.toBeVisible();
 
     const newUserRow = page.locator('tr', {
       hasText: 'qa-new-user@example.com',
     });
     await expect(newUserRow).toBeVisible();
     await expect(newUserRow.getByText('Пользователь')).toBeVisible();
-
-    // Resetting someone else's password shows the full share-this-password copy
-    await newUserRow.getByRole('button', { name: 'Сбросить пароль' }).click();
-    const otherResetDialog = page.getByRole('dialog');
-    await expect(
-      otherResetDialog.getByText(/Сообщите этот пароль пользователю напрямую/),
-    ).toBeVisible();
-    await page.keyboard.press('Escape');
 
     // Remove the new user
     await newUserRow.getByRole('button', { name: 'Удалить' }).click();

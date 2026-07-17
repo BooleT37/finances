@@ -13,7 +13,9 @@
   "categories": "Категории",
   "sources": "Источники",
   "subscriptions": "Подписки",
+  "project": "Проект",
   "users": "Пользователи",
+  "account": "Аккаунт",
   "signOut": "Выйти",
   "collapseSidebar": "Свернуть меню",
   "expandSidebar": "Развернуть меню"

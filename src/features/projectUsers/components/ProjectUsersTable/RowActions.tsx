@@ -1,7 +1,7 @@
 import { ActionIcon, Group, Tooltip } from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
-import { IconKey, IconTrash } from '@tabler/icons-react';
+import { IconTrash } from '@tabler/icons-react';
 import type { MRT_Row } from 'mantine-react-table';
 import { useTranslation } from 'react-i18next';
 
@@ -10,10 +10,9 @@ import type { ProjectUser } from '~/features/projectUsers/schema';
 
 interface Props {
   row: MRT_Row<ProjectUser>;
-  onResetPassword: (user: ProjectUser) => void;
 }
 
-export function RowActions({ row, onResetPassword }: Props) {
+export function RowActions({ row }: Props) {
   const { t } = useTranslation('projectUsers');
   const deleteMutation = useDeleteProjectUser();
   const user = row.original;
@@ -42,15 +41,6 @@ export function RowActions({ row, onResetPassword }: Props) {
 
   return (
     <Group gap={4}>
-      <Tooltip label={t('actions.resetPassword')}>
-        <ActionIcon
-          variant="subtle"
-          aria-label={t('actions.resetPassword')}
-          onClick={() => onResetPassword(user)}
-        >
-          <IconKey size={16} />
-        </ActionIcon>
-      </Tooltip>
       <Tooltip label={t('actions.delete')}>
         <ActionIcon
           variant="subtle"

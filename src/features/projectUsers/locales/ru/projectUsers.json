@@ -11,32 +11,29 @@
     "admin": "Админ"
   },
   "actions": {
-    "resetPassword": "Сбросить пароль",
-    "delete": "Удалить"
+    "delete": "Удалить",
+    "copyPassword": "Скопировать пароль",
+    "passwordCopied": "Скопировано"
   },
   "modal": {
     "addTitle": "Добавить пользователя",
-    "resetPasswordTitle": "Сбросить пароль для {{name}}",
-    "save": "Сохранить"
+    "createdTitle": "Пользователь добавлен",
+    "createdWarning": "Скопируйте этот пароль сейчас — после закрытия окна увидеть его снова будет невозможно.",
+    "save": "Сохранить",
+    "done": "Готово"
   },
   "form": {
     "name": "Имя",
     "email": "Email",
     "role": "Роль",
-    "tempPassword": "Временный пароль",
-    "tempPasswordDescription": "Сообщите этот пароль пользователю напрямую — он сможет войти по нему или через Google с тем же email.",
-    "newPasswordDescriptionSelf": "Введите новый пароль"
+    "generatedPassword": "Временный пароль"
   },
   "validation": {
     "nameRequired": "Укажите имя",
-    "emailInvalid": "Введите корректный email",
-    "passwordTooShort": "Пароль должен быть не короче 8 символов"
+    "emailInvalid": "Введите корректный email"
   },
   "notifications": {
-    "created": "Пользователь добавлен",
-    "createError": "Не удалось добавить пользователя",
-    "passwordReset": "Пароль сброшен",
-    "passwordResetError": "Не удалось сбросить пароль"
+    "createError": "Не удалось добавить пользователя"
   },
   "delete": {
     "confirmTitle": "Удалить пользователя",

@@ -23,6 +23,7 @@ import { Route as AuthenticatedSettingsUsersRouteImport } from './routes/_authen
 import { Route as AuthenticatedSettingsSubscriptionsRouteImport } from './routes/_authenticated.settings.subscriptions'
 import { Route as AuthenticatedSettingsSourcesRouteImport } from './routes/_authenticated.settings.sources'
 import { Route as AuthenticatedSettingsCategoriesRouteImport } from './routes/_authenticated.settings.categories'
+import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated.settings.account'
 import { Route as AuthenticatedSavingsSpendingsArchiveRouteImport } from './routes/_authenticated.savings-spendings.archive'
 import { Route as AuthenticatedSettingsSubscriptionsIndexRouteImport } from './routes/_authenticated.settings.subscriptions.index'
 import { Route as AuthenticatedSettingsSubscriptionsArchiveRouteImport } from './routes/_authenticated.settings.subscriptions.archive'
@@ -103,6 +104,12 @@ const AuthenticatedSettingsCategoriesRoute =
     path: '/categories',
     getParentRoute: () => AuthenticatedSettingsRoute,
   } as any)
+const AuthenticatedSettingsAccountRoute =
+  AuthenticatedSettingsAccountRouteImport.update({
+    id: '/account',
+    path: '/account',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
 const AuthenticatedSavingsSpendingsArchiveRoute =
   AuthenticatedSavingsSpendingsArchiveRouteImport.update({
     id: '/archive',
@@ -131,6 +138,7 @@ export interface FileRoutesByFullPath {
   '/statistics': typeof AuthenticatedStatisticsRoute
   '/transactions': typeof AuthenticatedTransactionsRoute
   '/savings-spendings/archive': typeof AuthenticatedSavingsSpendingsArchiveRoute
+  '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/categories': typeof AuthenticatedSettingsCategoriesRoute
   '/settings/sources': typeof AuthenticatedSettingsSourcesRoute
   '/settings/subscriptions': typeof AuthenticatedSettingsSubscriptionsRouteWithChildren
@@ -148,6 +156,7 @@ export interface FileRoutesByTo {
   '/transactions': typeof AuthenticatedTransactionsRoute
   '/': typeof AuthenticatedIndexRoute
   '/savings-spendings/archive': typeof AuthenticatedSavingsSpendingsArchiveRoute
+  '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/categories': typeof AuthenticatedSettingsCategoriesRoute
   '/settings/sources': typeof AuthenticatedSettingsSourcesRoute
   '/settings/users': typeof AuthenticatedSettingsUsersRoute
@@ -167,6 +176,7 @@ export interface FileRoutesById {
   '/_authenticated/transactions': typeof AuthenticatedTransactionsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/savings-spendings/archive': typeof AuthenticatedSavingsSpendingsArchiveRoute
+  '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/_authenticated/settings/categories': typeof AuthenticatedSettingsCategoriesRoute
   '/_authenticated/settings/sources': typeof AuthenticatedSettingsSourcesRoute
   '/_authenticated/settings/subscriptions': typeof AuthenticatedSettingsSubscriptionsRouteWithChildren
@@ -187,6 +197,7 @@ export interface FileRouteTypes {
     | '/statistics'
     | '/transactions'
     | '/savings-spendings/archive'
+    | '/settings/account'
     | '/settings/categories'
     | '/settings/sources'
     | '/settings/subscriptions'
@@ -204,6 +215,7 @@ export interface FileRouteTypes {
     | '/transactions'
     | '/'
     | '/savings-spendings/archive'
+    | '/settings/account'
     | '/settings/categories'
     | '/settings/sources'
     | '/settings/users'
@@ -222,6 +234,7 @@ export interface FileRouteTypes {
     | '/_authenticated/transactions'
     | '/_authenticated/'
     | '/_authenticated/savings-spendings/archive'
+    | '/_authenticated/settings/account'
     | '/_authenticated/settings/categories'
     | '/_authenticated/settings/sources'
     | '/_authenticated/settings/subscriptions'
@@ -338,6 +351,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsCategoriesRouteImport
       parentRoute: typeof AuthenticatedSettingsRoute
     }
+    '/_authenticated/settings/account': {
+      id: '/_authenticated/settings/account'
+      path: '/account'
+      fullPath: '/settings/account'
+      preLoaderRoute: typeof AuthenticatedSettingsAccountRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
     '/_authenticated/savings-spendings/archive': {
       id: '/_authenticated/savings-spendings/archive'
       path: '/archive'
@@ -399,6 +419,7 @@ const AuthenticatedSettingsSubscriptionsRouteWithChildren =
   )
 
 interface AuthenticatedSettingsRouteChildren {
+  AuthenticatedSettingsAccountRoute: typeof AuthenticatedSettingsAccountRoute
   AuthenticatedSettingsCategoriesRoute: typeof AuthenticatedSettingsCategoriesRoute
   AuthenticatedSettingsSourcesRoute: typeof AuthenticatedSettingsSourcesRoute
   AuthenticatedSettingsSubscriptionsRoute: typeof AuthenticatedSettingsSubscriptionsRouteWithChildren
@@ -406,6 +427,7 @@ interface AuthenticatedSettingsRouteChildren {
 }
 
 const AuthenticatedSettingsRouteChildren: AuthenticatedSettingsRouteChildren = {
+  AuthenticatedSettingsAccountRoute: AuthenticatedSettingsAccountRoute,
   AuthenticatedSettingsCategoriesRoute: AuthenticatedSettingsCategoriesRoute,
   AuthenticatedSettingsSourcesRoute: AuthenticatedSettingsSourcesRoute,
   AuthenticatedSettingsSubscriptionsRoute:

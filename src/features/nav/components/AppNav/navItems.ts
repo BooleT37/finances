@@ -8,6 +8,8 @@ import {
   IconSettings,
   IconTable,
   IconTag,
+  IconUser,
+  IconUserCog,
   IconUsers,
 } from '@tabler/icons-react';
 
@@ -45,10 +47,18 @@ export const navItems: NavItem[] = [
         icon: IconRepeat,
       },
       {
-        to: '/settings/users',
-        labelKey: 'users',
+        to: '/settings/project',
+        labelKey: 'project',
         icon: IconUsers,
-        adminOnly: true,
+        children: [
+          {
+            to: '/settings/users',
+            labelKey: 'users',
+            icon: IconUserCog,
+            adminOnly: true,
+          },
+          { to: '/settings/account', labelKey: 'account', icon: IconUser },
+        ],
       },
     ],
   },

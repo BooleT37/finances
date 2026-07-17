@@ -11,32 +11,29 @@
     "admin": "Admin"
   },
   "actions": {
-    "resetPassword": "Reset password",
-    "delete": "Remove"
+    "delete": "Remove",
+    "copyPassword": "Copy password",
+    "passwordCopied": "Copied"
   },
   "modal": {
     "addTitle": "Add user",
-    "resetPasswordTitle": "Reset password for {{name}}",
-    "save": "Save"
+    "createdTitle": "User added",
+    "createdWarning": "Copy this password now — once you close this dialog, it can never be shown again.",
+    "save": "Save",
+    "done": "Done"
   },
   "form": {
     "name": "Name",
     "email": "Email",
     "role": "Role",
-    "tempPassword": "Temporary password",
-    "tempPasswordDescription": "Share this password with them directly — they can sign in with it or via Google using the same email.",
-    "newPasswordDescriptionSelf": "Enter your new password"
+    "generatedPassword": "Temporary password"
   },
   "validation": {
     "nameRequired": "Name is required",
-    "emailInvalid": "Enter a valid email",
-    "passwordTooShort": "Password must be at least 8 characters"
+    "emailInvalid": "Enter a valid email"
   },
   "notifications": {
-    "created": "User added",
-    "createError": "Failed to add user",
-    "passwordReset": "Password reset",
-    "passwordResetError": "Failed to reset password"
+    "createError": "Failed to add user"
   },
   "delete": {
     "confirmTitle": "Remove user",

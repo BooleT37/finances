@@ -1,17 +1,22 @@
 import {
+  ActionIcon,
   Button,
+  CopyButton,
   Modal,
-  PasswordInput,
   Select,
   Stack,
+  Text,
   TextInput,
+  Tooltip,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
+import { IconCheck, IconCopy } from '@tabler/icons-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useCreateProjectUser } from '../queries';
-import type { CreateProjectUserInput } from '../schema';
+import type { CreatedProjectUser, CreateProjectUserInput } from '../schema';
 
 interface Props {
   opened: boolean;
@@ -21,27 +26,24 @@ interface Props {
 export function CreateProjectUserModal({ opened, onClose }: Props) {
   const { t } = useTranslation('projectUsers');
   const createMutation = useCreateProjectUser();
+  const [createdUser, setCreatedUser] = useState<CreatedProjectUser | null>(
+    null,
+  );
 
   const form = useForm<CreateProjectUserInput>({
-    initialValues: { name: '', email: '', password: '', role: 'user' },
+    initialValues: { name: '', email: '', role: 'user' },
     validate: {
       name: (value) => (value.trim() ? null : t('validation.nameRequired')),
       email: (value) =>
         /^\S+@\S+\.\S+$/.test(value) ? null : t('validation.emailInvalid'),
-      password: (value) =>
-        value.length >= 8 ? null : t('validation.passwordTooShort'),
     },
   });
 
   function handleSubmit(values: CreateProjectUserInput) {
     createMutation.mutate(values, {
-      onSuccess: () => {
-        notifications.show({
-          color: 'green',
-          message: t('notifications.created'),
-        });
+      onSuccess: (user) => {
+        setCreatedUser(user);
         form.reset();
-        onClose();
       },
       onError: () =>
         notifications.show({
@@ -51,41 +53,86 @@ export function CreateProjectUserModal({ opened, onClose }: Props) {
     });
   }
 
+  function handleClose() {
+    setCreatedUser(null);
+    onClose();
+  }
+
   return (
-    <Modal opened={opened} onClose={onClose} title={t('modal.addTitle')}>
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+    <Modal
+      opened={opened}
+      onClose={handleClose}
+      title={createdUser ? t('modal.createdTitle') : t('modal.addTitle')}
+      closeOnClickOutside={!createdUser}
+      closeOnEscape={!createdUser}
+    >
+      {createdUser ? (
         <Stack gap="md">
+          <Text size="sm">{t('modal.createdWarning')}</Text>
           <TextInput
-            label={t('form.name')}
-            required
-            {...form.getInputProps('name')}
+            label={t('form.generatedPassword')}
+            value={createdUser.password}
+            readOnly
+            rightSection={
+              <CopyButton value={createdUser.password}>
+                {({ copied, copy }) => (
+                  <Tooltip
+                    label={
+                      copied
+                        ? t('actions.passwordCopied')
+                        : t('actions.copyPassword')
+                    }
+                  >
+                    <ActionIcon
+                      variant="subtle"
+                      color={copied ? 'teal' : 'gray'}
+                      aria-label={t('actions.copyPassword')}
+                      onClick={copy}
+                    >
+                      {copied ? (
+                        <IconCheck size={16} />
+                      ) : (
+                        <IconCopy size={16} />
+                      )}
+                    </ActionIcon>
+                  </Tooltip>
+                )}
+              </CopyButton>
+            }
           />
-          <TextInput
-            label={t('form.email')}
-            type="email"
-            required
-            {...form.getInputProps('email')}
-          />
-          <PasswordInput
-            label={t('form.tempPassword')}
-            description={t('form.tempPasswordDescription')}
-            required
-            {...form.getInputProps('password')}
-          />
-          <Select
-            label={t('form.role')}
-            data={[
-              { value: 'user', label: t('roles.user') },
-              { value: 'admin', label: t('roles.admin') },
-            ]}
-            allowDeselect={false}
-            {...form.getInputProps('role')}
-          />
-          <Button type="submit" loading={createMutation.isPending} fullWidth>
-            {t('modal.save')}
+          <Button onClick={handleClose} fullWidth>
+            {t('modal.done')}
           </Button>
         </Stack>
-      </form>
+      ) : (
+        <form onSubmit={form.onSubmit(handleSubmit)}>
+          <Stack gap="md">
+            <TextInput
+              label={t('form.name')}
+              required
+              {...form.getInputProps('name')}
+            />
+            <TextInput
+              label={t('form.email')}
+              type="email"
+              required
+              {...form.getInputProps('email')}
+            />
+            <Select
+              label={t('form.role')}
+              data={[
+                { value: 'user', label: t('roles.user') },
+                { value: 'admin', label: t('roles.admin') },
+              ]}
+              allowDeselect={false}
+              {...form.getInputProps('role')}
+            />
+            <Button type="submit" loading={createMutation.isPending} fullWidth>
+              {t('modal.save')}
+            </Button>
+          </Stack>
+        </form>
+      )}
     </Modal>
   );
 }

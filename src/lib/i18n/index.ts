@@ -1,6 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
+import { i18nResources as accountResources } from '~/features/account/i18n';
 import { i18nResources as authResources } from '~/features/auth/i18n';
 import { i18nResources as budgetingResources } from '~/features/budgeting/i18n';
 import { i18nResources as categoriesResources } from '~/features/categories/i18n';
@@ -31,6 +32,7 @@ export const resources = {
     ...statisticsResources.en,
     ...authResources.en,
     ...projectUsersResources.en,
+    ...accountResources.en,
   },
   ru: {
     common: commonRu,
@@ -45,6 +47,7 @@ export const resources = {
     ...statisticsResources.ru,
     ...authResources.ru,
     ...projectUsersResources.ru,
+    ...accountResources.ru,
   },
 } as const;
 

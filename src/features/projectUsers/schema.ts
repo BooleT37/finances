@@ -7,18 +7,15 @@ export interface ProjectUser {
   role: string;
 }
 
+// The generated temporary password is only ever returned here, once, right
+// after creation — it's never stored in plaintext and never retrievable again.
+export interface CreatedProjectUser extends ProjectUser {
+  password: string;
+}
+
 export const createProjectUserSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
-  password: z.string().min(8),
   role: z.enum(['user', 'admin']),
 });
 export type CreateProjectUserInput = z.input<typeof createProjectUserSchema>;
-
-export const resetProjectUserPasswordSchema = z.object({
-  userId: z.string(),
-  password: z.string().min(8),
-});
-export type ResetProjectUserPasswordInput = z.input<
-  typeof resetProjectUserPasswordSchema
->;

@@ -1,0 +1,18 @@
+{
+  "pageTitle": "Мой аккаунт",
+  "sections": {
+    "name": "Имя",
+    "password": "Пароль"
+  },
+  "form": {
+    "name": "Имя",
+    "save": "Сохранить"
+  },
+  "validation": {
+    "nameRequired": "Укажите имя"
+  },
+  "notifications": {
+    "nameUpdated": "Имя обновлено",
+    "nameUpdateError": "Не удалось обновить имя"
+  }
+}
