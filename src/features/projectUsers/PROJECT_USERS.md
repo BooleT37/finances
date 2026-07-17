@@ -2,10 +2,12 @@
 
 Admin-only management of who has access to the current project (household). Every `User` belongs to exactly one `Project` for life — there is no cross-project membership or project switching.
 
+This lives as a section (`ProjectUsersTable`) on the same `/settings/project` page as [Project](../project/PROJECT.md) info, composed together in the route file (`_authenticated.settings.project.tsx`) rather than in either feature — the route only renders this section when `session.role === 'admin'`, since `fetchProjectUsers` itself is `adminMiddleware`-gated and would error for anyone else.
+
 ## Roles
 
-- `user` — default role, full access to all app features except this page.
-- `admin` — everything a `user` can do, plus access to `/settings/users` to add or remove other project members. Role does not gate anything else in the app.
+- `user` — default role, full access to all app features except the users section of this page.
+- `admin` — everything a `user` can do, plus the users section on `/settings/project` to add or remove other project members. Role does not gate anything else in the app.
 
 ## Adding a user
 
@@ -15,7 +17,7 @@ Our Google OAuth consent screen is in "Testing" publishing mode, so Google sign-
 
 ## Passwords and account settings
 
-Nobody — not even an admin — can set or reset another user's password from the app. Every user (any role) manages their own name and password from **My Account** (`/settings/account`, `~/features/account`), reachable via the nav's Project group alongside this page — not gated by role, since regular users can't reach this admin-only table. Password changes require the current password (Better Auth's built-in `changePassword` endpoint, called directly from the client via `ChangePasswordForm` in `~/features/auth`); email is not editable there. There is no self-service "forgot password" flow: if a user forgets their password and can't sign in to change it, the only recourse is `scripts/reset-password.ts`, run directly against the database by someone with infra access.
+Nobody — not even an admin — can set or reset another user's password from the app. Every user (any role) manages their own name and password from **My Account** (`/settings/account`, `~/features/account`), reachable from the same nav group as this page — not gated by role, since regular users can't reach the users section. Password changes require the current password (Better Auth's built-in `changePassword` endpoint, called directly from the client via `ChangePasswordForm` in `~/features/auth`); email is not editable there. There is no self-service "forgot password" flow: if a user forgets their password and can't sign in to change it, the only recourse is `scripts/reset-password.ts`, run directly against the database by someone with infra access.
 
 ## Removing a user
 

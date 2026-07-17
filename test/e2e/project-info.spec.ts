@@ -3,8 +3,14 @@ import { testAuth } from './db/testAuth';
 import { expect, test } from './fixtures';
 
 test.describe('Project info', () => {
-  test('admin can rename the project', async ({ page }) => {
+  test('admin can rename the project, and sees the users section on the same page', async ({
+    page,
+  }) => {
     await page.goto('/settings/project');
+
+    await expect(
+      page.getByRole('heading', { name: 'Пользователи проекта' }),
+    ).toBeVisible();
 
     const nameInput = page.getByLabel('Название проекта');
     await expect(nameInput).toHaveValue('E2E Test Project');
@@ -47,5 +53,13 @@ test.describe('Project info', () => {
     await expect(page.getByRole('button', { name: 'Сохранить' })).toHaveCount(
       0,
     );
+
+    // The users section is admin-only and shouldn't render at all for them.
+    await expect(
+      page.getByRole('heading', { name: 'Пользователи проекта' }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole('button', { name: 'Добавить пользователя' }),
+    ).toHaveCount(0);
   });
 });

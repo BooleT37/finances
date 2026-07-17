@@ -9,7 +9,6 @@ import {
   IconTable,
   IconTag,
   IconUser,
-  IconUserCog,
   IconUsers,
 } from '@tabler/icons-react';
 
@@ -23,8 +22,6 @@ export interface NavItem {
   icon: Icon;
   children?: NavItem[];
   adminOnly?: boolean;
-  /** Group items with children are plain (non-navigating) labels by default. */
-  clickable?: boolean;
 }
 
 export const navItems: NavItem[] = [
@@ -48,21 +45,8 @@ export const navItems: NavItem[] = [
         labelKey: 'subscriptions',
         icon: IconRepeat,
       },
-      {
-        to: '/settings/project',
-        labelKey: 'project',
-        icon: IconUsers,
-        clickable: true,
-        children: [
-          {
-            to: '/settings/users',
-            labelKey: 'users',
-            icon: IconUserCog,
-            adminOnly: true,
-          },
-          { to: '/settings/account', labelKey: 'account', icon: IconUser },
-        ],
-      },
+      { to: '/settings/project', labelKey: 'project', icon: IconUsers },
+      { to: '/settings/account', labelKey: 'account', icon: IconUser },
     ],
   },
 ];

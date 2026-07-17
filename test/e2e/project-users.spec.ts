@@ -2,7 +2,7 @@ import { expect, test } from './fixtures';
 
 test.describe('Project users', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/settings/users');
+    await page.goto('/settings/project');
   });
 
   test('shows the seeded admin, adds a user via a one-time generated password, and removes a non-admin user', async ({
