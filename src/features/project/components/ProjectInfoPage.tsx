@@ -1,85 +1,51 @@
-import { Button, Group, Stack, Text, TextInput, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useQuery } from '@tanstack/react-query';
 import { useRouteContext } from '@tanstack/react-router';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { EditableTitle } from '~/shared/components/EditableTitle';
 
 import { getProjectQueryOptions, useRenameProject } from '../queries';
 import type { ProjectInfo } from '../schema';
 
 export function ProjectInfoPage() {
-  const { t } = useTranslation('project');
   const { data: project } = useQuery(getProjectQueryOptions());
-
-  return (
-    <Stack gap="md" maw={400}>
-      <Title order={3}>{t('pageTitle')}</Title>
-      {project && <ProjectNameSection project={project} />}
-    </Stack>
-  );
+  return project ? <ProjectTitle project={project} /> : null;
 }
 
-interface ProjectNameSectionProps {
+interface ProjectTitleProps {
   project: ProjectInfo;
 }
 
-function ProjectNameSection({ project }: ProjectNameSectionProps) {
+function ProjectTitle({ project }: ProjectTitleProps) {
   const { t } = useTranslation('project');
   const { session } = useRouteContext({ from: '/_authenticated' });
   const isAdmin = session.role === 'admin';
   const renameMutation = useRenameProject();
-  const [name, setName] = useState(project.name);
 
-  function handleSave() {
-    if (!name.trim()) {
-      return;
+  async function handleSave(newName: string) {
+    try {
+      await renameMutation.mutateAsync({ name: newName });
+      notifications.show({
+        color: 'green',
+        message: t('notifications.renamed'),
+      });
+    } catch (error) {
+      notifications.show({
+        color: 'red',
+        message: t('notifications.renameError'),
+      });
+      throw error;
     }
-    renameMutation.mutate(
-      { name },
-      {
-        onSuccess: () =>
-          notifications.show({
-            color: 'green',
-            message: t('notifications.renamed'),
-          }),
-        onError: () =>
-          notifications.show({
-            color: 'red',
-            message: t('notifications.renameError'),
-          }),
-      },
-    );
   }
-
-  if (!isAdmin) {
-    return (
-      <Stack gap={4}>
-        <Text size="sm" fw={500}>
-          {t('form.name')}
-        </Text>
-        <Text>{project.name}</Text>
-      </Stack>
-    );
-  }
-
-  const isDirty = name.trim() !== project.name;
 
   return (
-    <Group align="flex-end">
-      <TextInput
-        label={t('form.name')}
-        value={name}
-        onChange={(e) => setName(e.currentTarget.value)}
-        style={{ flex: 1 }}
-      />
-      <Button
-        onClick={handleSave}
-        loading={renameMutation.isPending}
-        disabled={!isDirty}
-      >
-        {t('form.save')}
-      </Button>
-    </Group>
+    <EditableTitle
+      prefix={`${t('pageTitle')} `}
+      value={project.name}
+      editable={isAdmin}
+      editLabel={t('actions.rename')}
+      onSave={handleSave}
+    />
   );
 }

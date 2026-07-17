@@ -9,5 +9,9 @@
     "message": "There are unsaved changes. Discard them?",
     "confirm": "Discard",
     "cancel": "Continue editing"
+  },
+  "inlineEdit": {
+    "confirm": "Save",
+    "cancel": "Cancel"
   }
 }

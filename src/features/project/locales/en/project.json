@@ -1,8 +1,7 @@
 {
   "pageTitle": "Project",
-  "form": {
-    "name": "Project name",
-    "save": "Save"
+  "actions": {
+    "rename": "Rename project"
   },
   "notifications": {
     "renamed": "Project renamed",
