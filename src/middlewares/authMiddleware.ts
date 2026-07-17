@@ -1,12 +1,10 @@
 import { createMiddleware } from '@tanstack/react-start';
-import { getRequest } from '@tanstack/react-start/server';
 
-import { auth } from '~/server/auth';
+import { getSessionForRequest } from '~/server/getSessionForRequest';
 
 export const authMiddleware = createMiddleware({ type: 'function' }).server(
   async ({ next }) => {
-    const request = getRequest();
-    const session = await auth.api.getSession({ headers: request.headers });
+    const session = await getSessionForRequest();
 
     if (!session) {
       throw new Error('Unauthorized');

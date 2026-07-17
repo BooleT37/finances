@@ -1,23 +1,40 @@
 import { createMiddleware } from '@tanstack/react-start';
 
+import { getSessionForRequest } from '~/server/getSessionForRequest';
 import { posthog } from '~/server/posthog';
 
-// TODO: replace with the real user id once auth is in place. This matches the
-// hardcoded id used in finances-t3 so events keep flowing under the same
-// distinctId in the existing PostHog project. Also add `userEmail` to the
-// captured properties (t3 sets it from ctx.session.user.email).
-const HARDCODED_DISTINCT_ID = 'clg6kpbtn0000mr081ntz0f8i';
+const ANONYMOUS_DISTINCT_ID = 'anonymous';
+
+// Analytics must never take a request down with it, so a session that fails to
+// resolve is reported as anonymous rather than thrown. The real failure still
+// surfaces from authMiddleware, which awaits the same (memoised) lookup.
+const resolveSessionUser = async () => {
+  try {
+    const session = await getSessionForRequest();
+    return session?.user ?? null;
+  } catch (error) {
+    console.error('PostHog session lookup failed:', error);
+    return null;
+  }
+};
 
 export const posthogTrackingMiddleware = createMiddleware({
   type: 'function',
 }).server(async ({ next, method, serverFnMeta, data }) => {
+  const tracker = method === 'POST' ? posthog : null;
+  // Resolved before the handler runs: on failure `next()` throws, discarding the
+  // context that authMiddleware would otherwise have attached the user to.
+  const user = tracker ? await resolveSessionUser() : null;
+
   const environment =
     process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? 'unknown';
+  const distinctId = user?.id ?? ANONYMOUS_DISTINCT_ID;
   const commonProps = {
     name: serverFnMeta.name,
     input: data,
     timestamp: new Date().toISOString(),
     environment,
+    userEmail: user?.email ?? null,
   };
 
   let result: Awaited<ReturnType<typeof next>>;
@@ -25,10 +42,10 @@ export const posthogTrackingMiddleware = createMiddleware({
     result = await next();
   } catch (error) {
     console.error(`[serverfn] ${serverFnMeta.name} failed:`, error);
-    if (method === 'POST' && posthog) {
+    if (tracker) {
       try {
-        posthog.capture({
-          distinctId: HARDCODED_DISTINCT_ID,
+        tracker.capture({
+          distinctId,
           event: `serverfn_${serverFnMeta.name}`,
           properties: {
             ...commonProps,
@@ -43,12 +60,12 @@ export const posthogTrackingMiddleware = createMiddleware({
     throw error;
   }
 
-  if (method !== 'POST' || !posthog) {
+  if (!tracker) {
     return result;
   }
   try {
-    posthog.capture({
-      distinctId: HARDCODED_DISTINCT_ID,
+    tracker.capture({
+      distinctId,
       event: `serverfn_${serverFnMeta.name}`,
       properties: { ...commonProps, success: true },
     });
