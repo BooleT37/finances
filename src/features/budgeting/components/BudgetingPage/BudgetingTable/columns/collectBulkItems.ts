@@ -1,4 +1,4 @@
-import type { MRT_Row } from 'mantine-react-table';
+import type { MRT_Row } from 'mantine-react-table-open';
 
 import { decimalSum } from '~/shared/utils/decimalSum';
 

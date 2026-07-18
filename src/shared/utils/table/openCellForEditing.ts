@@ -2,7 +2,7 @@ import type {
   MRT_Cell,
   MRT_RowData,
   MRT_TableInstance,
-} from 'mantine-react-table';
+} from 'mantine-react-table-open';
 
 /**
  * MRT's built-in default edit input (used when a column has no custom `Edit`

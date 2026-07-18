@@ -7,7 +7,7 @@ import {
   queryClientAtom,
 } from 'jotai-tanstack-query';
 
-import { API_DATE_FORMAT, DATE_FORMAT } from '~/shared/constants';
+import { DATE_FORMAT, ISO_DATE_FORMAT } from '~/shared/constants';
 import type {
   NavTargets,
   ScrollRequest,
@@ -215,9 +215,9 @@ export const TransactionSidebarMolecule = molecule(() => {
         // Expense.date is @db.Date; serialize as a calendar date in the user's
         // local timezone so toISOString's UTC shift doesn't bump the row to
         // the previous day for positive-offset zones.
-        date: dayjs(values.date).format(API_DATE_FORMAT),
+        date: dayjs(values.date).format(ISO_DATE_FORMAT),
         actualDate: values.actualDate
-          ? dayjs(values.actualDate).format(API_DATE_FORMAT)
+          ? dayjs(values.actualDate).format(ISO_DATE_FORMAT)
           : null,
         categoryId: Number(values.category),
         subcategoryId:
@@ -259,9 +259,9 @@ export const TransactionSidebarMolecule = molecule(() => {
       const newTx = await get(addMutationAtom).mutateAsync({
         name: tx.name,
         cost: tx.cost.abs().toString(),
-        date: tx.date.format(API_DATE_FORMAT),
+        date: tx.date.format(ISO_DATE_FORMAT),
         actualDate: tx.actualDate
-          ? tx.actualDate.format(API_DATE_FORMAT)
+          ? tx.actualDate.format(ISO_DATE_FORMAT)
           : null,
         categoryId: tx.categoryId,
         subcategoryId: tx.subcategoryId ?? null,
@@ -303,7 +303,7 @@ export const TransactionSidebarMolecule = molecule(() => {
           const newTx = await _get(addMutationAtom).mutateAsync({
             name: row.name,
             cost: row.cost!.cost.abs().toString(),
-            date: dayjs(row.date, DATE_FORMAT).format(API_DATE_FORMAT),
+            date: dayjs(row.date, DATE_FORMAT).format(ISO_DATE_FORMAT),
             actualDate: null,
             categoryId: row.categoryId,
             subcategoryId: row.subcategoryId ?? null,

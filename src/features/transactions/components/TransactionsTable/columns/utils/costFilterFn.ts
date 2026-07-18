@@ -1,5 +1,5 @@
 import Decimal from 'decimal.js';
-import type { MRT_FilterFn } from 'mantine-react-table';
+import type { MRT_FilterFn } from 'mantine-react-table-open';
 
 import type {
   CostColValue,

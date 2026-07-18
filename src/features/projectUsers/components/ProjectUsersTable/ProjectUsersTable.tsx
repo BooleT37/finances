@@ -2,7 +2,10 @@ import { Button, Group, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconPlus } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
-import { MantineReactTable, useMantineReactTable } from 'mantine-react-table';
+import {
+  MantineReactTable,
+  useMantineReactTable,
+} from 'mantine-react-table-open';
 import { useTranslation } from 'react-i18next';
 
 import { useTableLocalization } from '~/shared/hooks/useTableLocalization';

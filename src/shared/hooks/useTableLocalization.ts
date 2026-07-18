@@ -1,5 +1,5 @@
-import { MRT_Localization_EN } from 'mantine-react-table/locales/en/index.cjs';
-import { MRT_Localization_RU } from 'mantine-react-table/locales/ru/index.cjs';
+import { MRT_Localization_EN } from 'mantine-react-table-open/locales/en/index.cjs';
+import { MRT_Localization_RU } from 'mantine-react-table-open/locales/ru/index.cjs';
 import { useTranslation } from 'react-i18next';
 
 const localizationMap = {

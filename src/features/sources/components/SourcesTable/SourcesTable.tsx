@@ -1,4 +1,7 @@
-import { MantineReactTable, useMantineReactTable } from 'mantine-react-table';
+import {
+  MantineReactTable,
+  useMantineReactTable,
+} from 'mantine-react-table-open';
 import { useEffect } from 'react';
 
 import { useOrderedSources } from '~/features/sources/facets/orderedSources';

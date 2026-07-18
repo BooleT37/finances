@@ -5,8 +5,8 @@ import { MONTH_DATE_FORMAT } from '~/shared/constants';
 export type Granularity = 'month' | 'quarter' | 'year';
 
 export interface PeriodAnchor {
-  /** Any date within the target period. For granularity="quarter", only its year is used. */
-  date: Date;
+  /** Any date within the target period (ISO_DATE_FORMAT string). For granularity="quarter", only its year is used. */
+  date: string;
   /** 1-4, used only when granularity === 'quarter'. */
   quarter: number;
 }

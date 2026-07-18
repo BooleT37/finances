@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import Decimal from 'decimal.js';
-import { type MRT_ColumnDef } from 'mantine-react-table';
+import { type MRT_ColumnDef } from 'mantine-react-table-open';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getSourceMapQueryOptions } from '~/features/sources/facets/sourceMap';
+import { DATE_FORMAT } from '~/shared/constants';
 import { costToString } from '~/shared/utils/costToString';
 
 import type { Subscription } from '../../../schema';
@@ -82,7 +83,7 @@ export function useSubscriptionTableColumns(
             }
           },
         }),
-        Cell: ({ row }) => row.original.firstDate.format('DD.MM.YYYY'),
+        Cell: ({ row }) => row.original.firstDate.format(DATE_FORMAT),
         Edit: ({ cell, row, table }) => (
           <SubscriptionDateCellEdit
             value={cell.getValue<Subscription['firstDate']>()}

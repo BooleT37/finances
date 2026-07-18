@@ -1,7 +1,7 @@
 import { molecule } from 'bunshi';
 import { atom } from 'jotai';
 
-import { API_DATE_FORMAT } from '~/shared/constants';
+import { ISO_DATE_FORMAT } from '~/shared/constants';
 
 import type { Transaction, TransactionComponent } from '../../schema';
 import { TransactionSidebarMolecule } from '../TransactionSidebar/transactionSidebarMolecule';
@@ -40,9 +40,9 @@ export const TransactionInlineEditMolecule = molecule((mol) => {
         id: nextTx.id,
         name: nextTx.name,
         cost: nextTx.cost.toString(),
-        date: nextTx.date.format(API_DATE_FORMAT),
+        date: nextTx.date.format(ISO_DATE_FORMAT),
         actualDate: nextTx.actualDate
-          ? nextTx.actualDate.format(API_DATE_FORMAT)
+          ? nextTx.actualDate.format(ISO_DATE_FORMAT)
           : null,
         categoryId: nextTx.categoryId,
         subcategoryId: nextTx.subcategoryId,
@@ -61,9 +61,9 @@ export const TransactionInlineEditMolecule = molecule((mol) => {
   );
 
   // The open sidebar form's field names/shapes don't all mirror Transaction's
-  // 1:1 (e.g. `source` holds a stringified sourceId, `date` is a native Date
-  // for the DatePickerInput), so each editable field needs its own mapping
-  // here rather than a generic `setFieldValue(field, value)`.
+  // 1:1 (e.g. `source` holds a stringified sourceId, `date` is an
+  // ISO_DATE_FORMAT string for the DatePickerInput), so each editable field
+  // needs its own mapping here rather than a generic `setFieldValue(field, value)`.
   const syncTransactionFieldToFormAtom = atom(
     null,
     (
@@ -83,7 +83,7 @@ export const TransactionInlineEditMolecule = molecule((mol) => {
           form.setFieldValue('name', patch.value);
           break;
         case 'date':
-          form.setFieldValue('date', patch.value.toDate());
+          form.setFieldValue('date', patch.value.format(ISO_DATE_FORMAT));
           break;
         case 'sourceId':
           form.setFieldValue(

@@ -4,7 +4,7 @@ import { notifications } from '@mantine/notifications';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { useMolecule } from 'bunshi/react';
 import { useSetAtom } from 'jotai';
-import type { MRT_Row } from 'mantine-react-table';
+import type { MRT_Row } from 'mantine-react-table-open';
 import { useTranslation } from 'react-i18next';
 
 import { CategorySidebarMolecule } from '~/features/categories/components/CategorySidebar/categorySidebarMolecule';

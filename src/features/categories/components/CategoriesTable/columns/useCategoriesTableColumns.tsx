@@ -1,4 +1,4 @@
-import type { MRT_ColumnDef } from 'mantine-react-table';
+import type { MRT_ColumnDef } from 'mantine-react-table-open';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 

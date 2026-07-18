@@ -9,7 +9,7 @@ import {
 } from '@tabler/icons-react';
 import { useMolecule } from 'bunshi/react';
 import { useSetAtom } from 'jotai';
-import type { MRT_Row } from 'mantine-react-table';
+import type { MRT_Row } from 'mantine-react-table-open';
 import { useTranslation } from 'react-i18next';
 
 import { SubscriptionSidebarMolecule } from '~/features/subscriptions/components/SubscriptionSidebar/subscriptionSidebarMolecule';
@@ -18,7 +18,7 @@ import {
   useUpdateSubscription,
 } from '~/features/subscriptions/queries';
 import type { Subscription } from '~/features/subscriptions/schema';
-import { API_DATE_FORMAT } from '~/shared/constants';
+import { ISO_DATE_FORMAT } from '~/shared/constants';
 
 interface Props {
   row: MRT_Row<Subscription>;
@@ -50,7 +50,7 @@ export function RowActions({ row, mode }: Props) {
         name,
         cost: cost.abs().toString(),
         period,
-        firstDate: firstDate.format(API_DATE_FORMAT),
+        firstDate: firstDate.format(ISO_DATE_FORMAT),
         categoryId,
         subcategoryId,
         sourceId,
@@ -73,7 +73,7 @@ export function RowActions({ row, mode }: Props) {
         name,
         cost: cost.abs().toString(),
         period,
-        firstDate: firstDate.format(API_DATE_FORMAT),
+        firstDate: firstDate.format(ISO_DATE_FORMAT),
         categoryId,
         subcategoryId,
         sourceId,

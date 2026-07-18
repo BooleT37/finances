@@ -38,6 +38,7 @@ import { TransactionTypeField } from './fields/TransactionTypeField';
 import type {
   TransactionFormTransform,
   TransactionFormValues,
+  TransformedTransactionFormValues,
   ValidatedTransactionFormValues,
 } from './transactionFormValues';
 import { emptyTransactionFormValuesAtom } from './TransactionSidebarForm.atoms';
@@ -141,7 +142,10 @@ export function TransactionSidebarForm() {
     // disabling the form during saves, which adds friction we decided isn't worth it.
   }, 600);
 
-  const form = useForm<TransactionFormValues, TransactionFormTransform>({
+  const form = useForm<
+    TransactionFormValues,
+    TransformedTransactionFormValues | null
+  >({
     initialValues,
     transformValues,
     validateInputOnBlur: true,
@@ -235,7 +239,7 @@ export function TransactionSidebarForm() {
                         : null,
                   })
                 : null,
-            firstDate: date ? new Date(date) : null,
+            firstDate: date,
             sourceId: source,
           }}
           onSuccess={({ subscriptionId, categoryId, sourceId, name }) => {

@@ -1,5 +1,5 @@
 import { Group, Text, Tooltip } from '@mantine/core';
-import type { MRT_Row } from 'mantine-react-table';
+import type { MRT_Row } from 'mantine-react-table-open';
 import { useTranslation } from 'react-i18next';
 
 import { costToString } from '~/shared/utils/costToString';

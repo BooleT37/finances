@@ -22,6 +22,7 @@ import { useAtom, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
 import { transactionSearchAtom } from '~/features/transactions/components/TransactionsPage/TransactionsPage.atoms';
+import { ISO_DATE_FORMAT, MONTH_DATE_FORMAT } from '~/shared/constants';
 import { selectedMonthKeyAtom, viewModeAtom } from '~/stores/month';
 
 function formatLabel(
@@ -32,7 +33,7 @@ function formatLabel(
   if (viewMode === 'year') {
     return monthStr.slice(0, 4);
   }
-  const formatted = dayjs(monthStr).locale(lang).format('MMMM YYYY');
+  const formatted = dayjs(monthStr).locale(lang).format(MONTH_DATE_FORMAT);
   return formatted.charAt(0).toUpperCase() + formatted.slice(1);
 }
 
@@ -61,15 +62,14 @@ export function MonthNavigator() {
     setMonth(dayjs(selectedMonth).add(1, unit).format('YYYY-MM'));
   };
 
-  const handlePickerChange = (date: Date | null) => {
+  const handlePickerChange = (date: string | null) => {
     if (date) {
       setMonth(dayjs(date).format('YYYY-MM'));
       closePicker();
     }
   };
 
-  // Mantine date pickers work with Date objects
-  const pickerValue = dayjs(selectedMonth).toDate();
+  const pickerValue = dayjs(selectedMonth).format(ISO_DATE_FORMAT);
 
   const nowYear = now.format('YYYY');
   const isCurrentYear = selectedMonth.slice(0, 4) === nowYear;

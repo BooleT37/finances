@@ -11,7 +11,6 @@ import { useForm } from '@mantine/form';
 import { useDebouncedCallback } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';
 import { useMolecule } from 'bunshi/react';
-import dayjs from 'dayjs';
 import { useAtomValue, useSetAtom, useStore } from 'jotai';
 import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -25,7 +24,7 @@ import { useCategoryTreeData } from '~/features/categories/facets/categoryTreeDa
 import { useOrderedSources } from '~/features/sources/facets/orderedSources';
 import { DatePickerWithTodayInput } from '~/shared/components/DatePickerWithTodayInput';
 import { TreeSelect } from '~/shared/components/TreeSelect';
-import { API_DATE_FORMAT } from '~/shared/constants';
+import { ISO_DATE_FORMAT } from '~/shared/constants';
 import { TableFlash, useFlashTrigger } from '~/shared/hooks/useTableFlash';
 
 import {
@@ -49,7 +48,7 @@ function subscriptionToFormValues(s: Subscription): SubscriptionFormValues {
       categoryId: s.categoryId,
       subcategoryId: s.subcategoryId,
     }),
-    firstDate: s.firstDate,
+    firstDate: s.firstDate.format(ISO_DATE_FORMAT),
     sourceId: s.sourceId !== null ? String(s.sourceId) : null,
   };
 }
@@ -134,7 +133,7 @@ export function SubscriptionSidebarForm() {
         name: values.name,
         cost: values.cost,
         period: Number(values.period),
-        firstDate: values.firstDate.format(API_DATE_FORMAT),
+        firstDate: values.firstDate,
         categoryId,
         subcategoryId,
         sourceId: values.sourceId !== null ? Number(values.sourceId) : null,
@@ -179,7 +178,7 @@ export function SubscriptionSidebarForm() {
         name: validatedValues.name,
         cost: validatedValues.cost,
         period: Number(validatedValues.period),
-        firstDate: validatedValues.firstDate.format(API_DATE_FORMAT),
+        firstDate: validatedValues.firstDate,
         categoryId,
         subcategoryId,
         sourceId:
@@ -256,10 +255,7 @@ export function SubscriptionSidebarForm() {
           label={t('form.firstDate')}
           required
           valueFormat="DD.MM.YYYY"
-          value={form.values.firstDate?.toDate() ?? null}
-          onChange={(val) =>
-            form.setFieldValue('firstDate', val ? dayjs(val) : null)
-          }
+          {...form.getInputProps('firstDate')}
           error={form.errors.firstDate}
         />
 

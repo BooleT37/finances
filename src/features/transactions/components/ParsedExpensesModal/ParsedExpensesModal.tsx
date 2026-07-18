@@ -13,7 +13,7 @@ import { getSubscriptionsQueryOptions } from '~/features/subscriptions/queries';
 import type { ParsedExpense } from '~/features/transactions/parsedExpense';
 import { getTransactionsQueryOptions } from '~/features/transactions/queries';
 import { useImportTransactions } from '~/features/transactions/queries';
-import { API_DATE_FORMAT } from '~/shared/constants';
+import { ISO_DATE_FORMAT } from '~/shared/constants';
 import { TableFlash, useFlashTrigger } from '~/shared/hooks/useTableFlash';
 import { findByIdOrThrow } from '~/shared/utils/getOrThrow';
 import { selectedYearAtom } from '~/stores/month';
@@ -210,7 +210,7 @@ export function ParsedExpensesModal({
       return {
         name: e.description,
         cost: new Decimal(e.amount).abs().toFixed(2),
-        date: e.date!.format(API_DATE_FORMAT),
+        date: e.date!.format(ISO_DATE_FORMAT),
         categoryId,
         subcategoryId,
         subscriptionId,

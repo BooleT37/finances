@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 import { getCategoryMapQueryOptions } from '~/features/categories/facets/categoryMap';
 import { getSavingSpendingCategoryMapQueryOptions } from '~/features/savingSpendings/facets/savingSpendingCategoryMap';
 import type { Transaction } from '~/features/transactions/schema';
+import { ISO_DATE_FORMAT } from '~/shared/constants';
 import { getOrThrow } from '~/shared/utils/getOrThrow';
 
 import type {
@@ -50,8 +51,8 @@ export function useTransactionToFormValues(): (
         })),
         cost: tx.cost.toString(),
         name: tx.name,
-        date: tx.date.toDate(),
-        actualDate: tx.actualDate?.toDate() ?? null,
+        date: tx.date.format(ISO_DATE_FORMAT),
+        actualDate: tx.actualDate?.format(ISO_DATE_FORMAT) ?? null,
         incomeCategory: cat?.isIncome ? String(tx.categoryId) : null,
         incomeSubcategory:
           cat?.isIncome && tx.subcategoryId !== null

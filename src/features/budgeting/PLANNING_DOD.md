@@ -46,7 +46,7 @@ Sets up the budgeting route and the core read-only table. No editing yet.
 
 ### Table structure
 
-- Uses `mantine-react-table` (same library as the transactions table).
+- Uses `mantine-react-table-open` (same library as the transactions table).
 - Three levels of nesting:
   1. **Type group rows** — "Расходы" (expenses) and "Доходы" (income). Always expanded, cannot be collapsed. Display aggregated values across their categories.
   2. **Category rows** — all categories except `FROM_SAVINGS`, in user-settings sort order. Always visible, even if no forecast exists.

@@ -2,7 +2,7 @@ import { ActionIcon, Group, Tooltip } from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { IconTrash } from '@tabler/icons-react';
-import type { MRT_Row } from 'mantine-react-table';
+import type { MRT_Row } from 'mantine-react-table-open';
 import { useTranslation } from 'react-i18next';
 
 import { useDeleteProjectUser } from '~/features/projectUsers/queries';

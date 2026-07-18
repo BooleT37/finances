@@ -1,6 +1,6 @@
 import { Group, Select, Text, Tooltip } from '@mantine/core';
 import { IconInfoCircle } from '@tabler/icons-react';
-import { type MRT_ColumnDef } from 'mantine-react-table';
+import { type MRT_ColumnDef } from 'mantine-react-table-open';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 

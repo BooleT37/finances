@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 import { getCategoryMapQueryOptions } from '~/features/categories/facets/categoryMap';
 import { getCategoriesQueryOptions } from '~/features/categories/queries';
-import { API_DATE_FORMAT, MONTH_DATE_FORMAT } from '~/shared/constants';
+import { ISO_DATE_FORMAT, MONTH_DATE_FORMAT } from '~/shared/constants';
 import { costToString } from '~/shared/utils/costToString';
 import { getOrThrow } from '~/shared/utils/getOrThrow';
 
@@ -32,9 +32,9 @@ const defaultFrom = today.subtract(11, 'month');
 
 export function DynamicsChart() {
   const { t, i18n } = useTranslation('statistics');
-  const [range, setRange] = useState<[Date | null, Date | null]>([
-    defaultFrom.toDate(),
-    today.toDate(),
+  const [range, setRange] = useState<[string | null, string | null]>([
+    defaultFrom.format(ISO_DATE_FORMAT),
+    today.format(ISO_DATE_FORMAT),
   ]);
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
 
@@ -46,8 +46,9 @@ export function DynamicsChart() {
 
   const { data: dynamicsData } = useQuery({
     ...getDynamicsDataQueryOptions({
-      from: dayjs(from ?? undefined).format(API_DATE_FORMAT),
-      to: dayjs(to ?? undefined).format(API_DATE_FORMAT),
+      // fallback only to make typescript happy
+      from: from ?? today.format(ISO_DATE_FORMAT),
+      to: to ?? today.format(ISO_DATE_FORMAT),
       categoryIds: categoryIds.map(Number),
     }),
     enabled: !sameMonth,

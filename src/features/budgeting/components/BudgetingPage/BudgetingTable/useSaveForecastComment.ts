@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { MRT_Row } from 'mantine-react-table';
+import type { MRT_Row } from 'mantine-react-table-open';
 import { useCallback } from 'react';
 
 import { getUpsertForecastMutationOptions } from '~/features/budgeting/queries';

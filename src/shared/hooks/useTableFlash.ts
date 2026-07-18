@@ -5,7 +5,7 @@ import type {
   MRT_Row,
   MRT_RowData,
   MRT_TableInstance,
-} from 'mantine-react-table';
+} from 'mantine-react-table-open';
 import type React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 

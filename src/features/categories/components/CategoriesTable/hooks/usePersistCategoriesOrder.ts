@@ -1,4 +1,4 @@
-import type { MRT_Row, MRT_TableInstance } from 'mantine-react-table';
+import type { MRT_Row, MRT_TableInstance } from 'mantine-react-table-open';
 
 import { useUpdateCategoryOrder } from '~/features/categories/queries';
 import type { Category } from '~/features/categories/schema';

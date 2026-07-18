@@ -1,4 +1,4 @@
-import type { MRT_Row, MRT_TableInstance } from 'mantine-react-table';
+import type { MRT_Row, MRT_TableInstance } from 'mantine-react-table-open';
 
 import { useUpdateSourceOrder } from '~/features/sources/queries';
 import type { Source } from '~/features/sources/schema';

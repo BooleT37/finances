@@ -1,5 +1,4 @@
 import type { UseFormReturnType } from '@mantine/form';
-import type { Dayjs } from 'dayjs';
 
 import type { CategorySubcategoryId } from '~/features/categories/categorySubcategoryId';
 
@@ -8,12 +7,12 @@ export interface SubscriptionFormValues {
   cost: string;
   period: '1' | '3' | '6' | '12';
   categoryId: CategorySubcategoryId | null;
-  firstDate: Dayjs | null;
+  firstDate: string | null;
   sourceId: string | null;
 }
 
 export interface ValidatedSubscriptionFormValues extends SubscriptionFormValues {
-  firstDate: Dayjs;
+  firstDate: string;
   categoryId: CategorySubcategoryId;
 }
 

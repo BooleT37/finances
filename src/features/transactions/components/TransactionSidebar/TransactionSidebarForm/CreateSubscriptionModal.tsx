@@ -9,7 +9,6 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { modals } from '@mantine/modals';
-import dayjs from 'dayjs';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -27,13 +26,13 @@ interface SubscriptionFormValues {
   cost: string;
   period: '1' | '3' | '6' | '12';
   categoryId: CategorySubcategoryId | null;
-  firstDate: Date | null;
+  firstDate: string | null;
   sourceId: string | null;
 }
 
 interface ValidatedSubscriptionFormValues extends SubscriptionFormValues {
   categoryId: CategorySubcategoryId;
-  firstDate: Date;
+  firstDate: string;
 }
 
 interface SubscriptionCreatedValues {
@@ -99,7 +98,7 @@ export function CreateSubscriptionModal({ initialValues, onSuccess }: Props) {
         name: validated.name,
         cost: validated.cost,
         period: Number(validated.period),
-        firstDate: dayjs(validated.firstDate).format('YYYY-MM-DD'),
+        firstDate: validated.firstDate,
         categoryId,
         subcategoryId,
         sourceId:

@@ -1,6 +1,6 @@
 import { Group, Text, Tooltip } from '@mantine/core';
 import Decimal from 'decimal.js';
-import { createMRTColumnHelper, type MRT_Row } from 'mantine-react-table';
+import { createMRTColumnHelper, type MRT_Row } from 'mantine-react-table-open';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 

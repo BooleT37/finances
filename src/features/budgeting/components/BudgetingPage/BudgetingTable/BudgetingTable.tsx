@@ -5,7 +5,7 @@ import {
   MRT_ExpandButton,
   type MRT_ExpandedState,
   useMantineReactTable,
-} from 'mantine-react-table';
+} from 'mantine-react-table-open';
 import { useTranslation } from 'react-i18next';
 
 import { NameWithOptionalIcon } from '~/features/categories/components/NameWithOptionalIcon';

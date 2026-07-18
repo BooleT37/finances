@@ -1,4 +1,5 @@
 import { useMolecule } from 'bunshi/react';
+import dayjs from 'dayjs';
 import { useAtomValue } from 'jotai';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,11 +13,11 @@ export function useActualDateValidator() {
   const actualDateShown = useAtomValue(actualDateShownAtom);
 
   return useCallback(
-    (value: Date | null, values: TransactionFormValues): string | null => {
+    (value: string | null, values: TransactionFormValues): string | null => {
       if (!actualDateShown || !value || !values.date) {
         return null;
       }
-      return value.toDateString() === values.date.toDateString()
+      return dayjs(value).isSame(values.date, 'day')
         ? t('form.errors.actualDateSameAsDate')
         : null;
     },

@@ -6,6 +6,7 @@ import '../../src/lib/dayjs';
 import { expect, test } from './fixtures';
 import { testPrisma } from './db/client';
 import { transactionNameCellClass } from '../../src/features/transactions/components/TransactionsTable/TransactionsTable.constants';
+import { DATE_FORMAT } from '../../src/shared/constants';
 import {
   TODAY_DAY,
   TODAY_MONTH,
@@ -33,7 +34,7 @@ async function selectTreeOption(
 }
 
 async function selectOption(page: Page, label: string, option: string) {
-  await page.getByRole('textbox', { name: label }).click();
+  await page.getByRole('combobox', { name: label }).click();
   await page.getByRole('option', { name: option }).click();
 }
 
@@ -554,9 +555,9 @@ test.describe('Transaction editing', () => {
     // Verify pre-filled fields match what was saved
     await expect(form.getByLabel('Сумма (€)')).toHaveValue('-50');
     await expect(
-      form.getByRole('textbox', { name: 'Категория', exact: true }),
+      form.getByRole('combobox', { name: 'Категория', exact: true }),
     ).toHaveValue('Продукты');
-    await expect(form.getByRole('textbox', { name: 'Источник' })).toHaveValue(
+    await expect(form.getByRole('combobox', { name: 'Источник' })).toHaveValue(
       'Vivid',
     );
     await expect(form.getByLabel('Комментарий')).toHaveValue(
@@ -641,14 +642,14 @@ test.describe('Inline cell editing', () => {
     const today = dayjs(`${TODAY_YEAR}-${TODAY_MONTH + 1}-${TODAY_DAY}`);
     const targetDay = 10;
     const targetDate = today.date(targetDay);
-    await row.getByText(today.format('DD.MM.YYYY')).click();
+    await row.getByText(today.format(DATE_FORMAT)).click();
     await page
       .locator('button:not([data-direction]):not([data-outside])', {
         hasText: new RegExp(`^${targetDay}$`),
       })
       .first()
       .click();
-    await expect(row.getByText(targetDate.format('DD.MM.YYYY'))).toBeVisible();
+    await expect(row.getByText(targetDate.format(DATE_FORMAT))).toBeVisible();
     await expect(form.getByLabel('Дата')).toHaveText(
       formatDateInput(targetDate),
     );
@@ -657,10 +658,10 @@ test.describe('Inline cell editing', () => {
     // The cell starts empty (no source set), so it can't be targeted by text.
     // Scoped to `row` — the sidebar's own Источник field is also on screen.
     await row.locator('td').nth(3).click();
-    await row.getByRole('textbox', { name: 'Источник' }).click();
+    await row.getByRole('combobox', { name: 'Источник' }).click();
     await page.getByRole('option', { name: 'Vivid' }).click();
     await expect(row.getByText('Vivid')).toBeVisible();
-    await expect(form.getByRole('textbox', { name: 'Источник' })).toHaveValue(
+    await expect(form.getByRole('combobox', { name: 'Источник' })).toHaveValue(
       'Vivid',
     );
   });
@@ -793,13 +794,15 @@ test.describe('Subscriptions', () => {
     await selectOption(page, 'Категория', 'Развлечения');
 
     // Subscription field appears for this category
-    await expect(form.getByRole('textbox', { name: 'Подписка' })).toBeVisible();
+    await expect(
+      form.getByRole('combobox', { name: 'Подписка' }),
+    ).toBeVisible();
     await selectOption(page, 'Подписка', 'Спотифай');
 
     // Form auto-fills name, cost and source from the subscription
     await expect(form.getByLabel('Комментарий')).toHaveValue('Спотифай');
     await expect(form.getByLabel('Сумма (€)')).toHaveValue('-9.99');
-    await expect(form.getByRole('textbox', { name: 'Источник' })).toHaveValue(
+    await expect(form.getByRole('combobox', { name: 'Источник' })).toHaveValue(
       'Vivid',
     );
 
@@ -845,7 +848,7 @@ test.describe('Subscriptions', () => {
     await expect(form.getByLabel('Комментарий')).toHaveValue('Мой платёж');
     // Empty cost and source are filled from the subscription
     await expect(form.getByLabel('Сумма (€)')).toHaveValue('-9.99');
-    await expect(form.getByRole('textbox', { name: 'Источник' })).toHaveValue(
+    await expect(form.getByRole('combobox', { name: 'Источник' })).toHaveValue(
       'Vivid',
     );
   });
@@ -901,7 +904,7 @@ test.describe('Subscriptions', () => {
     const form = page.getByRole('form', { name: 'Форма транзакции' });
 
     // Subscription field shows the original subscription
-    await expect(form.getByRole('textbox', { name: 'Подписка' })).toHaveValue(
+    await expect(form.getByRole('combobox', { name: 'Подписка' })).toHaveValue(
       'Спотифай',
     );
 
@@ -1044,7 +1047,7 @@ test.describe('Subscriptions', () => {
     await expect(modal).not.toBeVisible();
 
     // Subscription field is now filled in the transaction form
-    await expect(form.getByRole('textbox', { name: 'Подписка' })).toHaveValue(
+    await expect(form.getByRole('combobox', { name: 'Подписка' })).toHaveValue(
       'Спотифай',
     );
 
@@ -1114,7 +1117,7 @@ test.describe('Subscriptions', () => {
       .first()
       .click();
 
-    await modal.getByRole('textbox', { name: 'Источник' }).click();
+    await modal.getByRole('combobox', { name: 'Источник' }).click();
     await page.getByRole('option', { name: 'Vivid' }).click();
 
     await modal.getByRole('button', { name: 'Добавить' }).click();
@@ -1124,9 +1127,9 @@ test.describe('Subscriptions', () => {
 
     // Category and source from the modal are applied back to the sidebar form
     await expect(
-      form.getByRole('textbox', { name: 'Категория', exact: true }),
+      form.getByRole('combobox', { name: 'Категория', exact: true }),
     ).toHaveValue('Продукты');
-    await expect(form.getByRole('textbox', { name: 'Источник' })).toHaveValue(
+    await expect(form.getByRole('combobox', { name: 'Источник' })).toHaveValue(
       'Vivid',
     );
     // Comment/name is applied back too
@@ -1376,13 +1379,13 @@ test.describe('Saving spendings', () => {
       .dispatchEvent('click');
 
     // "Событие" select appears; saving-spending category not shown yet
-    await expect(form.getByRole('textbox', { name: 'Событие' })).toBeVisible();
+    await expect(form.getByRole('combobox', { name: 'Событие' })).toBeVisible();
     await expect(
-      form.getByRole('textbox', { name: 'Категория' }),
+      form.getByRole('combobox', { name: 'Категория' }),
     ).not.toBeVisible();
 
     // Completed event is absent from the dropdown
-    await form.getByRole('textbox', { name: 'Событие' }).click();
+    await form.getByRole('combobox', { name: 'Событие' }).click();
     await expect(
       page.getByRole('option', { name: 'Новый телевизор', exact: true }),
     ).toHaveCount(0);
@@ -1390,13 +1393,13 @@ test.describe('Saving spendings', () => {
     // Select Event A (single category) — category select stays hidden
     await page.getByRole('option', { name: 'Отпуск Рим 2025' }).click();
     await expect(
-      form.getByRole('textbox', { name: 'Категория' }),
+      form.getByRole('combobox', { name: 'Категория' }),
     ).not.toBeVisible();
 
     // Select Event B (multiple categories) — category select appears
     await selectOption(page, 'Событие', 'Переезд 2026');
     await expect(
-      form.getByRole('textbox', { name: 'Категория' }),
+      form.getByRole('combobox', { name: 'Категория' }),
     ).toBeVisible();
     await selectOption(page, 'Категория', 'Залог');
 
@@ -1480,19 +1483,19 @@ test.describe('Saving spendings', () => {
     const form = page.getByRole('form', { name: 'Форма транзакции' });
 
     // Completed event is preserved as the initial "Событие" value
-    await expect(form.getByRole('textbox', { name: 'Событие' })).toHaveValue(
+    await expect(form.getByRole('combobox', { name: 'Событие' })).toHaveValue(
       'Новый телевизор',
     );
 
     // Category select hidden — Event C has only one category
     await expect(
-      form.getByRole('textbox', { name: 'Категория' }),
+      form.getByRole('combobox', { name: 'Категория' }),
     ).not.toBeVisible();
 
     // Switch to Event B (multiple categories) — category select appears
     await selectOption(page, 'Событие', 'Переезд 2026');
     await expect(
-      form.getByRole('textbox', { name: 'Категория' }),
+      form.getByRole('combobox', { name: 'Категория' }),
     ).toBeVisible();
 
     // Select a category — auto-save fires; row moves to Event B subcategory

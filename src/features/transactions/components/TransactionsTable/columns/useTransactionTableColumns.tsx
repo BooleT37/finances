@@ -1,5 +1,5 @@
-import type { MRT_Row } from 'mantine-react-table';
-import { createMRTColumnHelper } from 'mantine-react-table';
+import type { MRT_Row } from 'mantine-react-table-open';
+import { createMRTColumnHelper } from 'mantine-react-table-open';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 

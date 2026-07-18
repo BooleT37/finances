@@ -5,7 +5,7 @@ import {
 } from '@mantine/dates';
 import dayjs from 'dayjs';
 
-const getTodayDayProps = (date: Date) =>
+const getTodayDayProps = (date: string) =>
   dayjs(date).isSame(dayjs(), 'day')
     ? { style: { border: '1px solid currentColor', borderRadius: 4 } }
     : {};

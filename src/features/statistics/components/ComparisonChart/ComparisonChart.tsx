@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useSortAllCategoriesById } from '~/features/categories/facets/categoriesOrder';
 import { getCategoryMapQueryOptions } from '~/features/categories/facets/categoryMap';
-import { API_DATE_FORMAT } from '~/shared/constants';
+import { ISO_DATE_FORMAT } from '~/shared/constants';
 import { costToString } from '~/shared/utils/costToString';
 import { getOrThrow } from '~/shared/utils/getOrThrow';
 
@@ -35,9 +35,9 @@ const lastMonth = today.subtract(1, 'month');
 
 interface PeriodPickerProps {
   granularity: Granularity;
-  date: Date;
+  date: string;
   quarter: number;
-  onDateChange: (date: Date) => void;
+  onDateChange: (date: string) => void;
   onQuarterChange: (quarter: number) => void;
   label: string;
 }
@@ -84,8 +84,12 @@ function PeriodPicker({
 export function ComparisonChart() {
   const { t, i18n } = useTranslation('statistics');
   const [granularity, setGranularity] = useState<Granularity>('month');
-  const [period1Date, setPeriod1Date] = useState<Date>(lastMonth.toDate());
-  const [period2Date, setPeriod2Date] = useState<Date>(today.toDate());
+  const [period1Date, setPeriod1Date] = useState<string>(
+    lastMonth.format(ISO_DATE_FORMAT),
+  );
+  const [period2Date, setPeriod2Date] = useState<string>(
+    today.format(ISO_DATE_FORMAT),
+  );
   const [period1Quarter, setPeriod1Quarter] = useState(1);
   const [period2Quarter, setPeriod2Quarter] = useState(1);
   const [sortBy, setSortBy] = useState<SortOption>('category');
@@ -106,12 +110,12 @@ export function ComparisonChart() {
   const { data: comparisonData } = useQuery({
     ...getComparisonDataQueryOptions({
       period1: {
-        start: period1.start.format(API_DATE_FORMAT),
-        end: period1.end.format(API_DATE_FORMAT),
+        start: period1.start.format(ISO_DATE_FORMAT),
+        end: period1.end.format(ISO_DATE_FORMAT),
       },
       period2: {
-        start: period2.start.format(API_DATE_FORMAT),
-        end: period2.end.format(API_DATE_FORMAT),
+        start: period2.start.format(ISO_DATE_FORMAT),
+        end: period2.end.format(ISO_DATE_FORMAT),
       },
     }),
     enabled: !samePeriod,

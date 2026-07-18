@@ -1,6 +1,6 @@
 import { useMolecule } from 'bunshi/react';
 import { useSetAtom } from 'jotai';
-import type { MRT_TableInstance } from 'mantine-react-table';
+import type { MRT_TableInstance } from 'mantine-react-table-open';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 

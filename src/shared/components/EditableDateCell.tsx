@@ -3,9 +3,9 @@ import { useState } from 'react';
 
 interface EditableDateCellProps {
   'aria-label'?: string;
-  value: Date;
+  value: string;
   onClose: () => void;
-  onSave: (value: Date) => Promise<unknown>;
+  onSave: (value: string) => Promise<unknown>;
 }
 
 export function EditableDateCell({
@@ -33,7 +33,7 @@ export function EditableDateCell({
         value={value}
         popoverProps={{ opened, onClose: close }}
         onChange={(date) => {
-          if (date && date.getTime() !== value.getTime()) {
+          if (date && date !== value) {
             void onSave(date);
           }
           close();

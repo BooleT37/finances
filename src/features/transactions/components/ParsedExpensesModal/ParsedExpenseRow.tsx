@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import { useEffect } from 'react';
 
 import { TreeSelect } from '~/shared/components/TreeSelect';
+import { ISO_DATE_FORMAT } from '~/shared/constants';
 
 import {
   type ParsedExpenseCategoryValue,
@@ -61,7 +62,7 @@ export function ParsedExpenseRow({ index, form }: Props) {
         size="xs"
         valueFormat="DD.MM.YYYY"
         disabled={!selected}
-        value={row.date?.toDate() ?? null}
+        value={row.date?.format(ISO_DATE_FORMAT) ?? null}
         onChange={(val) =>
           form.setFieldValue(`expenses.${index}.date`, val ? dayjs(val) : null)
         }

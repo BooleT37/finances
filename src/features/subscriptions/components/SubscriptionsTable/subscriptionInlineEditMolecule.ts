@@ -2,7 +2,7 @@ import { molecule } from 'bunshi';
 import { atom } from 'jotai';
 import { atomWithMutation, queryClientAtom } from 'jotai-tanstack-query';
 
-import { API_DATE_FORMAT } from '~/shared/constants';
+import { ISO_DATE_FORMAT } from '~/shared/constants';
 
 import { getUpdateSubscriptionMutationOptions } from '../../queries';
 import type { Subscription } from '../../schema';
@@ -40,7 +40,7 @@ export const SubscriptionInlineEditMolecule = molecule((mol) => {
           form.setFieldValue('cost', patch.value.toString());
           break;
         case 'firstDate':
-          form.setFieldValue('firstDate', patch.value);
+          form.setFieldValue('firstDate', patch.value.format(ISO_DATE_FORMAT));
           break;
         case 'sourceId':
           form.setFieldValue(
@@ -70,7 +70,7 @@ export const SubscriptionInlineEditMolecule = molecule((mol) => {
         name: next.name,
         cost: next.cost.toString(),
         period: next.period,
-        firstDate: next.firstDate.format(API_DATE_FORMAT),
+        firstDate: next.firstDate.format(ISO_DATE_FORMAT),
         active: next.active,
         categoryId: next.categoryId,
         subcategoryId: next.subcategoryId,

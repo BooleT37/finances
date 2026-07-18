@@ -9,9 +9,9 @@ const quarterOptions = [
 ];
 
 interface QuarterPickerInputProps {
-  year: Date;
+  year: string;
   quarter: number;
-  onYearChange: (year: Date) => void;
+  onYearChange: (year: string) => void;
   onQuarterChange: (quarter: number) => void;
   label: string;
 }

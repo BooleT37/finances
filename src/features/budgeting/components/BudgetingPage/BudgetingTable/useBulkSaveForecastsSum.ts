@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Decimal from 'decimal.js';
-import type { MRT_Row } from 'mantine-react-table';
+import type { MRT_Row } from 'mantine-react-table-open';
 import { useCallback } from 'react';
 
 import type { UpsertForecastInput } from '~/features/budgeting/api';

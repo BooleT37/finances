@@ -3,7 +3,7 @@ import { openConfirmModal } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { IconRepeat } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
-import type { MRT_Row } from 'mantine-react-table';
+import type { MRT_Row } from 'mantine-react-table-open';
 import { useTranslation } from 'react-i18next';
 
 import { getSourceMapQueryOptions } from '~/features/sources/facets/sourceMap';

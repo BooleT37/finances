@@ -4,7 +4,7 @@ import {
   MantineReactTable,
   MRT_ExpandButton,
   useMantineReactTable,
-} from 'mantine-react-table';
+} from 'mantine-react-table-open';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 

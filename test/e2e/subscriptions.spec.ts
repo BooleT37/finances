@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 
+import { DATE_FORMAT } from '../../src/shared/constants';
 import { testPrisma } from './db/client';
 import { expect, test } from './fixtures';
 
@@ -63,25 +64,25 @@ test.describe('Subscriptions inline editing', () => {
     const firstDate = dayjs('2024-01-01');
     const targetDay = 10;
     const targetDate = firstDate.date(targetDay);
-    await row.getByText(firstDate.format('DD.MM.YYYY')).click();
+    await row.getByText(firstDate.format(DATE_FORMAT)).click();
     await page
       .locator('button:not([data-direction]):not([data-outside])', {
         hasText: new RegExp(`^${targetDay}$`),
       })
       .first()
       .click();
-    await expect(row.getByText(targetDate.format('DD.MM.YYYY'))).toBeVisible();
+    await expect(row.getByText(targetDate.format(DATE_FORMAT))).toBeVisible();
     await expect(form.getByRole('button', { name: 'Дата начала' })).toHaveText(
-      targetDate.format('DD.MM.YYYY'),
+      targetDate.format(DATE_FORMAT),
     );
 
     // --- Source ---
     // Scoped to `row` — the sidebar's own Источник field is also on screen.
     await row.getByText('Vivid').click();
-    await row.getByRole('textbox', { name: 'Источник' }).click();
+    await row.getByRole('combobox', { name: 'Источник' }).click();
     await page.getByRole('option', { name: 'Vivid' }).click();
     await expect(row.getByText('Vivid')).toBeVisible();
-    await expect(form.getByRole('textbox', { name: 'Источник' })).toHaveValue(
+    await expect(form.getByRole('combobox', { name: 'Источник' })).toHaveValue(
       'Vivid',
     );
 

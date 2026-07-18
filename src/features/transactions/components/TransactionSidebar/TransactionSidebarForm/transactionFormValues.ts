@@ -14,8 +14,8 @@ export interface TransactionFormValues {
   components: TransactionComponentData[];
   cost: string;
   name: string;
-  date: Date | null;
-  actualDate: Date | null;
+  date: string | null;
+  actualDate: string | null;
   incomeCategory: string | null;
   incomeSubcategory: string | null;
   expenseCategory: string | null;
@@ -36,7 +36,7 @@ export type ValidatedTransactionFormValues = Omit<
   | 'expenseSubcategory'
   | 'transactionType'
 > & {
-  date: Date;
+  date: string;
 } & (
     | {
         transactionType: 'expense';
@@ -60,7 +60,7 @@ export interface TransformedTransactionFormValues extends Omit<
   | 'incomeCategory'
   | 'incomeSubcategory'
 > {
-  date: Date;
+  date: string;
   category: string;
   subcategory: string | null;
 }
@@ -71,5 +71,5 @@ export type TransactionFormTransform = (
 
 export type TransactionFormType = UseFormReturnType<
   TransactionFormValues,
-  TransactionFormTransform
+  TransformedTransactionFormValues | null
 >;

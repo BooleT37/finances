@@ -2,10 +2,11 @@ import { useMolecule } from 'bunshi/react';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { useSetAtom } from 'jotai';
-import type { MRT_TableInstance } from 'mantine-react-table';
+import type { MRT_TableInstance } from 'mantine-react-table-open';
 import { useTranslation } from 'react-i18next';
 
 import { EditableDateCell } from '~/shared/components/EditableDateCell';
+import { ISO_DATE_FORMAT } from '~/shared/constants';
 
 import type { Subscription } from '../../../schema';
 import { SubscriptionInlineEditMolecule } from '../subscriptionInlineEditMolecule';
@@ -32,7 +33,7 @@ export function SubscriptionDateCellEdit({
   return (
     <EditableDateCell
       aria-label={t('columns.firstDate')}
-      value={value.toDate()}
+      value={value.format(ISO_DATE_FORMAT)}
       onClose={() => table.setEditingCell(null)}
       onSave={(date) =>
         // The global error notification middleware already surfaces failures.

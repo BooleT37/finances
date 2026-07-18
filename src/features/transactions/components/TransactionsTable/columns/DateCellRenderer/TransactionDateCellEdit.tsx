@@ -1,11 +1,11 @@
 import { useMolecule } from 'bunshi/react';
 import dayjs from 'dayjs';
 import { useSetAtom } from 'jotai';
-import type { MRT_TableInstance } from 'mantine-react-table';
+import type { MRT_TableInstance } from 'mantine-react-table-open';
 import { useTranslation } from 'react-i18next';
 
 import { EditableDateCell } from '~/shared/components/EditableDateCell';
-import { DATE_FORMAT } from '~/shared/constants';
+import { DATE_FORMAT, ISO_DATE_FORMAT } from '~/shared/constants';
 
 import { TransactionInlineEditMolecule } from '../../transactionInlineEditMolecule';
 import type { TransactionTableItem } from '../../TransactionsTable.types';
@@ -32,7 +32,7 @@ export function TransactionDateCellEdit({
   return (
     <EditableDateCell
       aria-label={t('columns.date')}
-      value={dayjs(value, DATE_FORMAT).toDate()}
+      value={dayjs(value, DATE_FORMAT).format(ISO_DATE_FORMAT)}
       onClose={() => table.setEditingCell(null)}
       onSave={(date) =>
         // The global error notification middleware already surfaces failures.
