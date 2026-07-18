@@ -244,7 +244,7 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
         ...withFlashingStyles(row, column.id, {
           color: row.original.isUpcomingSubscription ? 'darkgray' : undefined,
           background: getRowBgColor(row.depth),
-          padding: '8px',
+          padding: '4px 8px',
         }),
         ...withNavigationStyles(row, column.id),
       },

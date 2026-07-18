@@ -104,6 +104,11 @@ export function BudgetingTable() {
         {t('emptyState')}
       </Text>
     ),
+    mantineTableBodyCellProps: {
+      style: {
+        padding: '6px var(--mantine-spacing-xs)',
+      },
+    },
     mantineTableBodyRowProps: ({ row }) => ({
       style: {
         background:
