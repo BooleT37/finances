@@ -3,6 +3,7 @@ import '@mantine/charts/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
 import 'mantine-react-table-open/styles.css';
+import '@gfazioli/mantine-onboarding-tour/styles.css';
 import 'dayjs/locale/ru';
 import '~/lib/dayjs';
 
