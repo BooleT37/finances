@@ -50,5 +50,15 @@
     "confirmMessage": "Are you sure you want to delete \"{{name}}\"? This cannot be undone.",
     "confirm": "Delete",
     "cancel": "Cancel"
+  },
+  "onboarding": {
+    "intro": {
+      "title": "Savings",
+      "content": "This is where the events you spend savings money on are shown. The idea: when you add a \"from savings\" expense on the transactions page, you can (optionally) link it to an event (e.g. \"Rome trip 2025\" or \"Moving\") and plan how much you want to spend on it (including by category). Then on this page you can see the total spending on that event — both overall and by subcategory. Either way, whether or not you linked a from-savings expense to an event, it is not counted in the monthly spending total."
+    },
+    "archive": {
+      "title": "Archive",
+      "content": "Past events can be archived so they don't clutter the space."
+    }
   }
 }
