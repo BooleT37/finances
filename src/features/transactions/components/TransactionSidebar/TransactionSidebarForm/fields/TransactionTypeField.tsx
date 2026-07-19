@@ -1,4 +1,5 @@
-import { Input } from '@mantine/core';
+import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour';
+import { Box, Input } from '@mantine/core';
 import {
   IconMoneybagMinus,
   IconMoneybagPlus,
@@ -7,7 +8,8 @@ import {
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { SegmentedControlWithIcons } from '~/shared/components/SegmentedControlWithIcons';
+import { TRANSACTIONS_FROM_SAVINGS_STEP_ID } from '~/features/transactions/onboarding/useTransactionsOnboardingSteps';
+import { SegmentedControlWithIcons } from '~/shared/components/SegmentedControlWithIcons/SegmentedControlWithIcons';
 
 import type {
   TransactionFormType,
@@ -33,28 +35,32 @@ export function TransactionTypeField({ form }: Props) {
 
   return (
     <Input.Wrapper label={t('form.type.label')}>
-      <SegmentedControlWithIcons
-        aria-label={t('form.type.label')}
-        value={form.values.transactionType}
-        onChange={handleTypeChange}
-        data={[
-          {
-            label: t('form.type.expense'),
-            value: 'expense',
-            icon: <IconMoneybagMinus size={18} />,
-          },
-          {
-            label: t('form.type.income'),
-            value: 'income',
-            icon: <IconMoneybagPlus size={18} />,
-          },
-          {
-            label: t('form.type.fromSavings'),
-            value: 'fromSavings',
-            icon: <IconPigMoney size={18} />,
-          },
-        ]}
-      />
+      <OnboardingTour.Target id={TRANSACTIONS_FROM_SAVINGS_STEP_ID}>
+        <Box>
+          <SegmentedControlWithIcons
+            aria-label={t('form.type.label')}
+            value={form.values.transactionType}
+            onChange={handleTypeChange}
+            data={[
+              {
+                label: t('form.type.expense'),
+                value: 'expense',
+                icon: <IconMoneybagMinus size={18} />,
+              },
+              {
+                label: t('form.type.income'),
+                value: 'income',
+                icon: <IconMoneybagPlus size={18} />,
+              },
+              {
+                label: t('form.type.fromSavings'),
+                value: 'fromSavings',
+                icon: <IconPigMoney size={18} />,
+              },
+            ]}
+          />
+        </Box>
+      </OnboardingTour.Target>
     </Input.Wrapper>
   );
 }

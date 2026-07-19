@@ -129,5 +129,15 @@
   "upcomingTooltipTitle_one": "{{count}} subscription not filled in",
   "upcomingTooltipTitle_other": "{{count}} subscriptions not filled in",
   "showInTable": "Show in table",
-  "hideFromTable": "Hide from table"
+  "hideFromTable": "Hide from table",
+  "onboarding": {
+    "intro": {
+      "title": "Transactions",
+      "content": "This is where you enter the list of expenses and income for the month. You can fill it in manually, or parse it automatically from a bank statement. If a budget is set for the month, the table shows the difference between the budget and actual spending."
+    },
+    "fromSavings": {
+      "title": "From savings",
+      "content": "When adding an expense you can choose the \"From savings\" type. In that case the expense won't be counted in the monthly spending total."
+    }
+  }
 }
