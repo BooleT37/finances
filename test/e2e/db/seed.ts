@@ -68,6 +68,12 @@ export async function seed(): Promise<SeedData> {
     emailVerified: true,
   });
   await ctx.test.saveUser(user);
+  // Mark onboarding complete so the first-run tour doesn't auto-start and
+  // overlay the UI in every spec. The onboarding spec opts back in explicitly.
+  await testPrisma.user.update({
+    where: { id: user.id },
+    data: { onboardingCompletedAt: new Date() },
+  });
   const { cookies: sessionCookies } = await ctx.test.login({
     userId: user.id,
   });

@@ -1,3 +1,4 @@
+import { testPrisma } from './db/client';
 import { TEST_PROJECT_ID } from './db/seed';
 import { testAuth } from './db/testAuth';
 import { expect, test } from './fixtures';
@@ -58,6 +59,10 @@ test.describe('Project info', () => {
         role: 'user',
         data: { projectId: TEST_PROJECT_ID, emailVerified: true },
       },
+    });
+    await testPrisma.user.update({
+      where: { email },
+      data: { onboardingCompletedAt: new Date() },
     });
 
     await context.clearCookies();

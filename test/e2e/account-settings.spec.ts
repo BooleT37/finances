@@ -34,6 +34,10 @@ test.describe('Account settings', () => {
         data: { projectId: project.id, emailVerified: true },
       },
     });
+    await testPrisma.user.update({
+      where: { email },
+      data: { onboardingCompletedAt: new Date() },
+    });
 
     await context.clearCookies();
     await page.goto('/login');
