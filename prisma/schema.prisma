@@ -37,6 +37,7 @@ model User {
   banned        Boolean?  @default(false)
   banReason     String?
   banExpires    DateTime?
+  onboardingCompletedAt DateTime?
   project       Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId     String
   sessions      Session[]
