@@ -11,6 +11,7 @@
     "src/features/sources/locales",
     "src/features/subscriptions/locales",
     "src/features/statistics/locales",
+    "src/features/onboarding/locales",
     "src/features/auth/locales",
     "src/features/projectUsers/locales",
     "src/features/account/locales",

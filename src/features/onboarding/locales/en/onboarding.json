@@ -1,0 +1,13 @@
+{
+  "next": "Next",
+  "back": "Back",
+  "skip": "Skip",
+  "finish": "Finish",
+  "helpTooltip": "Show a tour of this page",
+  "goTo": {
+    "transactions": "Go to Transactions",
+    "budgeting": "Go to Planning",
+    "savings": "Go to Savings",
+    "statistics": "Go to Statistics"
+  }
+}
