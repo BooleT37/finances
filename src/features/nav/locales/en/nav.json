@@ -18,5 +18,23 @@
   "account": "Account",
   "signOut": "Sign out",
   "collapseSidebar": "Collapse sidebar",
-  "expandSidebar": "Expand sidebar"
+  "expandSidebar": "Expand sidebar",
+  "onboarding": {
+    "settings": {
+      "title": "Welcome!",
+      "content": "Welcome to the personal and household finance planner. This tour will help you get familiar with the app's main features. Let's start with settings. You'll likely interact with them often in the beginning."
+    },
+    "categories": {
+      "title": "Categories",
+      "content": "Categories are the foundation of the whole app. Your expenses, income, and planning (budget) are grouped by them. Examples: \"Groceries\", \"Rent\", \"Transport\". Categories can include subcategories. Three categories have already been kindly created for you."
+    },
+    "sources": {
+      "title": "Sources",
+      "content": "Sources are optional, but they help remember where each transaction came from. Examples: \"Revolut\", \"Cash\", \"PayPal\". Here you can also set up importing transactions from a bank expense statement (if your bank isn't supported — let me know). There is unfortunately no direct import from banking apps."
+    },
+    "subscriptions": {
+      "title": "Subscriptions",
+      "content": "This is where all your Spotifys, rent, and other Netflixes live. Even a salary can essentially be a subscription. The app kindly reminds you of upcoming subscriptions when planning the month, and shows which of them are not yet paid when adding expenses. Now let's move on to the main screens."
+    }
+  }
 }

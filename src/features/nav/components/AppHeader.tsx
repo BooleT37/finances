@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 
 import { LanguageSwitcher } from '~/components/LanguageSwitcher';
 import { MonthNavigator } from '~/features/nav/components/MonthNavigator';
+import { OnboardingHelpButton } from '~/features/onboarding/components/OnboardingHelpButton';
 import { authClient } from '~/lib/auth/client';
 
 import { findBreadcrumbTrail } from './AppNav/navItems';
@@ -35,16 +36,19 @@ export function AppHeader() {
 
   return (
     <Group h="100%" px="md" justify="space-between" align="center">
-      <Breadcrumbs separator="/">
-        <Text key="app" fw={700} size="sm">
-          {t('appName')}
-        </Text>
-        {trail.map((item) => (
-          <Text key={item.to} fw={500} size="sm">
-            {t(item.labelKey)}
+      <Group gap="xs" align="center">
+        <Breadcrumbs separator="/">
+          <Text key="app" fw={700} size="sm">
+            {t('appName')}
           </Text>
-        ))}
-      </Breadcrumbs>
+          {trail.map((item) => (
+            <Text key={item.to} fw={500} size="sm">
+              {t(item.labelKey)}
+            </Text>
+          ))}
+        </Breadcrumbs>
+        <OnboardingHelpButton />
+      </Group>
 
       {showNavigator && <MonthNavigator />}
 

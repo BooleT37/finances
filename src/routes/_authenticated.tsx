@@ -5,7 +5,9 @@ import { useAtomValue } from 'jotai';
 import { fetchSession } from '~/features/auth/api';
 import { AppHeader } from '~/features/nav/components/AppHeader';
 import { AppNav } from '~/features/nav/components/AppNav/AppNav';
+import { NavOnboardingTour } from '~/features/nav/components/NavOnboardingTour';
 import { navCollapsedAtom } from '~/features/nav/navCollapsed.atom';
+import { OnboardingAutostart } from '~/features/onboarding/components/OnboardingAutostart';
 
 const NAV_WIDTH_EXPANDED = 200;
 const NAV_WIDTH_COLLAPSED = 60;
@@ -28,23 +30,26 @@ function AuthenticatedLayout() {
   const navCollapsed = useAtomValue(navCollapsedAtom);
 
   return (
-    <AppShell
-      header={{ height: 40 }}
-      navbar={{
-        width: navCollapsed ? NAV_WIDTH_COLLAPSED : NAV_WIDTH_EXPANDED,
-        breakpoint: 'xs',
-      }}
-      padding={{ base: 10, sm: 15, lg: 'md' }}
-    >
-      <AppShell.Header>
-        <AppHeader />
-      </AppShell.Header>
-      <AppShell.Navbar style={{ transition: 'width 0.25s ease' }}>
-        <AppNav />
-      </AppShell.Navbar>
-      <AppShell.Main style={{ transition: 'padding-left 0.25s ease' }}>
-        <Outlet />
-      </AppShell.Main>
-    </AppShell>
+    <NavOnboardingTour>
+      <OnboardingAutostart />
+      <AppShell
+        header={{ height: 40 }}
+        navbar={{
+          width: navCollapsed ? NAV_WIDTH_COLLAPSED : NAV_WIDTH_EXPANDED,
+          breakpoint: 'xs',
+        }}
+        padding={{ base: 10, sm: 15, lg: 'md' }}
+      >
+        <AppShell.Header>
+          <AppHeader />
+        </AppShell.Header>
+        <AppShell.Navbar style={{ transition: 'width 0.25s ease' }}>
+          <AppNav />
+        </AppShell.Navbar>
+        <AppShell.Main style={{ transition: 'padding-left 0.25s ease' }}>
+          <Outlet />
+        </AppShell.Main>
+      </AppShell>
+    </NavOnboardingTour>
   );
 }

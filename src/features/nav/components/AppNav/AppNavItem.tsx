@@ -1,3 +1,4 @@
+import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour';
 import { NavLink, Tooltip } from '@mantine/core';
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
 import { useAtomValue } from 'jotai';
@@ -77,16 +78,25 @@ export function AppNavItem({ item, depth = 0 }: AppNavItemProps) {
     },
   };
 
+  const withTourTarget = (element: React.ReactElement) =>
+    item.tourId ? (
+      <OnboardingTour.Target id={item.tourId}>{element}</OnboardingTour.Target>
+    ) : (
+      element
+    );
+
   if (hasChildren) {
     return (
       <Fragment>
-        <NavLink
-          label={t(item.labelKey)}
-          leftSection={leftSection}
-          active={isActive}
-          style={{ ...itemStyle, cursor: 'default' }}
-          styles={labelStyles}
-        />
+        {withTourTarget(
+          <NavLink
+            label={t(item.labelKey)}
+            leftSection={leftSection}
+            active={isActive}
+            style={{ ...itemStyle, cursor: 'default' }}
+            styles={labelStyles}
+          />,
+        )}
         {item.children?.map((child) => (
           <AppNavItem key={child.to} item={child} depth={depth + 1} />
         ))}
@@ -94,7 +104,7 @@ export function AppNavItem({ item, depth = 0 }: AppNavItemProps) {
     );
   }
 
-  return (
+  return withTourTarget(
     <NavLink
       component={Link}
       to={item.to}
@@ -104,6 +114,6 @@ export function AppNavItem({ item, depth = 0 }: AppNavItemProps) {
       style={itemStyle}
       styles={labelStyles}
       onClick={(e: React.MouseEvent) => handleNavClick(e, item.to)}
-    />
+    />,
   );
 }

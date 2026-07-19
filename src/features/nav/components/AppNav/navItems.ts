@@ -14,7 +14,10 @@ import {
 
 import type { i18nResources } from '../../i18n';
 
-export type NavLabelKey = keyof (typeof i18nResources)['ru']['nav'];
+type NavResources = (typeof i18nResources)['ru']['nav'];
+export type NavLabelKey = {
+  [K in keyof NavResources]: NavResources[K] extends string ? K : never;
+}[keyof NavResources];
 
 export interface NavItem {
   to: string;
@@ -22,6 +25,8 @@ export interface NavItem {
   icon: Icon;
   children?: NavItem[];
   adminOnly?: boolean;
+  /** Onboarding tour target id, when this item is highlighted by the nav tour. */
+  tourId?: string;
 }
 
 export const navItems: NavItem[] = [
@@ -37,13 +42,25 @@ export const navItems: NavItem[] = [
     to: '/settings',
     labelKey: 'settings',
     icon: IconSettings,
+    tourId: 'onboarding-settings',
     children: [
-      { to: '/settings/categories', labelKey: 'categories', icon: IconTag },
-      { to: '/settings/sources', labelKey: 'sources', icon: IconCreditCard },
+      {
+        to: '/settings/categories',
+        labelKey: 'categories',
+        icon: IconTag,
+        tourId: 'onboarding-categories',
+      },
+      {
+        to: '/settings/sources',
+        labelKey: 'sources',
+        icon: IconCreditCard,
+        tourId: 'onboarding-sources',
+      },
       {
         to: '/settings/subscriptions',
         labelKey: 'subscriptions',
         icon: IconRepeat,
+        tourId: 'onboarding-subscriptions',
       },
       { to: '/settings/project', labelKey: 'project', icon: IconUsers },
       { to: '/settings/account', labelKey: 'account', icon: IconUser },
