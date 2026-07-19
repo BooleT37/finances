@@ -26,5 +26,11 @@
     "categoriesLabel": "Categories",
     "categoriesPlaceholder": "All categories",
     "samePeriodWarning": "Please select a wider date range above"
+  },
+  "onboarding": {
+    "intro": {
+      "title": "Statistics",
+      "content": "Here you can compare how much you spent on rent last year versus this one; or contemplate how inflation devours your grocery spending."
+    }
   }
 }
