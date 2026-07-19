@@ -20,13 +20,22 @@ test.describe('Onboarding tour', () => {
     // Nav settings group auto-starts with the welcome step.
     await expect(page.getByText('Добро пожаловать!')).toBeVisible();
 
-    // Step through the settings menu items.
+    // Step through the settings menu items — each one also navigates to its
+    // page, so assert on the popover's unique body text (the title becomes
+    // ambiguous once the breadcrumb shows the same word) and the URL.
     await page.getByRole('button', { name: 'Далее' }).click();
-    await expect(page.getByText('Категории', { exact: true })).toBeVisible();
+    await expect(
+      page.getByText('Категории — основа всего приложения'),
+    ).toBeVisible();
+    await expect(page).toHaveURL(/\/settings\/categories/);
     await page.getByRole('button', { name: 'Далее' }).click();
-    await expect(page.getByText('Источники', { exact: true })).toBeVisible();
+    await expect(page.getByText('Источники не обязательны')).toBeVisible();
+    await expect(page).toHaveURL(/\/settings\/sources/);
     await page.getByRole('button', { name: 'Далее' }).click();
-    await expect(page.getByText('Подписки', { exact: true })).toBeVisible();
+    await expect(
+      page.getByText('Здесь будут находиться все ваши спотифаи'),
+    ).toBeVisible();
+    await expect(page).toHaveURL(/\/settings\/subscriptions/);
 
     // Last settings step hands off to the transactions page.
     await page.getByRole('button', { name: 'К транзакциям' }).click();
