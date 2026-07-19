@@ -1,6 +1,8 @@
+import { Box } from '@mantine/core';
 import { useAtom, useAtomValue } from 'jotai';
 import { useEffect } from 'react';
 
+import { FeatureOnboardingTour } from '~/features/onboarding/components/FeatureOnboardingTour';
 import { getToday } from '~/shared/utils/today';
 import {
   selectedMonthKeyAtom,
@@ -8,12 +10,14 @@ import {
   viewModeAtom,
 } from '~/stores/month';
 
+import { useBudgetingOnboardingSteps } from '../../onboarding/useBudgetingOnboardingSteps';
 import { BudgetingTable } from './BudgetingTable/BudgetingTable';
 
 export function BudgetingPage() {
   const [viewMode, setViewMode] = useAtom(viewModeAtom);
   const [, setMonth] = useAtom(selectedMonthKeyAtom);
   const year = useAtomValue(selectedYearAtom);
+  const steps = useBudgetingOnboardingSteps();
 
   useEffect(() => {
     if (viewMode === 'year') {
@@ -27,5 +31,11 @@ export function BudgetingPage() {
     }
   }, [setMonth, setViewMode, viewMode, year]);
 
-  return <BudgetingTable />;
+  return (
+    <FeatureOnboardingTour featureKey="budgeting" steps={steps}>
+      <Box data-onboarding-tour-id="budgeting-intro">
+        <BudgetingTable />
+      </Box>
+    </FeatureOnboardingTour>
+  );
 }

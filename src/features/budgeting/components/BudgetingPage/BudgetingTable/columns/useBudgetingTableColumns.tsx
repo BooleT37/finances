@@ -1,4 +1,5 @@
-import { Group, Text, Tooltip } from '@mantine/core';
+import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour';
+import { Box, Group, Text, Tooltip } from '@mantine/core';
 import Decimal from 'decimal.js';
 import { createMRTColumnHelper, type MRT_Row } from 'mantine-react-table-open';
 import { useMemo } from 'react';
@@ -91,36 +92,46 @@ export function useBudgetingTableColumns({
       columnHelper.accessor((row) => row.planSum?.abs().toNumber() ?? 0, {
         id: 'planSum',
         header: t('columns.plan'),
+        Header: () => (
+          <OnboardingTour.Target id="budgeting-plan-header">
+            <Box component="span">{t('columns.plan')}</Box>
+          </OnboardingTour.Target>
+        ),
         enableEditing: canEditPlanCell,
         Cell: ({ row }) => <PlanCell row={row} month={month} year={year} />,
         Footer: ({ table }) => {
           const surplus = grandTotal?.planSum ?? zero;
           return (
-            <Group
-              gap={4}
-              align="center"
-              wrap="nowrap"
-              data-testid="plan-footer"
-            >
-              <Text
-                size="sm"
-                fw={600}
-                c={surplus.isNegative() ? 'red' : 'green'}
-              >
-                {costToString(surplus)}
-              </Text>
-              {grandTotal?.subscriptions &&
-                grandTotal?.subscriptions.length > 0 && (
-                  <GrandTotalSubscriptionBadge
-                    allDue={grandTotal?.subscriptions}
-                    rows={
-                      table.getCoreRowModel().rows as MRT_Row<BudgetingRow>[]
-                    }
-                    month={month}
-                    year={year}
-                  />
-                )}
-            </Group>
+            <OnboardingTour.Target id="budgeting-grandtotal-plan">
+              <Box>
+                <Group
+                  gap={4}
+                  align="center"
+                  wrap="nowrap"
+                  data-testid="plan-footer"
+                >
+                  <Text
+                    size="sm"
+                    fw={600}
+                    c={surplus.isNegative() ? 'red' : 'green'}
+                  >
+                    {costToString(surplus)}
+                  </Text>
+                  {grandTotal?.subscriptions &&
+                    grandTotal?.subscriptions.length > 0 && (
+                      <GrandTotalSubscriptionBadge
+                        allDue={grandTotal?.subscriptions}
+                        rows={
+                          table.getCoreRowModel()
+                            .rows as MRT_Row<BudgetingRow>[]
+                        }
+                        month={month}
+                        year={year}
+                      />
+                    )}
+                </Group>
+              </Box>
+            </OnboardingTour.Target>
           );
         },
         sortingFn: (rowA, rowB) =>
@@ -158,19 +169,28 @@ export function useBudgetingTableColumns({
       columnHelper.display({
         id: 'thisMonth',
         header: t('columns.thisMonth'),
+        Header: () => (
+          <OnboardingTour.Target id="budgeting-thismonth-header">
+            <Box component="span">{t('columns.thisMonth')}</Box>
+          </OnboardingTour.Target>
+        ),
         enableEditing: false,
         enableSorting: false,
         Cell: ({ row }) => (
           <ThisMonthCell row={row.original} month={month} year={year} />
         ),
         Footer: () => (
-          <CostWithDiffCellView
-            cost={grandTotal?.thisMonthActual ?? zero}
-            forecast={grandTotal?.planSum ?? zero}
-            isContinuous={false}
-            month={month}
-            year={year}
-          />
+          <OnboardingTour.Target id="budgeting-grandtotal-fact">
+            <Box>
+              <CostWithDiffCellView
+                cost={grandTotal?.thisMonthActual ?? zero}
+                forecast={grandTotal?.planSum ?? zero}
+                isContinuous={false}
+                month={month}
+                year={year}
+              />
+            </Box>
+          </OnboardingTour.Target>
         ),
         mantineTableBodyCellProps: {
           'data-testing-column': 'thisMonth',

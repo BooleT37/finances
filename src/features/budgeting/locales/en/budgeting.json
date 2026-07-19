@@ -28,5 +28,27 @@
     "noSource": "No source",
     "notPaid": "unpaid",
     "paid": "paid"
+  },
+  "onboarding": {
+    "intro": {
+      "title": "Planning",
+      "content": "This is where you build the budget for the next month. Then you can compare it here against actual spending."
+    },
+    "planHeader": {
+      "title": "Plan",
+      "content": "You fill in this column when building the budget."
+    },
+    "thisMonthHeader": {
+      "title": "This month",
+      "content": "This shows the actual spending for this month, entered on the transactions screen. That lets you compare the plan against actual expenses."
+    },
+    "grandTotalPlan": {
+      "title": "Plan total",
+      "content": "Here you see the difference between planned expenses and income. If the value is negative, your plan for the month is too ambitious — something needs to be cut."
+    },
+    "grandTotalFact": {
+      "title": "Actual total",
+      "content": "Here is the actual difference between expenses and income (the bold black number), and the difference from the plan (the colored value beside it). Ideally you want this to be zero at the end of the month. If it's higher, the surplus can be moved to savings. If lower, you cancover the shortfall from savings (you can record it as income). The side number is secondary: it just shows how well you guessed how much you'd have left at the end of the month."
+    }
   }
 }
