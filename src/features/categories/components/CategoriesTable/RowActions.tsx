@@ -51,14 +51,18 @@ export function RowActions({ row }: Props) {
 
   return (
     <Group gap={4}>
-      <ActionIcon
-        variant="subtle"
-        aria-label={t('actions.edit')}
-        onClick={() => open(row.original.id)}
+      <Tooltip label={t('actions.edit')}>
+        <ActionIcon
+          variant="subtle"
+          aria-label={t('actions.edit')}
+          onClick={() => open(row.original.id)}
+        >
+          <IconEdit size={16} />
+        </ActionIcon>
+      </Tooltip>
+      <Tooltip
+        label={isSpecial ? t('delete.disabledTooltip') : t('actions.delete')}
       >
-        <IconEdit size={16} />
-      </ActionIcon>
-      <Tooltip label={t('delete.disabledTooltip')} disabled={!isSpecial}>
         <ActionIcon
           variant="subtle"
           color="red"
