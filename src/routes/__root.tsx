@@ -24,9 +24,10 @@ import type { createStore } from 'jotai';
 import { Provider as JotaiProvider } from 'jotai';
 import { useHydrateAtoms } from 'jotai/utils';
 import { queryClientAtom } from 'jotai-tanstack-query';
+import { useEffect } from 'react';
 import { I18nextProvider, useTranslation } from 'react-i18next';
 
-import i18n from '~/lib/i18n';
+import i18n, { LANGUAGE_STORAGE_KEY } from '~/lib/i18n';
 import { trpc, trpcClient } from '~/lib/trpc/client';
 
 const theme = createTheme({
@@ -115,6 +116,22 @@ function HydrateAtoms({
 
 function RootComponent() {
   const { queryClient, jotaiStore } = Route.useRouteContext();
+
+  // SSR (and therefore the client's first render) always uses the default
+  // language, since localStorage doesn't exist server-side. This effect
+  // restores the saved one right after mount. Since the saved language can
+  // differ from what was server-rendered, React logs a one-time hydration
+  // mismatch warning for the affected subtree in dev before it self-corrects
+  // — an accepted trade-off of any client-only persisted preference in an
+  // SSR app; the alternative (reading the preference from a cookie so SSR
+  // can render the right language from the start) is a materially bigger
+  // change than what this ticket asks for.
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    if (savedLanguage && savedLanguage !== i18n.language) {
+      void i18n.changeLanguage(savedLanguage);
+    }
+  }, []);
 
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
