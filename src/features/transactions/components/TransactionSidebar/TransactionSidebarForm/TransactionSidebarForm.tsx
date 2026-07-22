@@ -53,14 +53,14 @@ export function TransactionSidebarForm() {
     currentTransactionAtom,
     formRefAtom,
     saveTransactionAtom,
-    openAtom,
+    refreshActualDateShownAtom,
     closeAtom,
   } = useMolecule(TransactionSidebarMolecule);
 
   const editingId = useAtomValue(editingIdAtom);
   const currentTransaction = useAtomValue(currentTransactionAtom);
   const saveTransaction = useSetAtom(saveTransactionAtom);
-  const open = useSetAtom(openAtom);
+  const refreshActualDateShown = useSetAtom(refreshActualDateShownAtom);
   const close = useSetAtom(closeAtom);
   const flashOnGroupChange = useFlashOnGroupChange();
   const setFormRef = useSetAtom(formRefAtom);
@@ -291,7 +291,7 @@ export function TransactionSidebarForm() {
       if (wasAdding) {
         close();
       } else {
-        open(tx.id);
+        refreshActualDateShown(tx.id);
       }
     },
     (validationErrors) => {

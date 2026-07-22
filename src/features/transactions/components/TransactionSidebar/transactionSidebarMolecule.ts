@@ -80,14 +80,22 @@ export const TransactionSidebarMolecule = molecule(() => {
 
   // ── Open / close ────────────────────────────────────────────────────────────
 
+  // Refreshes actualDateShownAtom from the given transaction's saved
+  // actualDate — used both by openDirectAtom and standalone after an
+  // edit-save, where the sidebar is already open and doesn't need a full
+  // re-open, just this one field synced with what was actually persisted.
+  const refreshActualDateShownAtom = atom(null, (get, set, id: number) => {
+    const tx = get(transactionsMapAtom).data?.[id] ?? null;
+    set(actualDateShownAtom, tx?.actualDate != null);
+  });
+
   // Inner open logic without a dirty check — used directly when the caller has
   // already confirmed (or there is nothing to confirm), e.g. inside
   // createFromSubscriptionAtom after the mutation completes.
   const openDirectAtom = atom(null, (get, set, id: number | null) => {
     set(editingIdAtom, id);
     if (id !== null) {
-      const tx = get(transactionsMapAtom).data?.[id] ?? null;
-      set(actualDateShownAtom, tx?.actualDate != null);
+      set(refreshActualDateShownAtom, id);
     } else {
       set(actualDateShownAtom, false);
       // For the existing transaction path, we have the "key" workaround on the component,
@@ -337,6 +345,7 @@ export const TransactionSidebarMolecule = molecule(() => {
     actualDateShownAtom,
     formRefAtom,
     openAtom,
+    refreshActualDateShownAtom,
     openForComponentAtom,
     highlightedComponentIdAtom,
     closeAtom,
