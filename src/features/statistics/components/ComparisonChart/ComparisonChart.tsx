@@ -1,3 +1,4 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { BarChart } from '@mantine/charts';
 import {
   Alert,
@@ -13,7 +14,9 @@ import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { YAxisTickContentProps } from 'recharts';
 
+import { getIconByValue } from '~/features/categories/components/categoryIcons/categoryIcons';
 import { useSortAllCategoriesById } from '~/features/categories/facets/categoriesOrder';
 import { getCategoryMapQueryOptions } from '~/features/categories/facets/categoryMap';
 import { ISO_DATE_FORMAT } from '~/shared/constants';
@@ -81,6 +84,55 @@ function PeriodPicker({
   );
 }
 
+const CATEGORY_AXIS_WIDTH = 130;
+const CATEGORY_TICK_ICON_SIZE = 12;
+const CATEGORY_TICK_ICON_GAP = 6;
+// Icon + label share a fixed-width slot starting this far left of the tick's
+// anchor point (which sits right at the plot's edge), so the label always
+// starts at the same x regardless of whether its category has an icon.
+const CATEGORY_TICK_BLOCK_START = -(CATEGORY_AXIS_WIDTH - 20);
+
+interface ComparisonYAxisTickProps extends YAxisTickContentProps {
+  categoryIconByShortname: Map<string, string | null>;
+}
+
+function ComparisonYAxisTick({
+  x,
+  y,
+  payload,
+  categoryIconByShortname,
+}: ComparisonYAxisTickProps) {
+  const shortname = String(payload.value);
+  const iconValue = categoryIconByShortname.get(shortname);
+  const icon = iconValue ? getIconByValue(iconValue) : undefined;
+  const textX =
+    CATEGORY_TICK_BLOCK_START +
+    CATEGORY_TICK_ICON_SIZE +
+    CATEGORY_TICK_ICON_GAP;
+
+  return (
+    <g transform={`translate(${x}, ${y})`}>
+      {icon && (
+        // recharts renders axis ticks inside an SVG <g>, not the regular DOM,
+        // so we can't reuse the app's NameWithOptionalIcon (it renders HTML
+        // <span>/<Group>). FontAwesomeIcon itself renders an <svg>, and a
+        // nested <svg> is valid SVG (it opens its own viewport), so we can
+        // position it directly via x/y/width/height like any other SVG node.
+        <FontAwesomeIcon
+          icon={icon}
+          x={CATEGORY_TICK_BLOCK_START}
+          y={-CATEGORY_TICK_ICON_SIZE / 2}
+          width={CATEGORY_TICK_ICON_SIZE}
+          height={CATEGORY_TICK_ICON_SIZE}
+        />
+      )}
+      <text x={textX} y={0} dy={4} fontSize={12} fill="currentColor">
+        {shortname}
+      </text>
+    </g>
+  );
+}
+
 export function ComparisonChart() {
   const { t, i18n } = useTranslation('statistics');
   const [granularity, setGranularity] = useState<Granularity>('month');
@@ -134,12 +186,16 @@ export function ComparisonChart() {
           category.type !== 'TO_SAVINGS' && (showIncome || !category.isIncome)
         );
       })
-      .map((row) => ({
-        categoryId: row.categoryId,
-        category: getOrThrow(categoryMap, row.categoryId, 'Category').shortname,
-        period1: row.period1,
-        period2: row.period2,
-      }))
+      .map((row) => {
+        const category = getOrThrow(categoryMap, row.categoryId, 'Category');
+        return {
+          categoryId: row.categoryId,
+          category: category.shortname,
+          categoryIcon: category.icon,
+          period1: row.period1,
+          period2: row.period2,
+        };
+      })
       .sort((a, b) => {
         if (sortBy === 'category') {
           return sortAllCategoriesById(a.categoryId, b.categoryId);
@@ -147,6 +203,12 @@ export function ComparisonChart() {
         return b[sortBy] - a[sortBy];
       });
   }, [comparisonData, categoryMap, showIncome, sortBy, sortAllCategoriesById]);
+
+  const categoryIconByShortname = useMemo(() => {
+    const map = new Map<string, string | null>();
+    chartData.forEach((row) => map.set(row.category, row.categoryIcon));
+    return map;
+  }, [chartData]);
 
   const period1Label = formatPeriodLabel(granularity, period1, i18n.language);
   const period2Label = formatPeriodLabel(granularity, period2, i18n.language);
@@ -217,6 +279,15 @@ export function ComparisonChart() {
           data={chartData}
           dataKey="category"
           orientation="vertical"
+          yAxisProps={{
+            width: CATEGORY_AXIS_WIDTH,
+            tick: (tickProps: YAxisTickContentProps) => (
+              <ComparisonYAxisTick
+                {...tickProps}
+                categoryIconByShortname={categoryIconByShortname}
+              />
+            ),
+          }}
           series={[
             { name: 'period1', label: period1Label, color: 'blue.6' },
             { name: 'period2', label: period2Label, color: 'orange.6' },
