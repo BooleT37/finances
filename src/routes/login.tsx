@@ -1,4 +1,12 @@
-import { Box, Center, Divider, Paper, Stack, Title } from '@mantine/core';
+import {
+  Box,
+  Center,
+  Divider,
+  Group,
+  Paper,
+  Stack,
+  Title,
+} from '@mantine/core';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
@@ -42,9 +50,18 @@ function LoginPage() {
 
   return (
     <Box pos="relative" h="100vh">
-      <Box pos="absolute" top="md" right="md">
+      <Group
+        h={40}
+        px="md"
+        justify="flex-end"
+        align="center"
+        pos="absolute"
+        top={0}
+        right={0}
+        left={0}
+      >
         <LanguageSwitcher />
-      </Box>
+      </Group>
       <Center h="100%">
         <Paper withBorder p="xl" w={360}>
           <Stack gap="lg">
