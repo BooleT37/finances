@@ -1,4 +1,4 @@
-import { ActionIcon, Group } from '@mantine/core';
+import { ActionIcon, Group, Tooltip } from '@mantine/core';
 import { modals, openConfirmModal } from '@mantine/modals';
 import { IconCopy, IconEdit, IconTrash } from '@tabler/icons-react';
 import { useMolecule } from 'bunshi/react';
@@ -71,34 +71,40 @@ export function RowActions({ id, parentExpenseId, name }: Props) {
 
   return (
     <Group gap={4}>
-      <ActionIcon
-        variant="subtle"
-        aria-label={t('actions.edit')}
-        onClick={() =>
-          parentExpenseId !== null
-            ? openForComponent({ parentId: parentExpenseId, componentId: id })
-            : open(id)
-        }
-      >
-        <IconEdit size={16} />
-      </ActionIcon>
-      {parentExpenseId === null && (
+      <Tooltip label={t('actions.edit')}>
         <ActionIcon
           variant="subtle"
-          aria-label={t('actions.copy')}
-          onClick={handleCopy}
+          aria-label={t('actions.edit')}
+          onClick={() =>
+            parentExpenseId !== null
+              ? openForComponent({ parentId: parentExpenseId, componentId: id })
+              : open(id)
+          }
         >
-          <IconCopy size={16} />
+          <IconEdit size={16} />
         </ActionIcon>
+      </Tooltip>
+      {parentExpenseId === null && (
+        <Tooltip label={t('actions.copy')}>
+          <ActionIcon
+            variant="subtle"
+            aria-label={t('actions.copy')}
+            onClick={handleCopy}
+          >
+            <IconCopy size={16} />
+          </ActionIcon>
+        </Tooltip>
       )}
-      <ActionIcon
-        variant="subtle"
-        color="red"
-        aria-label={t('actions.delete')}
-        onClick={handleDelete}
-      >
-        <IconTrash size={16} />
-      </ActionIcon>
+      <Tooltip label={t('actions.delete')}>
+        <ActionIcon
+          variant="subtle"
+          color="red"
+          aria-label={t('actions.delete')}
+          onClick={handleDelete}
+        >
+          <IconTrash size={16} />
+        </ActionIcon>
+      </Tooltip>
     </Group>
   );
 }
