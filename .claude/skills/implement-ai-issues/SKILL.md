@@ -146,7 +146,17 @@ Once the PR is open, run the **review** skill on it passing the PR number. This 
 
 The review skill needs the PR diff to be available on GitHub, so run it after the push in Step 8 completes (no extra delay needed — the API is available immediately after `gh pr create` returns).
 
-## Step 10 — Clean up & report
+## Step 10 — Act on the review findings
+
+Do not just post the review and move on — triage every finding it returned:
+
+- **Confirmed, real bug** (a genuine correctness issue, not a style nit) — fix it in the same worktree, re-run typecheck/lint/format (and the relevant tests), push a follow-up commit on the same branch (never amend — this PR may already be pushed), and reply to each resolved review thread (`gh api repos/BooleT37/finances/pulls/comments/<id>/replies -f body="Fixed in <sha> — <one-line what changed>"`) so the owner sees it's addressed without re-reading the diff themselves.
+- **Low-confidence, non-blocking, or pre-existing-behavior note** (the reviewer itself says "not asking for a fix" or it's inherited from code this PR didn't introduce) — leave it alone. Don't manufacture a change just to look responsive.
+- **If you're unsure which bucket a finding falls into**, lean toward fixing it — a small unnecessary fix costs little, but a real bug left unfixed defeats the point of running the review at all.
+
+This step is not optional busywork: the whole reason Step 9 runs before merge is so problems get caught *and closed out* while the branch is still in your hands, not left for the owner to notice, ask about, and wait on a follow-up round for.
+
+## Step 11 — Clean up & report
 
 - Remove the worktree (`git worktree remove ../finances-worktrees/<dir>`) — the branch is safe on the remote, and the **fix-pr-comments** skill recreates a worktree if review feedback comes in.
 - Move to the next issue.
