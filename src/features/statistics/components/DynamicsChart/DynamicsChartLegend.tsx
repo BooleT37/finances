@@ -7,7 +7,7 @@ import { getOrThrow } from '~/shared/utils/getOrThrow';
 
 interface Props {
   payload?: readonly LegendPayload[];
-  categoryMap: Record<string, Category>;
+  categoryMap: Record<string, Category> | undefined;
 }
 
 export function DynamicsChartLegend({ payload, categoryMap }: Props) {
@@ -20,11 +20,9 @@ export function DynamicsChartLegend({ payload, categoryMap }: Props) {
       {payload
         .filter((item) => item.dataKey !== undefined)
         .map((item) => {
-          const category = getOrThrow(
-            categoryMap,
-            Number(item.dataKey),
-            'Category',
-          );
+          const category = categoryMap
+            ? getOrThrow(categoryMap, Number(item.dataKey), 'Category')
+            : null;
           return (
             <Group key={String(item.dataKey)} gap={4} wrap="nowrap">
               <ColorSwatch
@@ -33,8 +31,8 @@ export function DynamicsChartLegend({ payload, categoryMap }: Props) {
                 withShadow={false}
               />
               <NameWithOptionalIcon
-                name={category.shortname}
-                icon={category.icon}
+                name={category?.shortname ?? String(item.dataKey)}
+                icon={category?.icon}
               />
             </Group>
           );
