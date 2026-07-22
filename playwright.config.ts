@@ -18,6 +18,10 @@ export default defineConfig({
   use: {
     baseURL: TEST_BASE_URL,
     trace: 'on-first-retry',
+    // The app now prefills its language from the browser's locale when there's
+    // no saved preference. Pin it to Russian — the app's default — so specs
+    // asserting Russian text don't depend on the host machine's locale.
+    locale: 'ru-RU',
   },
   projects: [
     {

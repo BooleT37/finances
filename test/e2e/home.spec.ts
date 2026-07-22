@@ -67,3 +67,16 @@ test.describe('App shell', () => {
     );
   });
 });
+
+test.describe('Language prefill from browser locale', () => {
+  test.use({ locale: 'en-US' });
+
+  test('prefills from the browser locale when there is no saved language', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await expect(
+      page.getByRole('link', { name: 'Transactions' }),
+    ).toBeVisible();
+  });
+});
