@@ -64,13 +64,31 @@ declare module 'i18next' {
   }
 }
 
+const LANGUAGE_STORAGE_KEY = 'finances.language';
+
+// This module runs on both the server (SSR) and the client. `localStorage`
+// doesn't exist server-side, so SSR always renders in the default language;
+// the client then restores the saved one (if any) once this module loads.
+function getInitialLanguage(): string {
+  if (typeof window === 'undefined') {
+    return 'ru';
+  }
+  return localStorage.getItem(LANGUAGE_STORAGE_KEY) ?? 'ru';
+}
+
 i18n.use(initReactI18next).init({
-  lng: 'ru',
+  lng: getInitialLanguage(),
   defaultNS: 'home',
   resources,
   interpolation: {
     escapeValue: false,
   },
 });
+
+if (typeof window !== 'undefined') {
+  i18n.on('languageChanged', (lng) => {
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, lng);
+  });
+}
 
 export default i18n;
