@@ -1,11 +1,20 @@
 import { LineChart } from '@mantine/charts';
-import { Alert, Group, MultiSelect, Stack, Title } from '@mantine/core';
+import {
+  Alert,
+  type ComboboxItem,
+  Group,
+  MultiSelect,
+  Pill,
+  Stack,
+  Title,
+} from '@mantine/core';
 import { MonthPickerInput } from '@mantine/dates';
 import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { NameWithOptionalIcon } from '~/features/categories/components/NameWithOptionalIcon';
 import { getCategoryMapQueryOptions } from '~/features/categories/facets/categoryMap';
 import { getCategoriesQueryOptions } from '~/features/categories/queries';
 import { ISO_DATE_FORMAT, MONTH_DATE_FORMAT } from '~/shared/constants';
@@ -13,6 +22,7 @@ import { costToString } from '~/shared/utils/costToString';
 import { getOrThrow } from '~/shared/utils/getOrThrow';
 
 import { getDynamicsDataQueryOptions } from '../../queries';
+import { DynamicsChartLegend } from './DynamicsChartLegend';
 
 const palette = [
   'blue.6',
@@ -29,6 +39,10 @@ const palette = [
 
 const today = dayjs().startOf('month');
 const defaultFrom = today.subtract(11, 'month');
+
+interface CategoryOption extends ComboboxItem {
+  icon: string | null;
+}
 
 export function DynamicsChart() {
   const { t, i18n } = useTranslation('statistics');
@@ -54,11 +68,12 @@ export function DynamicsChart() {
     enabled: !sameMonth,
   });
 
-  const categoryOptions = useMemo(
+  const categoryOptions = useMemo<CategoryOption[]>(
     () =>
       (categories ?? []).map((category) => ({
         value: category.id.toString(),
         label: category.shortname,
+        icon: category.icon,
       })),
     [categories],
   );
@@ -113,6 +128,21 @@ export function DynamicsChart() {
           onChange={setCategoryIds}
           clearable
           w={400}
+          renderOption={({ option }) => (
+            <NameWithOptionalIcon
+              name={option.label}
+              icon={(option as CategoryOption).icon}
+              reserveIconSpace
+            />
+          )}
+          renderPill={({ option, onRemove, disabled }) => (
+            <Pill withRemoveButton={!disabled} onRemove={onRemove}>
+              <NameWithOptionalIcon
+                name={option.label}
+                icon={(option as CategoryOption).icon}
+              />
+            </Pill>
+          )}
         />
       </Group>
       {sameMonth ? (
@@ -126,6 +156,14 @@ export function DynamicsChart() {
           series={series}
           valueFormatter={(value) => costToString(value)}
           withLegend
+          legendProps={{
+            content: (props) => (
+              <DynamicsChartLegend
+                payload={props.payload}
+                categoryMap={categoryMap ?? {}}
+              />
+            ),
+          }}
         />
       )}
     </Stack>
