@@ -54,12 +54,14 @@ export function TransactionSidebarForm() {
     formRefAtom,
     saveTransactionAtom,
     openAtom,
+    closeAtom,
   } = useMolecule(TransactionSidebarMolecule);
 
   const editingId = useAtomValue(editingIdAtom);
   const currentTransaction = useAtomValue(currentTransactionAtom);
   const saveTransaction = useSetAtom(saveTransactionAtom);
   const open = useSetAtom(openAtom);
+  const close = useSetAtom(closeAtom);
   const flashOnGroupChange = useFlashOnGroupChange();
   const setFormRef = useSetAtom(formRefAtom);
   const store = useStore();
@@ -282,10 +284,15 @@ export function TransactionSidebarForm() {
       if (!prepared) {
         return;
       }
+      const wasAdding = editingId === null;
       const tx = await saveTransaction(prepared);
       flashOnGroupChange(null, tx);
       form.reset();
-      open(tx.id);
+      if (wasAdding) {
+        close();
+      } else {
+        open(tx.id);
+      }
     },
     (validationErrors) => {
       console.log(validationErrors);
