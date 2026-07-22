@@ -47,4 +47,23 @@ test.describe('App shell', () => {
     ).toBeVisible();
     await expect(page.getByRole('link', { name: 'Planning' })).toBeVisible();
   });
+
+  test('language switcher choice persists across reload', async ({ page }) => {
+    await page
+      .getByLabel('Language switcher')
+      .locator('input[value="en"]')
+      .dispatchEvent('click');
+    await expect(
+      page.getByRole('link', { name: 'Transactions' }),
+    ).toBeVisible();
+
+    await page.goto('/');
+
+    await expect(
+      page.getByRole('link', { name: 'Transactions' }),
+    ).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Планирование' })).toHaveCount(
+      0,
+    );
+  });
 });
