@@ -66,6 +66,13 @@ declare module 'i18next' {
 
 export const LANGUAGE_STORAGE_KEY = 'finances.language';
 
+type SupportedLanguage = keyof typeof resources;
+const SUPPORTED_LANGUAGES = Object.keys(resources) as SupportedLanguage[];
+
+export function isSupportedLanguage(value: string): value is SupportedLanguage {
+  return (SUPPORTED_LANGUAGES as string[]).includes(value);
+}
+
 i18n.use(initReactI18next).init({
   lng: 'ru',
   defaultNS: 'home',

@@ -27,7 +27,7 @@ import { queryClientAtom } from 'jotai-tanstack-query';
 import { useEffect } from 'react';
 import { I18nextProvider, useTranslation } from 'react-i18next';
 
-import i18n, { LANGUAGE_STORAGE_KEY } from '~/lib/i18n';
+import i18n, { isSupportedLanguage, LANGUAGE_STORAGE_KEY } from '~/lib/i18n';
 import { trpc, trpcClient } from '~/lib/trpc/client';
 
 const theme = createTheme({
@@ -128,7 +128,11 @@ function RootComponent() {
   // change than what this ticket asks for.
   useEffect(() => {
     const savedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
-    if (savedLanguage && savedLanguage !== i18n.language) {
+    if (
+      savedLanguage &&
+      isSupportedLanguage(savedLanguage) &&
+      savedLanguage !== i18n.language
+    ) {
       void i18n.changeLanguage(savedLanguage);
     }
   }, []);
