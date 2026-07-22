@@ -181,7 +181,7 @@ export function DynamicsChart() {
             content: (props) => (
               <DynamicsChartLegend
                 payload={props.payload}
-                categoryMap={categoryMap ?? {}}
+                categoryMap={categoryMap}
               />
             ),
           }}
