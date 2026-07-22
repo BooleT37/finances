@@ -143,6 +143,33 @@ test.describe('Transaction creation', () => {
     await expect(row.getByText('€2000.00')).toBeVisible();
   });
 
+  // Regression: after adding a transaction the sidebar used to reopen bound to
+  // the just-created transaction (edit mode) instead of closing.
+  test('sidebar closes after adding a transaction, instead of reopening in edit mode', async ({
+    page,
+    seedData,
+  }) => {
+    const form = page.getByRole('form', { name: 'Форма транзакции' });
+
+    await page.getByRole('button', { name: 'Добавить' }).click();
+    await expect(page.getByRole('heading', { name: 'Добавить' })).toBeVisible();
+
+    await selectOption(page, 'Категория', 'Продукты');
+    await page.getByLabel('Сумма (€)').fill('50');
+
+    await form.getByRole('button', { name: 'Добавить' }).click();
+    await page.waitForLoadState('networkidle');
+
+    // Sidebar slides off-screen via CSS transform — toBeInViewport catches this,
+    // toBeVisible would not.
+    await expect(form).not.toBeInViewport();
+
+    // The new transaction was still created and highlighted in the table.
+    await findTransactionRow(page, {
+      categoryId: seedData.categoryIds.продукты,
+    });
+  });
+
   test('create an expense with date in a previous month', async ({
     page,
     seedData,
