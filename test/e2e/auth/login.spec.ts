@@ -49,4 +49,22 @@ test.describe('login', () => {
     await page.goto('/transactions');
     await expect(page).toHaveURL(/\/login/);
   });
+
+  test('language switcher changes the page language', async ({
+    page,
+    context,
+  }) => {
+    await context.clearCookies();
+    await page.goto('/login');
+    await expect(page.getByText('Вход', { exact: true })).toBeVisible();
+
+    await page
+      .getByLabel('Language switcher')
+      .locator('input[value="en"]')
+      .dispatchEvent('click');
+
+    await expect(
+      page.getByRole('heading', { name: 'Sign in', exact: true }),
+    ).toBeVisible();
+  });
 });
