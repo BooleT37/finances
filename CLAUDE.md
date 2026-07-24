@@ -143,13 +143,13 @@ Types are inferred automatically via `as const` — no manual type maintenance n
 
 ## Analytics (PostHog)
 
-All `createServerFn` POST mutations are auto-captured via the global `posthogTrackingMiddleware` registered in [src/start.ts](src/start.ts). Events are named `serverfn_<functionName>` (e.g. `serverfn_createTransaction`) and logged with `{ input, timestamp, success, environment, userEmail }`. The `environment` field is `VERCEL_ENV` on Vercel (`production` / `preview` / `development`) or `NODE_ENV` locally — filter by it in PostHog to separate prod traffic from preview/dev noise.
+All `createServerFn` POST mutations are auto-captured via the global `posthogTrackingMiddleware` registered in [src/start.ts](src/start.ts). Events are named `serverfn_<functionName>` (e.g. `serverfn_createTransaction`) and logged with `{ input, timestamp, success, environment }`. The `environment` field is `VERCEL_ENV` on Vercel (`production` / `preview` / `development`) or `NODE_ENV` locally — filter by it in PostHog to separate prod traffic from preview/dev noise.
 
 Required env vars (set on Vercel for production, in `.env` for local):
 - `POSTHOG_API_KEY` — Project API key
 - `POSTHOG_HOST` — defaults to `https://eu.i.posthog.com`
 
-`distinctId` is the session user's id, and `userEmail` their email; both fall back to `'anonymous'`/`null` when no session resolves (e.g. an unauthenticated call rejected by `authMiddleware`). Events emitted before auth shipped are under the old hardcoded `finances-t3` distinctId `clg6kpbtn0000mr081ntz0f8i` — history is split at that point unless the ids are aliased in PostHog.
+`distinctId` is the session user's id, falling back to `'anonymous'` when no session resolves (e.g. an unauthenticated call rejected by `authMiddleware`). When a session does resolve, the user's `email`/`name` are attached as PostHog **person properties** via `$set` (not event properties) — this is what makes `person_display_name` show the name instead of the raw distinct_id. Events emitted before auth shipped are under the old hardcoded `finances-t3` distinctId `clg6kpbtn0000mr081ntz0f8i` — history is split at that point unless the ids are aliased in PostHog.
 
 The middleware resolves the session itself via `getSessionForRequest` (`~/server/getSessionForRequest`) rather than reading `authMiddleware`'s context: it is registered globally, so it runs *outside* the per-function middleware and `next()` throws on failure, which would drop the user from exactly the failed events worth attributing. `getSessionForRequest` memoises per request (keyed on `getRequest()`), so this shares one lookup with `authMiddleware` instead of doubling them. A session that fails to resolve is logged and reported as anonymous — analytics must never fail a request.
 

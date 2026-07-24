@@ -34,7 +34,9 @@ export const posthogTrackingMiddleware = createMiddleware({
     input: data,
     timestamp: new Date().toISOString(),
     environment,
-    userEmail: user?.email ?? null,
+    // Attaches person properties so PostHog's person_display_name shows the
+    // user's name/email instead of falling back to the raw distinct_id.
+    ...(user && { $set: { email: user.email, name: user.name } }),
   };
 
   let result: Awaited<ReturnType<typeof next>>;
