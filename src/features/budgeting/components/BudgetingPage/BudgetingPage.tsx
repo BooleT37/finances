@@ -1,4 +1,3 @@
-import { Box } from '@mantine/core';
 import { useAtom, useAtomValue } from 'jotai';
 import { useEffect } from 'react';
 
@@ -33,9 +32,7 @@ export function BudgetingPage() {
 
   return (
     <FeatureOnboardingTour featureKey="budgeting" steps={steps}>
-      <Box data-onboarding-tour-id="budgeting-intro">
-        <BudgetingTable />
-      </Box>
+      <BudgetingTable />
     </FeatureOnboardingTour>
   );
 }
