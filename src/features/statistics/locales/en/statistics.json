@@ -25,7 +25,11 @@
     "rangeLabel": "Date range",
     "categoriesLabel": "Categories",
     "categoriesPlaceholder": "All categories",
-    "samePeriodWarning": "Please select a wider date range above"
+    "samePeriodWarning": "Please select a wider date range above",
+    "legend": {
+      "showMore": "Show {{count}} more",
+      "showLess": "Show less"
+    }
   },
   "onboarding": {
     "intro": {
