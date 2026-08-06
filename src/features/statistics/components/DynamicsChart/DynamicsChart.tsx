@@ -1,4 +1,4 @@
-import { ChartTooltip, LineChart } from '@mantine/charts';
+import { LineChart } from '@mantine/charts';
 import {
   Alert,
   type ComboboxItem,
@@ -14,6 +14,7 @@ import dayjs from 'dayjs';
 import type { ReactNode } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { TooltipPayloadEntry } from 'recharts';
 
 import { NameWithOptionalIcon } from '~/features/categories/components/NameWithOptionalIcon';
 import { getCategoryMapQueryOptions } from '~/features/categories/facets/categoryMap';
@@ -23,8 +24,7 @@ import { costToString } from '~/shared/utils/costToString';
 import { getOrThrow } from '~/shared/utils/getOrThrow';
 
 import { getDynamicsDataQueryOptions } from '../../queries';
-import { DynamicsChartLegend } from './DynamicsChartLegend';
-import type { DynamicsChartTooltipPayloadItem } from './sortAndFilterTooltipPayload';
+import { DynamicsChartTooltip } from './DynamicsChartTooltip';
 import { sortAndFilterTooltipPayload } from './sortAndFilterTooltipPayload';
 
 const palette = [
@@ -102,16 +102,18 @@ export function DynamicsChart() {
       payload,
     }: {
       label?: ReactNode;
-      payload?: readonly DynamicsChartTooltipPayloadItem[];
+      payload?: readonly TooltipPayloadEntry[];
     }) => (
-      <ChartTooltip
-        label={label}
+      <DynamicsChartTooltip
+        label={
+          typeof label === 'string' || typeof label === 'number'
+            ? label
+            : undefined
+        }
         payload={payload ? sortAndFilterTooltipPayload(payload) : payload}
-        series={series}
-        valueFormatter={(value) => costToString(value)}
       />
     ),
-    [series],
+    [],
   );
 
   const chartData = useMemo(
@@ -177,9 +179,6 @@ export function DynamicsChart() {
           series={series}
           valueFormatter={(value) => costToString(value)}
           withLegend
-          legendProps={{
-            content: (props) => <DynamicsChartLegend payload={props.payload} />,
-          }}
           tooltipProps={{ content: tooltipContent }}
         />
       )}
