@@ -8,6 +8,8 @@ interface Props {
   testId?: string;
   /** Reserve a fixed-width icon slot even when there is no icon, so names stay left-aligned. */
   reserveIconSpace?: boolean;
+  /** CSS font-size for the icon (it scales with font-size like text). Defaults to the surrounding text size. */
+  iconSize?: string;
 }
 
 export function NameWithOptionalIcon({
@@ -15,11 +17,16 @@ export function NameWithOptionalIcon({
   icon,
   testId,
   reserveIconSpace,
+  iconSize,
 }: Props) {
   if (!icon && !reserveIconSpace) {
     return <span data-testid={testId}>{name}</span>;
   }
-  const iconComp = icon ? <CategoryIconComp value={icon} /> : null;
+  const iconComp = icon ? (
+    <span style={iconSize ? { fontSize: iconSize } : undefined}>
+      <CategoryIconComp value={icon} />
+    </span>
+  ) : null;
   return (
     <Group
       gap={4}
