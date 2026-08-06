@@ -678,6 +678,56 @@ test.describe('Transaction search', () => {
       }),
     ).toBeVisible();
   });
+
+  test('search box matches a split transaction by its total cost, and matches an individual component by its own cost', async ({
+    page,
+    seedData,
+  }) => {
+    await testPrisma.expense.create({
+      data: {
+        name: 'Сплит покупка',
+        cost: 100,
+        date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
+        categoryId: seedData.categoryIds.продукты,
+        projectId: seedData.projectId,
+        components: {
+          create: [
+            {
+              name: 'Такси',
+              cost: 30,
+              categoryId: seedData.categoryIds.транспорт,
+            },
+          ],
+        },
+      },
+    });
+
+    await page.goto('/transactions');
+
+    const searchInput = page.getByPlaceholder('Найти...');
+    const parentRow = () =>
+      page.locator(
+        `.${transactionNameCellClass}[data-testing-category-id="${seedData.categoryIds.продукты}"]`,
+        { hasText: 'Сплит покупка' },
+      );
+    const componentRow = () =>
+      page.locator(
+        `.${transactionNameCellClass}[data-testing-category-id="${seedData.categoryIds.транспорт}"]`,
+        { hasText: 'Такси' },
+      );
+
+    // The parent row displays only the remainder (100 - 30 = 70), but the
+    // transaction's true total cost (100) should still be searchable.
+    await searchInput.fill('100');
+    await expect(parentRow()).toBeVisible();
+    await expect(componentRow()).toBeVisible();
+
+    // Neither the remainder (70) nor the total (100) matches "30" — but the
+    // component's own cost does, so it surfaces on its own without its parent.
+    await searchInput.fill('30');
+    await expect(componentRow()).toBeVisible();
+    await expect(parentRow()).toHaveCount(0);
+  });
 });
 
 test.describe('Inline cell editing', () => {

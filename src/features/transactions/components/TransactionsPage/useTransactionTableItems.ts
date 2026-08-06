@@ -50,6 +50,19 @@ function matchesNameOrCost(
   );
 }
 
+function matchesTransactionSearch(tx: Transaction, search: string): boolean {
+  if (!search || tx.name.toLowerCase().includes(search)) {
+    return true;
+  }
+  // A split transaction's parent row displays only the remainder after
+  // components (costWithoutComponents), but the transaction's own total
+  // cost (tx.cost) should still be searchable even when it differs.
+  return (
+    matchesCostQuery(tx.cost, search) ||
+    matchesCostQuery(costWithoutComponents(tx.cost, tx.components), search)
+  );
+}
+
 // #region Mapping functions
 
 function tableDataName(
@@ -296,11 +309,7 @@ export function useTransactionTableItems({
   );
 
   const filtered = monthFiltered.filter((tx) =>
-    matchesNameOrCost(
-      tx.name,
-      costWithoutComponents(tx.cost, tx.components),
-      search,
-    ),
+    matchesTransactionSearch(tx, search),
   );
 
   const transactionRows = filtered.map((tx) =>
@@ -329,8 +338,15 @@ export function useTransactionTableItems({
   // matches the search — its name is never checked independently, mirroring
   // how the parent transaction match already governs component visibility.
   const componentRows = monthFiltered.flatMap((tx) => {
+    const parentMatches = !search || filteredIds.has(tx.id);
+    if (
+      !parentMatches &&
+      !tx.components.some((c) => matchesCostQuery(c.cost, search))
+    ) {
+      return [];
+    }
     const components = mapComponents(tx, categoryMap, sourceMap);
-    if (!search || filteredIds.has(tx.id)) {
+    if (parentMatches) {
       return components;
     }
     return components.filter(
