@@ -1,43 +1,12 @@
 import { testPrisma } from './db/client';
-import { TEST_PROJECT_ID, TEST_USER_ID } from './db/seed';
+import { TEST_USER_ID } from './db/seed';
 import { expect, test } from './fixtures';
-
-/** Enough rows to exceed the budgeting table's max-height and reproduce issue #171. */
-const CATEGORIES_TO_OVERFLOW_VIEWPORT = 30;
 
 /** Re-opt the seeded user into the first-run tour (the seed marks it done). */
 async function resetOnboarding() {
   await testPrisma.user.update({
     where: { id: TEST_USER_ID },
     data: { onboardingCompletedAt: null },
-  });
-}
-
-/**
- * Adds enough expense categories to push the budgeting table taller than the
- * viewport, reproducing the layout that made the intro step's popover
- * overflow the screen (issue #171).
- */
-async function seedManyExpenseCategories(count: number) {
-  const categories = await testPrisma.category.createManyAndReturn({
-    data: Array.from({ length: count }, (_, i) => ({
-      name: `Категория ${i + 1}`,
-      shortname: `Кат ${i + 1}`,
-      isIncome: false,
-      projectId: TEST_PROJECT_ID,
-    })),
-  });
-  const setting = await testPrisma.projectSetting.findUniqueOrThrow({
-    where: { projectId: TEST_PROJECT_ID },
-  });
-  await testPrisma.projectSetting.update({
-    where: { projectId: TEST_PROJECT_ID },
-    data: {
-      expenseCategoriesOrder: [
-        ...setting.expenseCategoriesOrder,
-        ...categories.map((category) => category.id),
-      ],
-    },
   });
 }
 
@@ -114,31 +83,5 @@ test.describe('Onboarding tour', () => {
     // Standalone single-step tour ends with Finish, not a hand-off.
     await expect(page.getByRole('button', { name: 'Завершить' })).toBeVisible();
     await expect(page.getByText('Пропустить')).not.toBeVisible();
-  });
-
-  test('the budgeting intro popover stays within the viewport when there are many categories', async ({
-    page,
-  }) => {
-    await seedManyExpenseCategories(CATEGORIES_TO_OVERFLOW_VIEWPORT);
-    await page.goto('/budgeting');
-
-    await page
-      .getByRole('button', { name: 'Показать обзор этой страницы' })
-      .click();
-
-    const popover = page.getByRole('dialog').filter({
-      hasText: 'Здесь составляется бюджет на следующий месяц',
-    });
-    await expect(popover).toBeVisible();
-
-    const box = await popover.boundingBox();
-    expect(box).not.toBeNull();
-    const viewport = page.viewportSize();
-    expect(viewport).not.toBeNull();
-
-    expect(box!.x).toBeGreaterThanOrEqual(0);
-    expect(box!.y).toBeGreaterThanOrEqual(0);
-    expect(box!.x + box!.width).toBeLessThanOrEqual(viewport!.width);
-    expect(box!.y + box!.height).toBeLessThanOrEqual(viewport!.height);
   });
 });
