@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import type Decimal from 'decimal.js';
 import { useAtomValue } from 'jotai';
 import { useCallback } from 'react';
 
@@ -25,6 +26,7 @@ import {
 
 import type { Transaction } from '../../schema';
 import { costWithoutComponents } from '../../utils/costWithoutComponents';
+import { matchesCostQuery } from '../../utils/matchesCostQuery';
 import { useFormatComponentName } from '../../utils/useFormatComponentName';
 import {
   type TransactionTableItem,
@@ -35,6 +37,18 @@ type CategoryMap = Record<string, Category>;
 type SourceMap = Record<string, Source>;
 type SavingSpendingMap = Record<string, SavingSpending>;
 type SavingSpendingCategoryMap = Record<string, SavingSpendingCategory>;
+
+function matchesNameOrCost(
+  name: string,
+  cost: Decimal,
+  search: string,
+): boolean {
+  return (
+    !search ||
+    name.toLowerCase().includes(search) ||
+    matchesCostQuery(cost, search)
+  );
+}
 
 // #region Mapping functions
 
@@ -277,10 +291,16 @@ export function useTransactionTableItems({
 
   const search = searchString.toLowerCase();
 
-  const filtered = transactions.filter(
-    (tx) =>
-      (viewMode !== 'month' || tx.date.format('YYYY-MM') === selectedMonth) &&
-      (!search || tx.name.toLowerCase().includes(search)),
+  const monthFiltered = transactions.filter(
+    (tx) => viewMode !== 'month' || tx.date.format('YYYY-MM') === selectedMonth,
+  );
+
+  const filtered = monthFiltered.filter((tx) =>
+    matchesNameOrCost(
+      tx.name,
+      costWithoutComponents(tx.cost, tx.components),
+      search,
+    ),
   );
 
   const transactionRows = filtered.map((tx) =>
@@ -296,15 +316,27 @@ export function useTransactionTableItems({
   const subscriptionRows = showUpcoming
     ? availableSubscriptions
         .filter((a) => a.transactionId === null)
-        .filter(
-          (a) => !search || a.subscription.name.toLowerCase().includes(search),
+        .filter((a) =>
+          matchesNameOrCost(a.subscription.name, a.subscription.cost, search),
         )
         .map((a) => mapSubscription(a, categoryMap, sourceMap))
     : [];
 
-  const componentRows = filtered.flatMap((tx) =>
-    mapComponents(tx, categoryMap, sourceMap),
-  );
+  const filteredIds = new Set(filtered.map((tx) => tx.id));
+
+  // A transaction's components are shown whenever the parent transaction
+  // matches, but a component can also surface on its own if its own cost
+  // matches the search — its name is never checked independently, mirroring
+  // how the parent transaction match already governs component visibility.
+  const componentRows = monthFiltered.flatMap((tx) => {
+    const components = mapComponents(tx, categoryMap, sourceMap);
+    if (!search || filteredIds.has(tx.id)) {
+      return components;
+    }
+    return components.filter(
+      (c) => c.cost !== null && matchesCostQuery(c.cost.cost, search),
+    );
+  });
 
   return [...transactionRows, ...subscriptionRows, ...componentRows];
 }
