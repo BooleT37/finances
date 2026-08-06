@@ -33,6 +33,7 @@ export function DynamicsChartLegend({ payload, categoryMap }: Props) {
               <NameWithOptionalIcon
                 name={category?.shortname ?? String(item.dataKey)}
                 icon={category?.icon}
+                iconSize="0.75em"
               />
             </Group>
           );
