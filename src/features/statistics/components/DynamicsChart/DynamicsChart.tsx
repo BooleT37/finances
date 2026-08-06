@@ -1,9 +1,10 @@
-import { LineChart } from '@mantine/charts';
+import { ChartTooltip, LineChart } from '@mantine/charts';
 import { Alert, Group, MultiSelect, Stack, Title } from '@mantine/core';
 import { MonthPickerInput } from '@mantine/dates';
 import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
-import { useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getCategoryMapQueryOptions } from '~/features/categories/facets/categoryMap';
@@ -13,6 +14,8 @@ import { costToString } from '~/shared/utils/costToString';
 import { getOrThrow } from '~/shared/utils/getOrThrow';
 
 import { getDynamicsDataQueryOptions } from '../../queries';
+import type { DynamicsChartTooltipPayloadItem } from './sortAndFilterTooltipPayload';
+import { sortAndFilterTooltipPayload } from './sortAndFilterTooltipPayload';
 
 const palette = [
   'blue.6',
@@ -78,6 +81,24 @@ export function DynamicsChart() {
       }));
   }, [dynamicsData, categoryMap]);
 
+  const tooltipContent = useCallback(
+    ({
+      label,
+      payload,
+    }: {
+      label?: ReactNode;
+      payload?: readonly DynamicsChartTooltipPayloadItem[];
+    }) => (
+      <ChartTooltip
+        label={label}
+        payload={payload ? sortAndFilterTooltipPayload(payload) : payload}
+        series={series}
+        valueFormatter={(value) => costToString(value)}
+      />
+    ),
+    [series],
+  );
+
   const chartData = useMemo(
     () =>
       (dynamicsData ?? []).map((row) => ({
@@ -126,6 +147,7 @@ export function DynamicsChart() {
           series={series}
           valueFormatter={(value) => costToString(value)}
           withLegend
+          tooltipProps={{ content: tooltipContent }}
         />
       )}
     </Stack>
