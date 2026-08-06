@@ -178,12 +178,7 @@ export function DynamicsChart() {
           valueFormatter={(value) => costToString(value)}
           withLegend
           legendProps={{
-            content: (props) => (
-              <DynamicsChartLegend
-                payload={props.payload}
-                categoryMap={categoryMap}
-              />
-            ),
+            content: (props) => <DynamicsChartLegend payload={props.payload} />,
           }}
           tooltipProps={{ content: tooltipContent }}
         />

@@ -1,16 +1,18 @@
 import { ColorSwatch, Group } from '@mantine/core';
+import { useQuery } from '@tanstack/react-query';
 import type { LegendPayload } from 'recharts';
 
 import { NameWithOptionalIcon } from '~/features/categories/components/NameWithOptionalIcon';
-import type { Category } from '~/features/categories/schema';
+import { getCategoryMapQueryOptions } from '~/features/categories/facets/categoryMap';
 import { getOrThrow } from '~/shared/utils/getOrThrow';
 
 interface Props {
   payload?: readonly LegendPayload[];
-  categoryMap: Record<string, Category> | undefined;
 }
 
-export function DynamicsChartLegend({ payload, categoryMap }: Props) {
+export function DynamicsChartLegend({ payload }: Props) {
+  const { data: categoryMap } = useQuery(getCategoryMapQueryOptions());
+
   if (!payload) {
     return null;
   }
