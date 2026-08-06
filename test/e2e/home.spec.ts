@@ -68,6 +68,35 @@ test.describe('App shell', () => {
   });
 });
 
+test.describe('Month navigator cross-tab behavior', () => {
+  test('changing the month in one tab does not affect another tab, but persists on reload', async ({
+    page,
+    context,
+  }) => {
+    await page.goto('/transactions');
+
+    const monthLabel = page.getByRole('button', { name: 'Апрель 2024' });
+    await expect(monthLabel).toBeVisible();
+
+    const page2 = await context.newPage();
+    await page2.goto('/transactions');
+    await page2.waitForLoadState('networkidle');
+    const monthLabel2 = page2.getByRole('button', { name: 'Апрель 2024' });
+    await expect(monthLabel2).toBeVisible();
+
+    await page.getByRole('button', { name: 'Next' }).click();
+    await expect(page.getByRole('button', { name: 'Май 2024' })).toBeVisible();
+
+    await expect(monthLabel2).toBeVisible();
+
+    await page2.goto('/transactions');
+    await page2.waitForLoadState('networkidle');
+    await expect(page2.getByRole('button', { name: 'Май 2024' })).toBeVisible();
+
+    await page2.close();
+  });
+});
+
 test.describe('Language prefill from browser locale', () => {
   test.use({ locale: 'en-US' });
 

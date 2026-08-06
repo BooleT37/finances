@@ -1,12 +1,25 @@
 import { atom } from 'jotai';
-import { atomWithStorage } from 'jotai/utils';
+import { atomWithStorage, createJSONStorage } from 'jotai/utils';
 
 import { getToday } from '~/shared/utils/today';
 
-/** Selected month stored as 'YYYY-MM', e.g. '2026-02'. Persisted to localStorage. */
+/**
+ * Same as the default JSON storage, minus `subscribe`. The default `subscribe`
+ * listens for the browser `storage` event and pushes changes made in other tabs
+ * into this atom, which would sync the selected month live across tabs. The
+ * selected month should persist to localStorage (so a reload remembers it) but
+ * stay per-tab, so cross-tab pushes are dropped here.
+ */
+const selectedMonthStorage = {
+  ...createJSONStorage<string>(),
+  subscribe: undefined,
+};
+
+/** Selected month stored as 'YYYY-MM', e.g. '2026-02'. Persisted to localStorage, per-tab only. */
 export const selectedMonthKeyAtom = atomWithStorage(
   'finances.selectedMonth',
   getToday().format('YYYY-MM'),
+  selectedMonthStorage,
 );
 
 /** Derived: numeric year from selectedMonthKeyAtom, e.g. 2026 */
