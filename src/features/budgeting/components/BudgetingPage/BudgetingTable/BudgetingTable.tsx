@@ -1,4 +1,5 @@
-import { Group, Text } from '@mantine/core';
+import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour';
+import { Box, Group, Text } from '@mantine/core';
 import { useAtomValue } from 'jotai';
 import {
   MantineReactTable,
@@ -81,6 +82,11 @@ export function BudgetingTable() {
     displayColumnDefOptions: {
       'mrt-row-expand': {
         header: t('columns.name'),
+        Header: () => (
+          <OnboardingTour.Target id="budgeting-intro">
+            <Box component="span">{t('columns.name')}</Box>
+          </OnboardingTour.Target>
+        ),
         Footer: () => (
           <Text size="sm" fw={600}>
             {t('grandTotal')}
