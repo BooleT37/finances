@@ -3,7 +3,7 @@ import { Alert, Group, MultiSelect, Stack, Title } from '@mantine/core';
 import { MonthPickerInput } from '@mantine/dates';
 import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getCategoryMapQueryOptions } from '~/features/categories/facets/categoryMap';
@@ -13,7 +13,6 @@ import { costToString } from '~/shared/utils/costToString';
 import { getOrThrow } from '~/shared/utils/getOrThrow';
 
 import { getDynamicsDataQueryOptions } from '../../queries';
-import { DynamicsChartLegend } from './DynamicsChartLegend';
 
 const palette = [
   'blue.6',
@@ -79,11 +78,6 @@ export function DynamicsChart() {
       }));
   }, [dynamicsData, categoryMap]);
 
-  const legendContent = useCallback(
-    () => <DynamicsChartLegend series={series} />,
-    [series],
-  );
-
   const chartData = useMemo(
     () =>
       (dynamicsData ?? []).map((row) => ({
@@ -132,7 +126,6 @@ export function DynamicsChart() {
           series={series}
           valueFormatter={(value) => costToString(value)}
           withLegend
-          legendProps={{ content: legendContent }}
         />
       )}
     </Stack>
