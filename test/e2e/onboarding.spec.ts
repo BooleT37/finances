@@ -2,6 +2,9 @@ import { testPrisma } from './db/client';
 import { TEST_PROJECT_ID, TEST_USER_ID } from './db/seed';
 import { expect, test } from './fixtures';
 
+/** Enough rows to exceed the budgeting table's max-height and reproduce issue #171. */
+const CATEGORIES_TO_OVERFLOW_VIEWPORT = 30;
+
 /** Re-opt the seeded user into the first-run tour (the seed marks it done). */
 async function resetOnboarding() {
   await testPrisma.user.update({
@@ -16,18 +19,14 @@ async function resetOnboarding() {
  * overflow the screen (issue #171).
  */
 async function seedManyExpenseCategories(count: number) {
-  const categories = await Promise.all(
-    Array.from({ length: count }, (_, i) =>
-      testPrisma.category.create({
-        data: {
-          name: `Категория ${i + 1}`,
-          shortname: `Кат ${i + 1}`,
-          isIncome: false,
-          projectId: TEST_PROJECT_ID,
-        },
-      }),
-    ),
-  );
+  const categories = await testPrisma.category.createManyAndReturn({
+    data: Array.from({ length: count }, (_, i) => ({
+      name: `Категория ${i + 1}`,
+      shortname: `Кат ${i + 1}`,
+      isIncome: false,
+      projectId: TEST_PROJECT_ID,
+    })),
+  });
   const setting = await testPrisma.projectSetting.findUniqueOrThrow({
     where: { projectId: TEST_PROJECT_ID },
   });
@@ -120,7 +119,7 @@ test.describe('Onboarding tour', () => {
   test('the budgeting intro popover stays within the viewport when there are many categories', async ({
     page,
   }) => {
-    await seedManyExpenseCategories(30);
+    await seedManyExpenseCategories(CATEGORIES_TO_OVERFLOW_VIEWPORT);
     await page.goto('/budgeting');
 
     await page
