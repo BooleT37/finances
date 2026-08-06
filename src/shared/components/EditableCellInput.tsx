@@ -46,6 +46,7 @@ export function EditableCellInput({
         }
       }}
       error={invalid}
+      style={{ flex: 1 }}
       styles={{
         input: invalid
           ? { backgroundColor: 'var(--mantine-color-red-0)' }
