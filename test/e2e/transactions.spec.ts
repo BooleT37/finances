@@ -613,6 +613,73 @@ test.describe('Transaction editing', () => {
   });
 });
 
+test.describe('Transaction search', () => {
+  test('search box matches transactions by cost, ignoring sign', async ({
+    page,
+    seedData,
+  }) => {
+    await testPrisma.expense.create({
+      data: {
+        name: 'Кофе',
+        cost: -75.5,
+        date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
+        categoryId: seedData.categoryIds.продукты,
+        projectId: seedData.projectId,
+      },
+    });
+    await testPrisma.expense.create({
+      data: {
+        name: 'Возврат налога',
+        cost: 75.5,
+        date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
+        categoryId: seedData.categoryIds.зарплата,
+        projectId: seedData.projectId,
+      },
+    });
+    await testPrisma.expense.create({
+      data: {
+        name: 'Не должно найтись',
+        cost: -20,
+        date: new Date(TODAY_YEAR, TODAY_MONTH, TODAY_DAY),
+        categoryId: seedData.categoryIds.продукты,
+        projectId: seedData.projectId,
+      },
+    });
+
+    await page.goto('/transactions');
+
+    const searchInput = page.getByPlaceholder('Найти...');
+
+    // Query without a leading "-" matches both the expense (-75.5) and the
+    // income (75.5) transaction — matching is sign-insensitive.
+    await searchInput.fill('75.5');
+    await expect(
+      page.locator(`.${transactionNameCellClass}`, { hasText: 'Кофе' }),
+    ).toBeVisible();
+    await expect(
+      page.locator(`.${transactionNameCellClass}`, {
+        hasText: 'Возврат налога',
+      }),
+    ).toBeVisible();
+    await expect(
+      page.locator(`.${transactionNameCellClass}`, {
+        hasText: 'Не должно найтись',
+      }),
+    ).toHaveCount(0);
+
+    // Same result with a leading "-" in the query.
+    await searchInput.fill('-75.5');
+    await expect(
+      page.locator(`.${transactionNameCellClass}`, { hasText: 'Кофе' }),
+    ).toBeVisible();
+    await expect(
+      page.locator(`.${transactionNameCellClass}`, {
+        hasText: 'Возврат налога',
+      }),
+    ).toBeVisible();
+  });
+});
+
 test.describe('Inline cell editing', () => {
   test('editing cost, name, date, and source inline updates the table and syncs the open sidebar form', async ({
     page,
