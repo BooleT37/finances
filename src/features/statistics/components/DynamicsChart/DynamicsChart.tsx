@@ -13,6 +13,7 @@ import { costToString } from '~/shared/utils/costToString';
 import { getOrThrow } from '~/shared/utils/getOrThrow';
 
 import { getDynamicsDataQueryOptions } from '../../queries';
+import { DynamicsChartLegend } from './DynamicsChartLegend';
 
 const palette = [
   'blue.6',
@@ -126,6 +127,9 @@ export function DynamicsChart() {
           series={series}
           valueFormatter={(value) => costToString(value)}
           withLegend
+          legendProps={{
+            content: () => <DynamicsChartLegend series={series} />,
+          }}
         />
       )}
     </Stack>

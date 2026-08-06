@@ -25,7 +25,11 @@
     "rangeLabel": "Период",
     "categoriesLabel": "Категории",
     "categoriesPlaceholder": "Все категории",
-    "samePeriodWarning": "Пожалуйста, выберите более широкий период сверху"
+    "samePeriodWarning": "Пожалуйста, выберите более широкий период сверху",
+    "legend": {
+      "showMore": "Показать ещё {{count}}",
+      "showLess": "Показать меньше"
+    }
   },
   "onboarding": {
     "intro": {
