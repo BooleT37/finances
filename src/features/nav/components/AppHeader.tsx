@@ -54,7 +54,7 @@ export function AppHeader() {
 
       <Group gap="sm">
         <Text size="sm" c="dimmed">
-          {session.email}
+          {session.name}
         </Text>
         <LanguageSwitcher />
         <Tooltip label={t('signOut')}>
