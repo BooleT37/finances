@@ -16,6 +16,10 @@ Users can edit categories in the UI:
 - **Order** — categories can be reordered in the category editor
 - **Continuous** — see below
 
+## Icon Display
+
+A category is always displayed together with its icon. Subcategories may skip the icon when shown in a context that already displays their parent category (e.g. grouped under the parent), since the icon would be redundant there.
+
 ## Ordering
 
 The order set in the category editor is reused across all views that display categories: the transactions table, forecasts, component selectors, etc. Expense and income categories are always displayed in separate groups — they are never mixed.
