@@ -3,15 +3,9 @@ import { atomWithStorage, createJSONStorage } from 'jotai/utils';
 
 import { getToday } from '~/shared/utils/today';
 
-/**
- * Same as the default JSON storage, minus `subscribe`. The default `subscribe`
- * listens for the browser `storage` event and pushes changes made in other tabs
- * into this atom, which would sync the selected month live across tabs. The
- * selected month should persist to localStorage (so a reload remembers it) but
- * stay per-tab, so cross-tab pushes are dropped here.
- */
 const selectedMonthStorage = {
   ...createJSONStorage<string>(),
+  // Drop subscribing to local storage changes to keep storage per-tab
   subscribe: undefined,
 };
 
