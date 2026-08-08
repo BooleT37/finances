@@ -1,4 +1,4 @@
-import { BarChart } from '@mantine/charts';
+import { BarChart, ChartTooltip } from '@mantine/charts';
 import {
   Alert,
   Group,
@@ -11,10 +11,12 @@ import {
 import { MonthPickerInput, YearPickerInput } from '@mantine/dates';
 import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
-import { useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { YAxisTickContentProps } from 'recharts';
+import type { TooltipPayloadEntry, YAxisTickContentProps } from 'recharts';
 
+import { NameWithOptionalIcon } from '~/features/categories/components/NameWithOptionalIcon';
 import { useSortAllCategoriesById } from '~/features/categories/facets/categoriesOrder';
 import { getCategoryMapQueryOptions } from '~/features/categories/facets/categoryMap';
 import { ISO_DATE_FORMAT } from '~/shared/constants';
@@ -166,6 +168,37 @@ export function ComparisonChart() {
   const period1Label = formatPeriodLabel(granularity, period1, i18n.language);
   const period2Label = formatPeriodLabel(granularity, period2, i18n.language);
 
+  const series = useMemo(
+    () => [
+      { name: 'period1', label: period1Label, color: 'blue.6' },
+      { name: 'period2', label: period2Label, color: 'orange.6' },
+    ],
+    [period1Label, period2Label],
+  );
+
+  const tooltipContent = useCallback(
+    ({
+      label,
+      payload,
+    }: {
+      label?: ReactNode;
+      payload?: readonly TooltipPayloadEntry[];
+    }) => (
+      <ChartTooltip
+        label={
+          <NameWithOptionalIcon
+            name={String(label)}
+            icon={categoryIconByShortname.get(String(label)) ?? null}
+          />
+        }
+        payload={payload}
+        series={series}
+        valueFormatter={(value) => costToString(value)}
+      />
+    ),
+    [categoryIconByShortname, series],
+  );
+
   return (
     <Stack gap="sm">
       <Title order={3}>{t('comparison.title')}</Title>
@@ -241,12 +274,10 @@ export function ComparisonChart() {
               />
             ),
           }}
-          series={[
-            { name: 'period1', label: period1Label, color: 'blue.6' },
-            { name: 'period2', label: period2Label, color: 'orange.6' },
-          ]}
+          series={series}
           valueFormatter={(value) => costToString(value)}
           withLegend
+          tooltipProps={{ content: tooltipContent }}
         />
       )}
     </Stack>
