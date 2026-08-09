@@ -239,18 +239,24 @@ model ExpenseComponent {
   @@map("ExpenseComponent")
 }
 
+enum ForecastLevel {
+  CATEGORY
+  SUBCATEGORY
+}
+
 model Forecast {
-  id            Int          @id @default(autoincrement())
-  category      Category     @relation(fields: [categoryId, projectId], references: [id, projectId], onDelete: Cascade)
+  id            Int           @id @default(autoincrement())
+  category      Category      @relation(fields: [categoryId, projectId], references: [id, projectId], onDelete: Cascade)
   categoryId    Int
-  subcategory   Subcategory? @relation(fields: [subcategoryId, projectId], references: [id, projectId], onDelete: Cascade)
+  subcategory   Subcategory?  @relation(fields: [subcategoryId, projectId], references: [id, projectId], onDelete: Cascade)
   subcategoryId Int?
-  month         Int          @db.SmallInt
-  year          Int          @db.SmallInt
-  sum           Decimal      @default(0) @db.Decimal(9, 2)
-  comment       String       @default("")
-  project       Project      @relation(fields: [projectId], references: [id])
+  level         ForecastLevel
+  month         Int           @db.SmallInt
+  year          Int           @db.SmallInt
+  sum           Decimal       @default(0) @db.Decimal(9, 2)
+  comment       String        @default("")
+  project       Project       @relation(fields: [projectId], references: [id])
   projectId     String
 
-  @@unique([categoryId, subcategoryId, month, year, projectId])
+  @@unique([categoryId, subcategoryId, month, year, projectId, level])
 }
