@@ -11,7 +11,7 @@ model Project {
   id                       String                   @id @default(cuid())
   name                     String
   createdAt                DateTime                 @default(now())
-  updatedAt                DateTime                 @updatedAt
+  updatedAt                DateTime                 @default(now()) @updatedAt
   users                    User[]
   setting                  ProjectSetting?
   categories               Category[]
@@ -32,7 +32,7 @@ model User {
   emailVerified Boolean   @default(false)
   image         String?
   createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  updatedAt     DateTime  @default(now()) @updatedAt
   role          String    @default("user")
   banned        Boolean?  @default(false)
   banReason     String?
@@ -49,7 +49,7 @@ model Session {
   expiresAt      DateTime
   token          String   @unique
   createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  updatedAt      DateTime @default(now()) @updatedAt
   ipAddress      String?
   userAgent      String?
   impersonatedBy String?
@@ -71,7 +71,7 @@ model Account {
   scope                 String?
   password              String?
   createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+  updatedAt             DateTime  @default(now()) @updatedAt
 }
 
 model Verification {
@@ -80,7 +80,7 @@ model Verification {
   value      String
   expiresAt  DateTime
   createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  updatedAt  DateTime @default(now()) @updatedAt
 }
 
 model ProjectSetting {
