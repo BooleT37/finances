@@ -1,5 +1,6 @@
 import type Decimal from 'decimal.js';
 
+import type { ForecastLineItem } from '~/features/budgeting/schema';
 import type { AvailableSubscription } from '~/features/subscriptions/facets/availableSubscriptions';
 
 import type { BudgetingRowId } from './budgetingRowId';
@@ -55,5 +56,9 @@ export interface BudgetingRow {
   monthCount: number;
   /** Subscriptions due this month for this row, and the plans to fill from them. */
   subscriptions: RowSubscriptions;
+  /** The breakdown making up planSum. Empty when the row has none. */
+  lineItems: ForecastLineItem[];
+  /** True when the parent category's own breakdown owns this row's value. */
+  isUnderCategoryBreakdown: boolean;
   subRows?: BudgetingRow[];
 }

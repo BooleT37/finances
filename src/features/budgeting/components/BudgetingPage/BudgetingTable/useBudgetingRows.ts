@@ -55,6 +55,7 @@ function buildCategoryRows(
       year,
     });
     const categoryPlanSum = catForecast?.sum ?? ZERO;
+    const categoryHasBreakdown = (catForecast?.lineItems.length ?? 0) > 0;
 
     if (category.subcategories.length === 0) {
       const rowId = buildBudgetingRowId({
@@ -88,6 +89,8 @@ function buildCategoryRows(
           list: ownSubs,
           plans: buildCategoryFillPlans(category.id, ownSubs),
         },
+        lineItems: catForecast?.lineItems ?? [],
+        isUnderCategoryBreakdown: false,
       } satisfies BudgetingRow;
     }
 
@@ -143,6 +146,8 @@ function buildCategoryRows(
               { subcategoryId: sub.id, subs: subSubs },
             ]),
           },
+          lineItems: subForecast?.lineItems ?? [],
+          isUnderCategoryBreakdown: categoryHasBreakdown,
         } satisfies BudgetingRow;
       },
     );
@@ -204,6 +209,8 @@ function buildCategoryRows(
             { subcategoryId: null, subs: restSubs },
           ]),
         },
+        lineItems: restForecast?.lineItems ?? [],
+        isUnderCategoryBreakdown: categoryHasBreakdown,
       },
     ];
 
@@ -243,6 +250,8 @@ function buildCategoryRows(
           })),
         ),
       },
+      lineItems: catForecast?.lineItems ?? [],
+      isUnderCategoryBreakdown: false,
       subRows,
     } satisfies BudgetingRow;
   });
@@ -381,6 +390,8 @@ export function useBudgetingRows(
           list: expenseSubs,
           plans: mergeFillPlans(expenseRows.map((r) => r.subscriptions.plans)),
         },
+        lineItems: [],
+        isUnderCategoryBreakdown: false,
         subRows: expenseRows,
       },
       {
@@ -403,6 +414,8 @@ export function useBudgetingRows(
           list: savingsSubs,
           plans: mergeFillPlans(savingsRows.map((r) => r.subscriptions.plans)),
         },
+        lineItems: [],
+        isUnderCategoryBreakdown: false,
         subRows: savingsRows,
       },
       {
@@ -425,6 +438,8 @@ export function useBudgetingRows(
           list: incomeSubs,
           plans: mergeFillPlans(incomeRows.map((r) => r.subscriptions.plans)),
         },
+        lineItems: [],
+        isUnderCategoryBreakdown: false,
         subRows: incomeRows,
       },
     ];

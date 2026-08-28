@@ -156,7 +156,8 @@ export function useBudgetingTableColumns({
             }
           },
         }),
-        size: 120,
+        size: 200,
+        minSize: 180,
       }),
       columnHelper.display({
         id: 'thisMonth',
