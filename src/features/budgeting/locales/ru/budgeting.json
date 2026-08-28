@@ -13,7 +13,6 @@
   "grandTotal": "Итого",
   "income": "Доходы",
   "lockedPlanTooltip": "Значение рассчитывается автоматически как сумма подкатегорий",
-  "restRowTooltip": "Это фиктивная подкатегория, добавить комментарий к ней нельзя",
   "restSubcategory": "Остальное",
   "savings": "В сбережения",
   "thisMonthTransactions": {

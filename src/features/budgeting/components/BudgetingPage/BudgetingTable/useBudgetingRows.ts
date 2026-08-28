@@ -21,7 +21,6 @@ import { decimalSum } from '~/shared/utils/decimalSum';
 
 import { buildBudgetingRowId } from './budgetingRowId';
 import type { BudgetingGrandTotal, BudgetingRow } from './BudgetingTable.types';
-import { REST_SUBCATEGORY_ID } from './constants';
 import {
   buildCategoryFillPlans,
   buildSubcategoriesFillPlans,
@@ -153,7 +152,15 @@ function buildCategoryRows(
     );
 
     const subcategorySum = decimalSum(...subcategoryRows.map((r) => r.planSum));
-    const restPlanSum = categoryPlanSum.minus(subcategorySum);
+    const restForecast = findSubcategoryForecast(forecasts, {
+      categoryId: category.id,
+      subcategoryId: null,
+      month,
+      year,
+    });
+    const restPlanSum = restForecast
+      ? restForecast.sum
+      : categoryPlanSum.minus(subcategorySum);
 
     const restRowId = buildBudgetingRowId({
       rowType: 'rest',
@@ -175,12 +182,12 @@ function buildCategoryRows(
         name: restSubcategoryName,
         icon: null,
         categoryId: category.id,
-        subcategoryId: REST_SUBCATEGORY_ID,
+        subcategoryId: null,
         isRestRow: true,
         isIncome: category.isIncome,
         isContinuous: category.isContinuous,
         planSum: restPlanSum,
-        comment: '',
+        comment: restForecast?.comment ?? '',
         thisMonthActual: thisMonthActuals.getSubcategoryTotal(
           category.id,
           null,

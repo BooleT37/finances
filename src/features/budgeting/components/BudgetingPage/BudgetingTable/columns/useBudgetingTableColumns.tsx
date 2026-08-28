@@ -1,5 +1,5 @@
 import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour';
-import { Box, Group, Text, Tooltip } from '@mantine/core';
+import { Box, Group, Text } from '@mantine/core';
 import Decimal from 'decimal.js';
 import { createMRTColumnHelper, type MRT_Row } from 'mantine-react-table-open';
 import { useMemo } from 'react';
@@ -23,9 +23,6 @@ const columnHelper = createMRTColumnHelper<BudgetingRow>();
 
 const canEditPlanCell = (row: MRT_Row<BudgetingRow>) =>
   row.original.rowType !== 'typeGroup' && !isPlanCellLocked(row.original);
-
-const canEditCommentCell = (row: MRT_Row<BudgetingRow>) =>
-  row.original.rowType !== 'typeGroup' && !row.original.isRestRow;
 
 interface Params {
   month: number;
@@ -195,19 +192,10 @@ export function useBudgetingTableColumns({
       columnHelper.accessor('comment', {
         header: t('columns.comment'),
         enableSorting: false,
-        enableEditing: canEditCommentCell,
+        enableEditing: (row) => row.original.rowType !== 'typeGroup',
         Cell: ({ row }) => {
           if (row.original.rowType === 'typeGroup') {
             return null;
-          }
-          if (row.original.isRestRow) {
-            return (
-              <Tooltip label={t('restRowTooltip')}>
-                <Text style={{ cursor: 'not-allowed' }} size="sm" c="dimmed">
-                  —
-                </Text>
-              </Tooltip>
-            );
           }
           return (
             <Text size="sm" c={row.original.comment ? undefined : 'dimmed'}>
@@ -233,7 +221,7 @@ export function useBudgetingTableColumns({
         mantineTableBodyCellProps: ({ row, cell, table }) => ({
           'data-testing-column': 'comment',
           onClick: () => {
-            if (canEditCommentCell(row)) {
+            if (row.original.rowType !== 'typeGroup') {
               openCellForEditing(table, cell);
             }
           },

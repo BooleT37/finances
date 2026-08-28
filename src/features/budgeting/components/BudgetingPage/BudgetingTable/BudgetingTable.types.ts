@@ -35,7 +35,7 @@ export interface BudgetingRow {
   icon: string | null;
   /** null for typeGroup rows */
   categoryId: number | null;
-  /** null for category rows; REST_SUBCATEGORY_ID (-1) for the rest row */
+  /** null for category rows and the Rest row — check isRestRow to tell them apart */
   subcategoryId: number | null;
   isRestRow: boolean;
   isIncome: boolean;
@@ -43,7 +43,7 @@ export interface BudgetingRow {
   isContinuous: boolean;
   /** Precomputed plan sum at every level. Negative for expense rows (adaptCost applied). */
   planSum: Decimal;
-  /** '' if no DB record exists. Always '' for Rest and typeGroup rows. */
+  /** '' if no DB record exists. Always '' for typeGroup rows. */
   comment: string;
   /** Signed actual total for the selected month. */
   thisMonthActual: Decimal;
