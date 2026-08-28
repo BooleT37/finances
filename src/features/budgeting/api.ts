@@ -15,7 +15,10 @@ export const fetchForecastsByYear = createServerFn({ method: 'GET' })
   .handler(async ({ data: year, context }) => {
     const forecasts = await prisma.forecast.findMany({
       where: { year, projectId: context.projectId },
-      include: { category: true },
+      include: {
+        category: true,
+        lineItems: { orderBy: { id: 'asc' } },
+      },
     });
     return forecasts.map((f) =>
       forecastSchema.encode({

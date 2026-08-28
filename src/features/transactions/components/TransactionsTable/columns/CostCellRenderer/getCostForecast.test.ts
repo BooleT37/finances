@@ -69,14 +69,20 @@ const mockCategories: Category[] = [
 const mockCategoryMap = indexBy(prop('id'), mockCategories);
 
 function makeForecast(
-  forecast: Omit<Forecast, 'month' | 'year' | 'sum' | 'comment'> & {
+  forecast: Omit<
+    Forecast,
+    'id' | 'month' | 'year' | 'sum' | 'comment' | 'lineItems'
+  > & {
     sum: string;
   },
+  index: number,
 ): Forecast {
   return {
+    id: index + 1,
     month: MONTH,
     year: YEAR,
     comment: '',
+    lineItems: [],
     ...forecast,
     sum: new Decimal(forecast.sum),
   };
