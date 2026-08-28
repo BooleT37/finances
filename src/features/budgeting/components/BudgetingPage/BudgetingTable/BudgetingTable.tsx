@@ -131,7 +131,10 @@ export function BudgetingTable() {
 
   return (
     <Box pos="relative">
-      <LoadingOverlay visible={isApplyingSubscriptions} />
+      <LoadingOverlay
+        visible={isApplyingSubscriptions}
+        data-testid="budgeting-applying-subscriptions-overlay"
+      />
       <MantineReactTable table={table} />
     </Box>
   );

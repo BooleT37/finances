@@ -23,6 +23,12 @@ function getGrandTotalBadge(page: Page) {
   );
 }
 
+function getApplyingOverlay(page: Page) {
+  return page.locator(
+    '[data-testid="budgeting-applying-subscriptions-overlay"]',
+  );
+}
+
 async function hoverBadge(badge: Locator) {
   await badge.hover();
   return badge.page().locator('[data-testid="subscription-tooltip"]');
@@ -276,5 +282,34 @@ test.describe('Budgeting subscriptions', () => {
     await page.waitForLoadState('networkidle');
     await expect(getPlanCell(остальное)).toContainText('-€50.00');
     await expect(getPlanCell(такси)).toContainText('€0.00');
+  });
+
+  test('multi-category fill shows a loading overlay while applying sequentially', async ({
+    page,
+  }) => {
+    await page.goto('/budgeting');
+
+    await expandRow(getRow(page, 'Транспорт'));
+
+    // Grand total spans two categories: Развлечения (no subcategories) and
+    // Транспорт (via its Такси subcategory) — exercises both endpoints in
+    // one sequential run.
+    await expect(getGrandTotalBadge(page)).toContainText('€314.99');
+    await expect(getApplyingOverlay(page)).toBeHidden();
+
+    await getGrandTotalBadge(page).getByRole('button').click();
+    await expect(getConfirmModal(page)).toBeVisible();
+    await getConfirmModal(page)
+      .getByRole('button', { name: 'Заполнить из подписок' })
+      .click();
+
+    // Overlay covers the table for the duration of the sequence, then clears.
+    await expect(getApplyingOverlay(page)).toBeVisible();
+    await expect(getApplyingOverlay(page)).toBeHidden();
+
+    await expect(getPlanCell(getRow(page, 'Развлечения'))).toContainText(
+      '-€15.99',
+    );
+    await expect(getPlanCell(getRow(page, 'Такси'))).toContainText('-€299.00');
   });
 });

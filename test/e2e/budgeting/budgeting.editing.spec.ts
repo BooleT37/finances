@@ -85,4 +85,33 @@ test.describe('Budgeting inline editing', () => {
     await page.reload();
     await expect(getCommentCell(транспортRow)).toHaveText('тест');
   });
+
+  // Test 3: commenting on an unmaterialized Rest row materializes it without
+  // touching the category's existing (state 2) sum
+  test('rest row comment persists and does not disturb the parent sum', async ({
+    page,
+  }) => {
+    await page.goto('/budgeting');
+
+    const продуктыRow = getRow(page, 'Продукты');
+    await продуктыRow.getByRole('button').first().click();
+
+    const остальноеRow = getRow(page, 'Остальное');
+
+    // No subcategory has been touched yet — Продукты is still state 2, Rest
+    // is the virtual full amount.
+    await expect(getPlanCell(остальноеRow)).toHaveText('-€100.00');
+
+    await editCommentCell(остальноеRow, 'налог');
+    await expect(getCommentCell(остальноеRow)).toHaveText('налог');
+
+    // Materializing Rest must not change the category's displayed sum.
+    await expect(getPlanCell(продуктыRow)).toHaveText('-€100.00');
+    await expect(getPlanCell(остальноеRow)).toHaveText('-€100.00');
+
+    await page.reload();
+    await продуктыRow.getByRole('button').first().click();
+    await expect(getCommentCell(остальноеRow)).toHaveText('налог');
+    await expect(getPlanCell(продуктыRow)).toHaveText('-€100.00');
+  });
 });
