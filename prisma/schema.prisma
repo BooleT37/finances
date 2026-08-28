@@ -23,25 +23,26 @@ model Project {
   subcategories            Subcategory[]
   savingSpendingCategories SavingSpendingCategory[]
   expenseComponents        ExpenseComponent[]
+  forecastLineItems        ForecastLineItem[]
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String
-  email         String    @unique
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @default(now()) @updatedAt
-  role          String    @default("user")
-  banned        Boolean?  @default(false)
-  banReason     String?
-  banExpires    DateTime?
+  id                    String    @id @default(cuid())
+  name                  String
+  email                 String    @unique
+  emailVerified         Boolean   @default(false)
+  image                 String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @default(now()) @updatedAt
+  role                  String    @default("user")
+  banned                Boolean?  @default(false)
+  banReason             String?
+  banExpires            DateTime?
   onboardingCompletedAt DateTime?
-  project       Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId     String
-  sessions      Session[]
-  accounts      Account[]
+  project               Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId             String
+  sessions              Session[]
+  accounts              Account[]
 }
 
 model Session {
@@ -245,18 +246,31 @@ enum ForecastLevel {
 }
 
 model Forecast {
-  id            Int           @id @default(autoincrement())
-  category      Category      @relation(fields: [categoryId, projectId], references: [id, projectId], onDelete: Cascade)
+  id            Int                @id @default(autoincrement())
+  category      Category           @relation(fields: [categoryId, projectId], references: [id, projectId], onDelete: Cascade)
   categoryId    Int
-  subcategory   Subcategory?  @relation(fields: [subcategoryId, projectId], references: [id, projectId], onDelete: Cascade)
+  subcategory   Subcategory?       @relation(fields: [subcategoryId, projectId], references: [id, projectId], onDelete: Cascade)
   subcategoryId Int?
   level         ForecastLevel
-  month         Int           @db.SmallInt
-  year          Int           @db.SmallInt
-  sum           Decimal       @default(0) @db.Decimal(9, 2)
-  comment       String        @default("")
-  project       Project       @relation(fields: [projectId], references: [id])
+  month         Int                @db.SmallInt
+  year          Int                @db.SmallInt
+  sum           Decimal            @default(0) @db.Decimal(9, 2)
+  comment       String             @default("")
+  project       Project            @relation(fields: [projectId], references: [id])
   projectId     String
+  lineItems     ForecastLineItem[]
 
   @@unique([categoryId, subcategoryId, month, year, projectId, level])
+  @@unique([id, projectId])
+}
+
+model ForecastLineItem {
+  id         Int      @id @default(autoincrement())
+  forecast   Forecast @relation(fields: [forecastId, projectId], references: [id, projectId], onDelete: Cascade)
+  forecastId Int
+  unitPrice  String
+  quantity   Decimal  @db.Decimal(9, 2)
+  comment    String   @default("")
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId  String
 }
