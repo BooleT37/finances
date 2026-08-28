@@ -31,3 +31,4 @@ data/sample pdfs/
 
 # One-off scripts that aren't reusable tooling
 scripts/*.local.ts
+scripts/*.local.json
