@@ -47,7 +47,7 @@ There's currently no check that subcategory forecasts don't add up to more than 
 
 There are two endpoints for saving a forecast, each scoped to one category. No caller ever needs to write the category's own value and its subcategories in the same request, since a category with subcategories never has its own value written directly:
 
-- `upsertCategoryForecast` — writes only the category's own row (sum and/or comment). It refuses to change the sum if any subcategory already has a non-zero value, mirroring the lock in the UI. The server has to check this too, since server functions are directly callable regardless of which route renders them.
+- `upsertCategoryForecast` — writes the category's own row (sum and/or comment). It refuses to change the sum if any real subcategory (not Rest) already has a non-zero value, mirroring the lock in the UI — the server has to check this too, since server functions are directly callable regardless of which route renders them. If Rest already has a row, a sum write recalculates Rest to absorb the new total, so `category.sum` still equals the sum of its children.
 - `upsertSubcategoryForecasts` — writes several subcategory rows for one category at once (real subcategories and/or Rest, via `subcategoryId: null`), creates Rest the first time any of them is touched, and recalculates the category's sum once for the whole batch.
 
 Neither endpoint sends anything back — the client just asks for the forecasts to be refetched instead of merging in a response. This is done to not overcomplicate the logic, since app is primarily client-side logic, and this is one of the few examples of server recalculating anything.

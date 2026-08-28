@@ -72,12 +72,14 @@ export type UpsertCategoryForecastInput = z.infer<
 >;
 
 /**
- * Writes only the category-level row. Rejects a sum write while any
- * subcategory-level row is non-zero (mirrors the client-side lock, enforced
+ * Writes only the category-level row. Rejects a sum write while any real
+ * subcategory (not Rest) is non-zero (mirrors the client-side lock, enforced
  * here since server functions are callable directly regardless of route) —
  * a locked category's value is derived from its children exclusively via
- * `upsertSubcategoryForecasts`. Returns nothing — the client invalidates the
- * forecasts query to pick up the write.
+ * `upsertSubcategoryForecasts`. If Rest already has a row, a sum write
+ * recalculates Rest to absorb the new total, keeping
+ * `category.sum = Σ(children)` true. Returns nothing — the client
+ * invalidates the forecasts query to pick up the write.
  */
 export const upsertCategoryForecast = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
@@ -95,22 +97,39 @@ export const upsertCategoryForecast = createServerFn({ method: 'POST' })
     await prisma.$transaction(async (tx) => {
       const categoryRow = await findOrCreateCategoryRow(tx, key);
 
-      if (data.sum !== undefined) {
-        const children = await findChildren(tx, key);
-        if (children.some((c) => !c.sum.isZero())) {
-          throw new Error(
-            `Cannot set category ${data.categoryId} forecast directly while it has non-zero subcategory forecasts`,
-          );
-        }
+      if (data.sum === undefined) {
+        await tx.forecast.update({
+          where: { id: categoryRow.id },
+          data: { comment: data.comment },
+        });
+        return;
       }
 
+      const children = await findChildren(tx, key);
+      const realChildren = children.filter((c) => c.subcategoryId !== null);
+      if (realChildren.some((c) => !c.sum.isZero())) {
+        throw new Error(
+          `Cannot set category ${data.categoryId} forecast directly while it has non-zero subcategory forecasts`,
+        );
+      }
+
+      const newSum = new Decimal(data.sum).abs();
       await tx.forecast.update({
         where: { id: categoryRow.id },
-        data:
-          data.sum !== undefined
-            ? { sum: new Decimal(data.sum).abs() }
-            : { comment: data.comment },
+        data: { sum: newSum },
       });
+
+      const rest = children.find((c) => c.subcategoryId === null);
+      if (rest) {
+        const realSum = realChildren.reduce(
+          (s, c) => s.plus(c.sum),
+          new Decimal(0),
+        );
+        await tx.forecast.update({
+          where: { id: rest.id },
+          data: { sum: newSum.minus(realSum) },
+        });
+      }
     });
   });
 
