@@ -38,6 +38,7 @@ type ForecastKey = {
 async function findChildren(tx: Prisma.TransactionClient, key: ForecastKey) {
   return tx.forecast.findMany({
     where: { ...key, level: 'SUBCATEGORY' },
+    include: { lineItems: { select: { id: true } } },
   });
 }
 
@@ -62,12 +63,67 @@ async function findOrCreateCategoryRow(
   });
 }
 
+function isPositiveDecimal(value: string) {
+  try {
+    return new Decimal(value).gt(0);
+  } catch {
+    return false;
+  }
+}
+
+const lineItemInputSchema = z.object({
+  unitPrice: z.string().min(1),
+  quantity: z.string().refine(isPositiveDecimal),
+  comment: z.string(),
+});
+
+type LineItemInput = z.infer<typeof lineItemInputSchema>;
+
+/** An empty `items` removes the breakdown, leaving the row's `sum` alone. */
+async function replaceLineItems(
+  tx: Prisma.TransactionClient,
+  forecastId: number,
+  projectId: string,
+  items: LineItemInput[],
+) {
+  await tx.forecastLineItem.deleteMany({ where: { forecastId, projectId } });
+  if (items.length === 0) {
+    return;
+  }
+  await tx.forecastLineItem.createMany({
+    data: items.map((item) => ({
+      forecastId,
+      projectId,
+      unitPrice: item.unitPrice,
+      quantity: new Decimal(item.quantity),
+      comment: item.comment,
+    })),
+  });
+}
+
+/**
+ * Rest holding the remainder is the normal state and has never locked the
+ * category, so only a value on a real subcategory counts — but a breakdown
+ * counts wherever it sits, Rest included.
+ */
+function isAuthoritativeChild(child: {
+  subcategoryId: number | null;
+  sum: Decimal;
+  lineItems: { id: number }[];
+}) {
+  return (
+    child.lineItems.length > 0 ||
+    (child.subcategoryId !== null && !child.sum.isZero())
+  );
+}
+
 const upsertCategoryForecastInputSchema = z.object({
   categoryId: z.number(),
   month: z.number(),
   year: z.number(),
   sum: z.string().optional(),
   comment: z.string().optional(),
+  lineItems: z.array(lineItemInputSchema).optional(),
 });
 
 export type UpsertCategoryForecastInput = z.infer<
@@ -75,14 +131,10 @@ export type UpsertCategoryForecastInput = z.infer<
 >;
 
 /**
- * Writes only the category-level row. Rejects a sum write while any real
- * subcategory (not Rest) is non-zero (mirrors the client-side lock, enforced
- * here since server functions are callable directly regardless of route) —
- * a locked category's value is derived from its children exclusively via
- * `upsertSubcategoryForecasts`. If Rest already has a row, a sum write
- * recalculates Rest to absorb the new total, keeping
- * `category.sum = Σ(children)` true. Returns nothing — the client
- * invalidates the forecasts query to pick up the write.
+ * The client greys the cell out while a child owns the total, but server
+ * functions are callable directly regardless of route, so the rule is
+ * enforced here too. Rest absorbs a sum write to keep the category equal to
+ * the sum of its children.
  */
 export const upsertCategoryForecast = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
@@ -101,6 +153,14 @@ export const upsertCategoryForecast = createServerFn({ method: 'POST' })
       const categoryRow = await findOrCreateCategoryRow(tx, key);
 
       if (data.sum === undefined) {
+        if (data.lineItems !== undefined) {
+          await replaceLineItems(
+            tx,
+            categoryRow.id,
+            key.projectId,
+            data.lineItems,
+          );
+        }
         await tx.forecast.update({
           where: { id: categoryRow.id },
           data: { comment: data.comment },
@@ -109,10 +169,18 @@ export const upsertCategoryForecast = createServerFn({ method: 'POST' })
       }
 
       const children = await findChildren(tx, key);
-      const realChildren = children.filter((c) => c.subcategoryId !== null);
-      if (realChildren.some((c) => !c.sum.isZero())) {
+      if (children.some(isAuthoritativeChild)) {
         throw new Error(
-          `Cannot set category ${data.categoryId} forecast directly while it has non-zero subcategory forecasts`,
+          `Cannot set category ${data.categoryId} forecast directly while a subcategory owns its total`,
+        );
+      }
+
+      if (data.lineItems !== undefined) {
+        await replaceLineItems(
+          tx,
+          categoryRow.id,
+          key.projectId,
+          data.lineItems,
         );
       }
 
@@ -124,10 +192,9 @@ export const upsertCategoryForecast = createServerFn({ method: 'POST' })
 
       const rest = children.find((c) => c.subcategoryId === null);
       if (rest) {
-        const realSum = realChildren.reduce(
-          (s, c) => s.plus(c.sum),
-          new Decimal(0),
-        );
+        const realSum = children
+          .filter((c) => c.subcategoryId !== null)
+          .reduce((s, c) => s.plus(c.sum), new Decimal(0));
         await tx.forecast.update({
           where: { id: rest.id },
           data: { sum: newSum.minus(realSum) },
@@ -146,6 +213,7 @@ const upsertSubcategoryForecastsInputSchema = z.object({
         subcategoryId: z.number().nullable(),
         sum: z.string().optional(),
         comment: z.string().optional(),
+        lineItems: z.array(lineItemInputSchema).optional(),
       }),
     )
     .min(1),
@@ -156,11 +224,9 @@ export type UpsertSubcategoryForecastsInput = z.infer<
 >;
 
 /**
- * Bulk-writes subcategory-level rows for a single category (a named
- * subcategory, or Rest via `subcategoryId: null`), materializes Rest on
- * first touch of any child, and recomputes `category.sum := Σ(children)`
- * once for the whole batch. Returns nothing — the client invalidates the
- * forecasts query to pick up the writes.
+ * Rest is created the first time any child is touched, and writing a
+ * breakdown counts as touching one. The category's sum is recomputed once for
+ * the whole batch rather than per item.
  */
 export const upsertSubcategoryForecasts = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
@@ -189,23 +255,16 @@ export const upsertSubcategoryForecasts = createServerFn({ method: 'POST' })
             comment: '',
           },
         });
-        children = [rest];
+        children = [{ ...rest, lineItems: [] }];
       }
 
       for (const item of data.items) {
         const existingChild = children.find(
           (c) => c.subcategoryId === item.subcategoryId,
         );
-        if (existingChild) {
-          await tx.forecast.update({
-            where: { id: existingChild.id },
-            data:
-              item.sum !== undefined
-                ? { sum: new Decimal(item.sum).abs() }
-                : { comment: item.comment },
-          });
-        } else {
-          await tx.forecast.create({
+        const row =
+          existingChild ??
+          (await tx.forecast.create({
             data: {
               ...key,
               subcategoryId: item.subcategoryId,
@@ -216,7 +275,20 @@ export const upsertSubcategoryForecasts = createServerFn({ method: 'POST' })
                   : new Decimal(0),
               comment: item.comment ?? '',
             },
+          }));
+
+        if (existingChild) {
+          await tx.forecast.update({
+            where: { id: existingChild.id },
+            data:
+              item.sum !== undefined
+                ? { sum: new Decimal(item.sum).abs() }
+                : { comment: item.comment },
           });
+        }
+
+        if (item.lineItems !== undefined) {
+          await replaceLineItems(tx, row.id, key.projectId, item.lineItems);
         }
       }
 
