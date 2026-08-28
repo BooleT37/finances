@@ -3,6 +3,17 @@ import type Decimal from 'decimal.js';
 import type { AvailableSubscription } from '~/features/subscriptions/facets/availableSubscriptions';
 
 import type { BudgetingRowId } from './budgetingRowId';
+import type { SubscriptionsFillPlans } from './fillPlans';
+
+/**
+ * Subscriptions due for a row, together with what filling from them would
+ * write. Always present; `list` is empty (and `plans` both-empty) when none
+ * are due — check `list.length` to decide whether to render a badge.
+ */
+export interface RowSubscriptions {
+  list: AvailableSubscription[];
+  plans: SubscriptionsFillPlans;
+}
 
 export interface BudgetingGrandTotal {
   thisMonthActual: Decimal;
@@ -11,8 +22,8 @@ export interface BudgetingGrandTotal {
   monthCount: number;
   /** Estimated surplus: Σ(income planSums) + Σ(expense planSums) + Σ(savings planSums). */
   planSum: Decimal;
-  /** All available subscriptions due this month */
-  subscriptions: AvailableSubscription[];
+  /** All subscriptions due this month, and the plans to fill the whole table. */
+  subscriptions: RowSubscriptions;
 }
 
 export type BudgetingRowType = 'typeGroup' | 'category' | 'subcategory';
@@ -42,7 +53,7 @@ export interface BudgetingRow {
   average: Decimal;
   /** Denominator for average; shown in tooltip. 0 means no data. */
   monthCount: number;
-  /** Subscriptions due this month for this row's (categoryId, subcategoryId) pair. */
-  subscriptions: AvailableSubscription[];
+  /** Subscriptions due this month for this row, and the plans to fill from them. */
+  subscriptions: RowSubscriptions;
   subRows?: BudgetingRow[];
 }

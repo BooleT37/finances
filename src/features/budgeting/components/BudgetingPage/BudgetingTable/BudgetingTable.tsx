@@ -1,5 +1,5 @@
 import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour';
-import { Box, Group, Text } from '@mantine/core';
+import { Box, Group, LoadingOverlay, Text } from '@mantine/core';
 import { useAtomValue } from 'jotai';
 import {
   MantineReactTable,
@@ -14,6 +14,7 @@ import { useTableLocalization } from '~/shared/hooks/useTableLocalization';
 import { selectedMonthAtom, selectedYearAtom } from '~/stores/month';
 
 import { buildBudgetingRowId } from './budgetingRowId';
+import { isApplyingSubscriptionsAtom } from './budgetingTableAtoms';
 import { useBudgetingTableColumns } from './columns/useBudgetingTableColumns';
 import { useBudgetingRows } from './useBudgetingRows';
 import { useSaveForecastComment } from './useSaveForecastComment';
@@ -24,6 +25,7 @@ export function BudgetingTable() {
 
   const year = useAtomValue(selectedYearAtom);
   const month = useAtomValue(selectedMonthAtom);
+  const isApplyingSubscriptions = useAtomValue(isApplyingSubscriptionsAtom);
   const { rows, grandTotal, isLoading } = useBudgetingRows(month, year);
   const savePlan = useSaveForecastSum(month, year);
   const saveComment = useSaveForecastComment(month, year);
@@ -127,5 +129,10 @@ export function BudgetingTable() {
     }),
   });
 
-  return <MantineReactTable table={table} />;
+  return (
+    <Box pos="relative">
+      <LoadingOverlay visible={isApplyingSubscriptions} />
+      <MantineReactTable table={table} />
+    </Box>
+  );
 }

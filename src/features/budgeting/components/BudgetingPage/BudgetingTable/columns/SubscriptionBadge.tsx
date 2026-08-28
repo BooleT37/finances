@@ -10,9 +10,8 @@ import { costToString } from '~/shared/utils/costToString';
 import { decimalSum } from '~/shared/utils/decimalSum';
 
 import type { BudgetingRow } from '../BudgetingTable.types';
-import type { BulkItem } from '../useBulkSaveForecastsSum';
-import { useBulkSaveForecastsSum } from '../useBulkSaveForecastsSum';
-import { collectBulkItems } from './collectBulkItems';
+import { countFilledRows } from '../fillPlans';
+import { useApplyCategoryFillPlans } from '../useApplyCategoryFillPlans';
 import { isPlanCellLocked } from './isPlanCellLocked';
 
 interface Props {
@@ -23,9 +22,9 @@ interface Props {
 
 export function SubscriptionBadge({ row, month, year }: Props) {
   const { t } = useTranslation('budgeting');
-  const bulkSave = useBulkSaveForecastsSum(month, year);
+  const applyPlans = useApplyCategoryFillPlans(month, year);
 
-  const subs = row.original.subscriptions;
+  const { list: subs, plans } = row.original.subscriptions;
   if (subs.length === 0) {
     return null;
   }
@@ -38,24 +37,18 @@ export function SubscriptionBadge({ row, month, year }: Props) {
   const subscriptionName = (s: (typeof subs)[number]) =>
     `${s.subscription.name}${s.transactionId !== null ? ` (${paid})` : ''}`;
 
-  function applySubscriptions() {
-    let items: BulkItem[];
+  async function applySubscriptions() {
+    await applyPlans(plans.category, plans.subcategories);
+
     if (row.original.rowType === 'typeGroup') {
-      items = [];
-      for (const categoryRow of row.subRows ?? []) {
-        items.push(...collectBulkItems(categoryRow));
-      }
-      bulkSave(items);
       notifications.show({
         message: t('subscriptions.appliedGroup', {
           cost: costToString(total),
-          count: items.length,
+          count: countFilledRows(plans),
         }),
         color: 'green',
       });
     } else {
-      items = collectBulkItems(row);
-      bulkSave(items);
       notifications.show({
         message: t('subscriptions.appliedSingle', {
           name: row.original.name,
@@ -80,7 +73,7 @@ export function SubscriptionBadge({ row, month, year }: Props) {
         onConfirm: applySubscriptions,
       });
     } else {
-      applySubscriptions();
+      void applySubscriptions();
     }
   }
 

@@ -5,6 +5,7 @@ import { decimalCodec } from '~/shared/codecs';
 export const forecastSchema = z.object({
   categoryId: z.number(),
   subcategoryId: z.number().nullable(),
+  level: z.enum(['CATEGORY', 'SUBCATEGORY']),
   month: z.number(),
   year: z.number(),
   sum: decimalCodec,

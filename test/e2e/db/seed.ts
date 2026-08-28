@@ -237,6 +237,7 @@ export async function seed(): Promise<SeedData> {
     data: {
       categoryId: продукты.id,
       subcategoryId: null,
+      level: 'CATEGORY',
       month: TODAY_MONTH,
       year: TODAY_YEAR,
       sum: 100,

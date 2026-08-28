@@ -8,7 +8,6 @@ import { getSubcategoryForecastsQueryOptions } from '~/features/budgeting/facets
 import type { Forecast } from '~/features/budgeting/schema';
 import { findCategoryForecast } from '~/features/budgeting/utils/findCategoryForecast';
 import { findSubcategoryForecast } from '~/features/budgeting/utils/findSubcategoryForecast';
-import { getRestForecastSum } from '~/features/budgeting/utils/getRestForecastSum';
 import { getCategoryMapQueryOptions } from '~/features/categories/facets/categoryMap';
 import type { Category } from '~/features/categories/schema';
 import { getSavingSpendingsQueryOptions } from '~/features/savingSpendings/queries';
@@ -99,11 +98,22 @@ export function getCostForecast(
   }
 
   if (isRestRow) {
-    return getRestForecastSum(categoryForecasts, subcategoryForecasts, {
-      categoryId,
-      month,
-      year,
-    });
+    // Rest may not be materialized yet (no subcategory has been touched) —
+    // fall back to the category's own sum, the full unallocated amount.
+    return (
+      findSubcategoryForecast(subcategoryForecasts ?? [], {
+        categoryId,
+        subcategoryId: null,
+        month,
+        year,
+      })?.sum ??
+      findCategoryForecast(categoryForecasts, {
+        categoryId,
+        month,
+        year,
+      })?.sum ??
+      decimalSum()
+    );
   }
 
   if (subcategoryId !== undefined) {

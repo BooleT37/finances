@@ -99,7 +99,7 @@ export function useBudgetingTableColumns({
         ),
         enableEditing: canEditPlanCell,
         Cell: ({ row }) => <PlanCell row={row} month={month} year={year} />,
-        Footer: ({ table }) => {
+        Footer: () => {
           const surplus = grandTotal?.planSum ?? zero;
           return (
             <OnboardingTour.Target id="budgeting-grandtotal-plan">
@@ -117,18 +117,13 @@ export function useBudgetingTableColumns({
                   >
                     {costToString(surplus)}
                   </Text>
-                  {grandTotal?.subscriptions &&
-                    grandTotal?.subscriptions.length > 0 && (
-                      <GrandTotalSubscriptionBadge
-                        allDue={grandTotal?.subscriptions}
-                        rows={
-                          table.getCoreRowModel()
-                            .rows as MRT_Row<BudgetingRow>[]
-                        }
-                        month={month}
-                        year={year}
-                      />
-                    )}
+                  {grandTotal && grandTotal.subscriptions.list.length > 0 && (
+                    <GrandTotalSubscriptionBadge
+                      subscriptions={grandTotal.subscriptions}
+                      month={month}
+                      year={year}
+                    />
+                  )}
                 </Group>
               </Box>
             </OnboardingTour.Target>

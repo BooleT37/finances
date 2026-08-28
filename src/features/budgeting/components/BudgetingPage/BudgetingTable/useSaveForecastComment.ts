@@ -2,14 +2,20 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { MRT_Row } from 'mantine-react-table-open';
 import { useCallback } from 'react';
 
-import { getUpsertForecastMutationOptions } from '~/features/budgeting/queries';
+import {
+  getUpsertCategoryForecastMutationOptions,
+  getUpsertSubcategoryForecastsMutationOptions,
+} from '~/features/budgeting/queries';
 
 import type { BudgetingRow } from './BudgetingTable.types';
 
 export function useSaveForecastComment(month: number, year: number) {
   const queryClient = useQueryClient();
-  const { mutate: saveUpsert } = useMutation(
-    getUpsertForecastMutationOptions(queryClient, year),
+  const { mutate: saveCategory } = useMutation(
+    getUpsertCategoryForecastMutationOptions(queryClient, year),
+  );
+  const { mutate: saveSubcategories } = useMutation(
+    getUpsertSubcategoryForecastsMutationOptions(queryClient, year),
   );
 
   return useCallback(
@@ -18,14 +24,29 @@ export function useSaveForecastComment(month: number, year: number) {
       if (categoryId === null) {
         return;
       }
-      saveUpsert({
-        categoryId,
-        subcategoryId: row.original.subcategoryId,
-        month,
-        year,
-        comment: value,
-      });
+      if (row.original.rowType === 'category') {
+        saveCategory({
+          categoryId,
+          month,
+          year,
+          comment: value,
+        });
+      } else {
+        saveSubcategories({
+          categoryId,
+          month,
+          year,
+          items: [
+            {
+              subcategoryId: row.original.isRestRow
+                ? null
+                : row.original.subcategoryId,
+              comment: value,
+            },
+          ],
+        });
+      }
     },
-    [month, year, saveUpsert],
+    [month, year, saveCategory, saveSubcategories],
   );
 }

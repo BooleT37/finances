@@ -23,7 +23,7 @@ export function PlanCell({ row, month, year }: Props) {
     text
   );
 
-  const hasBadge = row.original.subscriptions.length > 0;
+  const hasBadge = row.original.subscriptions.list.length > 0;
 
   if (!hasBadge) {
     return planText;

@@ -22,6 +22,11 @@ import { decimalSum } from '~/shared/utils/decimalSum';
 import { buildBudgetingRowId } from './budgetingRowId';
 import type { BudgetingGrandTotal, BudgetingRow } from './BudgetingTable.types';
 import { REST_SUBCATEGORY_ID } from './constants';
+import {
+  buildCategoryFillPlans,
+  buildSubcategoriesFillPlans,
+  mergeFillPlans,
+} from './fillPlans';
 
 const ZERO = new Decimal(0);
 
@@ -58,6 +63,11 @@ function buildCategoryRows(
         categoryId: category.id,
       });
       const { average, monthCount } = ta.averages.getCategoryTotal(category.id);
+      const ownSubs = subscriptions.filter(
+        (s) =>
+          s.subscription.categoryId === category.id &&
+          s.subscription.subcategoryId === null,
+      );
 
       return {
         id: rowId,
@@ -75,11 +85,10 @@ function buildCategoryRows(
         lastMonthActual: lastMonthActuals.getCategoryTotal(category.id),
         average,
         monthCount,
-        subscriptions: subscriptions.filter(
-          (s) =>
-            s.subscription.categoryId === category.id &&
-            s.subscription.subcategoryId === null,
-        ),
+        subscriptions: {
+          list: ownSubs,
+          plans: buildCategoryFillPlans(category.id, ownSubs),
+        },
       } satisfies BudgetingRow;
     }
 
@@ -100,6 +109,11 @@ function buildCategoryRows(
         const { average, monthCount } = ta.averages.getSubcategoryTotal(
           category.id,
           sub.id,
+        );
+        const subSubs = subscriptions.filter(
+          (s) =>
+            s.subscription.categoryId === category.id &&
+            s.subscription.subcategoryId === sub.id,
         );
 
         return {
@@ -124,11 +138,12 @@ function buildCategoryRows(
           ),
           average,
           monthCount,
-          subscriptions: subscriptions.filter(
-            (s) =>
-              s.subscription.categoryId === category.id &&
-              s.subscription.subcategoryId === sub.id,
-          ),
+          subscriptions: {
+            list: subSubs,
+            plans: buildSubcategoriesFillPlans(category.id, [
+              { subcategoryId: sub.id, subs: subSubs },
+            ]),
+          },
         } satisfies BudgetingRow;
       },
     );
@@ -146,6 +161,11 @@ function buildCategoryRows(
     });
     const { average: restAverage, monthCount: restMonthCount } =
       ta.averages.getSubcategoryTotal(category.id, null);
+    const restSubs = subscriptions.filter(
+      (s) =>
+        s.subscription.categoryId === category.id &&
+        s.subscription.subcategoryId === null,
+    );
 
     const subRows: BudgetingRow[] = [
       ...subcategoryRows,
@@ -171,11 +191,12 @@ function buildCategoryRows(
         ),
         average: restAverage,
         monthCount: restMonthCount,
-        subscriptions: subscriptions.filter(
-          (s) =>
-            s.subscription.categoryId === category.id &&
-            s.subscription.subcategoryId === null,
-        ),
+        subscriptions: {
+          list: restSubs,
+          plans: buildSubcategoriesFillPlans(category.id, [
+            { subcategoryId: null, subs: restSubs },
+          ]),
+        },
       },
     ];
 
@@ -185,6 +206,9 @@ function buildCategoryRows(
     });
     const { average: catAverage, monthCount: catMonthCount } =
       ta.averages.getCategoryTotal(category.id);
+    const categorySubs = subscriptions.filter(
+      (s) => s.subscription.categoryId === category.id,
+    );
 
     return {
       id: catRowId,
@@ -202,9 +226,16 @@ function buildCategoryRows(
       lastMonthActual: lastMonthActuals.getCategoryTotal(category.id),
       average: catAverage,
       monthCount: catMonthCount,
-      subscriptions: subscriptions.filter(
-        (s) => s.subscription.categoryId === category.id,
-      ),
+      subscriptions: {
+        list: categorySubs,
+        plans: buildSubcategoriesFillPlans(
+          category.id,
+          subRows.map((child) => ({
+            subcategoryId: child.isRestRow ? null : child.subcategoryId,
+            subs: child.subscriptions.list,
+          })),
+        ),
+      },
       subRows,
     } satisfies BudgetingRow;
   });
@@ -312,6 +343,16 @@ export function useBudgetingRows(
     const savingsCategoryIds = new Set(savingsCategories.map((c) => c.id));
     const incomeCategoryIds = new Set(incomeCategories.map((c) => c.id));
 
+    const expenseSubs = resolvedSubscriptions.filter((s) =>
+      expenseCategoryIds.has(s.subscription.categoryId),
+    );
+    const savingsSubs = resolvedSubscriptions.filter((s) =>
+      savingsCategoryIds.has(s.subscription.categoryId),
+    );
+    const incomeSubs = resolvedSubscriptions.filter((s) =>
+      incomeCategoryIds.has(s.subscription.categoryId),
+    );
+
     const rows: BudgetingRow[] = [
       {
         id: buildBudgetingRowId({ rowType: 'typeGroup', group: 'expense' }),
@@ -329,9 +370,10 @@ export function useBudgetingRows(
         lastMonthActual: lastMonthActuals.getTotalExpenses(),
         average: expenseAvg.average,
         monthCount: expenseAvg.monthCount,
-        subscriptions: resolvedSubscriptions.filter((s) =>
-          expenseCategoryIds.has(s.subscription.categoryId),
-        ),
+        subscriptions: {
+          list: expenseSubs,
+          plans: mergeFillPlans(expenseRows.map((r) => r.subscriptions.plans)),
+        },
         subRows: expenseRows,
       },
       {
@@ -350,9 +392,10 @@ export function useBudgetingRows(
         lastMonthActual: lastMonthActuals.getTotalSavings(),
         average: savingsAvg.average,
         monthCount: savingsAvg.monthCount,
-        subscriptions: resolvedSubscriptions.filter((s) =>
-          savingsCategoryIds.has(s.subscription.categoryId),
-        ),
+        subscriptions: {
+          list: savingsSubs,
+          plans: mergeFillPlans(savingsRows.map((r) => r.subscriptions.plans)),
+        },
         subRows: savingsRows,
       },
       {
@@ -371,9 +414,10 @@ export function useBudgetingRows(
         lastMonthActual: lastMonthActuals.getTotalIncome(),
         average: incomeAvg.average,
         monthCount: incomeAvg.monthCount,
-        subscriptions: resolvedSubscriptions.filter((s) =>
-          incomeCategoryIds.has(s.subscription.categoryId),
-        ),
+        subscriptions: {
+          list: incomeSubs,
+          plans: mergeFillPlans(incomeRows.map((r) => r.subscriptions.plans)),
+        },
         subRows: incomeRows,
       },
     ];
@@ -384,7 +428,10 @@ export function useBudgetingRows(
       average: totalAvg.average,
       monthCount: totalAvg.monthCount,
       planSum: expensePlanSum.plus(savingsPlanSum).plus(incomePlanSum),
-      subscriptions: resolvedSubscriptions,
+      subscriptions: {
+        list: resolvedSubscriptions,
+        plans: mergeFillPlans(rows.map((r) => r.subscriptions.plans)),
+      },
     };
 
     return { rows, grandTotal };

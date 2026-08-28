@@ -82,14 +82,20 @@ function makeForecast(
   };
 }
 
-const mockForecasts: Forecast[] = [
-  { categoryId: 1, subcategoryId: null, sum: '-100.00' },
-  { categoryId: 3, subcategoryId: null, sum: '200.00' },
-  { categoryId: 4, subcategoryId: null, sum: '-150.00' },
-  { categoryId: 4, subcategoryId: 41, sum: '-60.00' },
-  { categoryId: 4, subcategoryId: 42, sum: '-40.00' },
-  // Cat5 has no forecast — used for "returns undefined" tests
-].map(makeForecast);
+const mockForecasts: Forecast[] = (
+  [
+    { categoryId: 1, subcategoryId: null, level: 'CATEGORY', sum: '-100.00' },
+    { categoryId: 3, subcategoryId: null, level: 'CATEGORY', sum: '200.00' },
+    { categoryId: 4, subcategoryId: null, level: 'CATEGORY', sum: '-150.00' },
+    { categoryId: 4, subcategoryId: 41, level: 'SUBCATEGORY', sum: '-60.00' },
+    { categoryId: 4, subcategoryId: 42, level: 'SUBCATEGORY', sum: '-40.00' },
+    // Rest is materialized alongside 41/42 — the server creates it atomically
+    // the moment any subcategory is first touched, so a state with real
+    // subcategory forecasts but no Rest row can't occur.
+    { categoryId: 4, subcategoryId: null, level: 'SUBCATEGORY', sum: '-50.00' },
+    // Cat5 has no forecast — used for "returns undefined" tests
+  ] as const
+).map(makeForecast);
 
 const mockSavingSpendings: SavingSpending[] = [
   {
@@ -136,8 +142,8 @@ const mockSavingSpendings: SavingSpending[] = [
 ];
 
 const baseData = {
-  categoryForecasts: mockForecasts.filter((f) => f.subcategoryId === null),
-  subcategoryForecasts: mockForecasts.filter((f) => f.subcategoryId !== null),
+  categoryForecasts: mockForecasts.filter((f) => f.level === 'CATEGORY'),
+  subcategoryForecasts: mockForecasts.filter((f) => f.level === 'SUBCATEGORY'),
   savingSpendings: [] as SavingSpending[],
   categoryMap: mockCategoryMap,
   month: MONTH,
@@ -249,8 +255,7 @@ describe('getCostForecast', () => {
   });
 
   describe('rest row (isRestRow)', () => {
-    it('returns category forecast minus sum of subcategory forecasts', () => {
-      // Cat4 category forecast: -150; subcategory forecasts: -60 + -40 = -100; rest = -50
+    it('returns the materialized Rest forecast', () => {
       expect(
         getCostForecast(baseData, {
           categoryId: 4,

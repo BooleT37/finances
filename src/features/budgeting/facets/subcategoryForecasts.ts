@@ -5,5 +5,5 @@ import { getForecastsQueryOptions } from '../queries';
 export const getSubcategoryForecastsQueryOptions = (year: number) =>
   queryOptions({
     ...getForecastsQueryOptions(year),
-    select: (forecasts) => forecasts.filter((f) => f.subcategoryId !== null),
+    select: (forecasts) => forecasts.filter((f) => f.level === 'SUBCATEGORY'),
   });

@@ -3,7 +3,6 @@ import { openConfirmModal } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { IconRepeat } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
-import type { MRT_Row } from 'mantine-react-table-open';
 import { useTranslation } from 'react-i18next';
 
 import { getSourceMapQueryOptions } from '~/features/sources/facets/sourceMap';
@@ -12,26 +11,26 @@ import { CostList } from '~/shared/components/CostList';
 import { costToString } from '~/shared/utils/costToString';
 import { decimalSum } from '~/shared/utils/decimalSum';
 
-import type { BudgetingRow } from '../BudgetingTable.types';
-import { useBulkSaveForecastsSum } from '../useBulkSaveForecastsSum';
-import { collectBulkItems } from './collectBulkItems';
+import type { RowSubscriptions } from '../BudgetingTable.types';
+import { countFilledRows } from '../fillPlans';
+import { useApplyCategoryFillPlans } from '../useApplyCategoryFillPlans';
 
 interface Props {
-  allDue: AvailableSubscription[];
-  rows: MRT_Row<BudgetingRow>[];
+  subscriptions: RowSubscriptions;
   month: number;
   year: number;
 }
 
 export function GrandTotalSubscriptionBadge({
-  allDue,
-  rows,
+  subscriptions,
   month,
   year,
 }: Props) {
   const { t } = useTranslation('budgeting');
-  const bulkSave = useBulkSaveForecastsSum(month, year);
+  const applyPlans = useApplyCategoryFillPlans(month, year);
   const { data: sourceMap } = useQuery(getSourceMapQueryOptions());
+
+  const { list: allDue, plans } = subscriptions;
 
   const paid = t('subscriptions.paid');
   const noSource = t('subscriptions.noSource');
@@ -60,17 +59,12 @@ export function GrandTotalSubscriptionBadge({
         confirm: t('subscriptions.fillFromSubscriptions'),
         cancel: 'Отмена',
       },
-      onConfirm: () => {
-        const items = rows.flatMap((typeGroupRow) =>
-          (typeGroupRow.subRows ?? []).flatMap((categoryRow) =>
-            collectBulkItems(categoryRow),
-          ),
-        );
-        bulkSave(items);
+      onConfirm: async () => {
+        await applyPlans(plans.category, plans.subcategories);
         notifications.show({
           message: t('subscriptions.appliedGroup', {
             cost: costToString(grandTotal),
-            count: items.length,
+            count: countFilledRows(plans),
           }),
           color: 'green',
         });
