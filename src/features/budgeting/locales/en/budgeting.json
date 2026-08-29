@@ -49,5 +49,25 @@
       "title": "Actual total",
       "content": "Here is the actual difference between expenses and income (the bold black number), and the difference from the plan (the colored value beside it). Ideally you want this to be zero at the end of the month. If it's higher, the surplus can be moved to savings. If lower, you cancover the shortfall from savings (you can record it as income). The side number is secondary: it just shows how well you guessed how much you'd have left at the end of the month."
     }
+  },
+  "breakdown": {
+    "title": "Composite plan",
+    "unitPrice": "Price or formula",
+    "quantity": "Quantity",
+    "comment": "Comment",
+    "addRow": "Add row",
+    "deleteRow": "Delete row",
+    "total": "Total: {{cost}}",
+    "save": "Save",
+    "remove": "Remove composite plan",
+    "invalidFormula": "Invalid formula",
+    "invalidQuantity": "Quantity must be a positive number",
+    "totalMustBePositive": "The total must be greater than zero",
+    "openBreakdown": "Composite plan",
+    "lockedByCategoryBreakdown": "Planning by subcategories is not possible when the parent category has a composite plan",
+    "subtotal": "Subtotal",
+    "extraWithQuantity": "{{formula}} × {{quantity}} pcs",
+    "removeConfirm": "The composite plan will be deleted, and the sum will stay as it is. Continue?",
+    "cancel": "Cancel"
   }
 }

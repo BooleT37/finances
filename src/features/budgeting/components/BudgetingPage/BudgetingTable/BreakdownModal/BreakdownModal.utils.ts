@@ -39,6 +39,18 @@ export function parseQuantity(value: string): Decimal | null {
   return parsed.isZero() ? null : parsed;
 }
 
+export function formRowsToLineItems(rows: BreakdownFormRow[]) {
+  return rows.map((row) => ({
+    unitPrice: row.unitPrice.trim(),
+    quantity: row.quantity.trim().replace(',', '.'),
+    comment: row.comment,
+  }));
+}
+
+export function isPlainNumber(value: string): boolean {
+  return /^-?\d+([.,]\d+)?$/.test(value.trim());
+}
+
 export function rowSubtotal(row: BreakdownFormRow): Decimal | null {
   const price = evaluateFormula(row.unitPrice);
   if (!price.ok) {

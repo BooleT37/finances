@@ -5,6 +5,8 @@ import type { ForecastLineItem } from '~/features/budgeting/schema';
 import type { BreakdownFormRow } from './BreakdownModal.utils';
 import {
   breakdownTotal,
+  formRowsToLineItems,
+  isPlainNumber,
   lineItemsToFormRows,
   parseQuantity,
   rowSubtotal,
@@ -98,6 +100,33 @@ describe('breakdownTotal', () => {
 
   it('ignores rows that do not evaluate, so the total keeps updating while typing', () => {
     expect(breakdownTotal([row('10'), row('5+')]).toString()).toBe('10');
+  });
+});
+
+describe('isPlainNumber', () => {
+  it.each(['63', '19.99', '19,99', '-20', ' 4 '])('accepts %j', (input) => {
+    expect(isPlainNumber(input)).toBe(true);
+  });
+
+  it.each(['12+8', '1200/12', '(15+25)*3', '2*3', '', 'abc', '1.'])(
+    'rejects %j',
+    (input) => {
+      expect(isPlainNumber(input)).toBe(false);
+    },
+  );
+});
+
+describe('formRowsToLineItems', () => {
+  it('normalises a comma quantity to a dot', () => {
+    expect(formRowsToLineItems([row('4', '2,5')])).toEqual([
+      { unitPrice: '4', quantity: '2.5', comment: '' },
+    ]);
+  });
+
+  it('trims the price and quantity but keeps the formula text as written', () => {
+    expect(formRowsToLineItems([row(' 12+8 ', ' 3 ', 'Овощи')])).toEqual([
+      { unitPrice: '12+8', quantity: '3', comment: 'Овощи' },
+    ]);
   });
 });
 
