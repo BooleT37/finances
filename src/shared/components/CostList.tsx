@@ -1,4 +1,4 @@
-import { Anchor, Divider, Group, Stack, Text } from '@mantine/core';
+import { Anchor, Box, Divider, Stack, Text } from '@mantine/core';
 import type Decimal from 'decimal.js';
 import { Fragment, type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -47,37 +47,45 @@ export function CostList({ items, title, limit }: Props) {
           {title}
         </Text>
       )}
-      <Stack gap={4} mah={320} style={{ overflowY: 'auto' }}>
+      <Box
+        mah={320}
+        style={{
+          display: 'grid',
+          // The name takes the slack so the cost and extra columns line up
+          // across rows; minmax(0, …) is what lets the name truncate.
+          gridTemplateColumns: 'minmax(0, 1fr) auto auto',
+          columnGap: 'var(--mantine-spacing-md)',
+          rowGap: 4,
+          alignItems: 'baseline',
+          overflowY: 'auto',
+        }}
+      >
         {visible.map((item, index) => (
           <Fragment key={item.key}>
-            {index > 0 && <Divider />}
-            <Group justify="space-between" wrap="nowrap" gap="md">
-              <Text
-                size="xs"
-                truncate
-                style={{ flex: 1 }}
-                c={item.secondary ? 'dimmed' : undefined}
-              >
-                {item.name}
-              </Text>
-              <Group gap="xs" wrap="nowrap">
-                <Text
-                  size="xs"
-                  style={{ whiteSpace: 'nowrap' }}
-                  c={item.secondary ? 'dimmed' : undefined}
-                >
-                  {costToString(item.cost)}
-                </Text>
-                {item.extra !== undefined && (
-                  <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
-                    {item.extra}
-                  </Text>
-                )}
-              </Group>
-            </Group>
+            {index > 0 && <Divider style={{ gridColumn: '1 / -1' }} />}
+            <Text size="xs" truncate c={item.secondary ? 'dimmed' : undefined}>
+              {item.name}
+            </Text>
+            <Text
+              size="xs"
+              ta="right"
+              style={{ whiteSpace: 'nowrap' }}
+              c={item.secondary ? 'dimmed' : undefined}
+            >
+              {costToString(item.cost)}
+            </Text>
+            {/* Always rendered, empty or not, so the grid keeps its columns. */}
+            <Text
+              size="xs"
+              c="dimmed"
+              ta="right"
+              style={{ whiteSpace: 'nowrap' }}
+            >
+              {item.extra}
+            </Text>
           </Fragment>
         ))}
-      </Stack>
+      </Box>
       {collapsed && (
         <Anchor
           component="button"
