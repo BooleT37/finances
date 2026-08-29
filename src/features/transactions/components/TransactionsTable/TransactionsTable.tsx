@@ -29,6 +29,12 @@ import { ComponentNameCellEdit } from './columns/NameCellRenderer/ComponentNameC
 import { TransactionNameCellEdit } from './columns/NameCellRenderer/TransactionNameCellEdit';
 import { useTransactionTableColumns } from './columns/useTransactionTableColumns';
 import { RowActions } from './RowActions';
+import type { TransactionsRowId } from './transactionsRowId';
+import {
+  componentRowId,
+  transactionRowId,
+  upcomingSubscriptionRowId,
+} from './transactionsRowId';
 import { transactionNameCellClass } from './TransactionsTable.constants';
 import classes from './TransactionsTable.module.css';
 import type { TransactionTableItem } from './TransactionsTable.types';
@@ -83,14 +89,19 @@ export function TransactionTable({ items, groupBySubcategories }: Props) {
   const table = useMantineReactTable({
     columns,
     data: items ?? [],
-    getRowId: (row) => {
+    getRowId: (row): TransactionsRowId => {
       if (row.isUpcomingSubscription) {
-        return `subscription-${row.subscriptionId}`;
+        if (row.subscriptionId === null) {
+          // Only the row builder makes these, and it always copies the
+          // subscription's id across.
+          throw new Error('Upcoming subscription row has no subscriptionId');
+        }
+        return upcomingSubscriptionRowId(row.subscriptionId);
       }
       if (row.expenseId !== null) {
-        return `component-${row.id}`;
+        return componentRowId(row.id);
       }
-      return `transaction-${row.id}`;
+      return transactionRowId(row.id);
     },
     enableGrouping: true,
     enableEditing: true,
