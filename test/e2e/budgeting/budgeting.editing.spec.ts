@@ -5,7 +5,7 @@ import {
   getCommentCell,
   getPlanCell,
   getRow,
-} from './budgeting.utils';
+} from './budgeting.spec.utils';
 
 test.describe('Budgeting inline editing', () => {
   // Test 1: display + basic plan edit + persistence

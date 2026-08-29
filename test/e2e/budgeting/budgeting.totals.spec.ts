@@ -1,5 +1,5 @@
 import { expect, test } from '../fixtures';
-import { getActualCell, getRow } from './budgeting.utils';
+import { getActualCell, getRow } from './budgeting.spec.utils';
 
 test.describe('Budgeting transaction totals columns', () => {
   test('shows seeded transaction actuals in thisMonth, lastMonth, and average columns', async ({

@@ -7,7 +7,7 @@ import {
   TODAY_MONTH,
   TODAY_YEAR,
 } from '../../../src/shared/utils/today';
-import { expandRow, getPlanCell, getRow } from './budgeting.utils';
+import { expandRow, getPlanCell, getRow } from './budgeting.spec.utils';
 
 // ---------------------------------------------------------------------------
 // File-local helpers
