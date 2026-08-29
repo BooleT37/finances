@@ -104,8 +104,14 @@ export const deleteSubscription = createServerFn({ method: 'POST' })
     );
 
     await prisma.$transaction(async (tx) => {
-      // Composite FK can't SetNull — null the references first.
+      // Composite FK can't SetNull — null the references first. A forecast
+      // line item outlives the subscription that filled it in, as an ordinary
+      // hand-written line.
       await tx.expense.updateMany({
+        where: { subscriptionId: id, projectId: context.projectId },
+        data: { subscriptionId: null },
+      });
+      await tx.forecastLineItem.updateMany({
         where: { subscriptionId: id, projectId: context.projectId },
         data: { subscriptionId: null },
       });
