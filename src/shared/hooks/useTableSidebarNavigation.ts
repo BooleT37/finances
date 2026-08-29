@@ -106,8 +106,12 @@ export function syncScrollRequest<TData extends MRT_RowData & { id: number }>(
   if (!scrollRequest) {
     return;
   }
-  expandParentsOf(table.getGroupedRowModel().rows, scrollRequest.id);
-  setTimeout(() => scrollToRow(table, scrollRequest.id), 50);
+  // Navigation addresses rows by the entity being edited, not by the table's
+  // own row id.
+  const isTarget = (row: { original: TData }) =>
+    row.original.id === scrollRequest.id;
+  expandParentsOf(table.getGroupedRowModel().rows, isTarget);
+  setTimeout(() => scrollToRow(table, isTarget), 50);
 }
 
 interface UseTableSidebarNavigationOptions {

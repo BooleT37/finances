@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { TableFlash, useFlashTrigger } from '~/shared/hooks/useTableFlash';
 
 import { TransactionSidebarMolecule } from '../TransactionSidebar/transactionSidebarMolecule';
+import { transactionRowId } from './transactionsRowId';
 import type { TransactionTableItem } from './TransactionsTable.types';
 
 interface Props {
@@ -25,7 +26,7 @@ export function UpcomingSubscriptionRowActions({ row }: Props) {
     createFromSubscription({
       row,
       onCreated: (id) => {
-        triggerFlash([{ id }]);
+        triggerFlash([{ id: transactionRowId(id) }]);
       },
     });
   };

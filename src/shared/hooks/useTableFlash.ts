@@ -10,6 +10,7 @@ import type React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export enum TableFlash {
+  Budgeting = 'budgeting',
   Categories = 'categories',
   Sources = 'sources',
   Subscriptions = 'subscriptions',
@@ -22,7 +23,7 @@ export enum TableFlash {
  * only those cells (used to highlight which fields an edit changed).
  */
 export interface FlashTarget {
-  id: number;
+  id: string;
   columns?: string[];
 }
 
@@ -38,18 +39,16 @@ function getFlashAtom(name: TableFlash): PrimitiveAtom<FlashTarget[] | null> {
   return flashAtomRegistry.get(name)!;
 }
 
-export function scrollToRow<TData extends MRT_RowData & { id: number }>(
+export function scrollToRow<TData extends MRT_RowData>(
   table: MRT_TableInstance<TData>,
-  id: number,
+  matches: (row: MRT_Row<TData>) => boolean,
 ) {
   const container = table.refs.tableContainerRef.current;
   if (!container) {
     return;
   }
   const flatRows = table.getRowModel().rows;
-  const rowIndex = flatRows.findIndex(
-    (r) => !r.getIsGrouped() && r.original.id === id,
-  );
+  const rowIndex = flatRows.findIndex((r) => !r.getIsGrouped() && matches(r));
   if (rowIndex >= 0) {
     container
       .querySelectorAll('tbody tr')
@@ -57,16 +56,16 @@ export function scrollToRow<TData extends MRT_RowData & { id: number }>(
   }
 }
 
-export function expandParentsOf<TData extends { id: number }>(
+export function expandParentsOf<TData>(
   rows: Row<TData>[],
-  id: number,
+  matches: (row: Row<TData>) => boolean,
 ): boolean {
   for (const row of rows) {
     if (!row.getIsGrouped()) {
-      if (row.original.id === id) {
+      if (matches(row)) {
         return true;
       }
-    } else if (expandParentsOf(row.subRows, id)) {
+    } else if (expandParentsOf(row.subRows, matches)) {
       row.toggleExpanded(true);
       return true;
     }
@@ -81,7 +80,7 @@ export function useFlashTrigger(tableName: TableFlash) {
 /** `null` columns = flash the whole row; a Set = flash only those column ids. */
 type FlashColumns = Set<string> | null;
 
-export function useTableFlash<TData extends MRT_RowData & { id: number }>(
+export function useTableFlash<TData extends MRT_RowData>(
   tableName: TableFlash,
   options?: { fadeDuration?: number },
 ) {
@@ -90,7 +89,7 @@ export function useTableFlash<TData extends MRT_RowData & { id: number }>(
   const tableRef = useRef<MRT_TableInstance<TData> | null>(null);
 
   const [flashState, setFlashState] = useState<{
-    targets: Map<number, FlashColumns>;
+    targets: Map<string, FlashColumns>;
     fading: boolean;
   }>({ targets: new Map(), fading: false });
 
@@ -100,17 +99,20 @@ export function useTableFlash<TData extends MRT_RowData & { id: number }>(
     if (!trigger) {
       return;
     }
-    const targets = new Map<number, FlashColumns>(
+    const targets = new Map<string, FlashColumns>(
       trigger.map(({ id, columns }) => [id, columns ? new Set(columns) : null]),
     );
     const table = tableRef.current;
     if (table) {
       for (const id of targets.keys()) {
-        expandParentsOf(table.getGroupedRowModel().rows, id);
+        expandParentsOf(
+          table.getGroupedRowModel().rows,
+          (row) => row.id === id,
+        );
       }
       const firstId = [...targets.keys()][0];
       if (firstId !== undefined) {
-        setTimeout(() => scrollToRow(table, firstId), 50);
+        setTimeout(() => scrollToRow(table, (row) => row.id === firstId), 50);
       }
     }
     // Sync flash state with the external atom trigger; timers below schedule fade/clear.
@@ -142,9 +144,7 @@ export function useTableFlash<TData extends MRT_RowData & { id: number }>(
       columnId: string,
       extraStyles?: React.CSSProperties,
     ): React.CSSProperties => {
-      const columns = row.getIsGrouped()
-        ? undefined
-        : flashTargets.get(row.original.id);
+      const columns = row.getIsGrouped() ? undefined : flashTargets.get(row.id);
       const isFlashing =
         columns !== undefined && (columns === null || columns.has(columnId));
       if (!isFlashing) {

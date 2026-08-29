@@ -9,6 +9,7 @@ import { TableFlash, useFlashTrigger } from '~/shared/hooks/useTableFlash';
 
 import { TransactionSidebarMolecule } from '../TransactionSidebar/transactionSidebarMolecule';
 import { CopyComponentsModal } from './CopyComponentsModal';
+import { transactionRowId } from './transactionsRowId';
 
 interface Props {
   id: number;
@@ -45,7 +46,7 @@ export function RowActions({ id, parentExpenseId, name }: Props) {
   const doCopy = async ({ withComponents }: { withComponents: boolean }) => {
     const newId = await copyTx({ id, withComponents });
     if (newId !== undefined) {
-      triggerFlash([{ id: newId }]);
+      triggerFlash([{ id: transactionRowId(newId) }]);
     }
   };
 

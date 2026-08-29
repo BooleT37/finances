@@ -191,7 +191,7 @@ export function SubscriptionSidebarForm() {
         onSuccess: (result) => {
           form.reset();
           close();
-          triggerFlash([{ id: result.id }]);
+          triggerFlash([{ id: String(result.id) }]);
         },
       },
     );

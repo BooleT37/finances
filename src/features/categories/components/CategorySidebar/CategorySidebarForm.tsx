@@ -154,7 +154,7 @@ export function CategorySidebarForm() {
     });
     form.reset();
     close();
-    triggerFlash([{ id: result.id }]);
+    triggerFlash([{ id: String(result.id) }]);
   });
 
   const subcategoryFields = form.getValues().subcategories;

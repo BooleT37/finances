@@ -5,6 +5,7 @@ import { TableFlash, useFlashTrigger } from '~/shared/hooks/useTableFlash';
 
 import type { Transaction } from '../../../schema';
 import { groupBySubcategoriesAtom } from '../../TransactionsPage/TransactionsPage.atoms';
+import { transactionRowId } from '../../TransactionsTable/transactionsRowId';
 
 /** Maps a changed transaction field to the MRT column id whose cell should flash. */
 function getChangedColumns(
@@ -40,19 +41,19 @@ export function useFlashOnGroupChange() {
   return useCallback(
     (previous: Transaction | null, updated: Transaction) => {
       if (!previous) {
-        triggerFlash([{ id: updated.id }]);
+        triggerFlash([{ id: transactionRowId(updated.id) }]);
         return;
       }
       const categoryChanged = updated.categoryId !== previous.categoryId;
       const subcategoryChanged =
         (updated.subcategoryId ?? null) !== (previous.subcategoryId ?? null);
       if (categoryChanged || (groupBySubcategories && subcategoryChanged)) {
-        triggerFlash([{ id: updated.id }]);
+        triggerFlash([{ id: transactionRowId(updated.id) }]);
         return;
       }
       const columns = getChangedColumns(previous, updated);
       if (columns.length > 0) {
-        triggerFlash([{ id: updated.id, columns }]);
+        triggerFlash([{ id: transactionRowId(updated.id), columns }]);
       }
     },
     [triggerFlash, groupBySubcategories],

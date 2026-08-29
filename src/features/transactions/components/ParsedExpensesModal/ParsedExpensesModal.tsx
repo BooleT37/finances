@@ -18,6 +18,7 @@ import { TableFlash, useFlashTrigger } from '~/shared/hooks/useTableFlash';
 import { findByIdOrThrow } from '~/shared/utils/getOrThrow';
 import { selectedYearAtom } from '~/stores/month';
 
+import { transactionRowId } from '../TransactionsTable/transactionsRowId';
 import {
   isSubscriptionValue,
   type ParsedExpenseCategoryValue,
@@ -225,7 +226,7 @@ export function ParsedExpensesModal({
     });
 
     const created = await importTransactions.mutateAsync(items);
-    triggerFlash(created.map((tx) => ({ id: tx.id })));
+    triggerFlash(created.map((tx) => ({ id: transactionRowId(tx.id) })));
     notifications.show({
       color: 'green',
       message: t('importModal.success', { count: created.length }),
