@@ -7,13 +7,16 @@ import {
   type MRT_ExpandedState,
   useMantineReactTable,
 } from 'mantine-react-table-open';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { NameWithOptionalIcon } from '~/features/categories/components/NameWithOptionalIcon';
+import { TableFlash, useTableFlash } from '~/shared/hooks/useTableFlash';
 import { useTableLocalization } from '~/shared/hooks/useTableLocalization';
 import { selectedMonthAtom, selectedYearAtom } from '~/stores/month';
 
 import { buildBudgetingRowId } from './budgetingRowId';
+import type { BudgetingRow } from './BudgetingTable.types';
 import { isApplyingSubscriptionsAtom } from './budgetingTableAtoms';
 import { useBudgetingTableColumns } from './columns/useBudgetingTableColumns';
 import { useBudgetingRows } from './useBudgetingRows';
@@ -39,6 +42,9 @@ export function BudgetingTable() {
   });
 
   const tableLocalization = useTableLocalization();
+  const { withFlashingStyles, setTable } = useTableFlash<BudgetingRow>(
+    TableFlash.Budgeting,
+  );
 
   const table = useMantineReactTable({
     columns,
@@ -112,11 +118,11 @@ export function BudgetingTable() {
         {t('emptyState')}
       </Text>
     ),
-    mantineTableBodyCellProps: {
-      style: {
+    mantineTableBodyCellProps: ({ column, row }) => ({
+      style: withFlashingStyles(row, column.id, {
         padding: '6px var(--mantine-spacing-xs)',
-      },
-    },
+      }),
+    }),
     mantineTableBodyRowProps: ({ row }) => ({
       style: {
         background:
@@ -127,6 +133,10 @@ export function BudgetingTable() {
               : 'transparent',
       },
     }),
+  });
+
+  useEffect(() => {
+    setTable(table);
   });
 
   return (

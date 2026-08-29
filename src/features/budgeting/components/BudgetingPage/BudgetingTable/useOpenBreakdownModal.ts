@@ -8,6 +8,7 @@ import {
   getUpsertSubcategoryForecastsMutationOptions,
 } from '~/features/budgeting/queries';
 import { getCategoryMapQueryOptions } from '~/features/categories/facets/categoryMap';
+import { TableFlash, useFlashTrigger } from '~/shared/hooks/useTableFlash';
 import { getOrThrow } from '~/shared/utils/getOrThrow';
 
 import type { BreakdownFormRow } from './BreakdownModal/BreakdownModal.utils';
@@ -19,6 +20,7 @@ export function useOpenBreakdownModal(month: number, year: number) {
   const { t } = useTranslation('budgeting');
   const queryClient = useQueryClient();
   const { data: categoryMap = {} } = useQuery(getCategoryMapQueryOptions());
+  const triggerFlash = useFlashTrigger(TableFlash.Budgeting);
   const { mutate: saveCategory } = useMutation(
     getUpsertCategoryForecastMutationOptions(queryClient, year),
   );
@@ -68,10 +70,21 @@ export function useOpenBreakdownModal(month: number, year: number) {
       openBreakdownModal({
         title: `${t('breakdown.title')} — ${path}`,
         lineItems: row.lineItems,
-        onSave: (rows, total) => write({ rows, total }),
+        onSave: (rows, total) => {
+          write({ rows, total });
+          triggerFlash([{ id: row.id, columns: ['planSum'] }]);
+        },
         onRemove: () => write(null),
       });
     },
-    [t, month, year, categoryMap, saveCategory, saveSubcategories],
+    [
+      t,
+      month,
+      year,
+      categoryMap,
+      saveCategory,
+      saveSubcategories,
+      triggerFlash,
+    ],
   );
 }
