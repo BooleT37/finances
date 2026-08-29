@@ -7,6 +7,7 @@ import type { Transaction } from '~/features/transactions/schema';
 import { costWithoutComponents } from '~/features/transactions/utils/costWithoutComponents';
 import { useFormatComponentName } from '~/features/transactions/utils/useFormatComponentName';
 import type { CostListItem } from '~/shared/components/CostList';
+import { DATE_FORMAT } from '~/shared/constants';
 
 import type { BudgetingRow } from '../../BudgetingTable.types';
 
@@ -66,7 +67,7 @@ export function useThisMonthLineItems(
         key: `tx-${tx.id}`,
         name: tx.name || noName,
         cost: costWithoutComponents(tx.cost, tx.components),
-        date: tx.date,
+        extra: tx.date.format(DATE_FORMAT),
       }),
     );
 
@@ -76,7 +77,7 @@ export function useThisMonthLineItems(
           key: `component-${component.id}`,
           name: formatComponentName(component, tx) || noName,
           cost: component.cost,
-          date: tx.date,
+          extra: tx.date.format(DATE_FORMAT),
         }),
       ),
     );

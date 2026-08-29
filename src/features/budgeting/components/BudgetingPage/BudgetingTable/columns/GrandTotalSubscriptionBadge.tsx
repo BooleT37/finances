@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { getSourceMapQueryOptions } from '~/features/sources/facets/sourceMap';
 import type { AvailableSubscription } from '~/features/subscriptions/facets/availableSubscriptions';
 import { CostList } from '~/shared/components/CostList';
+import { DATE_FORMAT } from '~/shared/constants';
 import { costToString } from '~/shared/utils/costToString';
 import { decimalSum } from '~/shared/utils/decimalSum';
 
@@ -138,7 +139,7 @@ export function GrandTotalSubscriptionBadge({
                         s.transactionId !== null ? ` (${paid})` : ''
                       }`,
                       cost: s.subscription.cost,
-                      date: s.firstDate,
+                      extra: s.firstDate.format(DATE_FORMAT),
                       secondary: s.transactionId !== null,
                     }))}
                   />

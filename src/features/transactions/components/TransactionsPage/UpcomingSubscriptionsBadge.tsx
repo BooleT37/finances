@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useAvailableSubscriptions } from '~/features/subscriptions/facets/availableSubscriptions';
 import { CostList } from '~/shared/components/CostList';
+import { DATE_FORMAT } from '~/shared/constants';
 
 interface UpcomingSubscriptionsBadgeProps {
   showUpcoming: boolean;
@@ -45,7 +46,7 @@ export function UpcomingSubscriptionsBadge({
               key: String(a.subscription.id),
               name: a.subscription.name,
               cost: a.subscription.cost.abs(),
-              date: a.firstDate,
+              extra: a.firstDate.format(DATE_FORMAT),
             }))}
           />
           <Button

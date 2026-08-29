@@ -1,17 +1,15 @@
 import { Anchor, Divider, Group, Stack, Text } from '@mantine/core';
-import type { Dayjs } from 'dayjs';
 import type Decimal from 'decimal.js';
 import { Fragment, type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { DATE_FORMAT } from '~/shared/constants';
 import { costToString } from '~/shared/utils/costToString';
 
 export interface CostListItem {
   key: string;
   name: string;
   cost: Decimal;
-  date: Dayjs;
+  extra?: string;
   /** Render the row dimmed (e.g. an already-paid subscription). */
   secondary?: boolean;
 }
@@ -28,11 +26,13 @@ interface Props {
 }
 
 /**
- * Renders a list of transactions/subscriptions for a HoverCard dropdown: each
- * row shows a name, cost, and date. Assumes a light (HoverCard) background — do
- * not put it in a dark `Tooltip`. Wrap it in a Mantine `HoverCard` yourself;
- * this component is only the dropdown content and contains no active elements
- * other than the optional "show more" link.
+ * Renders a list of costed items for a HoverCard dropdown: each row shows a
+ * name, a cost, and whatever `extra` detail the caller passes after it — a
+ * formatted date for transactions and subscriptions, nothing at all for
+ * forecast line items, which aren't dated. Assumes a light (HoverCard)
+ * background — do not put it in a dark `Tooltip`. Wrap it in a Mantine
+ * `HoverCard` yourself; this component is only the dropdown content and
+ * contains no active elements other than the optional "show more" link.
  */
 export function CostList({ items, title, limit }: Props) {
   const { t } = useTranslation('common');
@@ -68,9 +68,11 @@ export function CostList({ items, title, limit }: Props) {
                 >
                   {costToString(item.cost)}
                 </Text>
-                <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
-                  {item.date.format(DATE_FORMAT)}
-                </Text>
+                {item.extra !== undefined && (
+                  <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
+                    {item.extra}
+                  </Text>
+                )}
               </Group>
             </Group>
           </Fragment>

@@ -6,6 +6,7 @@ import type { MRT_Row } from 'mantine-react-table-open';
 import { useTranslation } from 'react-i18next';
 
 import { CostList } from '~/shared/components/CostList';
+import { DATE_FORMAT } from '~/shared/constants';
 import { costToString } from '~/shared/utils/costToString';
 import { decimalSum } from '~/shared/utils/decimalSum';
 
@@ -131,7 +132,7 @@ export function SubscriptionBadge({ row, month, year }: Props) {
                 key: String(s.subscription.id),
                 name: subscriptionName(s),
                 cost: s.subscription.cost.abs(),
-                date: s.firstDate,
+                extra: s.firstDate.format(DATE_FORMAT),
                 secondary: s.transactionId !== null,
               }))}
             />
