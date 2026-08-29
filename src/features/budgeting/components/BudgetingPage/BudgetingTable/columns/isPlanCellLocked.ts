@@ -5,6 +5,11 @@ function isAuthoritativeChild(row: BudgetingRow): boolean {
 }
 
 export function isPlanCellLocked(row: BudgetingRow): boolean {
+  // While the table is loading, MRT swaps the data for placeholder rows built
+  // out of column ids alone, so none of the row's own fields exist yet.
+  if (!row.lineItems) {
+    return false;
+  }
   if (row.isUnderCategoryBreakdown || row.lineItems.length > 0) {
     return true;
   }
