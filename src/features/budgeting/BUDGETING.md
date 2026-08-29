@@ -43,12 +43,26 @@ Rest shows up in the UI whenever the category has at least one subcategory defin
 
 There's currently no check that subcategory forecasts don't add up to more than the category forecast — Rest is allowed to go negative, and we just show it as-is.
 
+## Composite Plan
+
+Splitting by subcategory is one way to make more granular forecasts. A composite plan is the other: instead of one typed number, the cell holds a list of line items, each with a price, a quantity and an optional comment, and its sum is what they add up to. A price can be a formula (`12+8`), so the arithmetic you'd otherwise do in your head stays visible in the plan.
+
+The two ways can't both describe the same total for the category, so a category with a composite plan has its subcategories (and Rest) disabled, and a category whose subcategories are in use has its own cell disabled. Rest counts as a subcategory here: a composite plan on Rest disables the category too.
+
+Line items live in their own table, keyed to the forecast they belong to. They store the price exactly as it was typed — `12+8` stays `12+8`, not `20` — since the point is to show how the number was reached. Only the sum on the forecast is ever used for calculations; the line items are there to explain it.
+
+The client evaluates the formulas and sends the total along with the items, and the server stores what it was given. It means what you saw in the modal footer when you pressed save is what gets stored, and the parser never has to run on the server.
+
+A plan is savable when every price parses, every quantity is a positive number, there's at least one line, and the total comes out positive. A single line may be negative — writing a discount as its own line is much of the reason to break a plan down — but the total can't be. Removing the plan is its own action rather than deleting every line, and it keeps the cell's sum: the number stays, only the explanation behind it goes away.
+
 ## Writing Forecasts
 
 There are two endpoints for saving a forecast, each scoped to one category. No caller ever needs to write the category's own value and its subcategories in the same request, since a category with subcategories never has its own value written directly:
 
-- `upsertCategoryForecast` — writes the category's own row (sum and/or comment). It refuses to change the sum if any real subcategory (not Rest) already has a non-zero value, mirroring the lock in the UI — the server has to check this too, since server functions are directly callable regardless of which route renders them. If Rest already has a row, a sum write recalculates Rest to absorb the new total, so `category.sum` still equals the sum of its children.
+- `upsertCategoryForecast` — writes the category's own row (sum and/or comment). It refuses to change the sum while a child owns the category's total — a real subcategory with a value of its own, or any child with a composite plan — mirroring the lock in the UI — the server has to check this too, since server functions are directly callable regardless of which route renders them. If Rest already has a row, a sum write recalculates Rest to absorb the new total, so `category.sum` still equals the sum of its children.
 - `upsertSubcategoryForecasts` — writes several subcategory rows for one category at once (real subcategories and/or Rest, via `subcategoryId: null`), creates Rest the first time any of them is touched, and recalculates the category's sum once for the whole batch.
+
+Both also take the line items of a composite plan, written in the same request as the sum they add up to, so a plan and the number it produces can't land apart.
 
 Neither endpoint sends anything back — the client just asks for the forecasts to be refetched instead of merging in a response. This is done to not overcomplicate the logic, since app is primarily client-side logic, and this is one of the few examples of server recalculating anything.
 
@@ -70,5 +84,4 @@ In both the transactions and forecasts views, we visualize the **diff between th
 
 ## Temporary Notes
 
-- There is currently no way to split a forecast into a line-by-line breakdown with its own formulas (price × quantity per line, with comments) — see issue #105. The only way to split a forecast today is by subcategory.
 - Month is currently a required field for a forecast. In future, we want to also support yearly forecasts in addition to monthly ones.
