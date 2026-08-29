@@ -1,5 +1,5 @@
 import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour';
-import { Box, Group, Text } from '@mantine/core';
+import { Box, Group, Text, Tooltip } from '@mantine/core';
 import Decimal from 'decimal.js';
 import { createMRTColumnHelper, type MRT_Row } from 'mantine-react-table-open';
 import { useMemo } from 'react';
@@ -9,13 +9,16 @@ import { CostWithDiffCellView } from '~/components/CostWithDiffCellView';
 import { costToString } from '~/shared/utils/costToString';
 import { openCellForEditing } from '~/shared/utils/table/openCellForEditing';
 
+import styles from '../BudgetingTable.module.css';
 import type {
   BudgetingGrandTotal,
   BudgetingRow,
 } from '../BudgetingTable.types';
+import { useOpenBreakdownModal } from '../useOpenBreakdownModal';
 import { AverageCell } from './AverageCell';
 import { GrandTotalSubscriptionBadge } from './GrandTotalSubscriptionBadge';
 import { isPlanCellLocked } from './isPlanCellLocked';
+import { PlanBreakdownIcon } from './PlanBreakdownIcon';
 import { PlanCell } from './PlanCell';
 import { ThisMonthCell } from './ThisMonthCell/ThisMonthCell';
 
@@ -40,6 +43,7 @@ export function useBudgetingTableColumns({
   saveComment,
 }: Params) {
   const { t } = useTranslation('budgeting');
+  const openBreakdown = useOpenBreakdownModal(month, year);
 
   return useMemo(() => {
     const zero = new Decimal(0);
@@ -132,6 +136,24 @@ export function useBudgetingTableColumns({
             .comparedTo((rowB.original.planSum ?? zero).abs()),
         mantineEditTextInputProps: ({ row, table }) => ({
           type: 'number',
+          // Mantine makes rightSection click-through by default.
+          rightSectionPointerEvents: 'all',
+          rightSection: (
+            <Tooltip label={t('breakdown.openBreakdown')}>
+              <PlanBreakdownIcon
+                data-testid="breakdown-icon-edit"
+                onMouseDown={(event) => {
+                  // The input's onBlur saves what's typed; opening the modal
+                  // on mousedown would race it, so keep focus and open on click.
+                  event.preventDefault();
+                }}
+                onClick={() => {
+                  table.setEditingCell(null);
+                  openBreakdown(row.original);
+                }}
+              />
+            </Tooltip>
+          ),
           onBlur: (event) => {
             const { value } = event.target;
             const parsed = new Decimal(value || 0);
@@ -150,6 +172,9 @@ export function useBudgetingTableColumns({
         }),
         mantineTableBodyCellProps: ({ row, cell, table }) => ({
           'data-testing-column': 'plan',
+          className: row.original.lineItems?.length
+            ? styles.breakdownCell
+            : undefined,
           onClick: () => {
             if (canEditPlanCell(row)) {
               openCellForEditing(table, cell);
@@ -230,5 +255,5 @@ export function useBudgetingTableColumns({
         size: 200,
       }),
     ];
-  }, [t, month, year, grandTotal, savePlan, saveComment]);
+  }, [t, month, year, grandTotal, savePlan, saveComment, openBreakdown]);
 }

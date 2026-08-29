@@ -1,0 +1,18 @@
+/**
+ * A plan cell whose value comes from a breakdown isn't editable, so MRT drops
+ * its hover outline along with the pointer cursor. The cell is still worth
+ * pointing at — its calculator opens the breakdown — so the outline comes
+ * back, matching MRT's own editable-cell hover. The cursor deliberately stays
+ * default: the cell itself does nothing on click, only the icon inside it does.
+ */
+@media (hover: hover) {
+  .breakdownCell:hover {
+    outline: 1px solid var(--mantine-color-gray-7);
+  }
+}
+
+@media (hover: none) {
+  .breakdownCell:active {
+    outline: 1px solid var(--mantine-color-gray-7);
+  }
+}
