@@ -7,6 +7,8 @@ export const forecastLineItemSchema = z.object({
   unitPrice: z.string(),
   quantity: decimalCodec,
   comment: z.string(),
+  /** The subscription that filled this line in, when one did. */
+  subscriptionId: z.number().nullable(),
 });
 
 export type ForecastLineItemWire = z.input<typeof forecastLineItemSchema>;

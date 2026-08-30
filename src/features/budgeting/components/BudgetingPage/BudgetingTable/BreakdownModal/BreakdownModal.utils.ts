@@ -7,6 +7,8 @@ export interface BreakdownFormRow {
   unitPrice: string;
   quantity: string;
   comment: string;
+  /** Carried through editing so a re-fill can still recognise its own rows. */
+  subscriptionId: number | null;
 }
 
 export interface BreakdownFormValues {
@@ -17,6 +19,7 @@ export const EMPTY_BREAKDOWN_ROW: BreakdownFormRow = {
   unitPrice: '',
   quantity: '1',
   comment: '',
+  subscriptionId: null,
 };
 
 export function lineItemsToFormRows(
@@ -26,6 +29,7 @@ export function lineItemsToFormRows(
     unitPrice: item.unitPrice,
     quantity: item.quantity.toString(),
     comment: item.comment,
+    subscriptionId: item.subscriptionId,
   }));
 }
 
@@ -44,6 +48,7 @@ export function formRowsToLineItems(rows: BreakdownFormRow[]) {
     unitPrice: row.unitPrice.trim(),
     quantity: row.quantity.trim().replace(',', '.'),
     comment: row.comment,
+    subscriptionId: row.subscriptionId,
   }));
 }
 

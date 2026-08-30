@@ -75,6 +75,7 @@ const lineItemInputSchema = z.object({
   unitPrice: z.string().min(1),
   quantity: z.string().refine(isPositiveDecimal),
   comment: z.string(),
+  subscriptionId: z.number().nullable(),
 });
 
 type LineItemInput = z.infer<typeof lineItemInputSchema>;
@@ -97,6 +98,7 @@ async function replaceLineItems(
       unitPrice: item.unitPrice,
       quantity: new Decimal(item.quantity),
       comment: item.comment,
+      subscriptionId: item.subscriptionId,
     })),
   });
 }

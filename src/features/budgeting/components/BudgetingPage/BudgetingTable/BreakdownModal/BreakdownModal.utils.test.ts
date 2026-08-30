@@ -16,8 +16,9 @@ function row(
   unitPrice: string,
   quantity = '1',
   comment = '',
+  subscriptionId: number | null = null,
 ): BreakdownFormRow {
-  return { unitPrice, quantity, comment };
+  return { unitPrice, quantity, comment, subscriptionId };
 }
 
 describe('parseQuantity', () => {
@@ -119,13 +120,13 @@ describe('isPlainNumber', () => {
 describe('formRowsToLineItems', () => {
   it('normalises a comma quantity to a dot', () => {
     expect(formRowsToLineItems([row('4', '2,5')])).toEqual([
-      { unitPrice: '4', quantity: '2.5', comment: '' },
+      { unitPrice: '4', quantity: '2.5', comment: '', subscriptionId: null },
     ]);
   });
 
   it('trims the price and quantity but keeps the formula text as written', () => {
-    expect(formRowsToLineItems([row(' 12+8 ', ' 3 ', 'Овощи')])).toEqual([
-      { unitPrice: '12+8', quantity: '3', comment: 'Овощи' },
+    expect(formRowsToLineItems([row(' 12+8 ', ' 3 ', 'Овощи', 7)])).toEqual([
+      { unitPrice: '12+8', quantity: '3', comment: 'Овощи', subscriptionId: 7 },
     ]);
   });
 });
@@ -138,17 +139,24 @@ describe('lineItemsToFormRows', () => {
         unitPrice: '12+8',
         quantity: new Decimal('2.00'),
         comment: 'Овощи',
+        subscriptionId: null,
       },
       {
         id: 2,
         unitPrice: '49.99',
         quantity: new Decimal(1),
         comment: '',
+        subscriptionId: 7,
       },
     ];
     expect(lineItemsToFormRows(items)).toEqual([
-      { unitPrice: '12+8', quantity: '2', comment: 'Овощи' },
-      { unitPrice: '49.99', quantity: '1', comment: '' },
+      {
+        unitPrice: '12+8',
+        quantity: '2',
+        comment: 'Овощи',
+        subscriptionId: null,
+      },
+      { unitPrice: '49.99', quantity: '1', comment: '', subscriptionId: 7 },
     ]);
   });
 
