@@ -7,7 +7,9 @@ import {
   getUpsertSubcategoryForecastsMutationOptions,
 } from '~/features/budgeting/queries';
 
+import { formRowsToLineItems } from './BreakdownModal/BreakdownModal.utils';
 import { isApplyingSubscriptionsAtom } from './budgetingTableAtoms';
+import { fillPlanFromSubscriptions } from './fillFromSubscriptions';
 import type { CategoryFillPlan, SubcategoriesFillPlan } from './fillPlans';
 
 /**
@@ -38,11 +40,16 @@ export function useApplyCategoryFillPlans(month: number, year: number) {
       setApplying(true);
       try {
         for (const plan of categoryPlans) {
+          const { rows, total } = fillPlanFromSubscriptions(
+            plan.current,
+            plan.due,
+          );
           await upsertCategory({
             categoryId: plan.categoryId,
             month,
             year,
-            sum: plan.enteredAbs.toString(),
+            sum: total.toString(),
+            lineItems: formRowsToLineItems(rows),
           });
         }
         for (const plan of subcategoriesPlans) {
@@ -50,10 +57,17 @@ export function useApplyCategoryFillPlans(month: number, year: number) {
             categoryId: plan.categoryId,
             month,
             year,
-            items: plan.items.map((item) => ({
-              subcategoryId: item.subcategoryId,
-              sum: item.enteredAbs.toString(),
-            })),
+            items: plan.items.map((item) => {
+              const { rows, total } = fillPlanFromSubscriptions(
+                item.current,
+                item.due,
+              );
+              return {
+                subcategoryId: item.subcategoryId,
+                sum: total.toString(),
+                lineItems: formRowsToLineItems(rows),
+              };
+            }),
           });
         }
       } finally {

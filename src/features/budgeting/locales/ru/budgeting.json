@@ -68,6 +68,7 @@
     "subtotal": "Сумма",
     "extraWithQuantity": "{{formula}} × {{quantity}} шт",
     "removeConfirm": "Составной план будет удалён, а сумма останется прежней. Продолжить?",
-    "cancel": "Отмена"
+    "cancel": "Отмена",
+    "subscriptionComment": "Подписка — {{name}}"
   }
 }
