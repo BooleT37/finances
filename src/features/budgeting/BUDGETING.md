@@ -55,6 +55,8 @@ The client evaluates the formulas and sends the total along with the items, and 
 
 A plan is savable when every price parses, every quantity is a positive number, there's at least one line, and the total comes out positive. A single line may be negative — writing a discount as its own line is much of the reason to break a plan down — but the total can't be. Removing the plan is its own action rather than deleting every line, and it keeps the cell's sum: the number stays, only the explanation behind it goes away.
 
+A line item can also come from a subscription fill (see Subscription Auto-Population below), carrying that subscription's id and marked as such.
+
 ## Writing Forecasts
 
 There are two endpoints for saving a forecast, each scoped to one category. No caller ever needs to write the category's own value and its subcategories in the same request, since a category with subcategories never has its own value written directly:
@@ -74,7 +76,17 @@ The sum of all income forecasts minus all expense forecasts gives the **estimate
 
 "Fill from subscriptions" fills in planned costs from upcoming subscriptions — for one row, for a whole group (Расходы/В сбережения/Доходы), or for the whole table via the grand total badge. A category's own badge always shows the total for every subscription under it, subcategory or not — a subcategory's (including rest's) own badge only counts its own. But clicking a category's badge behaves differently depending on whether it has subcategories: with none, it fills the category's own value directly; with subcategories, it fills each subcategory instead, and any subscription with no subcategory goes to Rest, the same as editing them by hand.
 
+A fill writes line items, one per subscription, never merged even when several land on the same row. Each one's price is the subscription's cost, its quantity is 1, and its comment names the subscription. If the row already held a plain typed sum, that sum becomes its own line alongside the new ones — the subscription is additional spend, not a replacement for what was planned — but only on the transition into having a breakdown; a row that already has one keeps its existing lines as they are. A zero sum is skipped rather than turning into an empty line.
+
+Filling a row again updates only the price of the lines it already owns — quantity and comment stay as edited, since editability is the point of leaving these rows open, and price is the only field with an upstream source to refresh from.
+
+Clicking a badge applies straight away, unless the fill would touch rows it doesn't fully own — a group, the grand total, or a category whose subcategories already have their own data — or would update subscription lines already applied; either case asks for confirmation first.
+
+Once every due subscription for a row is already in its plan, the badge marks the row as fully applied. It keeps showing the row's full due total either way, since that's what the hover card lists and what makes rows comparable.
+
 Filling several categories at once builds a plan for each category first, then saves them one at a time, never all together — two requests touching the same category at once could step on each other's recalculated sum. While this is happening, a loading overlay covers the table. The sequential logic instead of one bulk edit endpoint was made not to overcomplicate the code.
+
+Deleting a subscription leaves its line items behind as ordinary hand-written lines, comment and all — the reference to the subscription is cleared, the same way it's cleared on a transaction that paid it.
 
 ## Forecast vs Actual Visualization
 

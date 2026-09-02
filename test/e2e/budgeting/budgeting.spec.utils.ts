@@ -92,3 +92,16 @@ export async function fillBreakdownRow(
     await typeInto(inputs.nth(index * 3 + 2), values.comment);
   }
 }
+
+export async function readBreakdownRow(modal: Locator, index: number) {
+  const inputs = modal.locator('input');
+  return {
+    price: await inputs.nth(index * 3).inputValue(),
+    quantity: await inputs.nth(index * 3 + 1).inputValue(),
+    comment: await inputs.nth(index * 3 + 2).inputValue(),
+  };
+}
+
+export async function getBreakdownRowCount(modal: Locator) {
+  return (await modal.locator('input').count()) / 3;
+}

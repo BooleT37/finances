@@ -14,7 +14,7 @@ By repeatedly adding the period to the first payment date, we generate a stream 
 
 ## Payment Schedule
 
-Using the first date and the period, we can always unambiguously determine whether a subscription is due in any given month, and if so, when. This information is shown on the forecasts (planning) page. We can also automatically populate the total subscription cost into each category's forecast. Additionally, using the source property, we can calculate how much money needs to be available on each specific bank account to cover all upcoming subscriptions.
+Using the first date and the period, we can always unambiguously determine whether a subscription is due in any given month, and if so, when. This information is shown on the forecasts (planning) page. We can also automatically fill each category's forecast from its due subscriptions — see Composite Plan and Subscription Auto-Population in [Budgeting](../budgeting/BUDGETING.md) for how that fill turns into forecast line items. Additionally, using the source property, we can calculate how much money needs to be available on each specific bank account to cover all upcoming subscriptions.
 
 ## Linking to Transactions
 

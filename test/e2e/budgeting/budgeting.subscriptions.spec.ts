@@ -7,7 +7,17 @@ import {
   TODAY_MONTH,
   TODAY_YEAR,
 } from '../../../src/shared/utils/today';
-import { expandRow, getPlanCell, getRow } from './budgeting.spec.utils';
+import {
+  editPlanCell,
+  expandRow,
+  fillBreakdownRow,
+  getBreakdownIcon,
+  getBreakdownModal,
+  getBreakdownRowCount,
+  getPlanCell,
+  getRow,
+  readBreakdownRow,
+} from './budgeting.spec.utils';
 
 // ---------------------------------------------------------------------------
 // File-local helpers
@@ -311,5 +321,142 @@ test.describe('Budgeting subscriptions', () => {
       '-€15.99',
     );
     await expect(getPlanCell(getRow(page, 'Такси'))).toContainText('-€299.00');
+  });
+
+  test('fill writes a line item; re-fill only refreshes its price, keeping edits and the tick', async ({
+    page,
+    seedData,
+  }) => {
+    await page.goto('/budgeting');
+
+    const развлеченияRow = getRow(page, 'Развлечения');
+    const badgeButton = getSubscriptionBadge(
+      getPlanCell(развлеченияRow),
+    ).getByRole('button');
+
+    await badgeButton.click();
+    await page.waitForLoadState('networkidle');
+    await expect(getPlanCell(развлеченияRow)).toContainText('-€15.99');
+
+    // One line item, price and quantity from the subscription, auto-comment.
+    await getBreakdownIcon(развлеченияRow).click();
+    let modal = getBreakdownModal(page);
+    await expect(modal).toBeVisible();
+    expect(await getBreakdownRowCount(modal)).toBe(1);
+    let row = await readBreakdownRow(modal, 0);
+    expect(row).toEqual({
+      price: '15.99',
+      quantity: '1',
+      comment: 'Подписка — Netflix',
+    });
+
+    // User edits quantity and comment, then saves.
+    await fillBreakdownRow(modal, 0, {
+      price: row.price,
+      quantity: '3',
+      comment: 'Netflix (доп)',
+    });
+    await modal.getByRole('button', { name: 'Сохранить' }).click();
+    await expect(modal).toBeHidden();
+    await expect(getPlanCell(развлеченияRow)).toContainText('-€47.97');
+
+    // The subscription's price changes upstream.
+    await testPrisma.subscription.update({
+      where: { id: seedData.subscriptionIds.нетфликс },
+      data: { cost: 19.99 },
+    });
+    await page.reload();
+
+    // Every due subscription is still in the plan, so the badge stays ticked...
+    await expect(
+      getSubscriptionBadge(getPlanCell(развлеченияRow)).getByRole('button', {
+        name: 'Заново заполнить из подписок',
+      }),
+    ).toBeVisible();
+
+    // ...but re-filling now overwrites an already-applied line, so it confirms.
+    await badgeButton.click();
+    await expect(getConfirmModal(page)).toContainText(
+      'Цены уже применённых подписок будут обновлены',
+    );
+    await confirmFill(page);
+
+    // Only the price refreshed — the edited quantity and comment survived.
+    await expect(getPlanCell(развлеченияRow)).toContainText('-€59.97');
+    await getBreakdownIcon(развлеченияRow).click();
+    modal = getBreakdownModal(page);
+    await expect(modal).toBeVisible();
+    expect(await getBreakdownRowCount(modal)).toBe(1);
+    row = await readBreakdownRow(modal, 0);
+    expect(row).toEqual({
+      price: '19.99',
+      quantity: '3',
+      comment: 'Netflix (доп)',
+    });
+  });
+
+  test('an existing sum moves into its own line on the first fill, not on a re-fill', async ({
+    page,
+    seedData,
+  }) => {
+    await page.goto('/budgeting');
+
+    await expandRow(getRow(page, 'Транспорт'));
+    const такси = getRow(page, 'Такси');
+
+    await editPlanCell(такси, '50');
+    await expect(getPlanCell(такси)).toContainText('-€50.00');
+    await expect(getBreakdownIcon(такси)).toHaveCount(0);
+
+    // Nothing overlaps yet, so the single-row fill applies without confirming.
+    await getSubscriptionBadge(getPlanCell(такси)).getByRole('button').click();
+    await page.waitForLoadState('networkidle');
+    await expect(getPlanCell(такси)).toContainText('-€349.00');
+
+    await getBreakdownIcon(такси).click();
+    let modal = getBreakdownModal(page);
+    await expect(modal).toBeVisible();
+    expect(await getBreakdownRowCount(modal)).toBe(2);
+    expect(await readBreakdownRow(modal, 0)).toEqual({
+      price: '50',
+      quantity: '1',
+      comment: '',
+    });
+    expect(await readBreakdownRow(modal, 1)).toEqual({
+      price: '299',
+      quantity: '1',
+      comment: 'Подписка — Яндекс Такси',
+    });
+    await page.keyboard.press('Escape');
+
+    // The subscription's price changes upstream.
+    await testPrisma.subscription.update({
+      where: { id: seedData.subscriptionIds.яндексТакси },
+      data: { cost: 320 },
+    });
+    await page.reload();
+    await expandRow(getRow(page, 'Транспорт'));
+
+    // Re-filling overwrites the already-applied line, so it confirms.
+    await getSubscriptionBadge(getPlanCell(такси)).getByRole('button').click();
+    await confirmFill(page);
+
+    // The moved-in sum stays untouched — only the subscription line's price
+    // updates, and no second anonymous line was created.
+    await expect(getPlanCell(такси)).toContainText('-€370.00');
+    await getBreakdownIcon(такси).click();
+    modal = getBreakdownModal(page);
+    await expect(modal).toBeVisible();
+    expect(await getBreakdownRowCount(modal)).toBe(2);
+    expect(await readBreakdownRow(modal, 0)).toEqual({
+      price: '50',
+      quantity: '1',
+      comment: '',
+    });
+    expect(await readBreakdownRow(modal, 1)).toEqual({
+      price: '320',
+      quantity: '1',
+      comment: 'Подписка — Яндекс Такси',
+    });
   });
 });
