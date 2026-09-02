@@ -1,0 +1,19 @@
+.applied {
+  background: var(--mantine-color-white);
+}
+
+.tickIcon {
+  display: inline-flex;
+}
+
+.repeatIcon {
+  display: none;
+}
+
+.applied:hover .tickIcon {
+  display: none;
+}
+
+.applied:hover .repeatIcon {
+  display: inline-flex;
+}

@@ -10,6 +10,12 @@ export function getPlanCell(row: Locator) {
   return row.locator('[data-testing-column="plan"]');
 }
 
+/** The plan cell's value text, narrower than the cell itself so a click can't
+ *  land on a breakdown icon or subscription badge sharing the same cell. */
+export function getPlanValue(row: Locator) {
+  return getPlanCell(row).getByTestId('plan-value');
+}
+
 export function getCommentCell(row: Locator) {
   return row.locator('[data-testing-column="comment"]');
 }

@@ -13,8 +13,16 @@ export function isPlanCellLocked(row: BudgetingRow): boolean {
   if (row.isUnderCategoryBreakdown || row.lineItems.length > 0) {
     return true;
   }
-  if (row.rowType !== 'category' || !row.subRows) {
-    return false;
-  }
-  return row.subRows.some(isAuthoritativeChild);
+  return hasAuthoritativeChildren(row);
+}
+
+/** Whether a category's subcategories already own real data of their own,
+ *  which is what makes filling this category's own badge a multi-row write
+ *  rather than a fill of this exact row. */
+export function hasAuthoritativeChildren(row: BudgetingRow): boolean {
+  return (
+    row.rowType === 'category' &&
+    !!row.subRows &&
+    row.subRows.some(isAuthoritativeChild)
+  );
 }

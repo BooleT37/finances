@@ -26,7 +26,9 @@
     "fillFromSubscriptionsConfirm": "This will overwrite the plan values for all rows with subscriptions. Continue?",
     "noSource": "No source",
     "notPaid": "unpaid",
-    "paid": "paid"
+    "paid": "paid",
+    "reapplyConfirm": "Prices of the subscriptions already applied will be updated. Continue?",
+    "refillFromSubscriptions": "Refill from subscriptions"
   },
   "onboarding": {
     "intro": {

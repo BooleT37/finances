@@ -21,7 +21,11 @@ export function PlanCell({ row, month, year }: Props) {
   const { lineItems, isUnderCategoryBreakdown } = row.original;
   const hasBreakdown = lineItems.length > 0;
 
-  const text = <Text size="sm">{costToString(row.original.planSum)}</Text>;
+  const text = (
+    <Text size="sm" data-testid="plan-value">
+      {costToString(row.original.planSum)}
+    </Text>
+  );
   const lockedLabel = isUnderCategoryBreakdown
     ? t('breakdown.lockedByCategoryBreakdown')
     : t('lockedPlanTooltip');

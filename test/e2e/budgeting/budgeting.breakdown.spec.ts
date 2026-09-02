@@ -5,6 +5,7 @@ import {
   getBreakdownIcon,
   getBreakdownModal,
   getPlanCell,
+  getPlanValue,
   getRemovePlanConfirm,
   getRow,
   openBreakdownFromEditor,
@@ -38,7 +39,9 @@ test.describe('Budgeting composite plan', () => {
     await expect(getBreakdownIcon(транспортRow)).toBeVisible();
 
     // The value now comes from the plan, so the cell no longer takes typing.
-    await getPlanCell(транспортRow).click();
+    // Click the value itself, not the whole cell — a subscription badge sits
+    // right next to it and a click landing there would apply it instead.
+    await getPlanValue(транспортRow).click();
     await expect(транспортRow.locator('input[type="number"]')).toHaveCount(0);
 
     await page.reload();

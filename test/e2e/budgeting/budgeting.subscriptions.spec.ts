@@ -30,7 +30,7 @@ function getApplyingOverlay(page: Page) {
 }
 
 async function hoverBadge(badge: Locator) {
-  await badge.hover();
+  await badge.locator('[data-testid="subscription-cost"]').hover();
   return badge.page().locator('[data-testid="subscription-tooltip"]');
 }
 
