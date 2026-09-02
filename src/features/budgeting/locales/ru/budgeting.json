@@ -71,6 +71,7 @@
     "extraWithQuantity": "{{formula}} × {{quantity}} шт",
     "removeConfirm": "Составной план будет удалён, а сумма останется прежней. Продолжить?",
     "cancel": "Отмена",
-    "subscriptionComment": "Подписка — {{name}}"
+    "subscriptionComment": "Подписка — {{name}}",
+    "fromSubscription": "Эта строка создана из подписки"
   }
 }

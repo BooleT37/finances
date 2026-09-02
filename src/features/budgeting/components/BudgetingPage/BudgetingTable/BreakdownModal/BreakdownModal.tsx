@@ -105,7 +105,7 @@ export function BreakdownModal({
       <Box
         style={{
           display: 'grid',
-          gridTemplateColumns: '7rem 5rem 1fr 6rem auto',
+          gridTemplateColumns: '7rem 5rem 1fr auto 6rem auto',
           columnGap: 'var(--mantine-spacing-xs)',
           rowGap: 'var(--mantine-spacing-xs)',
           alignItems: 'start',
@@ -114,6 +114,7 @@ export function BreakdownModal({
         <HeaderLabel>{t('breakdown.unitPrice')}</HeaderLabel>
         <HeaderLabel>{t('breakdown.quantity')}</HeaderLabel>
         <HeaderLabel>{t('breakdown.comment')}</HeaderLabel>
+        <span />
         <HeaderLabel align="right">{t('breakdown.subtotal')}</HeaderLabel>
         <span />
 

@@ -71,6 +71,7 @@
     "extraWithQuantity": "{{formula}} × {{quantity}} pcs",
     "removeConfirm": "The composite plan will be deleted, and the sum will stay as it is. Continue?",
     "cancel": "Cancel",
-    "subscriptionComment": "Subscription — {{name}}"
+    "subscriptionComment": "Subscription — {{name}}",
+    "fromSubscription": "This line comes from a subscription"
   }
 }

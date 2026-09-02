@@ -1,6 +1,6 @@
-import { ActionIcon, Text, TextInput, Tooltip } from '@mantine/core';
+import { ActionIcon, Box, Text, TextInput, Tooltip } from '@mantine/core';
 import type { UseFormReturnType } from '@mantine/form';
-import { IconTrash } from '@tabler/icons-react';
+import { IconRepeat, IconTrash } from '@tabler/icons-react';
 import Decimal from 'decimal.js';
 import { useTranslation } from 'react-i18next';
 
@@ -41,6 +41,15 @@ export function BreakdownModalRow({ form, index, onRemove }: Props) {
         error={quantityProps.error ?? isQuantityInvalid}
       />
       <TextInput {...form.getInputProps(`rows.${index}.comment`)} />
+      {row?.subscriptionId !== null ? (
+        <Tooltip label={t('breakdown.fromSubscription')}>
+          <Box mt={8} display="inline-flex" c="dimmed">
+            <IconRepeat size={14} />
+          </Box>
+        </Tooltip>
+      ) : (
+        <span />
+      )}
       <Text size="sm" ta="right" mt={8}>
         {costToString(subtotal ?? ZERO)}
       </Text>
