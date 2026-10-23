@@ -117,30 +117,39 @@ function categoryToTreeNode({
   };
 }
 
+/** The subscriptions the picker offers: those still unpaid in the selected period. */
+export function useOfferedSubscriptions(): Subscription[] | undefined {
+  const availableSubscriptions = useAvailableSubscriptions();
+
+  return useMemo(
+    () =>
+      availableSubscriptions
+        ?.filter((a) => a.transactionId === null)
+        .map((a) => a.subscription),
+    [availableSubscriptions],
+  );
+}
+
 export function useParsedExpenseCategoryTree(options: {
   isIncome: boolean;
 }): TreeNode[] | undefined {
   const expenseCategories = useExpenseCategories();
   const incomeCategories = useIncomeCategories();
-  const availableSubscriptions = useAvailableSubscriptions();
+  const offeredSubscriptions = useOfferedSubscriptions();
 
   return useMemo(() => {
-    if (!expenseCategories || !incomeCategories || !availableSubscriptions) {
+    if (!expenseCategories || !incomeCategories || !offeredSubscriptions) {
       return undefined;
     }
-    const pendingSubscriptions = availableSubscriptions
-      .filter((a) => a.transactionId === null)
-      .map((a) => a.subscription);
-
     return groupParsedExpenseCategoryOptions({
       categories: options.isIncome ? incomeCategories : expenseCategories,
-      subscriptions: pendingSubscriptions,
+      subscriptions: offeredSubscriptions,
       isIncome: options.isIncome,
     }).map(categoryToTreeNode);
   }, [
     expenseCategories,
     incomeCategories,
-    availableSubscriptions,
+    offeredSubscriptions,
     options.isIncome,
   ]);
 }

@@ -3,6 +3,7 @@ import { DatePickerInput } from '@mantine/dates';
 import type { UseFormReturnType } from '@mantine/form';
 import dayjs from 'dayjs';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { ParsedExpenseCategoryValue } from '~/features/transactions/parsedExpenseCategoryValue';
 import { TreeSelect } from '~/shared/components/TreeSelect';
@@ -14,9 +15,15 @@ import type { ParsedExpenseFormValues } from './ParsedExpensesModal';
 interface Props {
   index: number;
   form: UseFormReturnType<ParsedExpenseFormValues>;
+  categorySuggestionLoading: boolean;
 }
 
-export function ParsedExpenseRow({ index, form }: Props) {
+export function ParsedExpenseRow({
+  index,
+  form,
+  categorySuggestionLoading,
+}: Props) {
+  const { t } = useTranslation('transactions');
   const row = form.values.expenses[index];
   const amount = row?.amount ?? '';
   const selected = row?.selected ?? false;
@@ -90,6 +97,11 @@ export function ParsedExpenseRow({ index, form }: Props) {
           form.setFieldValue(`expenses.${index}.categorySubcategoryId`, val);
         }}
         error={getInputProps('categorySubcategoryId').error}
+        placeholder={
+          categorySuggestionLoading
+            ? t('importModal.suggestingCategory')
+            : undefined
+        }
         disabled={!selected}
         selectionProp="selectionTitle"
         searchProp="searchValue"

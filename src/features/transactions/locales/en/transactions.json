@@ -118,7 +118,10 @@
     "importButton": "Import",
     "success_one": "{{count}} transaction added",
     "success_other": "{{count}} transactions added",
-    "duplicateWarning": "Unchecked items already exist in the database for this year."
+    "duplicateWarning": "Unchecked items already exist in the database for this year.",
+    "suggestingCategory": "Suggesting…",
+    "categorySuggestionsFailed": "Couldn't fetch category suggestions",
+    "retryCategorySuggestions": "Retry"
   },
   "searchPlaceholder": "Search...",
   "subscription": "Subscription",

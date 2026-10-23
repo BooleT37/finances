@@ -120,7 +120,10 @@
     "success_one": "Добавлена {{count}} транзакция",
     "success_few": "Добавлено {{count}} транзакции",
     "success_many": "Добавлено {{count}} транзакций",
-    "duplicateWarning": "Позиции без галочки уже существуют в базе данных за этот год."
+    "duplicateWarning": "Позиции без галочки уже существуют в базе данных за этот год.",
+    "suggestingCategory": "Подбираем…",
+    "categorySuggestionsFailed": "Не удалось получить подсказки категорий",
+    "retryCategorySuggestions": "Повторить"
   },
   "searchPlaceholder": "Найти...",
   "subscription": "Подписка",

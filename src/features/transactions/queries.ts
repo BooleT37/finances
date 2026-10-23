@@ -12,12 +12,15 @@ import {
   deleteTransaction,
   fetchTransactionsByYear,
   importTransactions,
+  suggestCategories,
   updateTransaction,
 } from '~/features/transactions/api';
+import type { ParsedExpense } from '~/features/transactions/parsedExpense';
 
 import {
   type ImportTransactionsInput,
   type NewTransactionInput,
+  suggestCategoriesSchema,
   transactionWithComponentsSchema,
   type UpdateTransactionInput,
 } from './schema';
@@ -25,6 +28,13 @@ import {
 const transactionsKeys = createQueryKeys('transactions', {
   byYear: (year: number) => ({
     queryKey: [year],
+  }),
+  categorySuggestions: (
+    sourceId: number,
+    subscriptionIds: number[],
+    parsedExpenseHashes: string[],
+  ) => ({
+    queryKey: [sourceId, subscriptionIds, parsedExpenseHashes],
   }),
 });
 
@@ -37,6 +47,34 @@ export const getTransactionsQueryOptions = (year: number) => {
     },
   });
 };
+
+export const getCategorySuggestionsQueryOptions = ({
+  sourceId,
+  subscriptionIds,
+  parsedExpenses,
+}: {
+  sourceId: number;
+  subscriptionIds: number[];
+  parsedExpenses: ParsedExpense[];
+}) =>
+  queryOptions({
+    ...transactionsKeys.categorySuggestions(
+      sourceId,
+      subscriptionIds,
+      parsedExpenses.map((parsedExpense) => parsedExpense.hash),
+    ),
+    queryFn: () =>
+      suggestCategories({
+        data: suggestCategoriesSchema.encode({
+          sourceId,
+          subscriptionIds,
+          parsedExpenses,
+        }),
+      }),
+    staleTime: Infinity,
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
 
 export const getUpdateTransactionMutationOptions = (
   queryClient: QueryClient,

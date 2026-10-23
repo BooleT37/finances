@@ -16,16 +16,22 @@ import {
   type ParsedExpenseCategoryValue,
   parseSubscriptionValue,
 } from '~/features/transactions/parsedExpenseCategoryValue';
-import { getTransactionsQueryOptions } from '~/features/transactions/queries';
-import { useImportTransactions } from '~/features/transactions/queries';
+import {
+  getCategorySuggestionsQueryOptions,
+  getTransactionsQueryOptions,
+  useImportTransactions,
+} from '~/features/transactions/queries';
+import { TextWithTooltipIcon } from '~/shared/components/TextWithTooltipIcon';
 import { ISO_DATE_FORMAT } from '~/shared/constants';
 import { TableFlash, useFlashTrigger } from '~/shared/hooks/useTableFlash';
 import { findByIdOrThrow } from '~/shared/utils/getOrThrow';
 import { selectedYearAtom } from '~/stores/month';
 
 import { transactionRowId } from '../TransactionsTable/transactionsRowId';
+import { useOfferedSubscriptions } from './parsedExpenseCategoryTree';
 import { ParsedExpenseRow } from './ParsedExpenseRow';
 import styles from './ParsedExpensesModal.module.css';
+import { usePrefillCategorySuggestions } from './usePrefillCategorySuggestions';
 
 export interface ParsedExpenseRowValues {
   selected: boolean;
@@ -104,6 +110,19 @@ export function ParsedExpensesModal({
   }, [parsedExpenses, isDuplicateFn]);
 
   const form = useForm<ParsedExpenseFormValues>({ initialValues });
+
+  const offeredSubscriptions = useOfferedSubscriptions();
+  const categorySuggestionsQuery = useQuery({
+    ...getCategorySuggestionsQueryOptions({
+      sourceId,
+      subscriptionIds: offeredSubscriptions?.map((s) => s.id) ?? [],
+      parsedExpenses,
+    }),
+    enabled: offeredSubscriptions !== undefined,
+  });
+  const categorySuggestions = categorySuggestionsQuery.data;
+
+  usePrefillCategorySuggestions(form, categorySuggestions);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [duplicateAlertHidden, setDuplicateAlertHidden] = useState(false);
@@ -264,6 +283,28 @@ export function ParsedExpensesModal({
         </Alert>
       )}
 
+      {categorySuggestionsQuery.isError && (
+        <Alert color="yellow" mb="md" p="xs" style={{ flexShrink: 0 }}>
+          <Group justify="space-between" wrap="nowrap">
+            <TextWithTooltipIcon
+              tooltip={categorySuggestionsQuery.error.message}
+            >
+              <Text size="sm">
+                {t('importModal.categorySuggestionsFailed')}
+              </Text>
+            </TextWithTooltipIcon>
+            <Button
+              size="xs"
+              variant="light"
+              color="yellow"
+              onClick={() => void categorySuggestionsQuery.refetch()}
+            >
+              {t('importModal.retryCategorySuggestions')}
+            </Button>
+          </Group>
+        </Alert>
+      )}
+
       <form
         onSubmit={handleSubmit}
         style={{
@@ -326,7 +367,14 @@ export function ParsedExpensesModal({
             </div>
 
             {expenses.map((_, index) => (
-              <ParsedExpenseRow key={index} index={index} form={form} />
+              <ParsedExpenseRow
+                key={index}
+                index={index}
+                form={form}
+                categorySuggestionLoading={
+                  categorySuggestionsQuery.isFetching && !categorySuggestions
+                }
+              />
             ))}
           </div>
         </div>
