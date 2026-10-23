@@ -1,7 +1,9 @@
+import dayjs from 'dayjs';
+import Decimal from 'decimal.js';
 import { PdfDataParser } from 'pdf-data-parser';
 import type PdfDataParserType from 'pdf-data-parser/types/PdfDataParser';
 
-import type { ParsedExpenseFromApi } from '~/features/transactions/parsedExpense';
+import type { ParsedExpense } from '~/features/transactions/parsedExpense';
 import { hash } from '~/server/hash';
 
 import type { IExpensesParser } from './ExpensesParser';
@@ -20,6 +22,23 @@ const parseAmount = (amount: string): string => {
   return `${matched.groups.sign}${matched.groups.amount?.replaceAll(',', '')}`;
 };
 
+interface StatementRow {
+  date: string;
+  type: string;
+  description: string;
+  amount: string;
+}
+
+// The hash covers the row exactly as the statement shows it, so it stays equal
+// to the peHash stored by earlier imports.
+const toParsedExpense = (row: StatementRow): ParsedExpense => ({
+  date: dayjs(row.date),
+  type: row.type,
+  description: row.description,
+  amount: new Decimal(row.amount),
+  hash: hash(row),
+});
+
 const validRow = (row: string[]): boolean =>
   (row.length === 5 || row.length === 4 || row.length === 3) &&
   !row[0]?.startsWith('Booking Date');
@@ -33,7 +52,7 @@ export class VividPdfExpensesParser implements IExpensesParser {
     });
   }
 
-  async parse(): Promise<ParsedExpenseFromApi[]> {
+  async parse(): Promise<ParsedExpense[]> {
     const rows = await this.parser.parse();
     if (!rows) {
       throw new Error('No rows found in the PDF');
@@ -62,29 +81,19 @@ export class VividPdfExpensesParser implements IExpensesParser {
             if (!nextRow[0]) {
               throw new Error(`Invalid row: ${row.join(', ')}`);
             }
-            const expense: Omit<ParsedExpenseFromApi, 'hash'> = {
+            return toParsedExpense({
               date: row[0],
               type: row[1],
               description: `${row[2]} ${array[index + 2]?.[0]}`,
               amount: parseAmount(nextRow[0]),
-            };
-
-            return {
-              ...expense,
-              hash: hash(expense),
-            };
+            });
           } else {
-            const expense: Omit<ParsedExpenseFromApi, 'hash'> = {
+            return toParsedExpense({
               date: row[0],
               type: row[1],
               description: `${array[index - 1]?.[0]} ${array[index + 1]?.[0]}`,
               amount: parseAmount(row[2]),
-            };
-
-            return {
-              ...expense,
-              hash: hash(expense),
-            };
+            });
           }
         }
         if (!row[3]) {
@@ -100,27 +109,19 @@ export class VividPdfExpensesParser implements IExpensesParser {
           if (!type || !date) {
             throw new Error(`Invalid row: ${row.join(', ')}`);
           }
-          const expense: Omit<ParsedExpenseFromApi, 'hash'> = {
+          return toParsedExpense({
             date,
             type,
             description: row[1],
             amount: parseAmount(row[2]),
-          };
-          return {
-            ...expense,
-            hash: hash(expense),
-          };
+          });
         } else {
-          const expense: Omit<ParsedExpenseFromApi, 'hash'> = {
+          return toParsedExpense({
             date: row[0],
             type: row[1],
             description: row[2],
             amount: parseAmount(row[3]),
-          };
-          return {
-            ...expense,
-            hash: hash(expense),
-          };
+          });
         }
       })
       .filter((row) => row !== null);

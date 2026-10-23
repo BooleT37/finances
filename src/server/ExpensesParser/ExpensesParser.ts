@@ -1,5 +1,5 @@
-import type { ParsedExpenseFromApi } from '~/features/transactions/parsedExpense';
+import type { ParsedExpense } from '~/features/transactions/parsedExpense';
 
 export interface IExpensesParser {
-  parse(): Promise<ParsedExpenseFromApi[]>;
+  parse(): Promise<ParsedExpense[]>;
 }

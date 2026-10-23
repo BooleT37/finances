@@ -7,6 +7,7 @@ import { prisma } from '~/server/db';
 import { adaptCost } from '~/shared/utils/adaptCost';
 import { assertOwnedByProject } from '~/shared/utils/assertOwnedByProject';
 
+import { parsedExpenseSchema } from './parsedExpense';
 import {
   type ImportTransactionsInput,
   importTransactionsSchema,
@@ -253,7 +254,10 @@ export const parsePdfExpenses = createServerFn({ method: 'POST' })
     try {
       writeFileSync(tmpPath, buffer);
       const parser = new VividPdfExpensesParser(tmpPath);
-      return await parser.parse();
+      const parsedExpenses = await parser.parse();
+      return parsedExpenses.map((parsedExpense) =>
+        parsedExpenseSchema.encode(parsedExpense),
+      );
     } finally {
       try {
         unlinkSync(tmpPath);

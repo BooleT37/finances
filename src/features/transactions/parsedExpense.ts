@@ -1,18 +1,13 @@
-import type { Dayjs } from 'dayjs';
-import type Decimal from 'decimal.js';
+import { z } from 'zod';
 
-export interface ParsedExpenseFromApi {
-  date: string;
-  type: string;
-  description: string;
-  amount: string;
-  hash: string;
-}
+import { datetimeCodec, decimalCodec } from '~/shared/codecs';
 
-export interface ParsedExpense {
-  date: Dayjs;
-  type: string;
-  description: string;
-  amount: Decimal;
-  hash: string;
-}
+export const parsedExpenseSchema = z.object({
+  date: datetimeCodec,
+  type: z.string(),
+  description: z.string(),
+  amount: decimalCodec,
+  hash: z.string(),
+});
+
+export type ParsedExpense = z.output<typeof parsedExpenseSchema>;

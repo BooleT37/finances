@@ -1,31 +1,19 @@
 import { Button, FileInput, Group, Modal, Select, Stack } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
-import dayjs from 'dayjs';
-import Decimal from 'decimal.js';
 import { atom, useAtom } from 'jotai';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getSourcesQueryOptions } from '~/features/sources/queries';
 import { parsePdfExpenses } from '~/features/transactions/api';
-import type {
-  ParsedExpense,
-  ParsedExpenseFromApi,
+import {
+  type ParsedExpense,
+  parsedExpenseSchema,
 } from '~/features/transactions/parsedExpense';
 
 import { ParsedExpensesModal } from './ParsedExpensesModal/ParsedExpensesModal';
 
 export const importModalOpenAtom = atom(false);
-
-function adaptParsedExpense(e: ParsedExpenseFromApi): ParsedExpense {
-  return {
-    date: dayjs(e.date),
-    type: e.type,
-    description: e.description,
-    amount: new Decimal(e.amount),
-    hash: e.hash,
-  };
-}
 
 export function ImportModal() {
   const { t } = useTranslation('transactions');
@@ -71,7 +59,7 @@ export function ImportModal() {
         data: { fileBase64: base64, parser: selectedSource.parser as 'VIVID' },
       });
       setOpen(false);
-      setParsedExpenses(rows.map(adaptParsedExpense));
+      setParsedExpenses(rows.map((row) => parsedExpenseSchema.decode(row)));
     } catch (err) {
       console.error('PDF parse error', err);
     } finally {
