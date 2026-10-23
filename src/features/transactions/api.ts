@@ -1,12 +1,22 @@
 import { createServerFn } from '@tanstack/react-start';
 import dayjs from 'dayjs';
 import Decimal from 'decimal.js';
+import pMap from 'p-map';
 
 import { authMiddleware } from '~/middlewares/authMiddleware';
 import { prisma } from '~/server/db';
+import { typesafe } from '~/server/typesafe';
 import { adaptCost } from '~/shared/utils/adaptCost';
 import { assertOwnedByProject } from '~/shared/utils/assertOwnedByProject';
+import { findByIdOrThrow } from '~/shared/utils/getOrThrow';
 
+import { buildCategoryJevCriteria } from './categorySuggestions/categoryJevCriteria';
+import { buildCategoryJevQuestion } from './categorySuggestions/categoryJevQuestion';
+import {
+  CATEGORY_SUGGESTION_CONCURRENCY,
+  SIMILAR_TRANSACTIONS_LIMIT,
+  toCategorySuggestion,
+} from './categorySuggestions/categorySuggestion';
 import { parsedExpenseSchema } from './parsedExpense';
 import {
   type ImportTransactionsInput,
@@ -15,6 +25,8 @@ import {
   newTransactionSchema,
   type ParsePdfExpensesInput,
   parsePdfExpensesSchema,
+  type SuggestCategoriesInput,
+  suggestCategoriesSchema,
   transactionWithComponentsSchema,
   type UpdateTransactionInput,
   updateTransactionSchema,
@@ -297,5 +309,86 @@ export const importTransactions = createServerFn({ method: 'POST' })
         actualDate: tx.actualDate ? dayjs(tx.actualDate) : null,
         components: [],
       }),
+    );
+  });
+
+export const suggestCategories = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
+  .validator((input: SuggestCategoriesInput) =>
+    suggestCategoriesSchema.parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    if (!typesafe) {
+      throw new Error('Category suggestions need TYPESAFE_API_KEY to be set');
+    }
+    const jev = typesafe;
+    await assertOwnedByProject(
+      prisma.source,
+      data.sourceId,
+      context.projectId,
+      'Source',
+    );
+
+    const [categories, subscriptions] = await Promise.all([
+      prisma.category.findMany({
+        where: { projectId: context.projectId },
+        include: { subcategories: true },
+      }),
+      prisma.subscription.findMany({
+        where: { projectId: context.projectId },
+      }),
+    ]);
+    const offeredSubscriptions = subscriptions.filter((s) =>
+      data.subscriptionIds.includes(s.id),
+    );
+
+    const findSimilarTransactions = (description: string, isIncome: boolean) =>
+      prisma.$transaction(async (tx) => {
+        const ranked = await tx.$queryRaw<{ id: number }[]>`
+          SELECT e.id
+          FROM "Expense" e
+          JOIN "Category" c ON c.id = e."categoryId" AND c."projectId" = e."projectId"
+          WHERE e."projectId" = ${context.projectId}
+            AND e."sourceId" = ${data.sourceId}
+            AND e."importedDescription" IS NOT NULL
+            AND c."isIncome" = ${isIncome}
+            AND similarity(e."importedDescription", ${description}) > 0
+          ORDER BY similarity(e."importedDescription", ${description}) DESC,
+                   e.date, e.id
+          LIMIT ${SIMILAR_TRANSACTIONS_LIMIT}
+        `;
+        const transactions = await tx.expense.findMany({
+          where: { id: { in: ranked.map(({ id }) => id) } },
+          include: { category: true },
+        });
+        return ranked.map(({ id }) =>
+          findByIdOrThrow(transactions, id, 'Similar transaction'),
+        );
+      });
+
+    return pMap(
+      data.parsedExpenses,
+      async (parsedExpense) => {
+        const isIncome = !parsedExpense.amount.isNegative();
+        const criteria = buildCategoryJevCriteria({
+          categories,
+          subscriptions: offeredSubscriptions,
+          isIncome,
+        });
+        const { state, question } = buildCategoryJevQuestion(
+          parsedExpense,
+          criteria,
+          await findSimilarTransactions(parsedExpense.description, isIncome),
+          subscriptions,
+        );
+        const answer = await jev.askChoice(state, question);
+        return toCategorySuggestion({
+          answer,
+          criteria,
+          subscriptions,
+          similarCount: state.similar_past_transactions.length,
+        });
+      },
+      { concurrency: CATEGORY_SUGGESTION_CONCURRENCY },
     );
   });

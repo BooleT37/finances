@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 import { datetimeCodec, decimalCodec } from '~/shared/codecs';
 
+import { parsedExpenseSchema } from './parsedExpense';
+
 // ── TransactionComponent ──────────────────────────────────────────────────────
 
 export const transactionComponentSchema = z.object({
@@ -94,6 +96,15 @@ export const importTransactionItemSchema = z.object({
 export const importTransactionsSchema = z.array(importTransactionItemSchema);
 export type ImportTransactionItem = z.infer<typeof importTransactionItemSchema>;
 export type ImportTransactionsInput = z.infer<typeof importTransactionsSchema>;
+
+// ── SuggestCategories (for parsed expenses) ───────────────────────────────────
+
+export const suggestCategoriesSchema = z.object({
+  sourceId: z.number(),
+  subscriptionIds: z.array(z.number()),
+  parsedExpenses: z.array(parsedExpenseSchema),
+});
+export type SuggestCategoriesInput = z.input<typeof suggestCategoriesSchema>;
 
 export const parsePdfExpensesSchema = z.object({
   fileBase64: z.string(),
