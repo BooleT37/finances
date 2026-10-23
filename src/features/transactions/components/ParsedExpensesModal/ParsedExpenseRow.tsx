@@ -4,13 +4,11 @@ import type { UseFormReturnType } from '@mantine/form';
 import dayjs from 'dayjs';
 import { useEffect } from 'react';
 
+import type { ParsedExpenseCategoryValue } from '~/features/transactions/parsedExpenseCategoryValue';
 import { TreeSelect } from '~/shared/components/TreeSelect';
 import { ISO_DATE_FORMAT } from '~/shared/constants';
 
-import {
-  type ParsedExpenseCategoryValue,
-  useParsedExpenseCategoryTree,
-} from './parsedExpenseCategoryTree';
+import { useParsedExpenseCategoryTree } from './parsedExpenseCategoryTree';
 import type { ParsedExpenseFormValues } from './ParsedExpensesModal';
 
 interface Props {

@@ -11,6 +11,11 @@ import { useTranslation } from 'react-i18next';
 import { parseCategorySubcategoryId } from '~/features/categories/categorySubcategoryId';
 import { getSubscriptionsQueryOptions } from '~/features/subscriptions/queries';
 import type { ParsedExpense } from '~/features/transactions/parsedExpense';
+import {
+  isSubscriptionValue,
+  type ParsedExpenseCategoryValue,
+  parseSubscriptionValue,
+} from '~/features/transactions/parsedExpenseCategoryValue';
 import { getTransactionsQueryOptions } from '~/features/transactions/queries';
 import { useImportTransactions } from '~/features/transactions/queries';
 import { ISO_DATE_FORMAT } from '~/shared/constants';
@@ -19,11 +24,6 @@ import { findByIdOrThrow } from '~/shared/utils/getOrThrow';
 import { selectedYearAtom } from '~/stores/month';
 
 import { transactionRowId } from '../TransactionsTable/transactionsRowId';
-import {
-  isSubscriptionValue,
-  type ParsedExpenseCategoryValue,
-  parseSubscriptionValue,
-} from './parsedExpenseCategoryTree';
 import { ParsedExpenseRow } from './ParsedExpenseRow';
 import styles from './ParsedExpensesModal.module.css';
 

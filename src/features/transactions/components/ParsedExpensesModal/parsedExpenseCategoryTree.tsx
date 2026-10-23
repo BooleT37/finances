@@ -3,10 +3,7 @@ import { IconRepeat } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 
-import {
-  buildCategorySubcategoryId,
-  type CategorySubcategoryId,
-} from '~/features/categories/categorySubcategoryId';
+import { buildCategorySubcategoryId } from '~/features/categories/categorySubcategoryId';
 import { CategoryIconComp } from '~/features/categories/components/categoryIcons/CategoryIconComp';
 import { NameWithOptionalIcon } from '~/features/categories/components/NameWithOptionalIcon';
 import { useExpenseCategories } from '~/features/categories/facets/expenseCategories';
@@ -14,33 +11,12 @@ import { useIncomeCategories } from '~/features/categories/facets/incomeCategori
 import type { Category } from '~/features/categories/schema';
 import { useAvailableSubscriptions } from '~/features/subscriptions/facets/availableSubscriptions';
 import type { Subscription } from '~/features/subscriptions/schema';
+import {
+  groupParsedExpenseCategoryOptions,
+  type ParsedExpenseCategoryGroup,
+} from '~/features/transactions/parsedExpenseCategoryOptions';
+import { buildSubscriptionValue } from '~/features/transactions/parsedExpenseCategoryValue';
 import type { TreeNode } from '~/shared/components/TreeSelect';
-
-// ── Value tokens ──────────────────────────────────────────────────────────────
-
-const SUBSCRIPTION_PREFIX = 'sub-';
-
-export type ParsedExpenseCategoryValue =
-  | CategorySubcategoryId
-  | `${typeof SUBSCRIPTION_PREFIX}${number}`;
-
-export function buildSubscriptionValue(
-  subscriptionId: number,
-): `${typeof SUBSCRIPTION_PREFIX}${number}` {
-  return `${SUBSCRIPTION_PREFIX}${subscriptionId}`;
-}
-
-export function isSubscriptionValue(
-  value: string,
-): value is `${typeof SUBSCRIPTION_PREFIX}${number}` {
-  return value.startsWith(SUBSCRIPTION_PREFIX);
-}
-
-export function parseSubscriptionValue(
-  value: `${typeof SUBSCRIPTION_PREFIX}${number}`,
-): number {
-  return parseInt(value.slice(SUBSCRIPTION_PREFIX.length), 10);
-}
 
 // ── Renderers ─────────────────────────────────────────────────────────────────
 
@@ -93,10 +69,10 @@ function subscriptionNode(
   };
 }
 
-function categoryToTreeNode(
-  category: Category,
-  subscriptions: Subscription[],
-): TreeNode {
+function categoryToTreeNode({
+  category,
+  subscriptions,
+}: ParsedExpenseCategoryGroup<Category, Subscription>): TreeNode {
   const categoryIcon = category.icon ? (
     <CategoryIconComp value={category.icon} />
   ) : null;
@@ -152,17 +128,15 @@ export function useParsedExpenseCategoryTree(options: {
     if (!expenseCategories || !incomeCategories || !availableSubscriptions) {
       return undefined;
     }
-    const categories = options.isIncome ? incomeCategories : expenseCategories;
     const pendingSubscriptions = availableSubscriptions
       .filter((a) => a.transactionId === null)
       .map((a) => a.subscription);
 
-    return categories.map((category) =>
-      categoryToTreeNode(
-        category,
-        pendingSubscriptions.filter((s) => s.categoryId === category.id),
-      ),
-    );
+    return groupParsedExpenseCategoryOptions({
+      categories: options.isIncome ? incomeCategories : expenseCategories,
+      subscriptions: pendingSubscriptions,
+      isIncome: options.isIncome,
+    }).map(categoryToTreeNode);
   }, [
     expenseCategories,
     incomeCategories,
