@@ -34,6 +34,7 @@ export interface ParsedExpenseRowValues {
   description: string;
   amount: string;
   categorySubcategoryId: ParsedExpenseCategoryValue | null;
+  hash: string;
 }
 
 export interface ParsedExpenseFormValues {
@@ -91,6 +92,7 @@ export function ParsedExpensesModal({
         description: e.description,
         amount: e.amount.toFixed(2),
         categorySubcategoryId: null,
+        hash: e.hash,
       }),
     );
     return {
@@ -216,12 +218,7 @@ export function ParsedExpensesModal({
         subcategoryId,
         subscriptionId,
         sourceId,
-        peHash:
-          parsedExpenses.find(
-            (p) =>
-              p.description === e.description &&
-              p.amount.toFixed(2) === e.amount,
-          )?.hash ?? '',
+        peHash: e.hash,
       };
     });
 
