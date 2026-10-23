@@ -9,32 +9,32 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated.index'
-import { Route as AuthenticatedTransactionsRouteImport } from './routes/_authenticated.transactions'
-import { Route as AuthenticatedStatisticsRouteImport } from './routes/_authenticated.statistics'
-import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
-import { Route as AuthenticatedSavingsSpendingsRouteImport } from './routes/_authenticated.savings-spendings'
 import { Route as AuthenticatedBudgetingRouteImport } from './routes/_authenticated.budgeting'
+import { Route as AuthenticatedSavingsSpendingsRouteImport } from './routes/_authenticated.savings-spendings'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
+import { Route as AuthenticatedStatisticsRouteImport } from './routes/_authenticated.statistics'
+import { Route as AuthenticatedTransactionsRouteImport } from './routes/_authenticated.transactions'
 import { Route as AuthenticatedSavingsSpendingsIndexRouteImport } from './routes/_authenticated.savings-spendings.index'
-import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
-import { Route as AuthenticatedSettingsSubscriptionsRouteImport } from './routes/_authenticated.settings.subscriptions'
-import { Route as AuthenticatedSettingsSourcesRouteImport } from './routes/_authenticated.settings.sources'
-import { Route as AuthenticatedSettingsProjectRouteImport } from './routes/_authenticated.settings.project'
-import { Route as AuthenticatedSettingsCategoriesRouteImport } from './routes/_authenticated.settings.categories'
-import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated.settings.account'
 import { Route as AuthenticatedSavingsSpendingsArchiveRouteImport } from './routes/_authenticated.savings-spendings.archive'
+import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated.settings.account'
+import { Route as AuthenticatedSettingsCategoriesRouteImport } from './routes/_authenticated.settings.categories'
+import { Route as AuthenticatedSettingsProjectRouteImport } from './routes/_authenticated.settings.project'
+import { Route as AuthenticatedSettingsSourcesRouteImport } from './routes/_authenticated.settings.sources'
+import { Route as AuthenticatedSettingsSubscriptionsRouteImport } from './routes/_authenticated.settings.subscriptions'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AuthenticatedSettingsSubscriptionsIndexRouteImport } from './routes/_authenticated.settings.subscriptions.index'
 import { Route as AuthenticatedSettingsSubscriptionsArchiveRouteImport } from './routes/_authenticated.settings.subscriptions.archive'
 
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
@@ -42,20 +42,9 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedTransactionsRoute =
-  AuthenticatedTransactionsRouteImport.update({
-    id: '/transactions',
-    path: '/transactions',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedStatisticsRoute = AuthenticatedStatisticsRouteImport.update({
-  id: '/statistics',
-  path: '/statistics',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
+const AuthenticatedBudgetingRoute = AuthenticatedBudgetingRouteImport.update({
+  id: '/budgeting',
+  path: '/budgeting',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedSavingsSpendingsRoute =
@@ -64,38 +53,38 @@ const AuthenticatedSavingsSpendingsRoute =
     path: '/savings-spendings',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedBudgetingRoute = AuthenticatedBudgetingRouteImport.update({
-  id: '/budgeting',
-  path: '/budgeting',
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedStatisticsRoute = AuthenticatedStatisticsRouteImport.update({
+  id: '/statistics',
+  path: '/statistics',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTransactionsRoute =
+  AuthenticatedTransactionsRouteImport.update({
+    id: '/transactions',
+    path: '/transactions',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedSavingsSpendingsIndexRoute =
   AuthenticatedSavingsSpendingsIndexRouteImport.update({
     id: '/',
     path: '/',
     getParentRoute: () => AuthenticatedSavingsSpendingsRoute,
   } as any)
-const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedSettingsSubscriptionsRoute =
-  AuthenticatedSettingsSubscriptionsRouteImport.update({
-    id: '/subscriptions',
-    path: '/subscriptions',
-    getParentRoute: () => AuthenticatedSettingsRoute,
+const AuthenticatedSavingsSpendingsArchiveRoute =
+  AuthenticatedSavingsSpendingsArchiveRouteImport.update({
+    id: '/archive',
+    path: '/archive',
+    getParentRoute: () => AuthenticatedSavingsSpendingsRoute,
   } as any)
-const AuthenticatedSettingsSourcesRoute =
-  AuthenticatedSettingsSourcesRouteImport.update({
-    id: '/sources',
-    path: '/sources',
-    getParentRoute: () => AuthenticatedSettingsRoute,
-  } as any)
-const AuthenticatedSettingsProjectRoute =
-  AuthenticatedSettingsProjectRouteImport.update({
-    id: '/project',
-    path: '/project',
+const AuthenticatedSettingsAccountRoute =
+  AuthenticatedSettingsAccountRouteImport.update({
+    id: '/account',
+    path: '/account',
     getParentRoute: () => AuthenticatedSettingsRoute,
   } as any)
 const AuthenticatedSettingsCategoriesRoute =
@@ -104,18 +93,29 @@ const AuthenticatedSettingsCategoriesRoute =
     path: '/categories',
     getParentRoute: () => AuthenticatedSettingsRoute,
   } as any)
-const AuthenticatedSettingsAccountRoute =
-  AuthenticatedSettingsAccountRouteImport.update({
-    id: '/account',
-    path: '/account',
+const AuthenticatedSettingsProjectRoute =
+  AuthenticatedSettingsProjectRouteImport.update({
+    id: '/project',
+    path: '/project',
     getParentRoute: () => AuthenticatedSettingsRoute,
   } as any)
-const AuthenticatedSavingsSpendingsArchiveRoute =
-  AuthenticatedSavingsSpendingsArchiveRouteImport.update({
-    id: '/archive',
-    path: '/archive',
-    getParentRoute: () => AuthenticatedSavingsSpendingsRoute,
+const AuthenticatedSettingsSourcesRoute =
+  AuthenticatedSettingsSourcesRouteImport.update({
+    id: '/sources',
+    path: '/sources',
+    getParentRoute: () => AuthenticatedSettingsRoute,
   } as any)
+const AuthenticatedSettingsSubscriptionsRoute =
+  AuthenticatedSettingsSubscriptionsRouteImport.update({
+    id: '/subscriptions',
+    path: '/subscriptions',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedSettingsSubscriptionsIndexRoute =
   AuthenticatedSettingsSubscriptionsIndexRouteImport.update({
     id: '/',
@@ -253,18 +253,18 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/': {
@@ -274,25 +274,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/transactions': {
-      id: '/_authenticated/transactions'
-      path: '/transactions'
-      fullPath: '/transactions'
-      preLoaderRoute: typeof AuthenticatedTransactionsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/statistics': {
-      id: '/_authenticated/statistics'
-      path: '/statistics'
-      fullPath: '/statistics'
-      preLoaderRoute: typeof AuthenticatedStatisticsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/settings': {
-      id: '/_authenticated/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+    '/_authenticated/budgeting': {
+      id: '/_authenticated/budgeting'
+      path: '/budgeting'
+      fullPath: '/budgeting'
+      preLoaderRoute: typeof AuthenticatedBudgetingRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/savings-spendings': {
@@ -302,11 +288,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSavingsSpendingsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/budgeting': {
-      id: '/_authenticated/budgeting'
-      path: '/budgeting'
-      fullPath: '/budgeting'
-      preLoaderRoute: typeof AuthenticatedBudgetingRouteImport
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/statistics': {
+      id: '/_authenticated/statistics'
+      path: '/statistics'
+      fullPath: '/statistics'
+      preLoaderRoute: typeof AuthenticatedStatisticsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/transactions': {
+      id: '/_authenticated/transactions'
+      path: '/transactions'
+      fullPath: '/transactions'
+      preLoaderRoute: typeof AuthenticatedTransactionsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/savings-spendings/': {
@@ -316,32 +316,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSavingsSpendingsIndexRouteImport
       parentRoute: typeof AuthenticatedSavingsSpendingsRoute
     }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/savings-spendings/archive': {
+      id: '/_authenticated/savings-spendings/archive'
+      path: '/archive'
+      fullPath: '/savings-spendings/archive'
+      preLoaderRoute: typeof AuthenticatedSavingsSpendingsArchiveRouteImport
+      parentRoute: typeof AuthenticatedSavingsSpendingsRoute
     }
-    '/_authenticated/settings/subscriptions': {
-      id: '/_authenticated/settings/subscriptions'
-      path: '/subscriptions'
-      fullPath: '/settings/subscriptions'
-      preLoaderRoute: typeof AuthenticatedSettingsSubscriptionsRouteImport
-      parentRoute: typeof AuthenticatedSettingsRoute
-    }
-    '/_authenticated/settings/sources': {
-      id: '/_authenticated/settings/sources'
-      path: '/sources'
-      fullPath: '/settings/sources'
-      preLoaderRoute: typeof AuthenticatedSettingsSourcesRouteImport
-      parentRoute: typeof AuthenticatedSettingsRoute
-    }
-    '/_authenticated/settings/project': {
-      id: '/_authenticated/settings/project'
-      path: '/project'
-      fullPath: '/settings/project'
-      preLoaderRoute: typeof AuthenticatedSettingsProjectRouteImport
+    '/_authenticated/settings/account': {
+      id: '/_authenticated/settings/account'
+      path: '/account'
+      fullPath: '/settings/account'
+      preLoaderRoute: typeof AuthenticatedSettingsAccountRouteImport
       parentRoute: typeof AuthenticatedSettingsRoute
     }
     '/_authenticated/settings/categories': {
@@ -351,19 +337,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsCategoriesRouteImport
       parentRoute: typeof AuthenticatedSettingsRoute
     }
-    '/_authenticated/settings/account': {
-      id: '/_authenticated/settings/account'
-      path: '/account'
-      fullPath: '/settings/account'
-      preLoaderRoute: typeof AuthenticatedSettingsAccountRouteImport
+    '/_authenticated/settings/project': {
+      id: '/_authenticated/settings/project'
+      path: '/project'
+      fullPath: '/settings/project'
+      preLoaderRoute: typeof AuthenticatedSettingsProjectRouteImport
       parentRoute: typeof AuthenticatedSettingsRoute
     }
-    '/_authenticated/savings-spendings/archive': {
-      id: '/_authenticated/savings-spendings/archive'
-      path: '/archive'
-      fullPath: '/savings-spendings/archive'
-      preLoaderRoute: typeof AuthenticatedSavingsSpendingsArchiveRouteImport
-      parentRoute: typeof AuthenticatedSavingsSpendingsRoute
+    '/_authenticated/settings/sources': {
+      id: '/_authenticated/settings/sources'
+      path: '/sources'
+      fullPath: '/settings/sources'
+      preLoaderRoute: typeof AuthenticatedSettingsSourcesRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
+    '/_authenticated/settings/subscriptions': {
+      id: '/_authenticated/settings/subscriptions'
+      path: '/subscriptions'
+      fullPath: '/settings/subscriptions'
+      preLoaderRoute: typeof AuthenticatedSettingsSubscriptionsRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/settings/subscriptions/': {
       id: '/_authenticated/settings/subscriptions/'
