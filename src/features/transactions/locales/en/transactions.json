@@ -121,7 +121,12 @@
     "duplicateWarning": "Unchecked items already exist in the database for this year.",
     "suggestingCategory": "Suggesting…",
     "categorySuggestionsFailed": "Couldn't fetch category suggestions",
-    "retryCategorySuggestions": "Retry"
+    "retryCategorySuggestions": "Retry",
+    "suggestedCategoryLabel": "Suggested category",
+    "suggestedCategory": "Suggested with {{confidence}}% confidence",
+    "suggestedCategorySimilar_zero": "No similar past transactions, so judged by the description alone",
+    "suggestedCategorySimilar_one": "Based on {{count}} similar past transaction",
+    "suggestedCategorySimilar_other": "Based on {{count}} similar past transactions"
   },
   "searchPlaceholder": "Search...",
   "subscription": "Subscription",

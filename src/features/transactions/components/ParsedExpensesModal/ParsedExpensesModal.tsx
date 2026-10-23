@@ -371,6 +371,7 @@ export function ParsedExpensesModal({
                 key={index}
                 index={index}
                 form={form}
+                categorySuggestion={categorySuggestions?.[index] ?? null}
                 categorySuggestionLoading={
                   categorySuggestionsQuery.isFetching && !categorySuggestions
                 }

@@ -1,10 +1,12 @@
-import { Checkbox, TextInput } from '@mantine/core';
+import { Checkbox, Group, TextInput, Tooltip } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import type { UseFormReturnType } from '@mantine/form';
+import { IconSparkles } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import type { CategorySuggestion } from '~/features/transactions/categorySuggestions/categorySuggestion';
 import type { ParsedExpenseCategoryValue } from '~/features/transactions/parsedExpenseCategoryValue';
 import { TreeSelect } from '~/shared/components/TreeSelect';
 import { ISO_DATE_FORMAT } from '~/shared/constants';
@@ -15,12 +17,14 @@ import type { ParsedExpenseFormValues } from './ParsedExpensesModal';
 interface Props {
   index: number;
   form: UseFormReturnType<ParsedExpenseFormValues>;
+  categorySuggestion: CategorySuggestion | null;
   categorySuggestionLoading: boolean;
 }
 
 export function ParsedExpenseRow({
   index,
   form,
+  categorySuggestion,
   categorySuggestionLoading,
 }: Props) {
   const { t } = useTranslation('transactions');
@@ -46,6 +50,10 @@ export function ParsedExpenseRow({
   if (!row) {
     return null;
   }
+
+  const isSuggested =
+    categorySuggestion !== null &&
+    row.categorySubcategoryId === categorySuggestion.value;
 
   const getInputProps = (field: string) =>
     form.getInputProps(`expenses.${index}.${field}`);
@@ -90,22 +98,54 @@ export function ParsedExpenseRow({
 
       <TextInput size="xs" disabled={!selected} {...getInputProps('amount')} />
 
-      <TreeSelect<ParsedExpenseCategoryValue>
-        treeData={categoryTreeData ?? []}
-        value={row.categorySubcategoryId}
-        onChange={(val) => {
-          form.setFieldValue(`expenses.${index}.categorySubcategoryId`, val);
-        }}
-        error={getInputProps('categorySubcategoryId').error}
-        placeholder={
-          categorySuggestionLoading
-            ? t('importModal.suggestingCategory')
-            : undefined
-        }
-        disabled={!selected}
-        selectionProp="selectionTitle"
-        searchProp="searchValue"
-      />
+      <Group gap={4} wrap="nowrap" align="flex-start">
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <TreeSelect<ParsedExpenseCategoryValue>
+            treeData={categoryTreeData ?? []}
+            value={row.categorySubcategoryId}
+            onChange={(val) => {
+              form.setFieldValue(
+                `expenses.${index}.categorySubcategoryId`,
+                val,
+              );
+            }}
+            error={getInputProps('categorySubcategoryId').error}
+            placeholder={
+              categorySuggestionLoading
+                ? t('importModal.suggestingCategory')
+                : undefined
+            }
+            disabled={!selected}
+            selectionProp="selectionTitle"
+            searchProp="searchValue"
+          />
+        </div>
+        <div style={{ width: 16, flexShrink: 0, paddingTop: 6 }}>
+          {isSuggested && (
+            <Tooltip
+              multiline
+              w={260}
+              label={
+                <>
+                  {t('importModal.suggestedCategory', {
+                    confidence: Math.round(categorySuggestion.confidence * 100),
+                  })}
+                  <br />
+                  {t('importModal.suggestedCategorySimilar', {
+                    count: categorySuggestion.similarCount,
+                  })}
+                </>
+              }
+            >
+              <IconSparkles
+                size={16}
+                color="var(--mantine-color-yellow-6)"
+                aria-label={t('importModal.suggestedCategoryLabel')}
+              />
+            </Tooltip>
+          )}
+        </div>
+      </Group>
     </div>
   );
 }
