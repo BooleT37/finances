@@ -279,6 +279,7 @@ export const importTransactions = createServerFn({ method: 'POST' })
         subscriptionId: item.subscriptionId ?? null,
         sourceId: item.sourceId,
         peHash: item.peHash,
+        importedDescription: item.importedDescription,
         projectId: context.projectId,
       })),
       include: { category: true },

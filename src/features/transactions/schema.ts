@@ -88,6 +88,7 @@ export const importTransactionItemSchema = z.object({
   subscriptionId: z.number().nullable().optional(),
   sourceId: z.number(),
   peHash: z.string(),
+  importedDescription: z.string(),
 });
 
 export const importTransactionsSchema = z.array(importTransactionItemSchema);
