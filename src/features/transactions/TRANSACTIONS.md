@@ -43,7 +43,39 @@ Components must always have a different category or subcategory from the parent 
 
 ## Import Deduplication
 
-Each transaction has a **`peHash`** (parsed expense hash) used to detect whether it was already imported via the "Import" feature, preventing duplicates.
+Each transaction has a **`peHash`** (parsed expense hash) used to detect whether it was already imported via the "Import" feature, preventing duplicates. The hash is computed from the statement row exactly as the bank shows it, so editing the description or the amount in the import modal keeps it the same.
+
+## Imported Description
+
+A transaction created by the import keeps the description exactly as the bank statement shows it in **`importedDescription`**, while its `name` can be edited freely, both in the import modal and later. Category suggestions (see below) rely on it, since the bank's own wording is what the next statement will contain.
+
+Transactions imported before this field existed were filled in from the saved bank statements. The ones whose statements weren't available stay empty.
+
+## Category Suggestions
+
+When importing, the app suggests a category for each parsed expense (a row parsed from a bank statement, not yet saved) and pre-fills it in the import modal:
+
+1. It finds the similar transactions (see below).
+2. It sends Jev, a classification model by TypeSafe, a question: which of the row's criteria fits it. The criteria ("criteria" is Jev's own word) are the options the category picker offers for this row, each described in words, plus "unknown". Along with the parsed expense, Jev sees the similar transactions, each with the criterion it was filed under.
+3. Jev answers with a choice and its confidence. The app keeps the choice as the row's category suggestion only if Jev is confident enough (see below). Otherwise the row stays empty.
+
+A category suggestion can be a subscription too. If the suggested subscription isn't offered for this row (e.g. it's already paid this period), the row gets the subscription's category and subcategory instead.
+
+A category suggestion fills a row only while its category is still empty, so a category the user has already picked always stays. The row is marked as suggested until the user changes it. If category suggestions can't be fetched, the modal says so and offers to retry, and the import works as usual.
+
+## Similar Transactions
+
+The similar transactions of a parsed expense are up to 10 transactions of the same source and the same sign (expense or income) whose imported description is the closest to the parsed expense's. Closeness is measured by Postgres' `pg_trgm` trigram similarity.
+
+The search stays within one source, since each bank writes its descriptions in its own way.
+
+## Suggestion Confidence
+
+Jev returns a confidence from 0 to 1 with each choice, and a category suggestion is shown only when it's at least **0.8**.
+
+This number, and the 10 similar transactions, were picked by replaying about 800 past Vivid imports (October 2026): at 0.8, about 63% of rows got a category, 80% of them exactly right and 89% in the right category. Most of the misses are merchants we file under different categories at different times (Wolt, Amazon, Rossmann), which no description can tell apart.
+
+These results hold for the exact Jev version (`JEV_MODEL`) and the exact wording of the question sent to Jev, so changing either means replaying the past imports again.
 
 ---
 
@@ -56,3 +88,5 @@ Each transaction has a **`peHash`** (parsed expense hash) used to detect whether
 - We don't support subscriptions or components for income transactions yet. But we will in future
 
 - We don't support positive costs and income categories for components yet. Will implement it in future
+
+- Category suggestions use only the description, amount and date of a parsed expense. The bank's transaction type ("Card transaction", "Outgoing transfer", etc.) is left out for now, since its effect couldn't be measured on past imports
