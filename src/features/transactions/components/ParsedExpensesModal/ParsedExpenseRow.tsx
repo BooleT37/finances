@@ -3,7 +3,6 @@ import { DatePickerInput } from '@mantine/dates';
 import type { UseFormReturnType } from '@mantine/form';
 import { IconSparkles } from '@tabler/icons-react';
 import dayjs from 'dayjs';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { CategorySuggestion } from '~/features/transactions/categorySuggestions/categorySuggestion';
@@ -21,6 +20,11 @@ interface Props {
   categorySuggestionLoading: boolean;
 }
 
+const isNegativeAmount = (amount: string) => {
+  const parsed = parseFloat(amount);
+  return !isNaN(parsed) && parsed < 0;
+};
+
 export function ParsedExpenseRow({
   index,
   form,
@@ -29,23 +33,12 @@ export function ParsedExpenseRow({
 }: Props) {
   const { t } = useTranslation('transactions');
   const row = form.values.expenses[index];
-  const amount = row?.amount ?? '';
   const selected = row?.selected ?? false;
-  const parsedAmount = parseFloat(amount);
-  const amountIsNegative = !isNaN(parsedAmount) && parsedAmount < 0;
+  const amountIsNegative = isNegativeAmount(row?.amount ?? '');
 
   const categoryTreeData = useParsedExpenseCategoryTree({
     isIncome: !amountIsNegative,
   });
-
-  useEffect(() => {
-    if (!row) {
-      return;
-    }
-    form.setFieldValue(`expenses.${index}.categorySubcategoryId`, null);
-    // reset category when amount sign changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amountIsNegative]);
 
   if (!row) {
     return null;
@@ -57,6 +50,14 @@ export function ParsedExpenseRow({
 
   const getInputProps = (field: string) =>
     form.getInputProps(`expenses.${index}.${field}`);
+
+  const amountInputProps = getInputProps('amount');
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isNegativeAmount(e.currentTarget.value) !== amountIsNegative) {
+      form.setFieldValue(`expenses.${index}.categorySubcategoryId`, null);
+    }
+    amountInputProps.onChange(e);
+  };
 
   return (
     <div style={{ display: 'contents' }} data-expense-row={index}>
@@ -96,7 +97,12 @@ export function ParsedExpenseRow({
         {...getInputProps('description')}
       />
 
-      <TextInput size="xs" disabled={!selected} {...getInputProps('amount')} />
+      <TextInput
+        size="xs"
+        disabled={!selected}
+        {...amountInputProps}
+        onChange={handleAmountChange}
+      />
 
       <Group gap={4} wrap="nowrap" align="flex-start">
         <div style={{ flex: 1, minWidth: 0 }}>
