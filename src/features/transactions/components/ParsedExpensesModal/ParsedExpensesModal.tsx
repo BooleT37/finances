@@ -120,7 +120,13 @@ export function ParsedExpensesModal({
     }),
     enabled: offeredSubscriptions !== undefined,
   });
-  const categorySuggestions = categorySuggestionsQuery.data;
+  const categorySuggestions = useMemo(
+    () =>
+      categorySuggestionsQuery.data?.map(
+        ({ categorySuggestion }) => categorySuggestion,
+      ),
+    [categorySuggestionsQuery.data],
+  );
 
   usePrefillCategorySuggestions(form, categorySuggestions);
 

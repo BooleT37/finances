@@ -47,6 +47,7 @@ if (process.env.NODE_ENV !== 'production') {
   globalThis.langfuse = langfuse ?? undefined;
 }
 
+export const isTracingOn = langfuse !== null;
 export const langfuseClient = langfuse?.client ?? null;
 
 /**

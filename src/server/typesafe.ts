@@ -25,7 +25,9 @@ export interface TypeSafeClient {
   askChoice<T extends string>(
     state: unknown,
     question: JevChoiceQuestion<T>,
-  ): Promise<JevChoiceAnswer<T> & { inputTokens: number }>;
+  ): Promise<
+    JevChoiceAnswer<T> & { inputTokens: number; outputTokens: number }
+  >;
 }
 
 const isRetryable = (status: number) => status === 429 || status >= 500;
@@ -54,6 +56,7 @@ function createTypeSafeClient(apiKey: string): TypeSafeClient {
           return {
             ...body.answers.answer,
             inputTokens: body.usage.input_tokens,
+            outputTokens: body.usage.output_tokens,
           };
         }
         if (!isRetryable(response.status) || attempt === MAX_ATTEMPTS) {

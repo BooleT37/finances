@@ -7,12 +7,19 @@ import { assertOwnedByProject } from '~/shared/utils/assertOwnedByProject';
 import { findByIdOrThrow } from '~/shared/utils/getOrThrow';
 
 import { buildCategoryJevCriteria } from './categoryJevCriteria';
-import { buildCategoryJevQuestion } from './categoryJevQuestion';
+import {
+  buildCategoryJevQuestion,
+  type SimilarTransaction,
+} from './categoryJevQuestion';
 import {
   CATEGORY_SUGGESTION_CONCURRENCY,
   SIMILAR_TRANSACTIONS_LIMIT,
   toCategorySuggestion,
 } from './categorySuggestion';
+import { traceCategoryChoice } from './langfuse/traceCategoryChoice';
+import { traceCategorySuggestion } from './langfuse/traceCategorySuggestion';
+import { traceCategorySuggestions } from './langfuse/traceCategorySuggestions';
+import { traceSimilarTransactions } from './langfuse/traceSimilarTransactions';
 
 export async function suggestCategoriesForProject(
   {
@@ -24,7 +31,7 @@ export async function suggestCategoriesForProject(
     subscriptionIds: number[];
     parsedExpenses: ParsedExpense[];
   },
-  { projectId }: { projectId: string },
+  { userId, projectId }: { userId: string; projectId: string },
 ) {
   if (!typesafe) {
     throw new Error('Category suggestions need TYPESAFE_API_KEY to be set');
@@ -44,7 +51,7 @@ export async function suggestCategoriesForProject(
   );
 
   const findSimilarTransactions = (description: string, isIncome: boolean) =>
-    prisma.$transaction(async (tx) => {
+    prisma.$transaction(async (tx): Promise<SimilarTransaction[]> => {
       const ranked = await tx.$queryRaw<{ id: number; similarity: number }[]>`
         SELECT e.id, similarity(e."importedDescription", ${description}) AS similarity
         FROM "Expense" e
@@ -67,34 +74,44 @@ export async function suggestCategoriesForProject(
       }));
     });
 
-  const suggestCategory = async (parsedExpense: ParsedExpense) => {
-    const isIncome = !parsedExpense.amount.isNegative();
-    const criteria = buildCategoryJevCriteria({
-      categories,
-      subscriptions: offeredSubscriptions,
-      isIncome,
+  const suggestCategory = (parsedExpense: ParsedExpense) =>
+    traceCategorySuggestion(parsedExpense, async () => {
+      const isIncome = !parsedExpense.amount.isNegative();
+      const criteria = buildCategoryJevCriteria({
+        categories,
+        subscriptions: offeredSubscriptions,
+        isIncome,
+      });
+      const similarTransactions = await traceSimilarTransactions(
+        {
+          description: parsedExpense.description,
+          sourceId,
+          isIncome,
+          criteria,
+          subscriptions,
+        },
+        () => findSimilarTransactions(parsedExpense.description, isIncome),
+      );
+      const { state, question } = buildCategoryJevQuestion(
+        parsedExpense,
+        criteria,
+        similarTransactions.map(({ transaction }) => transaction),
+        subscriptions,
+      );
+      const answer = await traceCategoryChoice(state, question, () =>
+        jev.askChoice(state, question),
+      );
+      return toCategorySuggestion({
+        answer,
+        criteria,
+        subscriptions,
+        similarCount: state.similar_past_transactions.length,
+      });
     });
-    const similarTransactions = await findSimilarTransactions(
-      parsedExpense.description,
-      isIncome,
-    );
-    const { state, question } = buildCategoryJevQuestion(
-      parsedExpense,
-      criteria,
-      similarTransactions.map(({ transaction }) => transaction),
-      subscriptions,
-    );
-    const answer = await jev.askChoice(state, question);
-    const { categorySuggestion } = toCategorySuggestion({
-      answer,
-      criteria,
-      subscriptions,
-      similarCount: state.similar_past_transactions.length,
-    });
-    return categorySuggestion;
-  };
 
-  return pMap(parsedExpenses, suggestCategory, {
-    concurrency: CATEGORY_SUGGESTION_CONCURRENCY,
-  });
+  return traceCategorySuggestions({ userId, sourceId }, () =>
+    pMap(parsedExpenses, suggestCategory, {
+      concurrency: CATEGORY_SUGGESTION_CONCURRENCY,
+    }),
+  );
 }
