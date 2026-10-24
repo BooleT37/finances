@@ -3,7 +3,7 @@ import './TreeSelect.css';
 import { Input, Loader, Text } from '@mantine/core';
 import { ClientOnly } from '@tanstack/react-router';
 import RcTreeSelect from 'rc-tree-select';
-import type { ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 
 export interface TreeNode {
   value: string;
@@ -33,6 +33,19 @@ interface Props<T extends string> {
   searchProp?: 'title' | 'searchValue';
 }
 
+function findAncestorValues(nodes: TreeNode[], value: string): string[] | null {
+  for (const node of nodes) {
+    if (node.value === value) {
+      return [];
+    }
+    const path = findAncestorValues(node.children ?? [], value);
+    if (path) {
+      return [node.value, ...path];
+    }
+  }
+  return null;
+}
+
 export function TreeSelect<T extends string>({
   treeData,
   value = null,
@@ -46,6 +59,17 @@ export function TreeSelect<T extends string>({
   selectionProp,
   searchProp = 'title',
 }: Props<T>) {
+  const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
+  const [searchValue, setSearchValue] = useState('');
+
+  const expandToValue = (open: boolean) => {
+    const ancestors =
+      open && value ? findAncestorValues(treeData, value) : null;
+    if (ancestors?.length) {
+      setExpandedKeys((keys) => [...new Set([...keys, ...ancestors])]);
+    }
+  };
+
   return (
     <div>
       {/* rc-tree-select renders something SSR can't type-check correctly
@@ -82,6 +106,10 @@ export function TreeSelect<T extends string>({
           virtual={false}
           listHeight={300}
           treeTitleRender={titleRender}
+          treeExpandedKeys={searchValue ? undefined : expandedKeys}
+          onTreeExpand={(keys) => setExpandedKeys(keys.map(String))}
+          onSearch={setSearchValue}
+          onDropdownVisibleChange={expandToValue}
         />
       </ClientOnly>
       {error && (
