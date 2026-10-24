@@ -342,6 +342,7 @@ export function ParsedExpensesModal({
             flex: 1,
             overflowY: 'auto',
             minHeight: 0,
+            paddingRight: 'var(--mantine-spacing-md)',
           }}
         >
           <div
