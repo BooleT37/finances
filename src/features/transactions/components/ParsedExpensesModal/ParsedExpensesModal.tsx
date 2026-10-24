@@ -220,7 +220,20 @@ export function ParsedExpensesModal({
       return;
     }
 
-    const items = selected.map((e) => {
+    const getCategorySuggestionTrace = (index: number) => {
+      const traced = categorySuggestionsQuery.data?.[index];
+      return traced?.traceId
+        ? {
+            traceId: traced.traceId,
+            suggestedValue: traced.categorySuggestion?.value ?? null,
+          }
+        : null;
+    };
+
+    const items = values.expenses.flatMap((e, index) => {
+      if (!e.selected) {
+        return [];
+      }
       const value = e.categorySubcategoryId!;
       let categoryId: number;
       let subcategoryId: number | null;
@@ -237,17 +250,20 @@ export function ParsedExpensesModal({
       } else {
         ({ categoryId, subcategoryId } = parseCategorySubcategoryId(value));
       }
-      return {
-        name: e.description,
-        cost: new Decimal(e.amount).abs().toFixed(2),
-        date: e.date!.format(ISO_DATE_FORMAT),
-        categoryId,
-        subcategoryId,
-        subscriptionId,
-        sourceId,
-        peHash: e.hash,
-        importedDescription: e.importedDescription,
-      };
+      return [
+        {
+          name: e.description,
+          cost: new Decimal(e.amount).abs().toFixed(2),
+          date: e.date!.format(ISO_DATE_FORMAT),
+          categoryId,
+          subcategoryId,
+          subscriptionId,
+          sourceId,
+          peHash: e.hash,
+          importedDescription: e.importedDescription,
+          categorySuggestionTrace: getCategorySuggestionTrace(index),
+        },
+      ];
     });
 
     const created = await importTransactions.mutateAsync(items);

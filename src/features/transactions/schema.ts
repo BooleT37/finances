@@ -91,6 +91,10 @@ export const importTransactionItemSchema = z.object({
   sourceId: z.number(),
   peHash: z.string(),
   importedDescription: z.string(),
+  categorySuggestionTrace: z
+    .object({ traceId: z.string(), suggestedValue: z.string().nullable() })
+    .nullable()
+    .optional(),
 });
 
 export const importTransactionsSchema = z.array(importTransactionItemSchema);

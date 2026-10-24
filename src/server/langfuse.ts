@@ -12,11 +12,14 @@ const missingEnvVars = [
   'LANGFUSE_BASE_URL',
 ].filter((name) => !process.env[name]);
 
+export const langfuseEnvironment =
+  process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? 'unknown';
+
 function createLangfuse() {
   // Immediate export, so spans are sent before a serverless function freezes.
   const spanProcessor = new LangfuseSpanProcessor({
     exportMode: 'immediate',
-    environment: process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? 'unknown',
+    environment: langfuseEnvironment,
   });
   new NodeSDK({
     serviceName: 'finances',

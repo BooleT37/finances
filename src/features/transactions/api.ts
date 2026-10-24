@@ -7,6 +7,7 @@ import { prisma } from '~/server/db';
 import { adaptCost } from '~/shared/utils/adaptCost';
 import { assertOwnedByProject } from '~/shared/utils/assertOwnedByProject';
 
+import { scoreCategorySuggestions } from './categorySuggestions/langfuse/scoreCategorySuggestions';
 import { suggestCategoriesForProject } from './categorySuggestions/suggestCategories';
 import { parsedExpenseSchema } from './parsedExpense';
 import {
@@ -291,6 +292,7 @@ export const importTransactions = createServerFn({ method: 'POST' })
       })),
       include: { category: true },
     });
+    await scoreCategorySuggestions(data, context.projectId);
 
     return created.map((tx) =>
       transactionWithComponentsSchema.encode({
