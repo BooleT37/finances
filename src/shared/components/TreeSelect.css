@@ -266,8 +266,8 @@
 }
 
 /* ── Selected node ── */
-.rc-tree-select-tree-node-selected .rc-tree-select-tree-node-content-wrapper,
-.rc-tree-select-tree-node-selected .rc-tree-select-tree-node-content-wrapper:hover {
+.rc-tree-select-tree-node-content-wrapper.rc-tree-select-tree-node-selected,
+.rc-tree-select-tree-node-content-wrapper.rc-tree-select-tree-node-selected:hover {
   background: var(--mantine-primary-color-light);
   color: var(--mantine-primary-color-light-color);
   font-weight: 500;
