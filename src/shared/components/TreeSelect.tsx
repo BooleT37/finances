@@ -1,6 +1,6 @@
 import './TreeSelect.css';
 
-import { Input, Text } from '@mantine/core';
+import { Input, Loader, Text } from '@mantine/core';
 import { ClientOnly } from '@tanstack/react-router';
 import RcTreeSelect from 'rc-tree-select';
 import type { ReactNode } from 'react';
@@ -21,6 +21,8 @@ interface Props<T extends string> {
   value?: T | null;
   onChange: (value: T | null) => void;
   placeholder?: string;
+  /** Shows a spinner in front of the placeholder. */
+  loading?: boolean;
   notFoundContent?: string;
   error?: ReactNode;
   disabled?: boolean;
@@ -36,6 +38,7 @@ export function TreeSelect<T extends string>({
   value = null,
   onChange,
   placeholder,
+  loading,
   notFoundContent,
   error,
   disabled,
@@ -58,7 +61,18 @@ export function TreeSelect<T extends string>({
             onChange((v as T) ?? null);
           }}
           treeData={treeData}
-          placeholder={placeholder}
+          placeholder={
+            loading ? (
+              <span
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <Loader size={10} />
+                {placeholder}
+              </span>
+            ) : (
+              placeholder
+            )
+          }
           showSearch
           treeNodeFilterProp={searchProp}
           treeNodeLabelProp={selectionProp}

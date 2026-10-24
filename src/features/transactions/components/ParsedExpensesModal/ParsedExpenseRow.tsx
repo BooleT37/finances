@@ -115,6 +115,7 @@ export function ParsedExpenseRow({
                 ? t('importModal.suggestingCategory')
                 : undefined
             }
+            loading={categorySuggestionLoading}
             disabled={!selected}
             selectionProp="selectionTitle"
             searchProp="searchValue"
