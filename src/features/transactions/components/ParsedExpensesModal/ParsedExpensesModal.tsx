@@ -282,6 +282,8 @@ export function ParsedExpensesModal({
       title={t('importModal.title')}
       size={1200}
       centered
+      closeOnEscape={false}
+      closeOnClickOutside={false}
       styles={{
         content: { display: 'flex', flexDirection: 'column' },
         body: {
