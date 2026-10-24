@@ -1,6 +1,6 @@
 ---
 name: add-issue
-description: Create a new GitHub issue on BooleT37/finances from a task description — clarifies ambiguity, checks for duplicates (exits early if found), decides the "ai" label and other labels, and once the repo's project-board automation adds the issue to the project, fills in its workflow fields (Status, Size, Feature, Priority). Use when the user wants to file/add/create a task, bug, or issue for this repo.
+description: Create a new GitHub issue on BooleT37/finances from a task description — clarifies ambiguity, checks for duplicates (exits early if found), decides the "ai" label and other labels, and once the repo's project-board automation adds the issue to the project, fills in its workflow fields (Status, Size, Feature, Priority) and links any blocked-by / blocking / parent issues. Use when the user wants to file/add/create a task, bug, or issue for this repo.
 ---
 
 ## What this does
@@ -95,12 +95,17 @@ How to pick each:
 - **Feature**: match the issue to the closest option based on which part of the app it touches (a Categories/Sources change generally falls under `Budgeting` or `Transactions` depending on where it surfaces; Project Users falls under `Users`/`Projects`). If genuinely unclear between two, ask.
 - **Priority**: infer from the description if it signals urgency or a blocker (`High`), or explicitly says it's minor/nice-to-have (`Low`). Default to `Medium` when nothing suggests otherwise — don't ask just to pick between Medium and something else unless the description gives conflicting signals.
 
-## Step 9 — Report back
+## Step 9 — Link related issues
 
-Tell the user: the issue number/URL, whether a duplicate check turned up anything close (even if not an exact dup), the labels applied and why (especially the `ai` decision), and the field values set.
+If the issue is blocked by, blocks, or is part of another issue, set GitHub's native relationship (issue dependencies or sub-issues) — the board only shows those, not "Blocked by #N" written in the body. Mentioning the dependency in the body is fine too, but always set the link as well. "Related to #N" has no native equivalent — leave it as text.
+
+## Step 10 — Report back
+
+Tell the user: the issue number/URL, whether a duplicate check turned up anything close (even if not an exact dup), the labels applied and why (especially the `ai` decision), the field values set, and any relationships linked.
 
 ## Never
 
 - Never create the issue if Step 3 finds a duplicate.
 - Never add implementation details to the issue body unless the user explicitly asked for them.
+- Never leave a dependency only in the body text — Step 9 links it natively.
 - Never invent a label or a project field option that isn't in the lists above / `gh label list` — ask instead.
