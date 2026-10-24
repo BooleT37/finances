@@ -21,10 +21,17 @@ export interface CategorySuggestion {
   similarCount: number;
 }
 
+export type CategorySuggestionResult =
+  | { outcome: 'suggested'; categorySuggestion: CategorySuggestion }
+  | {
+      outcome: 'unknown' | 'low-confidence' | 'unresolved';
+      categorySuggestion: null;
+    };
+
 /**
- * Turns Jev's choice into a category suggestion, or null when Jev chose
- * `unknown`, isn't confident enough, or chose something that no longer
- * resolves to one of the criteria.
+ * Turns Jev's choice into a category suggestion, or says why there is none:
+ * Jev chose `unknown`, isn't confident enough, or chose something that no
+ * longer resolves to one of the criteria.
  */
 export function toCategorySuggestion({
   answer,
@@ -36,17 +43,23 @@ export function toCategorySuggestion({
   criteria: CategoryJevCriterion[];
   subscriptions: Subscription[];
   similarCount: number;
-}): CategorySuggestion | null {
-  if (
-    answer.choice === UNKNOWN_JEV_CHOICE ||
-    answer.confidence < CATEGORY_SUGGESTION_MIN_CONFIDENCE
-  ) {
-    return null;
+}): CategorySuggestionResult {
+  if (answer.choice === UNKNOWN_JEV_CHOICE) {
+    return { outcome: 'unknown', categorySuggestion: null };
+  }
+  if (answer.confidence < CATEGORY_SUGGESTION_MIN_CONFIDENCE) {
+    return { outcome: 'low-confidence', categorySuggestion: null };
   }
   const value = resolveCategoryJevCriterion(
     answer.choice,
     criteria,
     subscriptions,
   );
-  return value ? { value, confidence: answer.confidence, similarCount } : null;
+  if (!value) {
+    return { outcome: 'unresolved', categorySuggestion: null };
+  }
+  return {
+    outcome: 'suggested',
+    categorySuggestion: { value, confidence: answer.confidence, similarCount },
+  };
 }

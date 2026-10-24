@@ -32,31 +32,38 @@ const suggest = (choice: CategoryJevChoice, confidence: number) =>
   });
 
 describe('toCategorySuggestion', () => {
-  it('returns null for an unknown choice', () => {
-    expect(suggest(UNKNOWN_JEV_CHOICE, 0.99)).toBeNull();
+  it('reports an unknown choice', () => {
+    expect(suggest(UNKNOWN_JEV_CHOICE, 0.99)).toEqual({
+      outcome: 'unknown',
+      categorySuggestion: null,
+    });
   });
 
-  it('returns null below the confidence threshold', () => {
-    expect(suggest('1-10', 0.79)).toBeNull();
+  it('reports a choice below the confidence threshold', () => {
+    expect(suggest('1-10', 0.79)).toEqual({
+      outcome: 'low-confidence',
+      categorySuggestion: null,
+    });
   });
 
-  it('keeps a choice at the confidence threshold', () => {
+  it('suggests a choice at the confidence threshold', () => {
     expect(suggest('1-10', 0.8)).toEqual({
-      value: '1-10',
-      confidence: 0.8,
-      similarCount: 3,
+      outcome: 'suggested',
+      categorySuggestion: { value: '1-10', confidence: 0.8, similarCount: 3 },
     });
   });
 
   it('falls back from a subscription that is not offered to its category and subcategory', () => {
     expect(suggest('sub-5', 0.9)).toEqual({
-      value: '1-10',
-      confidence: 0.9,
-      similarCount: 3,
+      outcome: 'suggested',
+      categorySuggestion: { value: '1-10', confidence: 0.9, similarCount: 3 },
     });
   });
 
-  it('returns null for a choice that resolves to none of the criteria', () => {
-    expect(suggest('2', 0.95)).toBeNull();
+  it('reports a choice that resolves to none of the criteria', () => {
+    expect(suggest('2', 0.95)).toEqual({
+      outcome: 'unresolved',
+      categorySuggestion: null,
+    });
   });
 });

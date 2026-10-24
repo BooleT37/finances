@@ -386,12 +386,13 @@ export const suggestCategories = createServerFn({ method: 'POST' })
           subscriptions,
         );
         const answer = await jev.askChoice(state, question);
-        return toCategorySuggestion({
+        const { categorySuggestion } = toCategorySuggestion({
           answer,
           criteria,
           subscriptions,
           similarCount: state.similar_past_transactions.length,
         });
+        return categorySuggestion;
       },
       { concurrency: CATEGORY_SUGGESTION_CONCURRENCY },
     );
