@@ -344,8 +344,8 @@ export const suggestCategories = createServerFn({ method: 'POST' })
 
     const findSimilarTransactions = (description: string, isIncome: boolean) =>
       prisma.$transaction(async (tx) => {
-        const ranked = await tx.$queryRaw<{ id: number }[]>`
-          SELECT e.id
+        const ranked = await tx.$queryRaw<{ id: number; similarity: number }[]>`
+          SELECT e.id, similarity(e."importedDescription", ${description}) AS similarity
           FROM "Expense" e
           JOIN "Category" c ON c.id = e."categoryId" AND c."projectId" = e."projectId"
           WHERE e."projectId" = ${context.projectId}
@@ -353,17 +353,17 @@ export const suggestCategories = createServerFn({ method: 'POST' })
             AND e."importedDescription" IS NOT NULL
             AND c."isIncome" = ${isIncome}
             AND similarity(e."importedDescription", ${description}) > 0
-          ORDER BY similarity(e."importedDescription", ${description}) DESC,
-                   e.date, e.id
+          ORDER BY similarity DESC, e.date, e.id
           LIMIT ${SIMILAR_TRANSACTIONS_LIMIT}
         `;
         const transactions = await tx.expense.findMany({
           where: { id: { in: ranked.map(({ id }) => id) } },
           include: { category: true },
         });
-        return ranked.map(({ id }) =>
-          findByIdOrThrow(transactions, id, 'Similar transaction'),
-        );
+        return ranked.map(({ id, similarity }) => ({
+          transaction: findByIdOrThrow(transactions, id, 'Similar transaction'),
+          similarity,
+        }));
       });
 
     return pMap(
@@ -375,10 +375,14 @@ export const suggestCategories = createServerFn({ method: 'POST' })
           subscriptions: offeredSubscriptions,
           isIncome,
         });
+        const similarTransactions = await findSimilarTransactions(
+          parsedExpense.description,
+          isIncome,
+        );
         const { state, question } = buildCategoryJevQuestion(
           parsedExpense,
           criteria,
-          await findSimilarTransactions(parsedExpense.description, isIncome),
+          similarTransactions.map(({ transaction }) => transaction),
           subscriptions,
         );
         const answer = await jev.askChoice(state, question);
