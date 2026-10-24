@@ -23,6 +23,7 @@ export const traceCategoryChoice = <T extends string>(
       generation.update({
         output: {
           choice: answer.choice,
+          criterion: question.criteria[answer.choice],
           confidence: answer.confidence,
           probabilities: rankJevChoices(question, answer.probabilities),
         },
