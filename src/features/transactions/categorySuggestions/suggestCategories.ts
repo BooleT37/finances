@@ -1,0 +1,100 @@
+import pMap from 'p-map';
+
+import type { ParsedExpense } from '~/features/transactions/parsedExpense';
+import { prisma } from '~/server/db';
+import { typesafe } from '~/server/typesafe';
+import { assertOwnedByProject } from '~/shared/utils/assertOwnedByProject';
+import { findByIdOrThrow } from '~/shared/utils/getOrThrow';
+
+import { buildCategoryJevCriteria } from './categoryJevCriteria';
+import { buildCategoryJevQuestion } from './categoryJevQuestion';
+import {
+  CATEGORY_SUGGESTION_CONCURRENCY,
+  SIMILAR_TRANSACTIONS_LIMIT,
+  toCategorySuggestion,
+} from './categorySuggestion';
+
+export async function suggestCategoriesForProject(
+  {
+    sourceId,
+    subscriptionIds,
+    parsedExpenses,
+  }: {
+    sourceId: number;
+    subscriptionIds: number[];
+    parsedExpenses: ParsedExpense[];
+  },
+  { projectId }: { projectId: string },
+) {
+  if (!typesafe) {
+    throw new Error('Category suggestions need TYPESAFE_API_KEY to be set');
+  }
+  const jev = typesafe;
+  await assertOwnedByProject(prisma.source, sourceId, projectId, 'Source');
+
+  const [categories, subscriptions] = await Promise.all([
+    prisma.category.findMany({
+      where: { projectId },
+      include: { subcategories: true },
+    }),
+    prisma.subscription.findMany({ where: { projectId } }),
+  ]);
+  const offeredSubscriptions = subscriptions.filter((s) =>
+    subscriptionIds.includes(s.id),
+  );
+
+  const findSimilarTransactions = (description: string, isIncome: boolean) =>
+    prisma.$transaction(async (tx) => {
+      const ranked = await tx.$queryRaw<{ id: number; similarity: number }[]>`
+        SELECT e.id, similarity(e."importedDescription", ${description}) AS similarity
+        FROM "Expense" e
+        JOIN "Category" c ON c.id = e."categoryId" AND c."projectId" = e."projectId"
+        WHERE e."projectId" = ${projectId}
+          AND e."sourceId" = ${sourceId}
+          AND e."importedDescription" IS NOT NULL
+          AND c."isIncome" = ${isIncome}
+          AND similarity(e."importedDescription", ${description}) > 0
+        ORDER BY similarity DESC, e.date, e.id
+        LIMIT ${SIMILAR_TRANSACTIONS_LIMIT}
+      `;
+      const transactions = await tx.expense.findMany({
+        where: { id: { in: ranked.map(({ id }) => id) } },
+        include: { category: true },
+      });
+      return ranked.map(({ id, similarity }) => ({
+        transaction: findByIdOrThrow(transactions, id, 'Similar transaction'),
+        similarity,
+      }));
+    });
+
+  const suggestCategory = async (parsedExpense: ParsedExpense) => {
+    const isIncome = !parsedExpense.amount.isNegative();
+    const criteria = buildCategoryJevCriteria({
+      categories,
+      subscriptions: offeredSubscriptions,
+      isIncome,
+    });
+    const similarTransactions = await findSimilarTransactions(
+      parsedExpense.description,
+      isIncome,
+    );
+    const { state, question } = buildCategoryJevQuestion(
+      parsedExpense,
+      criteria,
+      similarTransactions.map(({ transaction }) => transaction),
+      subscriptions,
+    );
+    const answer = await jev.askChoice(state, question);
+    const { categorySuggestion } = toCategorySuggestion({
+      answer,
+      criteria,
+      subscriptions,
+      similarCount: state.similar_past_transactions.length,
+    });
+    return categorySuggestion;
+  };
+
+  return pMap(parsedExpenses, suggestCategory, {
+    concurrency: CATEGORY_SUGGESTION_CONCURRENCY,
+  });
+}
