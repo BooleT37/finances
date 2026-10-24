@@ -153,6 +153,25 @@ Required env vars (set on Vercel for production, in `.env` for local):
 
 The middleware resolves the session itself via `getSessionForRequest` (`~/server/getSessionForRequest`) rather than reading `authMiddleware`'s context: it is registered globally, so it runs *outside* the per-function middleware and `next()` throws on failure, which would drop the user from exactly the failed events worth attributing. `getSessionForRequest` memoises per request (keyed on `getRequest()`), so this shares one lookup with `authMiddleware` instead of doubling them. A session that fails to resolve is logged and reported as anonymous — analytics must never fail a request.
 
+## Tracing (Langfuse)
+
+LLM calls are traced in [Langfuse](https://langfuse.com). [src/server/langfuse.ts](src/server/langfuse.ts) starts the OpenTelemetry Node SDK with a `LangfuseSpanProcessor` for traces and creates a `LangfuseClient` (`langfuseClient`) for scores. The `environment` comes from `VERCEL_ENV` / `NODE_ENV`, the same way as PostHog.
+
+Required env vars (set on Vercel for production, in `.env` for local):
+- `LANGFUSE_PUBLIC_KEY`
+- `LANGFUSE_SECRET_KEY`
+- `LANGFUSE_BASE_URL` — e.g. `https://cloud.langfuse.com` (EU)
+
+If any of them is missing, or Langfuse fails to start, tracing is off and a warning is logged; everything else works the same. Tracing must never fail a request: `flushLangfuse()` only logs its errors, and code that sends scores catches its own.
+
+- **Flush before returning.** On Vercel a function freezes as soon as it responds, so anything still queued is lost. Spans are exported immediately, and every server function that traces or scores must `await flushLangfuse()` before returning (in a `finally`, so failed runs are sent too).
+- **Keep Langfuse code in a `langfuse/` folder** next to the code it traces. Each wrapper takes the real step as a callback (`traceX(input, () => doX(input))`), so the business code reads the same with or without tracing.
+- **Use `isTracingOn`** before handing a trace id to the client: with tracing off, spans are no-ops and their ids are all zeros.
+- **Names are a stable API.** Dashboards, filters and evaluators in Langfuse rely on trace, observation and score names, so don't rename them casually.
+- **Score ids derived from the trace id** (e.g. `${traceId}-<score name>`) make a re-sent score replace the old one instead of duplicating it.
+- **Model and cost.** Record the model and token usage on generations. Only pass `costDetails` when Langfuse's pricing table doesn't know the model.
+- **Reading traces from the terminal.** Use `langfuse-cli` with `LANGFUSE_HOST` set to `LANGFUSE_BASE_URL`, e.g. `npx langfuse-cli api observations list --trace-id <id> --fields core,basic,io`. The CLI's legacy `traces` endpoints are deprecated.
+
 ## Authentication & Projects
 
 Auth is implemented via [Better Auth](https://better-auth.com) (`src/server/auth.ts`), self-hosted with a Prisma adapter — email/password (invite-only, no public sign-up) and Google OAuth (auto-links to an existing account by email match).
