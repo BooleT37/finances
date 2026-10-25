@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { type Prisma } from '~/generated/prisma/client';
 import { authMiddleware } from '~/middlewares/authMiddleware';
+import { trackInput } from '~/middlewares/tracking/trackInput';
 import { prisma } from '~/server/db';
 import { adaptCost } from '~/shared/utils/adaptCost';
 
@@ -139,7 +140,14 @@ export type UpsertCategoryForecastInput = z.infer<
  * the sum of its children.
  */
 export const upsertCategoryForecast = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([
+    authMiddleware,
+    trackInput<UpsertCategoryForecastInput>({
+      sum: 'send',
+      comment: 'omit',
+      lineItems: { unitPrice: 'send', quantity: 'send', comment: 'omit' },
+    }),
+  ])
   .inputValidator((input: UpsertCategoryForecastInput) =>
     upsertCategoryForecastInputSchema.parse(input),
   )
@@ -231,7 +239,16 @@ export type UpsertSubcategoryForecastsInput = z.infer<
  * the whole batch rather than per item.
  */
 export const upsertSubcategoryForecasts = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([
+    authMiddleware,
+    trackInput<UpsertSubcategoryForecastsInput>({
+      items: {
+        sum: 'send',
+        comment: 'omit',
+        lineItems: { unitPrice: 'send', quantity: 'send', comment: 'omit' },
+      },
+    }),
+  ])
   .inputValidator((input: UpsertSubcategoryForecastsInput) =>
     upsertSubcategoryForecastsInputSchema.parse(input),
   )

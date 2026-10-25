@@ -1,6 +1,7 @@
 import { createServerFn } from '@tanstack/react-start';
 
 import { authMiddleware } from '~/middlewares/authMiddleware';
+import { trackInput } from '~/middlewares/tracking/trackInput';
 import { prisma } from '~/server/db';
 import { assertOwnedByProject } from '~/shared/utils/assertOwnedByProject';
 
@@ -17,7 +18,7 @@ import {
 } from './schema';
 
 export const createSource = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([authMiddleware, trackInput<CreateSourceInput>({ name: 'send' })])
   .inputValidator((input: CreateSourceInput) => createSourceSchema.parse(input))
   .handler(async ({ data, context }) => {
     const created = await prisma.source.create({
@@ -48,7 +49,10 @@ export const fetchAllSources = createServerFn({ method: 'GET' })
   });
 
 export const updateSourceName = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([
+    authMiddleware,
+    trackInput<UpdateSourceNameInput>({ name: 'send' }),
+  ])
   .inputValidator((input: UpdateSourceNameInput) =>
     updateSourceNameSchema.parse(input),
   )
@@ -67,7 +71,10 @@ export const updateSourceName = createServerFn({ method: 'POST' })
   });
 
 export const updateSourceParser = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([
+    authMiddleware,
+    trackInput<UpdateSourceParserInput>({ parser: 'send' }),
+  ])
   .inputValidator((input: UpdateSourceParserInput) =>
     updateSourceParserSchema.parse(input),
   )
@@ -86,7 +93,7 @@ export const updateSourceParser = createServerFn({ method: 'POST' })
   });
 
 export const updateSourceOrder = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([authMiddleware, trackInput<UpdateSourceOrderInput>()])
   .inputValidator((input: UpdateSourceOrderInput) =>
     updateSourceOrderSchema.parse(input),
   )
@@ -98,7 +105,7 @@ export const updateSourceOrder = createServerFn({ method: 'POST' })
   });
 
 export const deleteSource = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([authMiddleware, trackInput<number>()])
   .inputValidator((id: number) => id)
   .handler(async ({ data: id, context }) => {
     await assertOwnedByProject(prisma.source, id, context.projectId, 'Source');

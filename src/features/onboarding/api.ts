@@ -1,6 +1,7 @@
 import { createServerFn } from '@tanstack/react-start';
 
 import { authMiddleware } from '~/middlewares/authMiddleware';
+import { trackInput } from '~/middlewares/tracking/trackInput';
 import { prisma } from '~/server/db';
 
 import {
@@ -20,7 +21,10 @@ export const fetchOnboardingStatus = createServerFn({ method: 'GET' })
   });
 
 export const completeOnboarding = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([
+    authMiddleware,
+    trackInput<CompleteOnboardingInput>({ reason: 'send' }),
+  ])
   .inputValidator((input: CompleteOnboardingInput) =>
     completeOnboardingSchema.parse(input),
   )

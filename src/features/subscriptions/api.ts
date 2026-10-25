@@ -4,6 +4,7 @@ import Decimal from 'decimal.js';
 
 import { type Prisma } from '~/generated/prisma/client';
 import { authMiddleware } from '~/middlewares/authMiddleware';
+import { trackInput } from '~/middlewares/tracking/trackInput';
 import { prisma } from '~/server/db';
 import { adaptCost } from '~/shared/utils/adaptCost';
 import { assertOwnedByProject } from '~/shared/utils/assertOwnedByProject';
@@ -40,7 +41,14 @@ export const fetchAllSubscriptions = createServerFn({ method: 'GET' })
   });
 
 export const createSubscription = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([
+    authMiddleware,
+    trackInput<CreateSubscriptionInput>({
+      name: 'send',
+      cost: 'send',
+      firstDate: 'send',
+    }),
+  ])
   .inputValidator((input: CreateSubscriptionInput) =>
     createSubscriptionSchema.parse(input),
   )
@@ -63,7 +71,14 @@ export const createSubscription = createServerFn({ method: 'POST' })
   });
 
 export const updateSubscription = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([
+    authMiddleware,
+    trackInput<UpdateSubscriptionInput>({
+      name: 'send',
+      cost: 'send',
+      firstDate: 'send',
+    }),
+  ])
   .inputValidator((input: UpdateSubscriptionInput) =>
     updateSubscriptionSchema.parse(input),
   )
@@ -93,7 +108,7 @@ export const updateSubscription = createServerFn({ method: 'POST' })
   });
 
 export const deleteSubscription = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([authMiddleware, trackInput<number>()])
   .inputValidator((id: number) => id)
   .handler(async ({ data: id, context }) => {
     await assertOwnedByProject(

@@ -2,6 +2,7 @@ import { createServerFn } from '@tanstack/react-start';
 
 import { type Prisma } from '~/generated/prisma/client';
 import { authMiddleware } from '~/middlewares/authMiddleware';
+import { trackInput } from '~/middlewares/tracking/trackInput';
 import { prisma } from '~/server/db';
 import { assertOwnedByProject } from '~/shared/utils/assertOwnedByProject';
 
@@ -45,7 +46,15 @@ export const fetchAllCategories = createServerFn({ method: 'GET' })
   });
 
 export const createCategory = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([
+    authMiddleware,
+    trackInput<CreateCategoryInput>({
+      name: 'send',
+      shortname: 'send',
+      icon: 'send',
+      subcategories: { name: 'send' },
+    }),
+  ])
   .inputValidator((input: CreateCategoryInput) =>
     createCategorySchema.parse(input),
   )
@@ -90,7 +99,15 @@ export const createCategory = createServerFn({ method: 'POST' })
   });
 
 export const updateCategory = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([
+    authMiddleware,
+    trackInput<UpdateCategoryInput>({
+      name: 'send',
+      shortname: 'send',
+      icon: 'send',
+      subcategories: { name: 'send' },
+    }),
+  ])
   .inputValidator((input: UpdateCategoryInput) =>
     updateCategorySchema.parse(input),
   )
@@ -157,7 +174,7 @@ export const updateCategory = createServerFn({ method: 'POST' })
   });
 
 export const updateCategoryOrder = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([authMiddleware, trackInput<UpdateCategoryOrderInput>()])
   .inputValidator((input: UpdateCategoryOrderInput) =>
     updateCategoryOrderSchema.parse(input),
   )
@@ -173,7 +190,7 @@ export const updateCategoryOrder = createServerFn({ method: 'POST' })
   });
 
 export const deleteCategory = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([authMiddleware, trackInput<number>()])
   .inputValidator((id: number) => id)
   .handler(async ({ data: id, context }) => {
     await assertOwnedByProject(

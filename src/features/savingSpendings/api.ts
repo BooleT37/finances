@@ -2,6 +2,7 @@ import { createServerFn } from '@tanstack/react-start';
 import Decimal from 'decimal.js';
 
 import { authMiddleware } from '~/middlewares/authMiddleware';
+import { trackInput } from '~/middlewares/tracking/trackInput';
 import { prisma } from '~/server/db';
 import { assertOwnedByProject } from '~/shared/utils/assertOwnedByProject';
 
@@ -58,7 +59,13 @@ export const fetchAllSavingSpendings = createServerFn({
   });
 
 export const createSavingSpending = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([
+    authMiddleware,
+    trackInput<CreateSavingSpendingInput>({
+      name: 'send',
+      categories: { name: 'send', forecast: 'send', comment: 'omit' },
+    }),
+  ])
   .inputValidator((input: CreateSavingSpendingInput) =>
     createSavingSpendingSchema.parse(input),
   )
@@ -82,7 +89,13 @@ export const createSavingSpending = createServerFn({ method: 'POST' })
   });
 
 export const updateSavingSpending = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([
+    authMiddleware,
+    trackInput<UpdateSavingSpendingInput>({
+      name: 'send',
+      categories: { name: 'send', forecast: 'send', comment: 'omit' },
+    }),
+  ])
   .inputValidator((input: UpdateSavingSpendingInput) =>
     updateSavingSpendingSchema.parse(input),
   )
@@ -152,7 +165,7 @@ export const updateSavingSpending = createServerFn({ method: 'POST' })
   });
 
 export const deleteSavingSpending = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([authMiddleware, trackInput<number>()])
   .inputValidator((id: number) => id)
   .handler(async ({ data: id, context }) => {
     await assertOwnedByProject(
@@ -183,7 +196,7 @@ export const deleteSavingSpending = createServerFn({ method: 'POST' })
   });
 
 export const archiveSavingSpending = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([authMiddleware, trackInput<number>()])
   .inputValidator((id: number) => id)
   .handler(async ({ data: id, context }) => {
     await assertOwnedByProject(
@@ -199,7 +212,7 @@ export const archiveSavingSpending = createServerFn({ method: 'POST' })
   });
 
 export const unarchiveSavingSpending = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([authMiddleware, trackInput<number>()])
   .inputValidator((id: number) => id)
   .handler(async ({ data: id, context }) => {
     await assertOwnedByProject(

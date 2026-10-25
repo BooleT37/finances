@@ -3,6 +3,7 @@ import { getRequest } from '@tanstack/react-start/server';
 import { generateRandomString } from 'better-auth/crypto';
 
 import { adminMiddleware } from '~/middlewares/adminMiddleware';
+import { trackInput } from '~/middlewares/tracking/trackInput';
 import { auth } from '~/server/auth';
 import { prisma } from '~/server/db';
 
@@ -25,7 +26,14 @@ export const fetchProjectUsers = createServerFn({ method: 'GET' })
   });
 
 export const createProjectUser = createServerFn({ method: 'POST' })
-  .middleware([adminMiddleware])
+  .middleware([
+    adminMiddleware,
+    trackInput<CreateProjectUserInput>({
+      name: 'omit',
+      email: 'omit',
+      role: 'send',
+    }),
+  ])
   .inputValidator((input: CreateProjectUserInput) =>
     createProjectUserSchema.parse(input),
   )
@@ -52,7 +60,7 @@ export const createProjectUser = createServerFn({ method: 'POST' })
   });
 
 export const deleteProjectUser = createServerFn({ method: 'POST' })
-  .middleware([adminMiddleware])
+  .middleware([adminMiddleware, trackInput<string>('sendFull')])
   .inputValidator((userId: string) => userId)
   .handler(async ({ data: targetUserId, context }) => {
     await prisma.$transaction(async (tx) => {

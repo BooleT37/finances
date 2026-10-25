@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import Decimal from 'decimal.js';
 
 import { authMiddleware } from '~/middlewares/authMiddleware';
+import { trackInput } from '~/middlewares/tracking/trackInput';
 import { prisma } from '~/server/db';
 import { adaptCost } from '~/shared/utils/adaptCost';
 import { assertOwnedByProject } from '~/shared/utils/assertOwnedByProject';
@@ -58,7 +59,16 @@ export const fetchTransactionsByYear = createServerFn({ method: 'GET' })
   });
 
 export const createTransaction = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([
+    authMiddleware,
+    trackInput<NewTransactionInput>({
+      name: 'omit',
+      cost: 'send',
+      date: 'send',
+      actualDate: 'send',
+      components: { name: 'omit', cost: 'send' },
+    }),
+  ])
   .inputValidator((input: NewTransactionInput) =>
     newTransactionSchema.parse(input),
   )
@@ -107,7 +117,7 @@ export const createTransaction = createServerFn({ method: 'POST' })
   });
 
 export const deleteTransaction = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([authMiddleware, trackInput<number>()])
   .inputValidator((id: number) => id)
   .handler(async ({ data: id, context }) => {
     await assertOwnedByProject(
@@ -120,7 +130,16 @@ export const deleteTransaction = createServerFn({ method: 'POST' })
   });
 
 export const updateTransaction = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([
+    authMiddleware,
+    trackInput<UpdateTransactionInput>({
+      name: 'omit',
+      cost: 'send',
+      date: 'send',
+      actualDate: 'send',
+      components: { name: 'omit', cost: 'send' },
+    }),
+  ])
   .inputValidator((input: UpdateTransactionInput) =>
     updateTransactionSchema.parse(input),
   )
@@ -215,7 +234,10 @@ export const updateTransaction = createServerFn({ method: 'POST' })
   });
 
 export const parsePdfExpenses = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([
+    authMiddleware,
+    trackInput<ParsePdfExpensesInput>({ fileBase64: 'length', parser: 'send' }),
+  ])
   .inputValidator((input: ParsePdfExpensesInput) =>
     parsePdfExpensesSchema.parse(input),
   )
@@ -272,7 +294,17 @@ export const parsePdfExpenses = createServerFn({ method: 'POST' })
   });
 
 export const importTransactions = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([
+    authMiddleware,
+    trackInput<ImportTransactionsInput>({
+      name: 'omit',
+      cost: 'send',
+      date: 'send',
+      peHash: 'omit',
+      importedDescription: 'omit',
+      categorySuggestionTrace: { traceId: 'sendFull', suggestedValue: 'send' },
+    }),
+  ])
   .inputValidator((input: ImportTransactionsInput) =>
     importTransactionsSchema.parse(input),
   )
@@ -306,7 +338,18 @@ export const importTransactions = createServerFn({ method: 'POST' })
   });
 
 export const suggestCategories = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
+  .middleware([
+    authMiddleware,
+    trackInput<SuggestCategoriesInput>({
+      parsedExpenses: {
+        date: 'send',
+        type: 'send',
+        description: 'omit',
+        amount: 'send',
+        hash: 'omit',
+      },
+    }),
+  ])
   .validator((input: SuggestCategoriesInput) =>
     suggestCategoriesSchema.parse(input),
   )

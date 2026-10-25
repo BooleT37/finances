@@ -2,6 +2,7 @@ import { createServerFn } from '@tanstack/react-start';
 
 import { adminMiddleware } from '~/middlewares/adminMiddleware';
 import { authMiddleware } from '~/middlewares/authMiddleware';
+import { trackInput } from '~/middlewares/tracking/trackInput';
 import { prisma } from '~/server/db';
 
 import {
@@ -20,7 +21,10 @@ export const fetchProject = createServerFn({ method: 'GET' })
   });
 
 export const renameProject = createServerFn({ method: 'POST' })
-  .middleware([adminMiddleware])
+  .middleware([
+    adminMiddleware,
+    trackInput<RenameProjectInput>({ name: 'send' }),
+  ])
   .inputValidator((input: RenameProjectInput) =>
     renameProjectSchema.parse(input),
   )
