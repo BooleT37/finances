@@ -18,6 +18,7 @@ import {
   HeadContent,
   Outlet,
   Scripts,
+  useMatches,
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import type { createStore } from 'jotai';
@@ -77,11 +78,26 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   const { t, i18n: i18nInstance } = useTranslation('nav');
+  // The app name is a fallback <title> rendered here, not a `title` in the
+  // root route's `head`, because it has to be translated. `head` runs on the
+  // server, which always renders in the default language, so a user with
+  // another language saved would get the wrong title until they navigate.
+  // A route that sets its own `title` in `head` still replaces it.
+  const routeHasTitle = useMatches({
+    select: (matches) =>
+      matches.some(
+        (match) =>
+          Array.isArray(match.meta) &&
+          match.meta.some((tag: unknown) =>
+            Boolean(tag && typeof tag === 'object' && 'title' in tag),
+          ),
+      ),
+  });
   return (
     <html lang={i18nInstance.language} data-mantine-color-scheme="light">
       <head>
         <HeadContent />
-        <title>{t('appName')}</title>
+        {!routeHasTitle && <title>{t('appName')}</title>}
       </head>
       <body>
         {children}
