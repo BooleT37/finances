@@ -4,6 +4,8 @@ import { ZodError } from 'zod';
 import { getSessionForRequest } from '~/server/getSessionForRequest';
 import { posthog } from '~/server/posthog';
 
+import { getTrackedInput } from './trackedInputs';
+
 const ANONYMOUS_DISTINCT_ID = 'anonymous';
 
 // Analytics must never take a request down with it, so a session that fails to
@@ -71,6 +73,7 @@ export const posthogTrackingMiddleware = createMiddleware({
           event: `serverfn_${serverFnMeta.name}`,
           properties: {
             ...commonProps,
+            input: getTrackedInput(serverFnMeta.id),
             durationMs: getDurationMs(),
             success: false,
             error: describeError(error),
@@ -92,6 +95,7 @@ export const posthogTrackingMiddleware = createMiddleware({
       event: `serverfn_${serverFnMeta.name}`,
       properties: {
         ...commonProps,
+        input: getTrackedInput(serverFnMeta.id),
         durationMs: getDurationMs(),
         success: true,
       },
