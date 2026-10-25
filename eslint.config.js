@@ -32,6 +32,23 @@ export default defineConfig(
     },
   },
   {
+    ignores: ['src/middlewares/tracking/**', '**/*.test.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['~/server/posthog', '**/server/posthog'],
+              message:
+                'Capture analytics only in the tracking middleware, so every event goes through trackInput rules.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     languageOptions: {
       parserOptions: {
         project: true,
