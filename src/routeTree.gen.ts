@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated.index'
 import { Route as AuthenticatedBudgetingRouteImport } from './routes/_authenticated.budgeting'
 import { Route as AuthenticatedSavingsSpendingsRouteImport } from './routes/_authenticated.savings-spendings'
@@ -41,6 +42,11 @@ const LoginRoute = LoginRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
@@ -139,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/budgeting': typeof AuthenticatedBudgetingRoute
   '/savings-spendings': typeof AuthenticatedSavingsSpendingsRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRouteWithChildren
@@ -158,6 +165,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/budgeting': typeof AuthenticatedBudgetingRoute
   '/settings': typeof AuthenticatedSettingsRouteWithChildren
   '/statistics': typeof AuthenticatedStatisticsRoute
@@ -178,6 +186,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/_authenticated/budgeting': typeof AuthenticatedBudgetingRoute
   '/_authenticated/savings-spendings': typeof AuthenticatedSavingsSpendingsRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteWithChildren
@@ -201,6 +210,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/privacy'
+    | '/terms'
     | '/budgeting'
     | '/savings-spendings'
     | '/settings'
@@ -220,6 +230,7 @@ export interface FileRouteTypes {
   to:
     | '/login'
     | '/privacy'
+    | '/terms'
     | '/budgeting'
     | '/settings'
     | '/statistics'
@@ -239,6 +250,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/login'
     | '/privacy'
+    | '/terms'
     | '/_authenticated/budgeting'
     | '/_authenticated/savings-spendings'
     | '/_authenticated/settings'
@@ -261,6 +273,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
   PrivacyRoute: typeof PrivacyRoute
+  TermsRoute: typeof TermsRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -285,6 +298,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/': {
@@ -487,6 +507,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   PrivacyRoute: PrivacyRoute,
+  TermsRoute: TermsRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
