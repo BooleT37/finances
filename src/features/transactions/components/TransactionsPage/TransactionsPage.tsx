@@ -16,7 +16,7 @@ import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { FeatureOnboardingTour } from '~/features/onboarding/components/FeatureOnboardingTour';
-import { getUserSettingsQueryOptions } from '~/features/userSettings/queries';
+import { getProjectSettingsQueryOptions } from '~/features/projectSettings/queries';
 
 import { useTransactionsOnboardingSteps } from '../../onboarding/useTransactionsOnboardingSteps';
 import { ImportModal, importModalOpenAtom } from '../ImportModal';
@@ -59,8 +59,8 @@ export function TransactionsPage() {
     showUpcoming,
     searchString: search,
   });
-  const { isSuccess: userSettingsLoaded } = useQuery(
-    getUserSettingsQueryOptions(),
+  const { isSuccess: projectSettingsLoaded } = useQuery(
+    getProjectSettingsQueryOptions(),
   );
 
   return (
@@ -113,13 +113,13 @@ export function TransactionsPage() {
           </Group>
         </Group>
         {/*
-          // we need to fetch all the orders from user settings
+          // we need to fetch all the orders from project settings
           // before we render the table, otherwise ordering won't work */}
         <Box
           data-onboarding-tour-id="transactions-intro"
           style={{ flex: 1, minHeight: 0 }}
         >
-          {userSettingsLoaded ? (
+          {projectSettingsLoaded ? (
             <TransactionTable
               items={items}
               groupBySubcategories={groupBySubcategories}

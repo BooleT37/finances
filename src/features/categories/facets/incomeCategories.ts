@@ -1,6 +1,6 @@
 import { useQueries } from '@tanstack/react-query';
 
-import { getIncomeCategoriesOrderQueryOptions } from '~/features/userSettings/facets/incomeCategoriesOrder';
+import { getIncomeCategoriesOrderQueryOptions } from '~/features/projectSettings/facets/incomeCategoriesOrder';
 
 import { getCategoriesQueryOptions } from '../queries';
 import type { Category } from '../schema';

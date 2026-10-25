@@ -1,6 +1,6 @@
 import { useQueries } from '@tanstack/react-query';
 
-import { getExpenseCategoriesOrderQueryOptions } from '~/features/userSettings/facets/expenseCategoriesOrder';
+import { getExpenseCategoriesOrderQueryOptions } from '~/features/projectSettings/facets/expenseCategoriesOrder';
 
 import { getCategoriesQueryOptions } from '../queries';
 import type { Category } from '../schema';

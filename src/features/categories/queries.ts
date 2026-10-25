@@ -7,7 +7,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 
-import { getUserSettingsQueryOptions } from '~/features/userSettings/queries';
+import { getProjectSettingsQueryOptions } from '~/features/projectSettings/queries';
 
 import {
   createCategory,
@@ -46,7 +46,7 @@ export function useCreateCategory() {
     mutationFn: (input: CreateCategoryInput) => createCategory({ data: input }),
     onSuccess: () =>
       Promise.all([
-        queryClient.invalidateQueries(getUserSettingsQueryOptions()),
+        queryClient.invalidateQueries(getProjectSettingsQueryOptions()),
         queryClient.invalidateQueries(getCategoriesQueryOptions()),
       ]),
   });
@@ -69,7 +69,7 @@ export function useUpdateCategoryOrder() {
     mutationFn: (input: UpdateCategoryOrderInput) =>
       updateCategoryOrder({ data: input }),
     onSettled: () =>
-      queryClient.invalidateQueries(getUserSettingsQueryOptions()),
+      queryClient.invalidateQueries(getProjectSettingsQueryOptions()),
   });
 }
 

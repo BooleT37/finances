@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
-import { getExpenseCategoriesOrderQueryOptions } from '~/features/userSettings/facets/expenseCategoriesOrder';
-import { getIncomeCategoriesOrderQueryOptions } from '~/features/userSettings/facets/incomeCategoriesOrder';
+import { getExpenseCategoriesOrderQueryOptions } from '~/features/projectSettings/facets/expenseCategoriesOrder';
+import { getIncomeCategoriesOrderQueryOptions } from '~/features/projectSettings/facets/incomeCategoriesOrder';
 
 import { getCategoryMapQueryOptions } from './categoryMap';
 

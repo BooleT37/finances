@@ -1,6 +1,6 @@
 import { useQueries } from '@tanstack/react-query';
 
-import { getSourcesOrderQueryOptions } from '~/features/userSettings/facets/sourcesOrder';
+import { getSourcesOrderQueryOptions } from '~/features/projectSettings/facets/sourcesOrder';
 
 import { getSourcesQueryOptions } from '../queries';
 import type { Source } from '../schema';

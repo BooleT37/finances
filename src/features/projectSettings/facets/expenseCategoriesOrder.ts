@@ -1,9 +1,9 @@
 import { queryOptions } from '@tanstack/react-query';
 
-import { getUserSettingsQueryOptions } from '../queries';
+import { getProjectSettingsQueryOptions } from '../queries';
 
 export const getExpenseCategoriesOrderQueryOptions = () =>
   queryOptions({
-    ...getUserSettingsQueryOptions(),
+    ...getProjectSettingsQueryOptions(),
     select: (s) => s.expenseCategoriesOrder,
   });

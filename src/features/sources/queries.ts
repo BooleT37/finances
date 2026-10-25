@@ -5,7 +5,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 
-import { getUserSettingsQueryOptions } from '~/features/userSettings/queries';
+import { getProjectSettingsQueryOptions } from '~/features/projectSettings/queries';
 
 import {
   createSource,
@@ -44,7 +44,7 @@ export function useCreateSource() {
     mutationFn: (input: CreateSourceInput) => createSource({ data: input }),
     onSuccess: () =>
       Promise.all([
-        queryClient.invalidateQueries(getUserSettingsQueryOptions()),
+        queryClient.invalidateQueries(getProjectSettingsQueryOptions()),
         queryClient.invalidateQueries(getSourcesQueryOptions()),
       ]),
   });
@@ -74,7 +74,7 @@ export function useUpdateSourceOrder() {
     mutationFn: (input: UpdateSourceOrderInput) =>
       updateSourceOrder({ data: input }),
     onSettled: () =>
-      queryClient.invalidateQueries(getUserSettingsQueryOptions()),
+      queryClient.invalidateQueries(getProjectSettingsQueryOptions()),
   });
 }
 
@@ -102,7 +102,7 @@ export function useDeleteSource() {
     onSettled: () =>
       Promise.all([
         queryClient.invalidateQueries(getSourcesQueryOptions()),
-        queryClient.invalidateQueries(getUserSettingsQueryOptions()),
+        queryClient.invalidateQueries(getProjectSettingsQueryOptions()),
       ]),
   });
 }
