@@ -1,9 +1,17 @@
 # Project
 
-The current project's (household's) own identity — currently just its name.
+A project is a household. Everything in the app belongs to a project rather than to a single user: categories, sources, transactions, budgets, subscriptions and savings. Every member of a project works with the same data.
 
-Visible to every project member at `/settings/project`. Renaming is restricted to admins (`adminMiddleware`); non-admins see the name as read-only text, not a disabled input.
+## Members
 
-The same `/settings/project` page also shows [Project Users](../projectUsers/PROJECT_USERS.md) management below the name, for admins only — that section is composed in at the route level (`_authenticated.settings.project.tsx`), not inside this feature, since it belongs to a different feature.
+A user belongs to exactly one project for as long as the user exists, and can't be moved to another one. Each member is either an admin or a regular user. Who the members are and what each role can do is described in [Project Users](../projectUsers/PROJECT_USERS.md).
 
-Account settings (`~/features/account`, your own name/password) are a separate concern with their own page (`/settings/account`), reachable from the same nav group as this page.
+A new project is only ever created by `scripts/bootstrap-project.ts`, together with its first admin, since there is no public sign-up.
+
+## Name
+
+A project has a name. Only an admin can change it.
+
+## Settings
+
+A project has one set of settings that applies to the whole household, such as the order of categories and sources and whether category autofill is on. They live in `~/features/projectSettings`. What category autofill does is described in [Transactions](../transactions/TRANSACTIONS.md).

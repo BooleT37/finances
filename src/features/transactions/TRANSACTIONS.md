@@ -63,6 +63,14 @@ A category suggestion can be a subscription too. If the suggested subscription i
 
 A category suggestion fills a row only while its category is still empty, so a category the user has already picked always stays. The row is marked as suggested until the user changes it. If category suggestions can't be fetched, the modal says so and offers to retry, and the import works as usual.
 
+## Category Autofill
+
+Category suggestions only run when the project has category autofill turned on. A project starts with it off, and only an admin can turn it on or off, on the project settings page (see [Project](../project/PROJECT.md)).
+
+Turning it on is how the household agrees to its data going to TypeSafe, which is in the USA and has no EU data protection agreement. That's why it starts off, and why the server refuses to suggest categories while it's off, whoever asks.
+
+While it's off, the import modal says so and links to the project settings. The hint can be hidden, and then stays hidden in that browser.
+
 ## Similar Transactions
 
 The similar transactions of a parsed expense are up to 10 transactions of the same source and the same sign (expense or income) whose imported description is the closest to the parsed expense's. Closeness is measured by Postgres' `pg_trgm` trigram similarity.

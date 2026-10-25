@@ -7,7 +7,7 @@ This lives as a section (`ProjectUsersTable`) on the same `/settings/project` pa
 ## Roles
 
 - `user` — default role, full access to all app features except the users section of this page.
-- `admin` — everything a `user` can do, plus the users section on `/settings/project` to add or remove other project members. Role does not gate anything else in the app.
+- `admin` — everything a `user` can do, plus the users section on `/settings/project` to add or remove other project members, renaming the project, and turning category autofill on or off. Role does not gate anything else in the app.
 
 ## Adding a user
 
