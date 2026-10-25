@@ -1,13 +1,20 @@
 import {
+  Anchor,
   Box,
   Center,
   Divider,
   Group,
   Paper,
   Stack,
+  Text,
   Title,
 } from '@mantine/core';
-import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  Link,
+  redirect,
+  useNavigate,
+} from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
@@ -63,16 +70,29 @@ function LoginPage() {
         <LanguageSwitcher />
       </Group>
       <Center h="100%">
-        <Paper withBorder p="xl" w={360}>
-          <Stack gap="lg">
-            <Title order={2} ta="center">
-              {t('pageTitle')}
-            </Title>
-            <LoginForm onSuccess={handleSuccess} />
-            <Divider label={t('form.or')} />
-            <GoogleSignInButton callbackURL={redirectTo} />
-          </Stack>
-        </Paper>
+        <Stack gap="sm" align="center">
+          <Paper withBorder p="xl" w={360}>
+            <Stack gap="lg">
+              <Title order={2} ta="center">
+                {t('pageTitle')}
+              </Title>
+              <LoginForm onSuccess={handleSuccess} />
+              <Divider label={t('form.or')} />
+              <GoogleSignInButton callbackURL={redirectTo} />
+            </Stack>
+          </Paper>
+          <Group gap="xs">
+            <Anchor component={Link} to="/terms" size="xs" c="dimmed">
+              {t('legal.terms')}
+            </Anchor>
+            <Text size="xs" c="dimmed">
+              ·
+            </Text>
+            <Anchor component={Link} to="/privacy" size="xs" c="dimmed">
+              {t('legal.privacy')}
+            </Anchor>
+          </Group>
+        </Stack>
       </Center>
     </Box>
   );
