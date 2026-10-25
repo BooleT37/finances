@@ -143,7 +143,34 @@ Types are inferred automatically via `as const` — no manual type maintenance n
 
 ## Analytics (PostHog)
 
-All `createServerFn` POST mutations are auto-captured via the global `posthogTrackingMiddleware` registered in [src/start.ts](src/start.ts). Events are named `serverfn_<functionName>` (e.g. `serverfn_createTransaction`) and logged with `{ input, timestamp, success, environment }`. The `environment` field is `VERCEL_ENV` on Vercel (`production` / `preview` / `development`) or `NODE_ENV` locally — filter by it in PostHog to separate prod traffic from preview/dev noise.
+All `createServerFn` POST mutations are auto-captured by the global `posthogTrackingMiddleware` (in `src/middlewares/tracking/`), registered in [src/start.ts](src/start.ts). Events are named `serverfn_<functionName>` (e.g. `serverfn_createTransaction`) and carry `name`, `timestamp`, `environment`, `durationMs`, `success`, the tracked `input` (see below) and, on failure, `error`. The `environment` field is `VERCEL_ENV` on Vercel (`production` / `preview` / `development`) or `NODE_ENV` locally. Filter by it in PostHog to separate prod traffic from preview/dev noise. We don't track anything in test environment
+
+PostHog is a third party, and every event is tied to the user's name and email. So to adhere to our privacy policy, a server function's input is sent only as far as the function's own rules allow:
+
+- **Every POST server function adds `trackInput<Input>(rules)` to its middleware**, after the auth middleware. `Input` is the type its `inputValidator` takes. A function without it sends no `input` at all.
+- Numbers, booleans and `null` are sent as they are. Every `string` field needs a rule, enums and fields inside arrays and nested objects included, and `tsc` fails until it has one. The rules:
+  - `'send'` sends the value cut to 200 characters, with `…` added when it was cut. Use it for amounts, dates, labels and enums.
+  - `'sendFull'` sends the value uncut. Only for strings that mean nothing once cut, such as ids and trace ids.
+  - `'length'` sends `{ length }`. Use it for large payloads like file contents.
+  - `'omit'` sends nothing. Use it for free text the user types (descriptions, comments, notes), another person's name or email, credentials, codes and tokens, and anything derived from them, like a hash of a description.
+- A field holding an object or array with strings in it takes nested rules, or `'omit'` for the whole field.
+- Middleware gets the input before validation, so a client can send fields the type doesn't declare. At runtime a string without a rule is dropped.
+
+```ts
+.middleware([
+  authMiddleware,
+  trackInput<CreateItemInput>({
+    name: 'send',
+    note: 'omit',
+    price: 'send',
+    lines: { label: 'send', comment: 'omit' },
+  }),
+])
+```
+
+A failed call sends `error: { type, code?, issues? }`. That is the error's class name, its `code` when it has one (Prisma's `P2003`, for example), and for validation errors the failed field paths with their Zod issue codes. The message itself is never sent, because Prisma's messages repeat the query's arguments verbatim. The full error goes to the server log.
+
+Only files in `src/middlewares/tracking/` may import `~/server/posthog`, which ESLint enforces with `no-restricted-imports`. New analytics belong in that folder, so every event goes through the rules above.
 
 Required env vars (set on Vercel for production, in `.env` for local):
 - `POSTHOG_API_KEY` — Project API key
