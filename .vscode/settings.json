@@ -15,7 +15,8 @@
     "src/features/auth/locales",
     "src/features/projectUsers/locales",
     "src/features/account/locales",
-    "src/features/project/locales"
+    "src/features/project/locales",
+    "src/features/projectSettings/locales"
   ],
   "i18n-ally.namespace": true,
   "i18n-ally.defaultNamespace": "home",

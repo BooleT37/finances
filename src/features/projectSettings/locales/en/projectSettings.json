@@ -1,0 +1,12 @@
+{
+  "categorySuggestions": {
+    "label": "Category autofill",
+    "description": "When this is on, importing your data sends each row's description, amount and date to TypeSafe in the USA, together with similar past transactions and the names of your categories and subscriptions, to suggest a category. TypeSafe says it doesn't train models on this data. Transfers to TypeSafe aren't covered by an EU data protection agreement.",
+    "adminOnly": "Only an admin can change this.",
+    "notifications": {
+      "enabled": "Category autofill turned on",
+      "disabled": "Category autofill turned off",
+      "error": "Failed to change category autofill"
+    }
+  }
+}

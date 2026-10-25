@@ -8,6 +8,7 @@ import { i18nResources as categoriesResources } from '~/features/categories/i18n
 import { i18nResources as navResources } from '~/features/nav/i18n';
 import { i18nResources as onboardingResources } from '~/features/onboarding/i18n';
 import { i18nResources as projectResources } from '~/features/project/i18n';
+import { i18nResources as projectSettingsResources } from '~/features/projectSettings/i18n';
 import { i18nResources as projectUsersResources } from '~/features/projectUsers/i18n';
 import { i18nResources as savingSpendingsResources } from '~/features/savingSpendings/i18n';
 import { i18nResources as sourcesResources } from '~/features/sources/i18n';
@@ -37,6 +38,7 @@ export const resources = {
     ...projectUsersResources.en,
     ...accountResources.en,
     ...projectResources.en,
+    ...projectSettingsResources.en,
   },
   ru: {
     common: commonRu,
@@ -54,6 +56,7 @@ export const resources = {
     ...projectUsersResources.ru,
     ...accountResources.ru,
     ...projectResources.ru,
+    ...projectSettingsResources.ru,
   },
 } as const;
 
