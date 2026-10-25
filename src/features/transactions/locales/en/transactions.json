@@ -120,6 +120,7 @@
     "success_other": "{{count}} transactions added",
     "duplicateWarning": "Unchecked items already exist in the database for this year.",
     "suggestingCategory": "Suggesting…",
+    "categorySuggestionsOff": "Category autofill is off. An admin can turn it on in <settingsLink>Project settings</settingsLink>.",
     "categorySuggestionsFailed": "Couldn't fetch category suggestions",
     "retryCategorySuggestions": "Retry",
     "suggestedCategoryLabel": "Suggested category",

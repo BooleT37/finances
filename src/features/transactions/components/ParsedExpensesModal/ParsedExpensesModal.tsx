@@ -1,14 +1,24 @@
-import { Alert, Button, Checkbox, Group, Modal, Text } from '@mantine/core';
+import {
+  Alert,
+  Anchor,
+  Button,
+  Checkbox,
+  Group,
+  Modal,
+  Text,
+} from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useQuery } from '@tanstack/react-query';
+import { Link } from '@tanstack/react-router';
 import { type Dayjs } from 'dayjs';
 import Decimal from 'decimal.js';
-import { useAtomValue } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { parseCategorySubcategoryId } from '~/features/categories/categorySubcategoryId';
+import { getProjectSettingsQueryOptions } from '~/features/projectSettings/queries';
 import { getSubscriptionsQueryOptions } from '~/features/subscriptions/queries';
 import type { ParsedExpense } from '~/features/transactions/parsedExpense';
 import {
@@ -28,6 +38,7 @@ import { findByIdOrThrow } from '~/shared/utils/getOrThrow';
 import { selectedYearAtom } from '~/stores/month';
 
 import { transactionRowId } from '../TransactionsTable/transactionsRowId';
+import { categorySuggestionsOffHintHiddenAtom } from './categorySuggestionsOffHintHidden.atom';
 import { useOfferedSubscriptions } from './parsedExpenseCategoryTree';
 import { ParsedExpenseRow } from './ParsedExpenseRow';
 import styles from './ParsedExpensesModal.module.css';
@@ -112,13 +123,17 @@ export function ParsedExpensesModal({
   const form = useForm<ParsedExpenseFormValues>({ initialValues });
 
   const offeredSubscriptions = useOfferedSubscriptions();
+  const { data: projectSettings } = useQuery(getProjectSettingsQueryOptions());
+  const categorySuggestionsEnabled =
+    projectSettings?.categorySuggestionsEnabled;
   const categorySuggestionsQuery = useQuery({
     ...getCategorySuggestionsQueryOptions({
       sourceId,
       subscriptionIds: offeredSubscriptions?.map((s) => s.id) ?? [],
       parsedExpenses,
     }),
-    enabled: offeredSubscriptions !== undefined,
+    enabled:
+      offeredSubscriptions !== undefined && categorySuggestionsEnabled === true,
   });
   const categorySuggestions = useMemo(
     () =>
@@ -132,6 +147,10 @@ export function ParsedExpensesModal({
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [duplicateAlertHidden, setDuplicateAlertHidden] = useState(false);
+  const [
+    categorySuggestionsOffHintHidden,
+    setCategorySuggestionsOffHintHidden,
+  ] = useAtom(categorySuggestionsOffHintHiddenAtom);
 
   const expenses = form.values.expenses;
   const allSelected = expenses.length > 0 && expenses.every((e) => e.selected);
@@ -306,6 +325,28 @@ export function ParsedExpensesModal({
           {t('importModal.duplicateWarning')}
         </Alert>
       )}
+
+      {categorySuggestionsEnabled === false &&
+        !categorySuggestionsOffHintHidden && (
+          <Alert
+            color="gray"
+            mb="md"
+            p="xs"
+            style={{ flexShrink: 0 }}
+            withCloseButton
+            onClose={() => setCategorySuggestionsOffHintHidden(true)}
+          >
+            <Trans
+              t={t}
+              i18nKey="importModal.categorySuggestionsOff"
+              components={{
+                settingsLink: (
+                  <Anchor component={Link} to="/settings/project" />
+                ),
+              }}
+            />
+          </Alert>
+        )}
 
       {categorySuggestionsQuery.isError && (
         <Alert color="yellow" mb="md" p="xs" style={{ flexShrink: 0 }}>

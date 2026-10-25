@@ -122,6 +122,7 @@
     "success_many": "Добавлено {{count}} транзакций",
     "duplicateWarning": "Позиции без галочки уже существуют в базе данных за этот год.",
     "suggestingCategory": "Подбираем…",
+    "categorySuggestionsOff": "Автозаполнение категорий выключено. Администратор может включить его в <settingsLink>настройках проекта</settingsLink>.",
     "categorySuggestionsFailed": "Не удалось получить подсказки категорий",
     "retryCategorySuggestions": "Повторить",
     "suggestedCategoryLabel": "Подобранная категория",

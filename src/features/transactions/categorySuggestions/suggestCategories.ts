@@ -33,6 +33,14 @@ export async function suggestCategoriesForProject(
   },
   { userId, projectId }: { userId: string; projectId: string },
 ) {
+  const { categorySuggestionsEnabledAt } =
+    await prisma.projectSetting.findUniqueOrThrow({
+      where: { projectId },
+      select: { categorySuggestionsEnabledAt: true },
+    });
+  if (categorySuggestionsEnabledAt === null) {
+    throw new Error('Category autofill is turned off for this project');
+  }
   if (!typesafe) {
     throw new Error('Category suggestions need TYPESAFE_API_KEY to be set');
   }
