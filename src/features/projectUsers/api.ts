@@ -34,7 +34,7 @@ export const createProjectUser = createServerFn({ method: 'POST' })
       role: 'send',
     }),
   ])
-  .inputValidator((input: CreateProjectUserInput) =>
+  .validator((input: CreateProjectUserInput) =>
     createProjectUserSchema.parse(input),
   )
   .handler(async ({ data, context }): Promise<CreatedProjectUser> => {
@@ -61,7 +61,7 @@ export const createProjectUser = createServerFn({ method: 'POST' })
 
 export const deleteProjectUser = createServerFn({ method: 'POST' })
   .middleware([adminMiddleware, trackInput<string>('sendFull')])
-  .inputValidator((userId: string) => userId)
+  .validator((userId: string) => userId)
   .handler(async ({ data: targetUserId, context }) => {
     await prisma.$transaction(async (tx) => {
       const target = await tx.user.findFirst({

@@ -66,7 +66,7 @@ export const createSavingSpending = createServerFn({ method: 'POST' })
       categories: { name: 'send', forecast: 'send', comment: 'omit' },
     }),
   ])
-  .inputValidator((input: CreateSavingSpendingInput) =>
+  .validator((input: CreateSavingSpendingInput) =>
     createSavingSpendingSchema.parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -96,7 +96,7 @@ export const updateSavingSpending = createServerFn({ method: 'POST' })
       categories: { name: 'send', forecast: 'send', comment: 'omit' },
     }),
   ])
-  .inputValidator((input: UpdateSavingSpendingInput) =>
+  .validator((input: UpdateSavingSpendingInput) =>
     updateSavingSpendingSchema.parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -166,7 +166,7 @@ export const updateSavingSpending = createServerFn({ method: 'POST' })
 
 export const deleteSavingSpending = createServerFn({ method: 'POST' })
   .middleware([authMiddleware, trackInput<number>()])
-  .inputValidator((id: number) => id)
+  .validator((id: number) => id)
   .handler(async ({ data: id, context }) => {
     await assertOwnedByProject(
       prisma.savingSpending,
@@ -197,7 +197,7 @@ export const deleteSavingSpending = createServerFn({ method: 'POST' })
 
 export const archiveSavingSpending = createServerFn({ method: 'POST' })
   .middleware([authMiddleware, trackInput<number>()])
-  .inputValidator((id: number) => id)
+  .validator((id: number) => id)
   .handler(async ({ data: id, context }) => {
     await assertOwnedByProject(
       prisma.savingSpending,
@@ -213,7 +213,7 @@ export const archiveSavingSpending = createServerFn({ method: 'POST' })
 
 export const unarchiveSavingSpending = createServerFn({ method: 'POST' })
   .middleware([authMiddleware, trackInput<number>()])
-  .inputValidator((id: number) => id)
+  .validator((id: number) => id)
   .handler(async ({ data: id, context }) => {
     await assertOwnedByProject(
       prisma.savingSpending,

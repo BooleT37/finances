@@ -25,9 +25,7 @@ export const renameProject = createServerFn({ method: 'POST' })
     adminMiddleware,
     trackInput<RenameProjectInput>({ name: 'send' }),
   ])
-  .inputValidator((input: RenameProjectInput) =>
-    renameProjectSchema.parse(input),
-  )
+  .validator((input: RenameProjectInput) => renameProjectSchema.parse(input))
   .handler(async ({ data, context }): Promise<ProjectInfo> => {
     return prisma.project.update({
       where: { id: context.projectId },

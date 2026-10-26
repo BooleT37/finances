@@ -25,7 +25,7 @@ export const completeOnboarding = createServerFn({ method: 'POST' })
     authMiddleware,
     trackInput<CompleteOnboardingInput>({ reason: 'send' }),
   ])
-  .inputValidator((input: CompleteOnboardingInput) =>
+  .validator((input: CompleteOnboardingInput) =>
     completeOnboardingSchema.parse(input),
   )
   .handler(async ({ context }): Promise<OnboardingStatus> => {

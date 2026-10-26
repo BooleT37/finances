@@ -27,7 +27,7 @@ import {
 
 export const fetchTransactionsByYear = createServerFn({ method: 'GET' })
   .middleware([authMiddleware])
-  .inputValidator((year: number) => year)
+  .validator((year: number) => year)
   .handler(async ({ data: year, context }) => {
     const transactions = await prisma.expense.findMany({
       where: {
@@ -69,9 +69,7 @@ export const createTransaction = createServerFn({ method: 'POST' })
       components: { name: 'omit', cost: 'send' },
     }),
   ])
-  .inputValidator((input: NewTransactionInput) =>
-    newTransactionSchema.parse(input),
-  )
+  .validator((input: NewTransactionInput) => newTransactionSchema.parse(input))
   .handler(async ({ data, context }) => {
     const tx = await prisma.expense.create({
       data: {
@@ -118,7 +116,7 @@ export const createTransaction = createServerFn({ method: 'POST' })
 
 export const deleteTransaction = createServerFn({ method: 'POST' })
   .middleware([authMiddleware, trackInput<number>()])
-  .inputValidator((id: number) => id)
+  .validator((id: number) => id)
   .handler(async ({ data: id, context }) => {
     await assertOwnedByProject(
       prisma.expense,
@@ -140,7 +138,7 @@ export const updateTransaction = createServerFn({ method: 'POST' })
       components: { name: 'omit', cost: 'send' },
     }),
   ])
-  .inputValidator((input: UpdateTransactionInput) =>
+  .validator((input: UpdateTransactionInput) =>
     updateTransactionSchema.parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -238,7 +236,7 @@ export const parsePdfExpenses = createServerFn({ method: 'POST' })
     authMiddleware,
     trackInput<ParsePdfExpensesInput>({ fileBase64: 'length', parser: 'send' }),
   ])
-  .inputValidator((input: ParsePdfExpensesInput) =>
+  .validator((input: ParsePdfExpensesInput) =>
     parsePdfExpensesSchema.parse(input),
   )
   .handler(async ({ data }) => {
@@ -305,7 +303,7 @@ export const importTransactions = createServerFn({ method: 'POST' })
       categorySuggestionTrace: { traceId: 'sendFull', suggestedValue: 'send' },
     }),
   ])
-  .inputValidator((input: ImportTransactionsInput) =>
+  .validator((input: ImportTransactionsInput) =>
     importTransactionsSchema.parse(input),
   )
   .handler(async ({ data, context }) => {

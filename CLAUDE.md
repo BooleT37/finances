@@ -149,7 +149,7 @@ All `createServerFn` POST mutations are auto-captured by the global `posthogTrac
 
 PostHog is a third party, and every event is tied to the user's name and email. So to adhere to our privacy policy, a server function's input is sent only as far as the function's own rules allow:
 
-- **Every POST server function adds `trackInput<Input>(rules)` to its middleware**, after the auth middleware. `Input` is the type its `inputValidator` takes. A function without it sends no `input` at all.
+- **Every POST server function adds `trackInput<Input>(rules)` to its middleware**, after the auth middleware. `Input` is the type its `validator` takes. A function without it sends no `input` at all.
 - Numbers, booleans and `null` are sent as they are. Every `string` field needs a rule, enums and fields inside arrays and nested objects included, and `tsc` fails until it has one. The rules:
   - `'send'` sends the value cut to 200 characters, with `…` added when it was cut. Use it for amounts, dates, labels and enums.
   - `'sendFull'` sends the value uncut. Only for strings that mean nothing once cut, such as ids and trace ids.

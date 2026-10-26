@@ -39,7 +39,7 @@ function toDatedTx(e: ExpenseWithComponents): DatedTx {
 
 export const fetchComparisonData = createServerFn({ method: 'GET' })
   .middleware([authMiddleware])
-  .inputValidator((input: FetchComparisonDataInput) =>
+  .validator((input: FetchComparisonDataInput) =>
     fetchComparisonDataInputSchema.parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -92,7 +92,7 @@ export const fetchComparisonData = createServerFn({ method: 'GET' })
 
 export const fetchDynamicsData = createServerFn({ method: 'GET' })
   .middleware([authMiddleware])
-  .inputValidator((input: FetchDynamicsDataInput) =>
+  .validator((input: FetchDynamicsDataInput) =>
     fetchDynamicsDataInputSchema.parse(input),
   )
   .handler(async ({ data, context }) => {

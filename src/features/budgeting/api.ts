@@ -12,7 +12,7 @@ import { forecastSchema } from './schema';
 
 export const fetchForecastsByYear = createServerFn({ method: 'GET' })
   .middleware([authMiddleware])
-  .inputValidator((year: number) => year)
+  .validator((year: number) => year)
   .handler(async ({ data: year, context }) => {
     const forecasts = await prisma.forecast.findMany({
       where: { year, projectId: context.projectId },
@@ -148,7 +148,7 @@ export const upsertCategoryForecast = createServerFn({ method: 'POST' })
       lineItems: { unitPrice: 'send', quantity: 'send', comment: 'omit' },
     }),
   ])
-  .inputValidator((input: UpsertCategoryForecastInput) =>
+  .validator((input: UpsertCategoryForecastInput) =>
     upsertCategoryForecastInputSchema.parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -249,7 +249,7 @@ export const upsertSubcategoryForecasts = createServerFn({ method: 'POST' })
       },
     }),
   ])
-  .inputValidator((input: UpsertSubcategoryForecastsInput) =>
+  .validator((input: UpsertSubcategoryForecastsInput) =>
     upsertSubcategoryForecastsInputSchema.parse(input),
   )
   .handler(async ({ data, context }) => {

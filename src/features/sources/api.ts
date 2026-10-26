@@ -19,7 +19,7 @@ import {
 
 export const createSource = createServerFn({ method: 'POST' })
   .middleware([authMiddleware, trackInput<CreateSourceInput>({ name: 'send' })])
-  .inputValidator((input: CreateSourceInput) => createSourceSchema.parse(input))
+  .validator((input: CreateSourceInput) => createSourceSchema.parse(input))
   .handler(async ({ data, context }) => {
     const created = await prisma.source.create({
       data: { name: data.name, projectId: context.projectId },
@@ -53,7 +53,7 @@ export const updateSourceName = createServerFn({ method: 'POST' })
     authMiddleware,
     trackInput<UpdateSourceNameInput>({ name: 'send' }),
   ])
-  .inputValidator((input: UpdateSourceNameInput) =>
+  .validator((input: UpdateSourceNameInput) =>
     updateSourceNameSchema.parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -75,7 +75,7 @@ export const updateSourceParser = createServerFn({ method: 'POST' })
     authMiddleware,
     trackInput<UpdateSourceParserInput>({ parser: 'send' }),
   ])
-  .inputValidator((input: UpdateSourceParserInput) =>
+  .validator((input: UpdateSourceParserInput) =>
     updateSourceParserSchema.parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -94,7 +94,7 @@ export const updateSourceParser = createServerFn({ method: 'POST' })
 
 export const updateSourceOrder = createServerFn({ method: 'POST' })
   .middleware([authMiddleware, trackInput<UpdateSourceOrderInput>()])
-  .inputValidator((input: UpdateSourceOrderInput) =>
+  .validator((input: UpdateSourceOrderInput) =>
     updateSourceOrderSchema.parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -106,7 +106,7 @@ export const updateSourceOrder = createServerFn({ method: 'POST' })
 
 export const deleteSource = createServerFn({ method: 'POST' })
   .middleware([authMiddleware, trackInput<number>()])
-  .inputValidator((id: number) => id)
+  .validator((id: number) => id)
   .handler(async ({ data: id, context }) => {
     await assertOwnedByProject(prisma.source, id, context.projectId, 'Source');
 

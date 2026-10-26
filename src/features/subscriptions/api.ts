@@ -49,7 +49,7 @@ export const createSubscription = createServerFn({ method: 'POST' })
       firstDate: 'send',
     }),
   ])
-  .inputValidator((input: CreateSubscriptionInput) =>
+  .validator((input: CreateSubscriptionInput) =>
     createSubscriptionSchema.parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -79,7 +79,7 @@ export const updateSubscription = createServerFn({ method: 'POST' })
       firstDate: 'send',
     }),
   ])
-  .inputValidator((input: UpdateSubscriptionInput) =>
+  .validator((input: UpdateSubscriptionInput) =>
     updateSubscriptionSchema.parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -109,7 +109,7 @@ export const updateSubscription = createServerFn({ method: 'POST' })
 
 export const deleteSubscription = createServerFn({ method: 'POST' })
   .middleware([authMiddleware, trackInput<number>()])
-  .inputValidator((id: number) => id)
+  .validator((id: number) => id)
   .handler(async ({ data: id, context }) => {
     await assertOwnedByProject(
       prisma.subscription,

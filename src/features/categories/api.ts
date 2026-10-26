@@ -55,9 +55,7 @@ export const createCategory = createServerFn({ method: 'POST' })
       subcategories: { name: 'send' },
     }),
   ])
-  .inputValidator((input: CreateCategoryInput) =>
-    createCategorySchema.parse(input),
-  )
+  .validator((input: CreateCategoryInput) => createCategorySchema.parse(input))
   .handler(async ({ data, context }) => {
     const category = await prisma.category.create({
       data: {
@@ -108,9 +106,7 @@ export const updateCategory = createServerFn({ method: 'POST' })
       subcategories: { name: 'send' },
     }),
   ])
-  .inputValidator((input: UpdateCategoryInput) =>
-    updateCategorySchema.parse(input),
-  )
+  .validator((input: UpdateCategoryInput) => updateCategorySchema.parse(input))
   .handler(async ({ data, context }) => {
     const { id, subcategories, ...fields } = data;
 
@@ -175,7 +171,7 @@ export const updateCategory = createServerFn({ method: 'POST' })
 
 export const updateCategoryOrder = createServerFn({ method: 'POST' })
   .middleware([authMiddleware, trackInput<UpdateCategoryOrderInput>()])
-  .inputValidator((input: UpdateCategoryOrderInput) =>
+  .validator((input: UpdateCategoryOrderInput) =>
     updateCategoryOrderSchema.parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -191,7 +187,7 @@ export const updateCategoryOrder = createServerFn({ method: 'POST' })
 
 export const deleteCategory = createServerFn({ method: 'POST' })
   .middleware([authMiddleware, trackInput<number>()])
-  .inputValidator((id: number) => id)
+  .validator((id: number) => id)
   .handler(async ({ data: id, context }) => {
     await assertOwnedByProject(
       prisma.category,

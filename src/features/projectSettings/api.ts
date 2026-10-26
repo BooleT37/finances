@@ -34,7 +34,7 @@ export const setCategorySuggestionsEnabled = createServerFn({
     adminMiddleware,
     trackInput<SetCategorySuggestionsEnabledInput>(),
   ])
-  .inputValidator((input: SetCategorySuggestionsEnabledInput) =>
+  .validator((input: SetCategorySuggestionsEnabledInput) =>
     setCategorySuggestionsEnabledSchema.parse(input),
   )
   .handler(async ({ data, context }) => {
