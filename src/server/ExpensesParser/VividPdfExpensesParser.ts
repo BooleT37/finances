@@ -30,7 +30,7 @@ interface StatementRow {
 }
 
 // The hash covers the row exactly as the statement shows it, so it stays equal
-// to the peHash stored by earlier imports.
+// to the importHash stored by earlier imports.
 const toImportedTransaction = (row: StatementRow): ImportedTransaction => ({
   date: dayjs(row.date),
   type: row.type,

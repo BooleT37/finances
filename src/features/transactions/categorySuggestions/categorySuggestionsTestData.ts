@@ -73,7 +73,7 @@ export const expenseRow = ({
   sourceId: 1,
   subscriptionId,
   savingSpendingCategoryId: null,
-  peHash: null,
+  importHash: null,
   importedDescription,
   projectId,
   createdAt: dayjs(date).toDate(),

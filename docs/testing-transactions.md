@@ -167,7 +167,7 @@ Seed requirements:
 - `TransactionsTable` — too integrated; covered by E2E
 - `TransactionSidebarForm` — same reason; the auto-save debounce and full form flow are better tested end-to-end
 - `useTransactionTableItems` — a complex hook tightly coupled to query data; E2E gives better coverage at lower maintenance cost
-- Import deduplication (`peHash`) — no UI surface yet
+- Import deduplication (`importHash`) — no UI surface yet
 
 ---
 

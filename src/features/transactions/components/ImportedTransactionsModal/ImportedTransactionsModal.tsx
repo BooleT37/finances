@@ -95,7 +95,7 @@ export function ImportedTransactionsModal({
     () => (e: ImportedTransaction) =>
       existingTransactions.some(
         (tx) =>
-          (tx.peHash != null && tx.peHash === e.hash) ||
+          (tx.importHash != null && tx.importHash === e.hash) ||
           (tx.date.isSame(e.date, 'day') && tx.cost.abs().eq(e.amount.abs())),
       ),
     [existingTransactions],
@@ -278,7 +278,7 @@ export function ImportedTransactionsModal({
           subcategoryId,
           subscriptionId,
           sourceId,
-          peHash: e.hash,
+          importHash: e.hash,
           importedDescription: e.importedDescription,
           categorySuggestionTrace: getCategorySuggestionTrace(index),
         },

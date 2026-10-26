@@ -43,7 +43,7 @@ Components must always have a different category or subcategory from the parent 
 
 ## Import Deduplication
 
-Each transaction has a **`peHash`** (parsed expense hash) used to detect whether it was already imported via the "Import" feature, preventing duplicates. The hash is computed from the statement row exactly as the bank shows it, so editing the description or the amount in the import modal keeps it the same.
+Each transaction has an **`importHash`** used to detect whether it was already imported via the "Import" feature, preventing duplicates. The hash is computed from the statement row exactly as the bank shows it, so editing the description or the amount in the import modal keeps it the same.
 
 ## Imported Description
 

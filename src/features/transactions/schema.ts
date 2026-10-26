@@ -31,7 +31,7 @@ export const transactionSchema = z.object({
   sourceId: z.number().nullable(),
   subscriptionId: z.number().nullable(),
   savingSpendingCategoryId: z.number().nullable(),
-  peHash: z.string().nullable().optional(),
+  importHash: z.string().nullable().optional(),
 });
 
 export const transactionWithComponentsSchema = transactionSchema.extend({
@@ -89,7 +89,7 @@ export const importTransactionItemSchema = z.object({
   subcategoryId: z.number().nullable().optional(),
   subscriptionId: z.number().nullable().optional(),
   sourceId: z.number(),
-  peHash: z.string(),
+  importHash: z.string(),
   importedDescription: z.string(),
   categorySuggestionTrace: z
     .object({ traceId: z.string(), suggestedValue: z.string().nullable() })

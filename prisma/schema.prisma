@@ -218,7 +218,7 @@ model Expense {
   savingSpendingCategoryId Int?
   subcategoryId            Int?
   components               ExpenseComponent[]
-  peHash                   String?
+  importHash               String?
   importedDescription      String?
   project                  Project                 @relation(fields: [projectId], references: [id])
   projectId                String
