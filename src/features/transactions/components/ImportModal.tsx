@@ -7,11 +7,11 @@ import { useTranslation } from 'react-i18next';
 import { getSourcesQueryOptions } from '~/features/sources/queries';
 import { parsePdfExpenses } from '~/features/transactions/api';
 import {
-  type ParsedExpense,
-  parsedExpenseSchema,
-} from '~/features/transactions/parsedExpense';
+  type ImportedTransaction,
+  importedTransactionSchema,
+} from '~/features/transactions/importedTransaction';
 
-import { ParsedExpensesModal } from './ParsedExpensesModal/ParsedExpensesModal';
+import { ImportedTransactionsModal } from './ImportedTransactionsModal/ImportedTransactionsModal';
 
 export const importModalOpenAtom = atom(false);
 
@@ -21,9 +21,9 @@ export function ImportModal() {
   const [selectedSourceId, setSelectedSourceId] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  const [parsedExpenses, setParsedExpenses] = useState<ParsedExpense[] | null>(
-    null,
-  );
+  const [importedTransactions, setImportedTransactions] = useState<
+    ImportedTransaction[] | null
+  >(null);
 
   const { data: sources = [] } = useQuery(getSourcesQueryOptions());
 
@@ -59,7 +59,9 @@ export function ImportModal() {
         data: { fileBase64: base64, parser: selectedSource.parser as 'VIVID' },
       });
       setOpen(false);
-      setParsedExpenses(rows.map((row) => parsedExpenseSchema.decode(row)));
+      setImportedTransactions(
+        rows.map((row) => importedTransactionSchema.decode(row)),
+      );
     } catch (err) {
       console.error('PDF parse error', err);
     } finally {
@@ -73,7 +75,7 @@ export function ImportModal() {
   };
 
   const handleReviewClose = () => {
-    setParsedExpenses(null);
+    setImportedTransactions(null);
     setSelectedSourceId(null);
     setFile(null);
   };
@@ -111,9 +113,9 @@ export function ImportModal() {
         </Stack>
       </Modal>
 
-      {parsedExpenses && selectedSource && (
-        <ParsedExpensesModal
-          parsedExpenses={parsedExpenses}
+      {importedTransactions && selectedSource && (
+        <ImportedTransactionsModal
+          importedTransactions={importedTransactions}
           sourceId={selectedSource.id}
           onClose={handleReviewClose}
         />

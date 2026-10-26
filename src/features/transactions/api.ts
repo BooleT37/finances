@@ -10,7 +10,7 @@ import { assertOwnedByProject } from '~/shared/utils/assertOwnedByProject';
 
 import { scoreCategorySuggestions } from './categorySuggestions/langfuse/scoreCategorySuggestions';
 import { suggestCategoriesForProject } from './categorySuggestions/suggestCategories';
-import { parsedExpenseSchema } from './parsedExpense';
+import { importedTransactionSchema } from './importedTransaction';
 import {
   type ImportTransactionsInput,
   importTransactionsSchema,
@@ -280,9 +280,9 @@ export const parsePdfExpenses = createServerFn({ method: 'POST' })
     try {
       writeFileSync(tmpPath, buffer);
       const parser = new VividPdfExpensesParser(tmpPath);
-      const parsedExpenses = await parser.parse();
-      return parsedExpenses.map((parsedExpense) =>
-        parsedExpenseSchema.encode(parsedExpense),
+      const importedTransactions = await parser.parse();
+      return importedTransactions.map((importedTransaction) =>
+        importedTransactionSchema.encode(importedTransaction),
       );
     } finally {
       try {
@@ -341,7 +341,7 @@ export const suggestCategories = createServerFn({ method: 'POST' })
   .middleware([
     authMiddleware,
     trackInput<SuggestCategoriesInput>({
-      parsedExpenses: {
+      importedTransactions: {
         date: 'send',
         type: 'send',
         description: 'omit',

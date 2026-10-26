@@ -1,4 +1,4 @@
-import { toParsedExpenseCategoryValue } from '~/features/transactions/parsedExpenseCategoryValue';
+import { toImportedTransactionCategoryValue } from '~/features/transactions/importedTransactionCategoryValue';
 import type { ImportTransactionsInput } from '~/features/transactions/schema';
 import { prisma } from '~/server/db';
 import {
@@ -54,7 +54,7 @@ export async function scoreCategorySuggestions(
 
     const scores = buildCategorySuggestionScores(
       tracedItems.map((item) => {
-        const importedValue = toParsedExpenseCategoryValue({
+        const importedValue = toImportedTransactionCategoryValue({
           categoryId: item.categoryId,
           subcategoryId: item.subcategoryId ?? null,
           subscriptionId: item.subscriptionId ?? null,

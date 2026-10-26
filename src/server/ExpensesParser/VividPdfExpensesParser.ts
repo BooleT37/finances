@@ -3,7 +3,7 @@ import Decimal from 'decimal.js';
 import { PdfDataParser } from 'pdf-data-parser';
 import type PdfDataParserType from 'pdf-data-parser/types/PdfDataParser';
 
-import type { ParsedExpense } from '~/features/transactions/parsedExpense';
+import type { ImportedTransaction } from '~/features/transactions/importedTransaction';
 import { hash } from '~/server/hash';
 
 import type { IExpensesParser } from './ExpensesParser';
@@ -31,7 +31,7 @@ interface StatementRow {
 
 // The hash covers the row exactly as the statement shows it, so it stays equal
 // to the peHash stored by earlier imports.
-const toParsedExpense = (row: StatementRow): ParsedExpense => ({
+const toImportedTransaction = (row: StatementRow): ImportedTransaction => ({
   date: dayjs(row.date),
   type: row.type,
   description: row.description,
@@ -52,7 +52,7 @@ export class VividPdfExpensesParser implements IExpensesParser {
     });
   }
 
-  async parse(): Promise<ParsedExpense[]> {
+  async parse(): Promise<ImportedTransaction[]> {
     const rows = await this.parser.parse();
     if (!rows) {
       throw new Error('No rows found in the PDF');
@@ -81,14 +81,14 @@ export class VividPdfExpensesParser implements IExpensesParser {
             if (!nextRow[0]) {
               throw new Error(`Invalid row: ${row.join(', ')}`);
             }
-            return toParsedExpense({
+            return toImportedTransaction({
               date: row[0],
               type: row[1],
               description: `${row[2]} ${array[index + 2]?.[0]}`,
               amount: parseAmount(nextRow[0]),
             });
           } else {
-            return toParsedExpense({
+            return toImportedTransaction({
               date: row[0],
               type: row[1],
               description: `${array[index - 1]?.[0]} ${array[index + 1]?.[0]}`,
@@ -109,14 +109,14 @@ export class VividPdfExpensesParser implements IExpensesParser {
           if (!type || !date) {
             throw new Error(`Invalid row: ${row.join(', ')}`);
           }
-          return toParsedExpense({
+          return toImportedTransaction({
             date,
             type,
             description: row[1],
             amount: parseAmount(row[2]),
           });
         } else {
-          return toParsedExpense({
+          return toImportedTransaction({
             date: row[0],
             type: row[1],
             description: row[2],

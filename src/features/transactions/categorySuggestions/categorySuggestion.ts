@@ -1,4 +1,4 @@
-import type { ParsedExpenseCategoryValue } from '~/features/transactions/parsedExpenseCategoryValue';
+import type { ImportedTransactionCategoryValue } from '~/features/transactions/importedTransactionCategoryValue';
 import type { Subscription } from '~/generated/prisma/client';
 import type { JevChoiceAnswer } from '~/server/typesafe';
 
@@ -16,7 +16,7 @@ export const CATEGORY_SUGGESTION_MIN_CONFIDENCE = 0.8;
 export const CATEGORY_SUGGESTION_CONCURRENCY = 4;
 
 export interface CategorySuggestion {
-  value: ParsedExpenseCategoryValue;
+  value: ImportedTransactionCategoryValue;
   confidence: number;
   similarCount: number;
 }

@@ -12,10 +12,10 @@ import type { Category } from '~/features/categories/schema';
 import { useAvailableSubscriptions } from '~/features/subscriptions/facets/availableSubscriptions';
 import type { Subscription } from '~/features/subscriptions/schema';
 import {
-  groupParsedExpenseCategoryOptions,
-  type ParsedExpenseCategoryGroup,
-} from '~/features/transactions/parsedExpenseCategoryOptions';
-import { buildSubscriptionValue } from '~/features/transactions/parsedExpenseCategoryValue';
+  groupImportedTransactionCategoryOptions,
+  type ImportedTransactionCategoryGroup,
+} from '~/features/transactions/importedTransactionCategoryOptions';
+import { buildSubscriptionValue } from '~/features/transactions/importedTransactionCategoryValue';
 import type { TreeNode } from '~/shared/components/TreeSelect';
 
 // ── Renderers ─────────────────────────────────────────────────────────────────
@@ -72,7 +72,7 @@ function subscriptionNode(
 function categoryToTreeNode({
   category,
   subscriptions,
-}: ParsedExpenseCategoryGroup<Category, Subscription>): TreeNode {
+}: ImportedTransactionCategoryGroup<Category, Subscription>): TreeNode {
   const categoryIcon = category.icon ? (
     <CategoryIconComp value={category.icon} />
   ) : null;
@@ -130,7 +130,7 @@ export function useOfferedSubscriptions(): Subscription[] | undefined {
   );
 }
 
-export function useParsedExpenseCategoryTree(options: {
+export function useImportedTransactionCategoryTree(options: {
   isIncome: boolean;
 }): TreeNode[] | undefined {
   const expenseCategories = useExpenseCategories();
@@ -141,7 +141,7 @@ export function useParsedExpenseCategoryTree(options: {
     if (!expenseCategories || !incomeCategories || !offeredSubscriptions) {
       return undefined;
     }
-    return groupParsedExpenseCategoryOptions({
+    return groupImportedTransactionCategoryOptions({
       categories: options.isIncome ? incomeCategories : expenseCategories,
       subscriptions: offeredSubscriptions,
       isIncome: options.isIncome,

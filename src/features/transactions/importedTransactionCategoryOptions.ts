@@ -4,7 +4,7 @@ import type {
   Subscription,
 } from '~/generated/prisma/client';
 
-export interface ParsedExpenseCategoryGroup<C, S> {
+export interface ImportedTransactionCategoryGroup<C, S> {
   category: C;
   subscriptions: S[];
 }
@@ -15,7 +15,7 @@ export interface ParsedExpenseCategoryGroup<C, S> {
  * that belong to it. A subscription pointing at a subcategory the category no
  * longer has is left out, since the picker has nowhere to place it.
  */
-export function groupParsedExpenseCategoryOptions<
+export function groupImportedTransactionCategoryOptions<
   C extends Pick<Category, 'id' | 'isIncome'> & {
     subcategories: Pick<Subcategory, 'id'>[];
   },
@@ -28,7 +28,7 @@ export function groupParsedExpenseCategoryOptions<
   categories: C[];
   subscriptions: S[];
   isIncome: boolean;
-}): ParsedExpenseCategoryGroup<C, S>[] {
+}): ImportedTransactionCategoryGroup<C, S>[] {
   return categories
     .filter((category) => category.isIncome === isIncome)
     .map((category) => ({

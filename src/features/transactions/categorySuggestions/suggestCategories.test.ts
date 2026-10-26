@@ -18,7 +18,7 @@ vi.mock('~/server/typesafe', () => ({
   typesafe: { askChoice: mocks.askChoice },
 }));
 
-const request = { sourceId: 1, subscriptionIds: [], parsedExpenses: [] };
+const request = { sourceId: 1, subscriptionIds: [], importedTransactions: [] };
 const context = { userId: 'user-1', projectId: 'project-1' };
 
 beforeEach(() => {

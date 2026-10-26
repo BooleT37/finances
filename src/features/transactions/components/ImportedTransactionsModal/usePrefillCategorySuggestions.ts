@@ -3,14 +3,14 @@ import { useEffect, useEffectEvent } from 'react';
 
 import type { CategorySuggestion } from '~/features/transactions/categorySuggestions/categorySuggestion';
 
-import type { ParsedExpenseFormValues } from './ParsedExpensesModal';
+import type { ImportedTransactionFormValues } from './ImportedTransactionsModal';
 
 /**
  * Fills each row's category with its category suggestion when they arrive,
  * leaving rows the user has already picked a category for untouched.
  */
 export function usePrefillCategorySuggestions(
-  form: UseFormReturnType<ParsedExpenseFormValues>,
+  form: UseFormReturnType<ImportedTransactionFormValues>,
   categorySuggestions: (CategorySuggestion | null)[] | undefined,
 ) {
   const prefill = useEffectEvent(

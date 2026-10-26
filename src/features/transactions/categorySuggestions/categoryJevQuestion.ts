@@ -1,10 +1,10 @@
 import dayjs from 'dayjs';
 
-import type { ParsedExpense } from '~/features/transactions/parsedExpense';
+import type { ImportedTransaction } from '~/features/transactions/importedTransaction';
 import {
-  type ParsedExpenseCategoryValue,
-  toParsedExpenseCategoryValue,
-} from '~/features/transactions/parsedExpenseCategoryValue';
+  type ImportedTransactionCategoryValue,
+  toImportedTransactionCategoryValue,
+} from '~/features/transactions/importedTransactionCategoryValue';
 import type { Prisma, Subscription } from '~/generated/prisma/client';
 import { ISO_DATE_FORMAT } from '~/shared/constants';
 import { adaptCost } from '~/shared/utils/adaptCost';
@@ -26,13 +26,15 @@ export interface SimilarTransaction {
 export const UNKNOWN_JEV_CHOICE = 'unknown';
 
 export type CategoryJevChoice =
-  | ParsedExpenseCategoryValue
+  | ImportedTransactionCategoryValue
   | typeof UNKNOWN_JEV_CHOICE;
 
-export const describeParsedExpense = (parsedExpense: ParsedExpense) => ({
-  description: parsedExpense.description,
-  amount: parsedExpense.amount.toFixed(2),
-  date: parsedExpense.date.format(ISO_DATE_FORMAT),
+export const describeImportedTransaction = (
+  importedTransaction: ImportedTransaction,
+) => ({
+  description: importedTransaction.description,
+  amount: importedTransaction.amount.toFixed(2),
+  date: importedTransaction.date.format(ISO_DATE_FORMAT),
 });
 
 /**
@@ -45,7 +47,7 @@ export function describeSimilarTransaction(
   subscriptions: Subscription[],
 ) {
   const value = resolveCategoryJevCriterion(
-    toParsedExpenseCategoryValue(similar),
+    toImportedTransactionCategoryValue(similar),
     criteria,
     subscriptions,
   );
@@ -58,11 +60,11 @@ export function describeSimilarTransaction(
 }
 
 /**
- * The request Jev answers for one parsed expense. A similar transaction that
+ * The request Jev answers for one imported transaction. A similar transaction that
  * no longer resolves to any of the row's criteria is left out.
  */
 export function buildCategoryJevQuestion(
-  parsedExpense: ParsedExpense,
+  importedTransaction: ImportedTransaction,
   criteria: CategoryJevCriterion[],
   similarTransactions: ExpenseWithCategory[],
   subscriptions: Subscription[],
@@ -77,7 +79,7 @@ export function buildCategoryJevQuestion(
 
   return {
     state: {
-      transaction: describeParsedExpense(parsedExpense),
+      transaction: describeImportedTransaction(importedTransaction),
       similar_past_transactions: similarTransactions.flatMap((similar) => {
         const { filed_under, ...described } = describeSimilarTransaction(
           similar,

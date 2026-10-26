@@ -3,18 +3,18 @@ import dayjs from 'dayjs';
 import { describe, expect, it } from 'vitest';
 
 import type { CategorySuggestion } from '~/features/transactions/categorySuggestions/categorySuggestion';
-import type { ParsedExpenseCategoryValue } from '~/features/transactions/parsedExpenseCategoryValue';
+import type { ImportedTransactionCategoryValue } from '~/features/transactions/importedTransactionCategoryValue';
 import { act, renderHook } from '~/test/render';
 
 import type {
-  ParsedExpenseFormValues,
-  ParsedExpenseRowValues,
-} from './ParsedExpensesModal';
+  ImportedTransactionFormValues,
+  ImportedTransactionRowValues,
+} from './ImportedTransactionsModal';
 import { usePrefillCategorySuggestions } from './usePrefillCategorySuggestions';
 
 const row = (
-  categorySubcategoryId: ParsedExpenseCategoryValue | null,
-): ParsedExpenseRowValues => ({
+  categorySubcategoryId: ImportedTransactionCategoryValue | null,
+): ImportedTransactionRowValues => ({
   selected: true,
   date: dayjs('2026-09-30'),
   type: 'Card transaction',
@@ -25,7 +25,9 @@ const row = (
   importedDescription: 'REWE Markt GmbH-Zw, Berlin, DE Card *6213',
 });
 
-const suggestion = (value: ParsedExpenseCategoryValue): CategorySuggestion => ({
+const suggestion = (
+  value: ImportedTransactionCategoryValue,
+): CategorySuggestion => ({
   value,
   confidence: 0.9,
   similarCount: 3,
@@ -35,11 +37,11 @@ interface PrefillProps {
   categorySuggestions: (CategorySuggestion | null)[] | undefined;
 }
 
-const renderPrefill = (rows: ParsedExpenseRowValues[]) => {
+const renderPrefill = (rows: ImportedTransactionRowValues[]) => {
   const initialProps: PrefillProps = { categorySuggestions: undefined };
   return renderHook(
     ({ categorySuggestions }: PrefillProps) => {
-      const form = useForm<ParsedExpenseFormValues>({
+      const form = useForm<ImportedTransactionFormValues>({
         initialValues: { expenses: rows },
       });
       usePrefillCategorySuggestions(form, categorySuggestions);

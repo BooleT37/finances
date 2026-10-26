@@ -5,7 +5,7 @@ import {
 
 const SUBSCRIPTION_PREFIX = 'sub-';
 
-export type ParsedExpenseCategoryValue =
+export type ImportedTransactionCategoryValue =
   | CategorySubcategoryId
   | `${typeof SUBSCRIPTION_PREFIX}${number}`;
 
@@ -21,11 +21,11 @@ export function isSubscriptionValue(
   return value.startsWith(SUBSCRIPTION_PREFIX);
 }
 
-export function toParsedExpenseCategoryValue(transaction: {
+export function toImportedTransactionCategoryValue(transaction: {
   categoryId: number;
   subcategoryId: number | null;
   subscriptionId: number | null;
-}): ParsedExpenseCategoryValue {
+}): ImportedTransactionCategoryValue {
   return transaction.subscriptionId !== null
     ? buildSubscriptionValue(transaction.subscriptionId)
     : buildCategorySubcategoryId(transaction);

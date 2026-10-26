@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { datetimeCodec, decimalCodec } from '~/shared/codecs';
 
-export const parsedExpenseSchema = z.object({
+export const importedTransactionSchema = z.object({
   date: datetimeCodec,
   type: z.string(),
   description: z.string(),
@@ -10,4 +10,4 @@ export const parsedExpenseSchema = z.object({
   hash: z.string(),
 });
 
-export type ParsedExpense = z.output<typeof parsedExpenseSchema>;
+export type ImportedTransaction = z.output<typeof importedTransactionSchema>;

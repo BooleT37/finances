@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { groupParsedExpenseCategoryOptions } from './parsedExpenseCategoryOptions';
+import { groupImportedTransactionCategoryOptions } from './importedTransactionCategoryOptions';
 
 const restaurants = {
   id: 1,
@@ -16,9 +16,9 @@ const groceries = {
 };
 const salary = { id: 3, name: 'Зарплата', isIncome: true, subcategories: [] };
 
-describe('groupParsedExpenseCategoryOptions', () => {
+describe('groupImportedTransactionCategoryOptions', () => {
   it('keeps only the categories of the given sign', () => {
-    const groups = groupParsedExpenseCategoryOptions({
+    const groups = groupImportedTransactionCategoryOptions({
       categories: [restaurants, groceries, salary],
       subscriptions: [],
       isIncome: false,
@@ -34,7 +34,7 @@ describe('groupParsedExpenseCategoryOptions', () => {
     const netflix = { id: 5, categoryId: 1, subcategoryId: null };
     const delivery = { id: 6, categoryId: 1, subcategoryId: 10 };
 
-    const groups = groupParsedExpenseCategoryOptions({
+    const groups = groupImportedTransactionCategoryOptions({
       categories: [restaurants, groceries],
       subscriptions: [netflix, delivery],
       isIncome: false,
@@ -49,7 +49,7 @@ describe('groupParsedExpenseCategoryOptions', () => {
   it('leaves out a subscription whose subcategory the category no longer has', () => {
     const orphan = { id: 7, categoryId: 1, subcategoryId: 99 };
 
-    const groups = groupParsedExpenseCategoryOptions({
+    const groups = groupImportedTransactionCategoryOptions({
       categories: [restaurants],
       subscriptions: [orphan],
       isIncome: false,

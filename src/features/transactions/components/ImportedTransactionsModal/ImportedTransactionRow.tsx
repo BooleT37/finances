@@ -6,16 +6,16 @@ import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 
 import type { CategorySuggestion } from '~/features/transactions/categorySuggestions/categorySuggestion';
-import type { ParsedExpenseCategoryValue } from '~/features/transactions/parsedExpenseCategoryValue';
+import type { ImportedTransactionCategoryValue } from '~/features/transactions/importedTransactionCategoryValue';
 import { TreeSelect } from '~/shared/components/TreeSelect';
 import { ISO_DATE_FORMAT } from '~/shared/constants';
 
-import { useParsedExpenseCategoryTree } from './parsedExpenseCategoryTree';
-import type { ParsedExpenseFormValues } from './ParsedExpensesModal';
+import { useImportedTransactionCategoryTree } from './importedTransactionCategoryTree';
+import type { ImportedTransactionFormValues } from './ImportedTransactionsModal';
 
 interface Props {
   index: number;
-  form: UseFormReturnType<ParsedExpenseFormValues>;
+  form: UseFormReturnType<ImportedTransactionFormValues>;
   categorySuggestion: CategorySuggestion | null;
   categorySuggestionLoading: boolean;
 }
@@ -25,7 +25,7 @@ const isNegativeAmount = (amount: string) => {
   return !isNaN(parsed) && parsed < 0;
 };
 
-export function ParsedExpenseRow({
+export function ImportedTransactionRow({
   index,
   form,
   categorySuggestion,
@@ -36,7 +36,7 @@ export function ParsedExpenseRow({
   const selected = row?.selected ?? false;
   const amountIsNegative = isNegativeAmount(row?.amount ?? '');
 
-  const categoryTreeData = useParsedExpenseCategoryTree({
+  const categoryTreeData = useImportedTransactionCategoryTree({
     isIncome: !amountIsNegative,
   });
 
@@ -106,7 +106,7 @@ export function ParsedExpenseRow({
 
       <Group gap={4} wrap="nowrap" align="flex-start">
         <div style={{ flex: 1, minWidth: 0 }}>
-          <TreeSelect<ParsedExpenseCategoryValue>
+          <TreeSelect<ImportedTransactionCategoryValue>
             treeData={categoryTreeData ?? []}
             value={row.categorySubcategoryId}
             onChange={(val) => {

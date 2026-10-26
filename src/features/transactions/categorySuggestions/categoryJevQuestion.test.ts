@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import Decimal from 'decimal.js';
 import { describe, expect, it } from 'vitest';
 
-import type { ParsedExpense } from '~/features/transactions/parsedExpense';
+import type { ImportedTransaction } from '~/features/transactions/importedTransaction';
 
 import { buildCategoryJevCriteria } from './categoryJevCriteria';
 import {
@@ -19,7 +19,7 @@ const criteria = buildCategoryJevCriteria({
   isIncome: false,
 });
 
-const parsedExpense: ParsedExpense = {
+const importedTransaction: ImportedTransaction = {
   date: dayjs('2026-09-30'),
   type: 'Card transaction',
   description: 'REWE Markt GmbH-Zw, Berlin, DE Card *6213',
@@ -28,8 +28,13 @@ const parsedExpense: ParsedExpense = {
 };
 
 describe('buildCategoryJevQuestion', () => {
-  it('sends the parsed expense with a two-decimal amount and an ISO date', () => {
-    const { state } = buildCategoryJevQuestion(parsedExpense, criteria, [], []);
+  it('sends the imported transaction with a two-decimal amount and an ISO date', () => {
+    const { state } = buildCategoryJevQuestion(
+      importedTransaction,
+      criteria,
+      [],
+      [],
+    );
 
     expect(state.transaction).toEqual({
       description: 'REWE Markt GmbH-Zw, Berlin, DE Card *6213',
@@ -48,7 +53,7 @@ describe('buildCategoryJevQuestion', () => {
     });
 
     const { state } = buildCategoryJevQuestion(
-      parsedExpense,
+      importedTransaction,
       criteria,
       [similar],
       [],
@@ -74,7 +79,7 @@ describe('buildCategoryJevQuestion', () => {
     });
 
     const { state } = buildCategoryJevQuestion(
-      parsedExpense,
+      importedTransaction,
       criteria,
       [income],
       [],
@@ -85,7 +90,7 @@ describe('buildCategoryJevQuestion', () => {
 
   it('offers the criteria plus an unknown choice', () => {
     const { question } = buildCategoryJevQuestion(
-      parsedExpense,
+      importedTransaction,
       criteria,
       [],
       [],

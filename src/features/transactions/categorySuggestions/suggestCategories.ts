@@ -1,6 +1,6 @@
 import pMap from 'p-map';
 
-import type { ParsedExpense } from '~/features/transactions/parsedExpense';
+import type { ImportedTransaction } from '~/features/transactions/importedTransaction';
 import { prisma } from '~/server/db';
 import { typesafe } from '~/server/typesafe';
 import { assertOwnedByProject } from '~/shared/utils/assertOwnedByProject';
@@ -25,11 +25,11 @@ export async function suggestCategoriesForProject(
   {
     sourceId,
     subscriptionIds,
-    parsedExpenses,
+    importedTransactions,
   }: {
     sourceId: number;
     subscriptionIds: number[];
-    parsedExpenses: ParsedExpense[];
+    importedTransactions: ImportedTransaction[];
   },
   { userId, projectId }: { userId: string; projectId: string },
 ) {
@@ -82,9 +82,9 @@ export async function suggestCategoriesForProject(
       }));
     });
 
-  const suggestCategory = (parsedExpense: ParsedExpense) =>
-    traceCategorySuggestion(parsedExpense, async () => {
-      const isIncome = !parsedExpense.amount.isNegative();
+  const suggestCategory = (importedTransaction: ImportedTransaction) =>
+    traceCategorySuggestion(importedTransaction, async () => {
+      const isIncome = !importedTransaction.amount.isNegative();
       const criteria = buildCategoryJevCriteria({
         categories,
         subscriptions: offeredSubscriptions,
@@ -92,16 +92,17 @@ export async function suggestCategoriesForProject(
       });
       const similarTransactions = await traceSimilarTransactions(
         {
-          description: parsedExpense.description,
+          description: importedTransaction.description,
           sourceId,
           isIncome,
           criteria,
           subscriptions,
         },
-        () => findSimilarTransactions(parsedExpense.description, isIncome),
+        () =>
+          findSimilarTransactions(importedTransaction.description, isIncome),
       );
       const { state, question } = buildCategoryJevQuestion(
-        parsedExpense,
+        importedTransaction,
         criteria,
         similarTransactions.map(({ transaction }) => transaction),
         subscriptions,
@@ -118,7 +119,7 @@ export async function suggestCategoriesForProject(
     });
 
   return traceCategorySuggestions({ userId, sourceId }, () =>
-    pMap(parsedExpenses, suggestCategory, {
+    pMap(importedTransactions, suggestCategory, {
       concurrency: CATEGORY_SUGGESTION_CONCURRENCY,
     }),
   );

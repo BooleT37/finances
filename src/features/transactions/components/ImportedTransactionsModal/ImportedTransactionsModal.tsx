@@ -20,12 +20,12 @@ import { Trans, useTranslation } from 'react-i18next';
 import { parseCategorySubcategoryId } from '~/features/categories/categorySubcategoryId';
 import { getProjectSettingsQueryOptions } from '~/features/projectSettings/queries';
 import { getSubscriptionsQueryOptions } from '~/features/subscriptions/queries';
-import type { ParsedExpense } from '~/features/transactions/parsedExpense';
+import type { ImportedTransaction } from '~/features/transactions/importedTransaction';
 import {
+  type ImportedTransactionCategoryValue,
   isSubscriptionValue,
-  type ParsedExpenseCategoryValue,
   parseSubscriptionValue,
-} from '~/features/transactions/parsedExpenseCategoryValue';
+} from '~/features/transactions/importedTransactionCategoryValue';
 import {
   getCategorySuggestionsQueryOptions,
   getTransactionsQueryOptions,
@@ -39,24 +39,24 @@ import { selectedYearAtom } from '~/stores/month';
 
 import { transactionRowId } from '../TransactionsTable/transactionsRowId';
 import { categorySuggestionsOffHintHiddenAtom } from './categorySuggestionsOffHintHidden.atom';
-import { useOfferedSubscriptions } from './parsedExpenseCategoryTree';
-import { ParsedExpenseRow } from './ParsedExpenseRow';
-import styles from './ParsedExpensesModal.module.css';
+import { useOfferedSubscriptions } from './importedTransactionCategoryTree';
+import { ImportedTransactionRow } from './ImportedTransactionRow';
+import styles from './ImportedTransactionsModal.module.css';
 import { usePrefillCategorySuggestions } from './usePrefillCategorySuggestions';
 
-export interface ParsedExpenseRowValues {
+export interface ImportedTransactionRowValues {
   selected: boolean;
   date: Dayjs | null;
   type: string;
   description: string;
   amount: string;
-  categorySubcategoryId: ParsedExpenseCategoryValue | null;
+  categorySubcategoryId: ImportedTransactionCategoryValue | null;
   hash: string;
   importedDescription: string;
 }
 
-export interface ParsedExpenseFormValues {
-  expenses: ParsedExpenseRowValues[];
+export interface ImportedTransactionFormValues {
+  expenses: ImportedTransactionRowValues[];
 }
 
 const gridColumns = '24px 2fr 3fr 8fr 100px 4fr';
@@ -72,13 +72,13 @@ const stickyHeaderRowStyle: React.CSSProperties = {
 };
 
 interface Props {
-  parsedExpenses: ParsedExpense[];
+  importedTransactions: ImportedTransaction[];
   sourceId: number;
   onClose: () => void;
 }
 
-export function ParsedExpensesModal({
-  parsedExpenses,
+export function ImportedTransactionsModal({
+  importedTransactions,
   sourceId,
   onClose,
 }: Props) {
@@ -92,7 +92,7 @@ export function ParsedExpensesModal({
   const triggerFlash = useFlashTrigger(TableFlash.Transactions);
 
   const isDuplicateFn = useMemo(
-    () => (e: ParsedExpense) =>
+    () => (e: ImportedTransaction) =>
       existingTransactions.some(
         (tx) =>
           (tx.peHash != null && tx.peHash === e.hash) ||
@@ -102,8 +102,8 @@ export function ParsedExpensesModal({
   );
 
   const { initialValues, hasDuplicates } = useMemo(() => {
-    const expenses = parsedExpenses.map(
-      (e): ParsedExpenseRowValues => ({
+    const expenses = importedTransactions.map(
+      (e): ImportedTransactionRowValues => ({
         selected: !isDuplicateFn(e),
         date: e.date,
         type: e.type,
@@ -116,11 +116,11 @@ export function ParsedExpensesModal({
     );
     return {
       initialValues: { expenses },
-      hasDuplicates: parsedExpenses.some((e) => isDuplicateFn(e)),
+      hasDuplicates: importedTransactions.some((e) => isDuplicateFn(e)),
     };
-  }, [parsedExpenses, isDuplicateFn]);
+  }, [importedTransactions, isDuplicateFn]);
 
-  const form = useForm<ParsedExpenseFormValues>({ initialValues });
+  const form = useForm<ImportedTransactionFormValues>({ initialValues });
 
   const offeredSubscriptions = useOfferedSubscriptions();
   const { data: projectSettings } = useQuery(getProjectSettingsQueryOptions());
@@ -130,7 +130,7 @@ export function ParsedExpensesModal({
     ...getCategorySuggestionsQueryOptions({
       sourceId,
       subscriptionIds: offeredSubscriptions?.map((s) => s.id) ?? [],
-      parsedExpenses,
+      importedTransactions,
     }),
     enabled:
       offeredSubscriptions !== undefined && categorySuggestionsEnabled === true,
@@ -433,7 +433,7 @@ export function ParsedExpensesModal({
             </div>
 
             {expenses.map((_, index) => (
-              <ParsedExpenseRow
+              <ImportedTransactionRow
                 key={index}
                 index={index}
                 form={form}

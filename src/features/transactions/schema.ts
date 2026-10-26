@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { datetimeCodec, decimalCodec } from '~/shared/codecs';
 
-import { parsedExpenseSchema } from './parsedExpense';
+import { importedTransactionSchema } from './importedTransaction';
 
 // ── TransactionComponent ──────────────────────────────────────────────────────
 
@@ -101,12 +101,12 @@ export const importTransactionsSchema = z.array(importTransactionItemSchema);
 export type ImportTransactionItem = z.infer<typeof importTransactionItemSchema>;
 export type ImportTransactionsInput = z.infer<typeof importTransactionsSchema>;
 
-// ── SuggestCategories (for parsed expenses) ───────────────────────────────────
+// ── SuggestCategories (for imported transactions) ─────────────────────────────
 
 export const suggestCategoriesSchema = z.object({
   sourceId: z.number(),
   subscriptionIds: z.array(z.number()),
-  parsedExpenses: z.array(parsedExpenseSchema),
+  importedTransactions: z.array(importedTransactionSchema),
 });
 export type SuggestCategoriesInput = z.input<typeof suggestCategoriesSchema>;
 

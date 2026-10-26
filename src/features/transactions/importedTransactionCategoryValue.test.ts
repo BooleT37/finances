@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { toParsedExpenseCategoryValue } from './parsedExpenseCategoryValue';
+import { toImportedTransactionCategoryValue } from './importedTransactionCategoryValue';
 
-describe('toParsedExpenseCategoryValue', () => {
+describe('toImportedTransactionCategoryValue', () => {
   it('returns the subscription value when the transaction has a subscription', () => {
     expect(
-      toParsedExpenseCategoryValue({
+      toImportedTransactionCategoryValue({
         categoryId: 1,
         subcategoryId: 10,
         subscriptionId: 5,
@@ -15,7 +15,7 @@ describe('toParsedExpenseCategoryValue', () => {
 
   it('returns the category and subcategory value without a subscription', () => {
     expect(
-      toParsedExpenseCategoryValue({
+      toImportedTransactionCategoryValue({
         categoryId: 1,
         subcategoryId: 10,
         subscriptionId: null,
@@ -25,7 +25,7 @@ describe('toParsedExpenseCategoryValue', () => {
 
   it('returns the category value without a subcategory', () => {
     expect(
-      toParsedExpenseCategoryValue({
+      toImportedTransactionCategoryValue({
         categoryId: 1,
         subcategoryId: null,
         subscriptionId: null,

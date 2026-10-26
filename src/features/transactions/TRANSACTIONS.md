@@ -53,10 +53,10 @@ Transactions imported before this field existed were filled in from the saved ba
 
 ## Category Suggestions
 
-When importing, the app suggests a category for each parsed expense (a row parsed from a bank statement, not yet saved) and pre-fills it in the import modal:
+When importing, the app suggests a category for each imported transaction (a row parsed from a bank statement, not yet saved) and pre-fills it in the import modal:
 
 1. It finds the similar transactions (see below).
-2. It sends Jev, a classification model by TypeSafe, a question: which of the row's criteria fits it. The criteria ("criteria" is Jev's own word) are the options the category picker offers for this row, each described in words, plus "unknown". Along with the parsed expense, Jev sees the similar transactions, each with the criterion it was filed under.
+2. It sends Jev, a classification model by TypeSafe, a question: which of the row's criteria fits it. The criteria ("criteria" is Jev's own word) are the options the category picker offers for this row, each described in words, plus "unknown". Along with the imported transaction, Jev sees the similar transactions, each with the criterion it was filed under.
 3. Jev answers with a choice and its confidence. The app keeps the choice as the row's category suggestion only if Jev is confident enough (see below). Otherwise the row stays empty.
 
 A category suggestion can be a subscription too. If the suggested subscription isn't offered for this row (e.g. it's already paid this period), the row gets the subscription's category and subcategory instead.
@@ -73,7 +73,7 @@ While it's off, the import modal says so and links to the project settings. The 
 
 ## Similar Transactions
 
-The similar transactions of a parsed expense are up to 10 transactions of the same source and the same sign (expense or income) whose imported description is the closest to the parsed expense's. Closeness is measured by Postgres' `pg_trgm` trigram similarity.
+The similar transactions of an imported transaction are up to 10 transactions of the same source and the same sign (expense or income) whose imported description is the closest to the imported transaction's. Closeness is measured by Postgres' `pg_trgm` trigram similarity.
 
 The search stays within one source, since each bank writes its descriptions in its own way.
 
@@ -97,4 +97,4 @@ These results hold for the exact Jev version (`JEV_MODEL`) and the exact wording
 
 - We don't support positive costs and income categories for components yet. Will implement it in future
 
-- Category suggestions use only the description, amount and date of a parsed expense. The bank's transaction type ("Card transaction", "Outgoing transfer", etc.) is left out for now, since its effect couldn't be measured on past imports
+- Category suggestions use only the description, amount and date of an imported transaction. The bank's transaction type ("Card transaction", "Outgoing transfer", etc.) is left out for now, since its effect couldn't be measured on past imports

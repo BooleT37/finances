@@ -1,15 +1,15 @@
 import { buildCategorySubcategoryId } from '~/features/categories/categorySubcategoryId';
-import { groupParsedExpenseCategoryOptions } from '~/features/transactions/parsedExpenseCategoryOptions';
+import { groupImportedTransactionCategoryOptions } from '~/features/transactions/importedTransactionCategoryOptions';
 import {
   buildSubscriptionValue,
+  type ImportedTransactionCategoryValue,
   isSubscriptionValue,
-  type ParsedExpenseCategoryValue,
   parseSubscriptionValue,
-} from '~/features/transactions/parsedExpenseCategoryValue';
+} from '~/features/transactions/importedTransactionCategoryValue';
 import type { Prisma, Subscription } from '~/generated/prisma/client';
 
 export interface CategoryJevCriterion {
-  value: ParsedExpenseCategoryValue;
+  value: ImportedTransactionCategoryValue;
   description: string;
 }
 
@@ -22,7 +22,7 @@ export function buildCategoryJevCriteria(params: {
   subscriptions: Subscription[];
   isIncome: boolean;
 }): CategoryJevCriterion[] {
-  return groupParsedExpenseCategoryOptions(params).flatMap(
+  return groupImportedTransactionCategoryOptions(params).flatMap(
     ({ category, subscriptions }) => {
       const fullName = (subcategoryId: number | null) => {
         const subcategory = category.subcategories.find(
@@ -59,11 +59,11 @@ export function buildCategoryJevCriteria(params: {
  * back to its own category and subcategory. Returns null when nothing fits.
  */
 export function resolveCategoryJevCriterion(
-  value: ParsedExpenseCategoryValue,
+  value: ImportedTransactionCategoryValue,
   criteria: CategoryJevCriterion[],
   allSubscriptions: Subscription[],
-): ParsedExpenseCategoryValue | null {
-  const isOffered = (candidate: ParsedExpenseCategoryValue) =>
+): ImportedTransactionCategoryValue | null {
+  const isOffered = (candidate: ImportedTransactionCategoryValue) =>
     criteria.some((criterion) => criterion.value === candidate);
 
   if (isOffered(value)) {

@@ -1,9 +1,9 @@
 import { startActiveObservation } from '@langfuse/tracing';
 
-import type { ParsedExpense } from '~/features/transactions/parsedExpense';
+import type { ImportedTransaction } from '~/features/transactions/importedTransaction';
 import { isTracingOn } from '~/server/langfuse';
 
-import { describeParsedExpense } from '../categoryJevQuestion';
+import { describeImportedTransaction } from '../categoryJevQuestion';
 import type {
   CategorySuggestion,
   CategorySuggestionResult,
@@ -15,13 +15,13 @@ export interface TracedCategorySuggestion {
 }
 
 export const traceCategorySuggestion = (
-  parsedExpense: ParsedExpense,
+  importedTransaction: ImportedTransaction,
   suggest: () => Promise<CategorySuggestionResult>,
 ) =>
   startActiveObservation(
     'suggest-category',
     async (span): Promise<TracedCategorySuggestion> => {
-      span.update({ input: describeParsedExpense(parsedExpense) });
+      span.update({ input: describeImportedTransaction(importedTransaction) });
       const result = await suggest();
       span.update({ output: result });
       return {

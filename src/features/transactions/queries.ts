@@ -15,7 +15,7 @@ import {
   suggestCategories,
   updateTransaction,
 } from '~/features/transactions/api';
-import type { ParsedExpense } from '~/features/transactions/parsedExpense';
+import type { ImportedTransaction } from '~/features/transactions/importedTransaction';
 
 import {
   type ImportTransactionsInput,
@@ -32,9 +32,9 @@ const transactionsKeys = createQueryKeys('transactions', {
   categorySuggestions: (
     sourceId: number,
     subscriptionIds: number[],
-    parsedExpenseHashes: string[],
+    importedTransactionHashes: string[],
   ) => ({
-    queryKey: [sourceId, subscriptionIds, parsedExpenseHashes],
+    queryKey: [sourceId, subscriptionIds, importedTransactionHashes],
   }),
 });
 
@@ -51,24 +51,26 @@ export const getTransactionsQueryOptions = (year: number) => {
 export const getCategorySuggestionsQueryOptions = ({
   sourceId,
   subscriptionIds,
-  parsedExpenses,
+  importedTransactions,
 }: {
   sourceId: number;
   subscriptionIds: number[];
-  parsedExpenses: ParsedExpense[];
+  importedTransactions: ImportedTransaction[];
 }) =>
   queryOptions({
     ...transactionsKeys.categorySuggestions(
       sourceId,
       subscriptionIds,
-      parsedExpenses.map((parsedExpense) => parsedExpense.hash),
+      importedTransactions.map(
+        (importedTransaction) => importedTransaction.hash,
+      ),
     ),
     queryFn: () =>
       suggestCategories({
         data: suggestCategoriesSchema.encode({
           sourceId,
           subscriptionIds,
-          parsedExpenses,
+          importedTransactions,
         }),
       }),
     staleTime: Infinity,
