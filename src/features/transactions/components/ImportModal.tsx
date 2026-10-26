@@ -1,6 +1,6 @@
 import { Button, FileInput, Group, Modal, Select, Stack } from '@mantine/core';
-import { useQuery } from '@tanstack/react-query';
-import { atom, useAtom } from 'jotai';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { atom, useAtom, useAtomValue } from 'jotai';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -10,6 +10,8 @@ import {
   type ImportedTransaction,
   importedTransactionSchema,
 } from '~/features/transactions/importedTransaction';
+import { getTransactionsQueryOptions } from '~/features/transactions/queries';
+import { selectedYearAtom } from '~/stores/month';
 
 import { ImportedTransactionsModal } from './ImportedTransactionsModal/ImportedTransactionsModal';
 
@@ -17,6 +19,8 @@ export const importModalOpenAtom = atom(false);
 
 export function ImportModal() {
   const { t } = useTranslation('transactions');
+  const queryClient = useQueryClient();
+  const selectedYear = useAtomValue(selectedYearAtom);
   const [open, setOpen] = useAtom(importModalOpenAtom);
   const [selectedSourceId, setSelectedSourceId] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -58,10 +62,17 @@ export function ImportModal() {
       const rows = await parsePdfExpenses({
         data: { fileBase64: base64, parser: selectedSource.parser as 'VIVID' },
       });
+      const decoded = rows.map((row) => importedTransactionSchema.decode(row));
+      const previousYear = selectedYear - 1;
+      if (decoded.some((row) => row.date.year() === previousYear)) {
+        // ensure all the required years are loaded (we only care about the current and previous one)
+        // so the ImportedTransactionsModal doesn't have to deal with the loading state
+        await queryClient.ensureQueryData(
+          getTransactionsQueryOptions(previousYear),
+        );
+      }
       setOpen(false);
-      setImportedTransactions(
-        rows.map((row) => importedTransactionSchema.decode(row)),
-      );
+      setImportedTransactions(decoded);
     } catch (err) {
       console.error('PDF parse error', err);
     } finally {

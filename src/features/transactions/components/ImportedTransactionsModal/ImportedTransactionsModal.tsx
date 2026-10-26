@@ -84,8 +84,23 @@ export function ImportedTransactionsModal({
 }: Props) {
   const { t } = useTranslation('transactions');
   const selectedYear = useAtomValue(selectedYearAtom);
-  const { data: existingTransactions = [] } = useQuery(
+  const previousYear = selectedYear - 1;
+  const includesPreviousYear = importedTransactions.some(
+    (row) => row.date.year() === previousYear,
+  );
+  const { data: selectedYearTransactions = [] } = useQuery(
     getTransactionsQueryOptions(selectedYear),
+  );
+  const { data: previousYearTransactions = [] } = useQuery({
+    ...getTransactionsQueryOptions(previousYear),
+    enabled: includesPreviousYear,
+  });
+  const existingTransactions = useMemo(
+    () =>
+      includesPreviousYear
+        ? [...previousYearTransactions, ...selectedYearTransactions]
+        : selectedYearTransactions,
+    [includesPreviousYear, previousYearTransactions, selectedYearTransactions],
   );
   const { data: subscriptions = [] } = useQuery(getSubscriptionsQueryOptions());
   const importTransactions = useImportTransactions();
