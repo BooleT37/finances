@@ -15,7 +15,9 @@ export const auth = betterAuth({
   baseURL: allowedHosts?.length
     ? {
         allowedHosts,
-        protocol: 'auto' as const,
+        // Every environment is served over https, but in dev Nitro hands the
+        // request to the app as plain http, which 'auto' would pick up.
+        protocol: 'https' as const,
         // For scripts (bootstrap-project.ts, reset-password.ts) we can't
         // derive baseURL from request/headers
         fallback: 'http://localhost',

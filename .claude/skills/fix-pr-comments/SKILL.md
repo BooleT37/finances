@@ -118,7 +118,7 @@ For each commit-group, in order:
 1. Make the change, following repo conventions (`CLAUDE.md`, feature docs, **bugfix**/**api-conventions** skills). For AI-comment fixes endorsed with clarifying instructions, follow those instructions over the original AI suggestion.
 2. Get `npm run typecheck && npm run lint && npm run format:check` clean.
 3. If the feature has tests and the fix changes behavior, update/add a case (**testing** skill) and run it.
-4. If the change is **visual**, verify it in the browser via the **Playwright MCP** (dev server on `http://localhost:3002`) and capture an after-screenshot.
+4. If the change is **visual**, verify it in the browser via the **Playwright MCP** (dev server on `https://localhost:3002`) and capture an after-screenshot.
 5. Commit with a [conventional commits](https://www.conventionalcommits.org/) message scoped to the feature. Keep it to this one fix-group.
 
 ## Step 6 — Push

@@ -17,6 +17,7 @@ export default defineConfig({
   workers: 1, // sequential spec files — parallel workers would race to reset the same DB
   use: {
     baseURL: TEST_BASE_URL,
+    ignoreHTTPSErrors: true,
     trace: 'on-first-retry',
     // The app now prefills its language from the browser's locale when there's
     // no saved preference. Pin it to Russian — the app's default — so specs
@@ -32,6 +33,7 @@ export default defineConfig({
   webServer: {
     command: 'npm run dev -- --port 3001',
     url: TEST_BASE_URL,
+    ignoreHTTPSErrors: true,
     reuseExistingServer: false, // always fresh — tests must use the test DB, not the dev DB
     env: {
       DATABASE_URL: TEST_DB_URL,

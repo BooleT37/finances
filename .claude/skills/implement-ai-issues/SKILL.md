@@ -83,9 +83,9 @@ If the feature has **no** tests at all, do **not** introduce a brand-new test la
 
 Start the worktree dev server and drive it with the **Playwright MCP**:
 ```bash
-npm run dev --prefix ../finances-worktrees/<dir>   # serves on http://localhost:3002
+npm run dev --prefix ../finances-worktrees/<dir>   # serves on https://localhost:3002
 ```
-- `browser_navigate` to `http://localhost:3002`, reproduce the original problem path, and confirm the new behavior.
+- `browser_navigate` to `https://localhost:3002`, reproduce the original problem path, and confirm the new behavior.
 - Capture screenshots with `browser_take_screenshot` — for a visual change, take **before** (on `main`, if feasible) and **after**; for a behavioral fix, capture the key end state.
 - Stop the dev server when done (don't leave it running into the next issue).
 

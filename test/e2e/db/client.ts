@@ -6,7 +6,7 @@ import { PrismaClient } from '../../../src/generated/prisma/client';
 export const TEST_DB_URL =
   'postgresql://postgres:postgres@localhost:5435/finances_test';
 
-export const TEST_BASE_URL = 'http://localhost:3001';
+export const TEST_BASE_URL = 'https://localhost:3001';
 
 export const TEST_BETTER_AUTH_SECRET = 'e2e-test-secret-not-for-production-use';
 

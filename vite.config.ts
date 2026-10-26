@@ -1,4 +1,5 @@
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
+import basicSsl from '@vitejs/plugin-basic-ssl';
 import viteReact from '@vitejs/plugin-react';
 import { nitro } from 'nitro/vite';
 import type { Plugin, Rollup } from 'vite';
@@ -26,8 +27,30 @@ const suppressUseClientDirectiveWarning: Plugin = {
   },
 };
 
+// Over HTTP/2 a browser sends the host only as the ":authority" pseudo-header.
+// Nitro's dev proxy then forwards the request with its internal worker address
+// as the host, which breaks every URL built from it (OAuth and bank
+// redirects). Adding a "host" header from ":authority" keeps the real one; the
+// proxy copies rawHeaders, so it goes there too.
+const keepHostOverHttp2: Plugin = {
+  name: 'keep-host-over-http2',
+  apply: 'serve',
+  configureServer(server) {
+    server.middlewares.use((req, _res, next) => {
+      const authority = req.headers[':authority'];
+      if (!req.headers.host && typeof authority === 'string') {
+        req.headers.host = authority;
+        req.rawHeaders.push('host', authority);
+      }
+      next();
+    });
+  },
+};
+
 export default defineConfig({
   plugins: [
+    keepHostOverHttp2,
+    basicSsl(),
     tsconfigPaths(),
     tanstackStart(),
     nitro(),

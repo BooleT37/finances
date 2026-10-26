@@ -63,6 +63,8 @@ npm run build
 npm run typecheck
 ```
 
+The dev server runs on **https** (`https://localhost:3002`, Playwright on `https://localhost:3001`) with a self-signed certificate from `@vitejs/plugin-basic-ssl`, because some third-party redirect callbacks only accept https URLs. The browser shows a certificate warning the first time. Nitro hands requests to the app as plain http, so Better Auth's `baseURL` uses `protocol: 'https'` rather than `'auto'`; otherwise it would build `http://` callback URLs and mismatched cookie names. Over HTTP/2 a browser sends the host only as `:authority`, which Nitro's dev proxy drops, so a small plugin in `vite.config.ts` copies it into a `host` header; without it every URL built from the request host (OAuth and bank redirects) points at Nitro's internal worker address.
+
 ## Code Quality
 
 **Always run these checks after every code change before considering a task done:**
