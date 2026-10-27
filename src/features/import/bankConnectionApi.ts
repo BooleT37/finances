@@ -23,11 +23,15 @@ import {
   bankConnectionSourceSchema,
   type CompleteBankAuthInput,
   completeBankAuthSchema,
+  type FetchBankTransactionsInput,
+  fetchBankTransactionsSchema,
   type SelectBankAccountInput,
   selectBankAccountSchema,
 } from './bankConnectionSchema';
 import { createBankConnector } from './BankConnector/bankConnectorRegistry';
+import { isSessionGoneError } from './BankConnector/EnableBankingClient';
 import { getEnableBankingCredentials } from './BankConnector/enableBankingCredentials';
+import { importedTransactionSchema } from './importedTransaction';
 
 const BANK_AUTH_COOKIE = 'bank-auth';
 const BANK_AUTH_COOKIE_MAX_AGE_SECONDS = 15 * 60;
@@ -219,5 +223,51 @@ export const disconnectBankConnection = createServerFn({ method: 'POST' })
         .catch((error: unknown) => {
           console.warn('Could not close the bank session', error);
         });
+    }
+  });
+
+export const fetchBankTransactions = createServerFn({ method: 'POST' })
+  .middleware([
+    authMiddleware,
+    trackInput<FetchBankTransactionsInput>({ dateFrom: 'send' }),
+  ])
+  .validator((input: FetchBankTransactionsInput) =>
+    fetchBankTransactionsSchema.parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const credentials = requireEnableBankingCredentials(context.projectId);
+    const connection = await prisma.bankConnection.findUnique({
+      where: {
+        sourceId_projectId: {
+          sourceId: data.sourceId,
+          projectId: context.projectId,
+        },
+      },
+    });
+    if (!connection?.accountUid) {
+      throw new Error('This source has no connected bank account');
+    }
+    if (dayjs(connection.expiresAt).isBefore(dayjs())) {
+      return { status: 'expired' as const };
+    }
+    try {
+      const transactions = await createBankConnector(
+        connection.connector,
+        credentials,
+      ).fetchTransactions({
+        accountUid: connection.accountUid,
+        dateFrom: dayjs(data.dateFrom),
+      });
+      return {
+        status: 'fetched' as const,
+        transactions: transactions.map((transaction) =>
+          importedTransactionSchema.encode(transaction),
+        ),
+      };
+    } catch (error) {
+      if (isSessionGoneError(error)) {
+        return { status: 'expired' as const };
+      }
+      throw error;
     }
   });

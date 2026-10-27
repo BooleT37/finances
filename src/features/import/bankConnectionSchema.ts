@@ -28,6 +28,15 @@ export const selectBankAccountSchema = z.object({
   accountUid: z.string().min(1),
 });
 
+export const fetchBankTransactionsSchema = z.object({
+  sourceId: z.number(),
+  dateFrom: z.string(),
+});
+
+export type FetchBankTransactionsInput = z.infer<
+  typeof fetchBankTransactionsSchema
+>;
+
 export const bankAccountSchema = z.object({
   uid: z.string(),
   label: z.string(),
