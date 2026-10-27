@@ -24,6 +24,7 @@ model Project {
   savingSpendingCategories SavingSpendingCategory[]
   expenseComponents        ExpenseComponent[]
   forecastLineItems        ForecastLineItem[]
+  bankConnections          BankConnection[]
 }
 
 model User {
@@ -142,15 +143,37 @@ enum ExpensesParser {
 }
 
 model Source {
-  id            Int             @id @default(autoincrement())
-  name          String
-  parser        ExpensesParser?
-  subscriptions Subscription[]
-  expenses      Expense[]
-  project       Project         @relation(fields: [projectId], references: [id])
-  projectId     String
+  id             Int             @id @default(autoincrement())
+  name           String
+  parser         ExpensesParser?
+  subscriptions  Subscription[]
+  expenses       Expense[]
+  project        Project         @relation(fields: [projectId], references: [id])
+  projectId      String
+  bankConnection BankConnection?
 
   @@unique([id, projectId])
+}
+
+enum BankConnector {
+  VIVID
+}
+
+model BankConnection {
+  id             Int           @id @default(autoincrement())
+  source         Source        @relation(fields: [sourceId, projectId], references: [id, projectId], onDelete: Cascade)
+  sourceId       Int
+  connector      BankConnector
+  sessionId      String
+  accountUid     String?
+  expiresAt      DateTime
+  lastImportedAt DateTime?
+  project        Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId      String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @default(now()) @updatedAt
+
+  @@unique([sourceId, projectId])
 }
 
 model SavingSpending {
