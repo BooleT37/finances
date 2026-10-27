@@ -4,7 +4,7 @@ import type { Dayjs } from 'dayjs';
 
 import { ISO_DATE_FORMAT } from '~/shared/constants';
 
-const API_BASE = 'https://api.enablebanking.com';
+export const ENABLE_BANKING_API_URL = 'https://api.enablebanking.com';
 const JWT_LIFETIME_SECONDS = 3600;
 
 const SESSION_GONE_ERRORS = new Set([
@@ -17,6 +17,7 @@ const SESSION_GONE_ERRORS = new Set([
 export interface EnableBankingCredentials {
   applicationId: string;
   privateKey: string;
+  apiUrl: string;
 }
 
 export interface EnableBankingAccount {
@@ -163,7 +164,7 @@ export class EnableBankingClient {
     path: string,
     body?: unknown,
   ): Promise<T> {
-    const response = await fetch(`${API_BASE}${path}`, {
+    const response = await fetch(`${this.credentials.apiUrl}${path}`, {
       method,
       headers: {
         Authorization: `Bearer ${this.buildJwt()}`,

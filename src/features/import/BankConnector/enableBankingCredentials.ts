@@ -1,4 +1,7 @@
-import type { EnableBankingCredentials } from './EnableBankingClient';
+import {
+  ENABLE_BANKING_API_URL,
+  type EnableBankingCredentials,
+} from './EnableBankingClient';
 
 /**
  * Enable Banking's free tier is for the operator's own accounts only, so one
@@ -14,5 +17,9 @@ export function getEnableBankingCredentials(
   if (!applicationId || !privateKey || projectId !== allowedProjectId) {
     return null;
   }
-  return { applicationId, privateKey: privateKey.replaceAll('\\n', '\n') };
+  return {
+    applicationId,
+    privateKey: privateKey.replaceAll('\\n', '\n'),
+    apiUrl: process.env.ENABLE_BANKING_API_URL || ENABLE_BANKING_API_URL,
+  };
 }
