@@ -9,7 +9,6 @@ export const importTransactionItemSchema = z.object({
   categoryId: z.number(),
   subcategoryId: z.number().nullable().optional(),
   subscriptionId: z.number().nullable().optional(),
-  sourceId: z.number(),
   importHash: z.string(),
   importedDescription: z.string(),
   categorySuggestionTrace: z
@@ -18,7 +17,11 @@ export const importTransactionItemSchema = z.object({
     .optional(),
 });
 
-export const importTransactionsSchema = z.array(importTransactionItemSchema);
+export const importTransactionsSchema = z.object({
+  sourceId: z.number(),
+  fromBank: z.boolean(),
+  transactions: z.array(importTransactionItemSchema),
+});
 export type ImportTransactionItem = z.infer<typeof importTransactionItemSchema>;
 export type ImportTransactionsInput = z.infer<typeof importTransactionsSchema>;
 

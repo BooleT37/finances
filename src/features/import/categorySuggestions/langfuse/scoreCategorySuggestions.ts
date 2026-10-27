@@ -1,5 +1,5 @@
 import { toImportedTransactionCategoryValue } from '~/features/import/importedTransactionCategoryValue';
-import type { ImportTransactionsInput } from '~/features/import/schema';
+import type { ImportTransactionItem } from '~/features/import/schema';
 import { prisma } from '~/server/db';
 import {
   flushLangfuse,
@@ -17,7 +17,7 @@ import { buildCategorySuggestionScores } from './buildCategorySuggestionScores';
  * scoring never fails the import.
  */
 export async function scoreCategorySuggestions(
-  items: ImportTransactionsInput,
+  items: ImportTransactionItem[],
   projectId: string,
 ): Promise<void> {
   const client = langfuseClient;

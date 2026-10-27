@@ -83,7 +83,7 @@ export function useImportTransactions() {
       const wires = await importTransactions({ data: input });
       return wires.map((w) => transactionWithComponentsSchema.decode(w));
     },
-    onSuccess: async (created) => {
+    onSuccess: async (created, input) => {
       const years = new Set(created.map((tx) => tx.date.year()));
       for (const year of years) {
         queryClient.setQueryData(
@@ -93,6 +93,9 @@ export function useImportTransactions() {
             return old ? [...old, ...additions] : additions;
           },
         );
+      }
+      if (input.fromBank) {
+        await queryClient.invalidateQueries(getBankConnectionsQueryOptions());
       }
     },
   });

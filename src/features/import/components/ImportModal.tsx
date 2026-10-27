@@ -41,6 +41,7 @@ export function ImportModal() {
   const [importedTransactions, setImportedTransactions] = useState<
     ImportedTransaction[] | null
   >(null);
+  const [importingFromBank, setImportingFromBank] = useState(false);
 
   const { data: sources = [] } = useQuery(getSourcesQueryOptions());
   const bankImportAvailable = useBankImportAvailable();
@@ -72,7 +73,7 @@ export function ImportModal() {
   const showBothOptions =
     showStatementUpload && selectedBankConnection !== null;
 
-  const openReview = async (rows: ImportedTransaction[]) => {
+  const openReview = async (rows: ImportedTransaction[], fromBank: boolean) => {
     const previousYear = selectedYear - 1;
     if (rows.some((row) => row.date.year() === previousYear)) {
       // ensure all the required years are loaded (we only care about the current and previous one)
@@ -82,6 +83,7 @@ export function ImportModal() {
       );
     }
     setOpen(false);
+    setImportingFromBank(fromBank);
     setImportedTransactions(rows);
   };
 
@@ -108,6 +110,7 @@ export function ImportModal() {
       });
       await openReview(
         rows.map((row) => importedTransactionSchema.decode(row)),
+        false,
       );
     } catch (err) {
       console.error('PDF parse error', err);
@@ -202,7 +205,7 @@ export function ImportModal() {
               <BankImportSection
                 key={selectedBankConnection.sourceId}
                 connection={selectedBankConnection}
-                onFetched={openReview}
+                onFetched={(rows) => openReview(rows, true)}
               />
             </Stack>
           )}
@@ -212,6 +215,7 @@ export function ImportModal() {
       {importedTransactions && selectedSource && (
         <ImportedTransactionsModal
           importedTransactions={importedTransactions}
+          fromBank={importingFromBank}
           sourceId={selectedSource.id}
           onClose={handleReviewClose}
         />

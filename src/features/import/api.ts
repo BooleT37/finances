@@ -84,34 +84,48 @@ export const importTransactions = createServerFn({ method: 'POST' })
   .middleware([
     authMiddleware,
     trackInput<ImportTransactionsInput>({
-      name: 'omit',
-      cost: 'send',
-      date: 'send',
-      importHash: 'omit',
-      importedDescription: 'omit',
-      categorySuggestionTrace: { traceId: 'sendFull', suggestedValue: 'send' },
+      transactions: {
+        name: 'omit',
+        cost: 'send',
+        date: 'send',
+        importHash: 'omit',
+        importedDescription: 'omit',
+        categorySuggestionTrace: {
+          traceId: 'sendFull',
+          suggestedValue: 'send',
+        },
+      },
     }),
   ])
   .validator((input: ImportTransactionsInput) =>
     importTransactionsSchema.parse(input),
   )
   .handler(async ({ data, context }) => {
-    const created = await prisma.expense.createManyAndReturn({
-      data: data.map((item) => ({
-        name: item.name,
-        cost: new Decimal(item.cost).abs(),
-        date: new Date(item.date),
-        categoryId: item.categoryId,
-        subcategoryId: item.subcategoryId ?? null,
-        subscriptionId: item.subscriptionId ?? null,
-        sourceId: item.sourceId,
-        importHash: item.importHash,
-        importedDescription: item.importedDescription,
-        projectId: context.projectId,
-      })),
-      include: { category: true },
+    const created = await prisma.$transaction(async (tx) => {
+      const rows = await tx.expense.createManyAndReturn({
+        data: data.transactions.map((item) => ({
+          name: item.name,
+          cost: new Decimal(item.cost).abs(),
+          date: new Date(item.date),
+          categoryId: item.categoryId,
+          subcategoryId: item.subcategoryId ?? null,
+          subscriptionId: item.subscriptionId ?? null,
+          sourceId: data.sourceId,
+          importHash: item.importHash,
+          importedDescription: item.importedDescription,
+          projectId: context.projectId,
+        })),
+        include: { category: true },
+      });
+      if (data.fromBank) {
+        await tx.bankConnection.updateMany({
+          where: { sourceId: data.sourceId, projectId: context.projectId },
+          data: { lastImportedAt: new Date() },
+        });
+      }
+      return rows;
     });
-    await scoreCategorySuggestions(data, context.projectId);
+    await scoreCategorySuggestions(data.transactions, context.projectId);
 
     return created.map((tx) =>
       transactionWithComponentsSchema.encode({

@@ -74,12 +74,14 @@ const stickyHeaderRowStyle: React.CSSProperties = {
 interface Props {
   importedTransactions: ImportedTransaction[];
   sourceId: number;
+  fromBank: boolean;
   onClose: () => void;
 }
 
 export function ImportedTransactionsModal({
   importedTransactions,
   sourceId,
+  fromBank,
   onClose,
 }: Props) {
   const { t } = useTranslation('import');
@@ -292,7 +294,6 @@ export function ImportedTransactionsModal({
           categoryId,
           subcategoryId,
           subscriptionId,
-          sourceId,
           importHash: e.hash,
           importedDescription: e.importedDescription,
           categorySuggestionTrace: getCategorySuggestionTrace(index),
@@ -300,7 +301,11 @@ export function ImportedTransactionsModal({
       ];
     });
 
-    const created = await importTransactions.mutateAsync(items);
+    const created = await importTransactions.mutateAsync({
+      sourceId,
+      fromBank,
+      transactions: items,
+    });
     triggerFlash(created.map((tx) => ({ id: transactionRowId(tx.id) })));
     notifications.show({
       color: 'green',
