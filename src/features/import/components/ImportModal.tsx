@@ -4,12 +4,12 @@ import { atom, useAtom, useAtomValue } from 'jotai';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { getSourcesQueryOptions } from '~/features/sources/queries';
-import { parsePdfExpenses } from '~/features/transactions/api';
+import { parsePdfExpenses } from '~/features/import/api';
 import {
   type ImportedTransaction,
   importedTransactionSchema,
-} from '~/features/transactions/importedTransaction';
+} from '~/features/import/importedTransaction';
+import { getSourcesQueryOptions } from '~/features/sources/queries';
 import { getTransactionsQueryOptions } from '~/features/transactions/queries';
 import { selectedYearAtom } from '~/stores/month';
 
@@ -18,7 +18,7 @@ import { ImportedTransactionsModal } from './ImportedTransactionsModal/ImportedT
 export const importModalOpenAtom = atom(false);
 
 export function ImportModal() {
-  const { t } = useTranslation('transactions');
+  const { t } = useTranslation('import');
   const queryClient = useQueryClient();
   const selectedYear = useAtomValue(selectedYearAtom);
   const [open, setOpen] = useAtom(importModalOpenAtom);

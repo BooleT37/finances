@@ -9,13 +9,13 @@ import { NameWithOptionalIcon } from '~/features/categories/components/NameWithO
 import { useExpenseCategories } from '~/features/categories/facets/expenseCategories';
 import { useIncomeCategories } from '~/features/categories/facets/incomeCategories';
 import type { Category } from '~/features/categories/schema';
-import { useAvailableSubscriptions } from '~/features/subscriptions/facets/availableSubscriptions';
-import type { Subscription } from '~/features/subscriptions/schema';
 import {
   groupImportedTransactionCategoryOptions,
   type ImportedTransactionCategoryGroup,
-} from '~/features/transactions/importedTransactionCategoryOptions';
-import { buildSubscriptionValue } from '~/features/transactions/importedTransactionCategoryValue';
+} from '~/features/import/importedTransactionCategoryOptions';
+import { buildSubscriptionValue } from '~/features/import/importedTransactionCategoryValue';
+import { useAvailableSubscriptions } from '~/features/subscriptions/facets/availableSubscriptions';
+import type { Subscription } from '~/features/subscriptions/schema';
 import type { TreeNode } from '~/shared/components/TreeSelect';
 
 // ── Renderers ─────────────────────────────────────────────────────────────────

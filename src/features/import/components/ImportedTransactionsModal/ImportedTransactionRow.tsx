@@ -5,8 +5,8 @@ import { IconSparkles } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 
-import type { CategorySuggestion } from '~/features/transactions/categorySuggestions/categorySuggestion';
-import type { ImportedTransactionCategoryValue } from '~/features/transactions/importedTransactionCategoryValue';
+import type { CategorySuggestion } from '~/features/import/categorySuggestions/categorySuggestion';
+import type { ImportedTransactionCategoryValue } from '~/features/import/importedTransactionCategoryValue';
 import { TreeSelect } from '~/shared/components/TreeSelect';
 import { ISO_DATE_FORMAT } from '~/shared/constants';
 
@@ -31,7 +31,7 @@ export function ImportedTransactionRow({
   categorySuggestion,
   categorySuggestionLoading,
 }: Props) {
-  const { t } = useTranslation('transactions');
+  const { t } = useTranslation('import');
   const row = form.values.expenses[index];
   const selected = row?.selected ?? false;
   const amountIsNegative = isNegativeAmount(row?.amount ?? '');

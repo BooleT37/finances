@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import Decimal from 'decimal.js';
 import { describe, expect, it } from 'vitest';
 
-import type { ImportedTransaction } from '~/features/transactions/importedTransaction';
+import type { ImportedTransaction } from '~/features/import/importedTransaction';
 
 import { buildCategoryJevCriteria } from './categoryJevCriteria';
 import {

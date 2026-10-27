@@ -18,26 +18,26 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
 import { parseCategorySubcategoryId } from '~/features/categories/categorySubcategoryId';
-import { getProjectSettingsQueryOptions } from '~/features/projectSettings/queries';
-import { getSubscriptionsQueryOptions } from '~/features/subscriptions/queries';
-import type { ImportedTransaction } from '~/features/transactions/importedTransaction';
+import type { ImportedTransaction } from '~/features/import/importedTransaction';
 import {
   type ImportedTransactionCategoryValue,
   isSubscriptionValue,
   parseSubscriptionValue,
-} from '~/features/transactions/importedTransactionCategoryValue';
+} from '~/features/import/importedTransactionCategoryValue';
 import {
   getCategorySuggestionsQueryOptions,
-  getTransactionsQueryOptions,
   useImportTransactions,
-} from '~/features/transactions/queries';
+} from '~/features/import/queries';
+import { getProjectSettingsQueryOptions } from '~/features/projectSettings/queries';
+import { getSubscriptionsQueryOptions } from '~/features/subscriptions/queries';
+import { getTransactionsQueryOptions } from '~/features/transactions/queries';
 import { TextWithTooltipIcon } from '~/shared/components/TextWithTooltipIcon';
 import { ISO_DATE_FORMAT } from '~/shared/constants';
 import { TableFlash, useFlashTrigger } from '~/shared/hooks/useTableFlash';
 import { findByIdOrThrow } from '~/shared/utils/getOrThrow';
+import { transactionRowId } from '~/shared/utils/transactionsRowId';
 import { selectedYearAtom } from '~/stores/month';
 
-import { transactionRowId } from '../TransactionsTable/transactionsRowId';
 import { categorySuggestionsOffHintHiddenAtom } from './categorySuggestionsOffHintHidden.atom';
 import { useOfferedSubscriptions } from './importedTransactionCategoryTree';
 import { ImportedTransactionRow } from './ImportedTransactionRow';
@@ -82,7 +82,7 @@ export function ImportedTransactionsModal({
   sourceId,
   onClose,
 }: Props) {
-  const { t } = useTranslation('transactions');
+  const { t } = useTranslation('import');
   const selectedYear = useAtomValue(selectedYearAtom);
   const previousYear = selectedYear - 1;
   const includesPreviousYear = importedTransactions.some(

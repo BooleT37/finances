@@ -1,6 +1,6 @@
 import { startActiveObservation } from '@langfuse/tracing';
 
-import type { ImportedTransaction } from '~/features/transactions/importedTransaction';
+import type { ImportedTransaction } from '~/features/import/importedTransaction';
 import { isTracingOn } from '~/server/langfuse';
 
 import { describeImportedTransaction } from '../categoryJevQuestion';

@@ -1,0 +1,39 @@
+{
+  "import": "Import",
+  "importModal": {
+    "title": "Import expenses",
+    "source": "Source",
+    "sourcePlaceholder": "Select source",
+    "noParser": "This source has no parser configured. Go to Settings → Sources to set one up.",
+    "uploadLabel": "Upload PDF statement",
+    "uploadDescription": "PDF file from your banking app",
+    "parse": "Parse file",
+    "columns": {
+      "date": "Date",
+      "type": "Type",
+      "description": "Description",
+      "amount": "Amount (€)",
+      "category": "Category"
+    },
+    "selectAll": "Select all",
+    "importButton": "Import",
+    "success_one": "{{count}} transaction added",
+    "success_other": "{{count}} transactions added",
+    "duplicateWarning": "Unchecked items already exist in the database for this year.",
+    "suggestingCategory": "Suggesting…",
+    "categorySuggestionsOff": "Category autofill is off. An admin can turn it on in <settingsLink>Project settings</settingsLink>.",
+    "categorySuggestionsFailed": "Couldn't fetch category suggestions",
+    "retryCategorySuggestions": "Retry",
+    "suggestedCategoryLabel": "Suggested category",
+    "suggestedCategory": "Suggested with {{confidence}}% confidence",
+    "suggestedCategorySimilar_zero": "No similar past transactions, so judged by the description alone",
+    "suggestedCategorySimilar_one": "Based on {{count}} similar past transaction",
+    "suggestedCategorySimilar_other": "Based on {{count}} similar past transactions"
+  },
+  "form": {
+    "errors": {
+      "dateRequired": "Enter a date",
+      "categoryRequired": "Select a category"
+    }
+  }
+}

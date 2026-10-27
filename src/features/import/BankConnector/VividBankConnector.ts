@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import Decimal from 'decimal.js';
 
-import type { ImportedTransaction } from '~/features/transactions/importedTransaction';
+import type { ImportedTransaction } from '~/features/import/importedTransaction';
 import { hash } from '~/server/hash';
 
 import type { BankSession, IBankConnector } from './BankConnector';

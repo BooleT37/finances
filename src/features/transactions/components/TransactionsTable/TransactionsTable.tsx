@@ -23,18 +23,18 @@ import {
   useTableSidebarNavigation,
 } from '~/shared/hooks/useTableSidebarNavigation';
 import { expandRowEditableProps } from '~/shared/utils/table/expandRowEditableProps';
+import type { TransactionsRowId } from '~/shared/utils/transactionsRowId';
+import {
+  componentRowId,
+  transactionRowId,
+  upcomingSubscriptionRowId,
+} from '~/shared/utils/transactionsRowId';
 
 import { TransactionSidebarMolecule } from '../TransactionSidebar/transactionSidebarMolecule';
 import { ComponentNameCellEdit } from './columns/NameCellRenderer/ComponentNameCellEdit';
 import { TransactionNameCellEdit } from './columns/NameCellRenderer/TransactionNameCellEdit';
 import { useTransactionTableColumns } from './columns/useTransactionTableColumns';
 import { RowActions } from './RowActions';
-import type { TransactionsRowId } from './transactionsRowId';
-import {
-  componentRowId,
-  transactionRowId,
-  upcomingSubscriptionRowId,
-} from './transactionsRowId';
 import { transactionNameCellClass } from './TransactionsTable.constants';
 import classes from './TransactionsTable.module.css';
 import type { TransactionTableItem } from './TransactionsTable.types';

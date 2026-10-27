@@ -6,10 +6,10 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
 import { TableFlash, useFlashTrigger } from '~/shared/hooks/useTableFlash';
+import { transactionRowId } from '~/shared/utils/transactionsRowId';
 
 import { TransactionSidebarMolecule } from '../TransactionSidebar/transactionSidebarMolecule';
 import { CopyComponentsModal } from './CopyComponentsModal';
-import { transactionRowId } from './transactionsRowId';
 
 interface Props {
   id: number;

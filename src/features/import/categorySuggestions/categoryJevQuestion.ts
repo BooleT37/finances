@@ -1,10 +1,10 @@
 import dayjs from 'dayjs';
 
-import type { ImportedTransaction } from '~/features/transactions/importedTransaction';
+import type { ImportedTransaction } from '~/features/import/importedTransaction';
 import {
   type ImportedTransactionCategoryValue,
   toImportedTransactionCategoryValue,
-} from '~/features/transactions/importedTransactionCategoryValue';
+} from '~/features/import/importedTransactionCategoryValue';
 import type { Prisma, Subscription } from '~/generated/prisma/client';
 import { ISO_DATE_FORMAT } from '~/shared/constants';
 import { adaptCost } from '~/shared/utils/adaptCost';

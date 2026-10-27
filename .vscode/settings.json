@@ -5,6 +5,7 @@
     "src/lib/i18n/locales",
     "src/features/nav/locales",
     "src/features/transactions/locales",
+    "src/features/import/locales",
     "src/features/budgeting/locales",
     "src/features/savingSpendings/locales",
     "src/features/categories/locales",

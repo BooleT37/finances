@@ -1,11 +1,11 @@
 import { buildCategorySubcategoryId } from '~/features/categories/categorySubcategoryId';
-import { groupImportedTransactionCategoryOptions } from '~/features/transactions/importedTransactionCategoryOptions';
+import { groupImportedTransactionCategoryOptions } from '~/features/import/importedTransactionCategoryOptions';
 import {
   buildSubscriptionValue,
   type ImportedTransactionCategoryValue,
   isSubscriptionValue,
   parseSubscriptionValue,
-} from '~/features/transactions/importedTransactionCategoryValue';
+} from '~/features/import/importedTransactionCategoryValue';
 import type { Prisma, Subscription } from '~/generated/prisma/client';
 
 export interface CategoryJevCriterion {

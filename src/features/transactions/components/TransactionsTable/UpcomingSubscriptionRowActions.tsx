@@ -5,9 +5,9 @@ import { useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
 import { TableFlash, useFlashTrigger } from '~/shared/hooks/useTableFlash';
+import { transactionRowId } from '~/shared/utils/transactionsRowId';
 
 import { TransactionSidebarMolecule } from '../TransactionSidebar/transactionSidebarMolecule';
-import { transactionRowId } from './transactionsRowId';
 import type { TransactionTableItem } from './TransactionsTable.types';
 
 interface Props {

@@ -5,6 +5,7 @@ import { i18nResources as accountResources } from '~/features/account/i18n';
 import { i18nResources as authResources } from '~/features/auth/i18n';
 import { i18nResources as budgetingResources } from '~/features/budgeting/i18n';
 import { i18nResources as categoriesResources } from '~/features/categories/i18n';
+import { i18nResources as importResources } from '~/features/import/i18n';
 import { i18nResources as navResources } from '~/features/nav/i18n';
 import { i18nResources as onboardingResources } from '~/features/onboarding/i18n';
 import { i18nResources as projectResources } from '~/features/project/i18n';
@@ -27,6 +28,7 @@ export const resources = {
     home: homeEn,
     ...navResources.en,
     ...transactionsResources.en,
+    ...importResources.en,
     ...budgetingResources.en,
     ...savingSpendingsResources.en,
     ...categoriesResources.en,
@@ -45,6 +47,7 @@ export const resources = {
     home: homeRu,
     ...navResources.ru,
     ...transactionsResources.ru,
+    ...importResources.ru,
     ...budgetingResources.ru,
     ...savingSpendingsResources.ru,
     ...categoriesResources.ru,

@@ -2,10 +2,10 @@ import { useAtomValue } from 'jotai';
 import { useCallback } from 'react';
 
 import { TableFlash, useFlashTrigger } from '~/shared/hooks/useTableFlash';
+import { transactionRowId } from '~/shared/utils/transactionsRowId';
 
 import type { Transaction } from '../../../schema';
 import { groupBySubcategoriesAtom } from '../../TransactionsPage/TransactionsPage.atoms';
-import { transactionRowId } from '../../TransactionsTable/transactionsRowId';
 
 /** Maps a changed transaction field to the MRT column id whose cell should flash. */
 function getChangedColumns(

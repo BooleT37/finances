@@ -3,7 +3,7 @@ import Decimal from 'decimal.js';
 import { PdfDataParser } from 'pdf-data-parser';
 import type PdfDataParserType from 'pdf-data-parser/types/PdfDataParser';
 
-import type { ImportedTransaction } from '~/features/transactions/importedTransaction';
+import type { ImportedTransaction } from '~/features/import/importedTransaction';
 import { hash } from '~/server/hash';
 
 import type { IExpensesParser } from './ExpensesParser';

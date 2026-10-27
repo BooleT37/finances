@@ -1,6 +1,6 @@
 import pMap from 'p-map';
 
-import type { ImportedTransaction } from '~/features/transactions/importedTransaction';
+import type { ImportedTransaction } from '~/features/import/importedTransaction';
 import { prisma } from '~/server/db';
 import { typesafe } from '~/server/typesafe';
 import { assertOwnedByProject } from '~/shared/utils/assertOwnedByProject';

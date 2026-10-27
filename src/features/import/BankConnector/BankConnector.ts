@@ -1,6 +1,6 @@
 import type { Dayjs } from 'dayjs';
 
-import type { ImportedTransaction } from '~/features/transactions/importedTransaction';
+import type { ImportedTransaction } from '~/features/import/importedTransaction';
 
 export interface BankAccount {
   uid: string;

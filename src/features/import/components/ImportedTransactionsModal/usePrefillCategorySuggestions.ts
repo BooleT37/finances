@@ -1,7 +1,7 @@
 import type { UseFormReturnType } from '@mantine/form';
 import { useEffect, useEffectEvent } from 'react';
 
-import type { CategorySuggestion } from '~/features/transactions/categorySuggestions/categorySuggestion';
+import type { CategorySuggestion } from '~/features/import/categorySuggestions/categorySuggestion';
 
 import type { ImportedTransactionFormValues } from './ImportedTransactionsModal';
 

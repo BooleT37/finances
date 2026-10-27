@@ -2,8 +2,8 @@ import { useForm } from '@mantine/form';
 import dayjs from 'dayjs';
 import { describe, expect, it } from 'vitest';
 
-import type { CategorySuggestion } from '~/features/transactions/categorySuggestions/categorySuggestion';
-import type { ImportedTransactionCategoryValue } from '~/features/transactions/importedTransactionCategoryValue';
+import type { CategorySuggestion } from '~/features/import/categorySuggestions/categorySuggestion';
+import type { ImportedTransactionCategoryValue } from '~/features/import/importedTransactionCategoryValue';
 import { act, renderHook } from '~/test/render';
 
 import type {

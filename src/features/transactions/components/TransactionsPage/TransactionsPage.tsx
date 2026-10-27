@@ -1,25 +1,15 @@
-import {
-  ActionIcon,
-  Box,
-  Button,
-  Checkbox,
-  Group,
-  Stack,
-  TextInput,
-  Tooltip,
-} from '@mantine/core';
-import { IconFileImport, IconPlus, IconSearch } from '@tabler/icons-react';
+import { Box, Button, Checkbox, Group, Stack, TextInput } from '@mantine/core';
+import { IconPlus, IconSearch } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useMolecule } from 'bunshi/react';
 import { useAtom, useSetAtom } from 'jotai';
-import { useCallback, useState } from 'react';
+import { type ReactNode, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { FeatureOnboardingTour } from '~/features/onboarding/components/FeatureOnboardingTour';
 import { getProjectSettingsQueryOptions } from '~/features/projectSettings/queries';
 
 import { useTransactionsOnboardingSteps } from '../../onboarding/useTransactionsOnboardingSteps';
-import { ImportModal, importModalOpenAtom } from '../ImportModal';
 import { TransactionSidebar } from '../TransactionSidebar/TransactionSidebar';
 import { TransactionSidebarMolecule } from '../TransactionSidebar/transactionSidebarMolecule';
 import { TransactionTable } from '../TransactionsTable/TransactionsTable';
@@ -33,12 +23,15 @@ import { useTransactionTableItems } from './useTransactionTableItems';
 
 const sidebarWidth = 300;
 
-export function TransactionsPage() {
+interface Props {
+  importAction?: ReactNode;
+}
+
+export function TransactionsPage({ importAction }: Props) {
   const { t } = useTranslation('transactions');
   const { openAtom, closeAtom } = useMolecule(TransactionSidebarMolecule);
   const openSidebar = useSetAtom(openAtom);
   const closeSidebar = useSetAtom(closeAtom);
-  const setImportOpen = useSetAtom(importModalOpenAtom);
   const onboardingSteps = useTransactionsOnboardingSteps();
 
   // Open the sidebar as soon as the intro step (not just the "from savings"
@@ -95,15 +88,7 @@ export function TransactionsPage() {
             />
           </Group>
           <Group gap="sm">
-            <Tooltip label={t('import')}>
-              <ActionIcon
-                variant="default"
-                size="lg"
-                onClick={() => setImportOpen(true)}
-              >
-                <IconFileImport size={16} />
-              </ActionIcon>
-            </Tooltip>
+            {importAction}
             <Button
               leftSection={<IconPlus size={16} />}
               onClick={() => openSidebar(null)}
@@ -130,7 +115,6 @@ export function TransactionsPage() {
         </Box>
 
         <TransactionSidebar width={sidebarWidth} />
-        <ImportModal />
       </Stack>
     </FeatureOnboardingTour>
   );

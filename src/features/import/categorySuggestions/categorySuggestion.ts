@@ -1,4 +1,4 @@
-import type { ImportedTransactionCategoryValue } from '~/features/transactions/importedTransactionCategoryValue';
+import type { ImportedTransactionCategoryValue } from '~/features/import/importedTransactionCategoryValue';
 import type { Subscription } from '~/generated/prisma/client';
 import type { JevChoiceAnswer } from '~/server/typesafe';
 
