@@ -45,5 +45,21 @@
     "useAccount": "Use this account",
     "connected": "Bank account connected",
     "backToSources": "Back to sources"
+  },
+  "bankConnections": {
+    "startFailed": "Could not start the bank login. Try again.",
+    "expiredTooltip": "The connection has expired. Connect again to sync this source.",
+    "noAccountTooltip": "No bank account was picked. Connect again to pick one.",
+    "disconnect": {
+      "confirmTitle": "Disconnect the bank account?",
+      "confirmMessage": "\"{{name}}\" will stop syncing from the bank. Transactions it already imported stay.",
+      "confirm": "Disconnect",
+      "cancel": "Cancel",
+      "success": "\"{{name}}\" is disconnected from the bank",
+      "failed": "Could not disconnect the bank account. Try again.",
+      "action": "Disconnect the bank account"
+    },
+    "connect": "Connect a bank account",
+    "reconnect": "Connect the bank account again"
   }
 }

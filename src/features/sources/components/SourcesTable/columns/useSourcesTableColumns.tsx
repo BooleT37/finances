@@ -4,6 +4,8 @@ import { type MRT_ColumnDef } from 'mantine-react-table-open';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ConnectedUntilCell } from '~/features/import/components/BankConnection/ConnectedUntilCell';
+import { useBankImportAvailable } from '~/features/import/components/BankConnection/useBankConnection';
 import {
   useUpdateSourceName,
   useUpdateSourceParser,
@@ -16,6 +18,7 @@ export function useSourcesTableColumns(): MRT_ColumnDef<Source>[] {
   const { t } = useTranslation('sources');
   const updateSourceName = useUpdateSourceName();
   const updateSourceParser = useUpdateSourceParser();
+  const bankImportAvailable = useBankImportAvailable();
 
   const parserOptions = useMemo(
     () => [
@@ -79,7 +82,26 @@ export function useSourcesTableColumns(): MRT_ColumnDef<Source>[] {
           />
         ),
       },
+      ...(bankImportAvailable
+        ? [
+            {
+              id: 'bankConnection',
+              header: t('columns.connectedUntil'),
+              enableEditing: false,
+              size: 150,
+              Cell: ({ row }) => (
+                <ConnectedUntilCell sourceId={row.original.id} />
+              ),
+            } satisfies MRT_ColumnDef<Source>,
+          ]
+        : []),
     ],
-    [t, updateSourceName, updateSourceParser, parserOptions],
+    [
+      t,
+      updateSourceName,
+      updateSourceParser,
+      parserOptions,
+      bankImportAvailable,
+    ],
   );
 }

@@ -5,7 +5,8 @@
   "columns": {
     "name": "Name",
     "parser": "Parser",
-    "parserTooltip": "A parser lets you import expenses from bank statements on the Transactions page. Match your bank's source to a parser here. Currently only Vivid Bank is supported."
+    "parserTooltip": "A parser lets you import expenses from bank statements on the Transactions page. Match your bank's source to a parser here. Currently only Vivid Bank is supported.",
+    "connectedUntil": "Connected until"
   },
   "parsers": {
     "none": "None",

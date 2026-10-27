@@ -4,6 +4,7 @@ import {
 } from 'mantine-react-table-open';
 import { useEffect } from 'react';
 
+import { useBankImportAvailable } from '~/features/import/components/BankConnection/useBankConnection';
 import { useOrderedSources } from '~/features/sources/facets/orderedSources';
 import type { Source } from '~/features/sources/schema';
 import { TableFlash, useTableFlash } from '~/shared/hooks/useTableFlash';
@@ -17,6 +18,7 @@ export function SourcesTable() {
   const orderedSources = useOrderedSources();
   const persistSourcesOrder = usePersistSourcesOrder();
   const columns = useSourcesTableColumns();
+  const bankImportAvailable = useBankImportAvailable();
   const { withFlashingStyles, setTable } = useTableFlash<Source>(
     TableFlash.Sources,
   );
@@ -41,7 +43,13 @@ export function SourcesTable() {
     layoutMode: 'grid-no-grow',
     initialState: { density: 'xs' },
     state: {
-      columnOrder: ['mrt-row-drag', 'name', 'parser', 'mrt-row-actions'],
+      columnOrder: [
+        'mrt-row-drag',
+        'name',
+        'parser',
+        ...(bankImportAvailable ? ['bankConnection'] : []),
+        'mrt-row-actions',
+      ],
       isLoading: !orderedSources,
     },
     mantinePaperProps: { style: { width: 'fit-content' } },
@@ -53,7 +61,7 @@ export function SourcesTable() {
     },
     displayColumnDefOptions: {
       'mrt-row-drag': { header: '', size: 40 },
-      'mrt-row-actions': { header: '', size: 60 },
+      'mrt-row-actions': { header: '', size: bankImportAvailable ? 120 : 60 },
     },
     mantineRowDragHandleProps: ({ table: tbl }) => ({
       onDragEnd: () => persistSourcesOrder(tbl),
