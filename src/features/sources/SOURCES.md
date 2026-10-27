@@ -12,6 +12,6 @@ Sources are shown as a column in the transactions table and can be used to filte
 
 ## Import
 
-Each source can be assigned its own statement parser for bulk-importing transactions
+Each source can be assigned its own statement parser for bulk-importing transactions, and can be connected to the bank to import straight from it. See [Import](../import/IMPORT.md).
 
 Sources can be reordered in settings. The order is reflected everywhere the list of sources is displayed.
