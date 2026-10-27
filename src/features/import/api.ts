@@ -7,6 +7,7 @@ import { authMiddleware } from '~/middlewares/authMiddleware';
 import { trackInput } from '~/middlewares/tracking/trackInput';
 import { prisma } from '~/server/db';
 import { adaptCost } from '~/shared/utils/adaptCost';
+import { getToday } from '~/shared/utils/today';
 
 import { scoreCategorySuggestions } from './categorySuggestions/langfuse/scoreCategorySuggestions';
 import { suggestCategoriesForProject } from './categorySuggestions/suggestCategories';
@@ -120,7 +121,7 @@ export const importTransactions = createServerFn({ method: 'POST' })
       if (data.fromBank) {
         await tx.bankConnection.updateMany({
           where: { sourceId: data.sourceId, projectId: context.projectId },
-          data: { lastImportedAt: new Date() },
+          data: { lastImportedAt: getToday().toDate() },
         });
       }
       return rows;

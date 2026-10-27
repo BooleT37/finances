@@ -3,6 +3,7 @@ import Decimal from 'decimal.js';
 
 import type { ImportedTransaction } from '~/features/import/importedTransaction';
 import { hash } from '~/server/hash';
+import { getToday } from '~/shared/utils/today';
 
 import type { BankSession, IBankConnector } from './BankConnector';
 import type {
@@ -79,7 +80,7 @@ export class VividBankConnector implements IBankConnector {
       psuType: 'personal',
       redirectUrl: params.redirectUrl,
       state: params.state,
-      validUntil: dayjs().add(CONSENT_DAYS, 'day'),
+      validUntil: getToday().add(CONSENT_DAYS, 'day'),
     });
     return url;
   }

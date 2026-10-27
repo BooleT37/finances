@@ -1,8 +1,8 @@
 import { Text, Tooltip } from '@mantine/core';
-import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 
 import { DATE_FORMAT } from '~/shared/constants';
+import { getToday } from '~/shared/utils/today';
 
 import { useBankConnection } from './useBankConnection';
 
@@ -20,7 +20,7 @@ export function ConnectedUntilCell({ sourceId }: Props) {
 
   const date = connection.expiresAt.format(DATE_FORMAT);
 
-  if (connection.expiresAt.isBefore(dayjs())) {
+  if (connection.expiresAt.isBefore(getToday())) {
     return (
       <Tooltip label={t('bankConnections.expiredTooltip')}>
         <Text size="sm" c="red" span>

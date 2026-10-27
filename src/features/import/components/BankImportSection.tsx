@@ -8,7 +8,6 @@ import {
   Text,
 } from '@mantine/core';
 import { Link, useRouteContext } from '@tanstack/react-router';
-import dayjs from 'dayjs';
 import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -17,6 +16,7 @@ import type { ImportedTransaction } from '~/features/import/importedTransaction'
 import { useFetchBankTransactions } from '~/features/import/queries';
 import { DatePickerWithTodayInput } from '~/shared/components/DatePickerWithTodayInput';
 import { DATE_FORMAT, ISO_DATE_FORMAT } from '~/shared/constants';
+import { getToday } from '~/shared/utils/today';
 
 // Repeat imports start a little before the previous one, to catch rows the
 // bank published a day after booking them. Rows already imported are
@@ -26,7 +26,7 @@ const REPEAT_IMPORT_OVERLAP_DAYS = 2;
 const initialDateFrom = (connection: BankConnection) =>
   (connection.lastImportedAt
     ? connection.lastImportedAt.subtract(REPEAT_IMPORT_OVERLAP_DAYS, 'day')
-    : dayjs().startOf('month')
+    : getToday().startOf('month')
   ).format(ISO_DATE_FORMAT);
 
 interface Props {
@@ -80,7 +80,7 @@ export function BankImportSection({ connection, onFetched }: Props) {
           id={dateFromId}
           value={dateFrom}
           onChange={setDateFrom}
-          maxDate={dayjs().format(ISO_DATE_FORMAT)}
+          maxDate={getToday().format(ISO_DATE_FORMAT)}
           valueFormat={DATE_FORMAT}
           style={{ flex: 1 }}
         />

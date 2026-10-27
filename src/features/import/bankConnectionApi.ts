@@ -14,6 +14,7 @@ import { authMiddleware } from '~/middlewares/authMiddleware';
 import { trackInput } from '~/middlewares/tracking/trackInput';
 import { prisma } from '~/server/db';
 import { assertOwnedByProject } from '~/shared/utils/assertOwnedByProject';
+import { getToday } from '~/shared/utils/today';
 
 import {
   BANK_CALLBACK_PATH,
@@ -247,7 +248,7 @@ export const fetchBankTransactions = createServerFn({ method: 'POST' })
     if (!connection?.accountUid) {
       throw new Error('This source has no connected bank account');
     }
-    if (dayjs(connection.expiresAt).isBefore(dayjs())) {
+    if (dayjs(connection.expiresAt).isBefore(getToday())) {
       return { status: 'expired' as const };
     }
     try {
