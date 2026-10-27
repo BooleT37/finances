@@ -9,6 +9,20 @@ import { getTransactionsQueryOptions } from '~/features/transactions/queries';
 import { transactionWithComponentsSchema } from '~/features/transactions/schema';
 
 import { importTransactions, suggestCategories } from './api';
+import {
+  completeBankAuth,
+  disconnectBankConnection,
+  fetchBankConnections,
+  fetchBankImportAvailable,
+  selectBankAccount,
+  startBankAuth,
+} from './bankConnectionApi';
+import {
+  bankConnectionSchema,
+  type BankConnectionSourceInput,
+  type CompleteBankAuthInput,
+  type SelectBankAccountInput,
+} from './bankConnectionSchema';
 import type { ImportedTransaction } from './importedTransaction';
 import {
   type ImportTransactionsInput,
@@ -16,6 +30,8 @@ import {
 } from './schema';
 
 const importKeys = createQueryKeys('import', {
+  bankImportAvailable: { queryKey: null },
+  bankConnections: { queryKey: null },
   categorySuggestions: (
     sourceId: number,
     subscriptionIds: number[],
@@ -74,5 +90,58 @@ export function useImportTransactions() {
         );
       }
     },
+  });
+}
+
+export const getBankImportAvailableQueryOptions = () =>
+  queryOptions({
+    ...importKeys.bankImportAvailable,
+    queryFn: () => fetchBankImportAvailable(),
+    staleTime: Infinity,
+  });
+
+export const getBankConnectionsQueryOptions = () =>
+  queryOptions({
+    ...importKeys.bankConnections,
+    queryFn: async () => {
+      const rows = await fetchBankConnections();
+      return rows.map((row) => bankConnectionSchema.decode(row));
+    },
+  });
+
+export function useStartBankAuth() {
+  return useMutation({
+    mutationFn: (input: BankConnectionSourceInput) =>
+      startBankAuth({ data: input }),
+  });
+}
+
+export function useCompleteBankAuth() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: CompleteBankAuthInput) =>
+      completeBankAuth({ data: input }),
+    onSuccess: () =>
+      queryClient.invalidateQueries(getBankConnectionsQueryOptions()),
+  });
+}
+
+export function useSelectBankAccount() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: SelectBankAccountInput) =>
+      selectBankAccount({ data: input }),
+    onSuccess: () =>
+      queryClient.invalidateQueries(getBankConnectionsQueryOptions()),
+  });
+}
+
+export function useDisconnectBankConnection() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: BankConnectionSourceInput) =>
+      disconnectBankConnection({ data: input }),
+    onSuccess: () =>
+      queryClient.invalidateQueries(getBankConnectionsQueryOptions()),
   });
 }

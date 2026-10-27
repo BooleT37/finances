@@ -35,5 +35,15 @@
       "dateRequired": "Enter a date",
       "categoryRequired": "Select a category"
     }
+  },
+  "bankCallback": {
+    "title": "Connecting a bank account",
+    "connecting": "Connecting your bank account…",
+    "cancelled": "The bank login was cancelled or did not finish.",
+    "failed": "The bank account could not be connected. Try again from the sources page.",
+    "pickAccount": "The bank returned several accounts. Which one should this source sync?",
+    "useAccount": "Use this account",
+    "connected": "Bank account connected",
+    "backToSources": "Back to sources"
   }
 }

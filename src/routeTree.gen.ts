@@ -27,6 +27,7 @@ import { Route as AuthenticatedSettingsProjectRouteImport } from './routes/_auth
 import { Route as AuthenticatedSettingsSourcesRouteImport } from './routes/_authenticated.settings.sources'
 import { Route as AuthenticatedSettingsSubscriptionsRouteImport } from './routes/_authenticated.settings.subscriptions'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as AuthenticatedSettingsSourcesBankCallbackRouteImport } from './routes/_authenticated.settings.sources_.bank-callback'
 import { Route as AuthenticatedSettingsSubscriptionsIndexRouteImport } from './routes/_authenticated.settings.subscriptions.index'
 import { Route as AuthenticatedSettingsSubscriptionsArchiveRouteImport } from './routes/_authenticated.settings.subscriptions.archive'
 
@@ -128,6 +129,12 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedSettingsSourcesBankCallbackRoute =
+  AuthenticatedSettingsSourcesBankCallbackRouteImport.update({
+    id: '/sources_/bank-callback',
+    path: '/sources/bank-callback',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
 const AuthenticatedSettingsSubscriptionsIndexRoute =
   AuthenticatedSettingsSubscriptionsIndexRouteImport.update({
     id: '/',
@@ -159,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/settings/subscriptions': typeof AuthenticatedSettingsSubscriptionsRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/savings-spendings/': typeof AuthenticatedSavingsSpendingsIndexRoute
+  '/settings/sources/bank-callback': typeof AuthenticatedSettingsSourcesBankCallbackRoute
   '/settings/subscriptions/archive': typeof AuthenticatedSettingsSubscriptionsArchiveRoute
   '/settings/subscriptions/': typeof AuthenticatedSettingsSubscriptionsIndexRoute
 }
@@ -178,6 +186,7 @@ export interface FileRoutesByTo {
   '/settings/sources': typeof AuthenticatedSettingsSourcesRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/savings-spendings': typeof AuthenticatedSavingsSpendingsIndexRoute
+  '/settings/sources/bank-callback': typeof AuthenticatedSettingsSourcesBankCallbackRoute
   '/settings/subscriptions/archive': typeof AuthenticatedSettingsSubscriptionsArchiveRoute
   '/settings/subscriptions': typeof AuthenticatedSettingsSubscriptionsIndexRoute
 }
@@ -201,6 +210,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/subscriptions': typeof AuthenticatedSettingsSubscriptionsRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_authenticated/savings-spendings/': typeof AuthenticatedSavingsSpendingsIndexRoute
+  '/_authenticated/settings/sources_/bank-callback': typeof AuthenticatedSettingsSourcesBankCallbackRoute
   '/_authenticated/settings/subscriptions/archive': typeof AuthenticatedSettingsSubscriptionsArchiveRoute
   '/_authenticated/settings/subscriptions/': typeof AuthenticatedSettingsSubscriptionsIndexRoute
 }
@@ -224,6 +234,7 @@ export interface FileRouteTypes {
     | '/settings/subscriptions'
     | '/api/auth/$'
     | '/savings-spendings/'
+    | '/settings/sources/bank-callback'
     | '/settings/subscriptions/archive'
     | '/settings/subscriptions/'
   fileRoutesByTo: FileRoutesByTo
@@ -243,6 +254,7 @@ export interface FileRouteTypes {
     | '/settings/sources'
     | '/api/auth/$'
     | '/savings-spendings'
+    | '/settings/sources/bank-callback'
     | '/settings/subscriptions/archive'
     | '/settings/subscriptions'
   id:
@@ -265,6 +277,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/subscriptions'
     | '/api/auth/$'
     | '/_authenticated/savings-spendings/'
+    | '/_authenticated/settings/sources_/bank-callback'
     | '/_authenticated/settings/subscriptions/archive'
     | '/_authenticated/settings/subscriptions/'
   fileRoutesById: FileRoutesById
@@ -405,6 +418,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/settings/sources_/bank-callback': {
+      id: '/_authenticated/settings/sources_/bank-callback'
+      path: '/sources/bank-callback'
+      fullPath: '/settings/sources/bank-callback'
+      preLoaderRoute: typeof AuthenticatedSettingsSourcesBankCallbackRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
     '/_authenticated/settings/subscriptions/': {
       id: '/_authenticated/settings/subscriptions/'
       path: '/'
@@ -464,6 +484,7 @@ interface AuthenticatedSettingsRouteChildren {
   AuthenticatedSettingsProjectRoute: typeof AuthenticatedSettingsProjectRoute
   AuthenticatedSettingsSourcesRoute: typeof AuthenticatedSettingsSourcesRoute
   AuthenticatedSettingsSubscriptionsRoute: typeof AuthenticatedSettingsSubscriptionsRouteWithChildren
+  AuthenticatedSettingsSourcesBankCallbackRoute: typeof AuthenticatedSettingsSourcesBankCallbackRoute
 }
 
 const AuthenticatedSettingsRouteChildren: AuthenticatedSettingsRouteChildren = {
@@ -473,6 +494,8 @@ const AuthenticatedSettingsRouteChildren: AuthenticatedSettingsRouteChildren = {
   AuthenticatedSettingsSourcesRoute: AuthenticatedSettingsSourcesRoute,
   AuthenticatedSettingsSubscriptionsRoute:
     AuthenticatedSettingsSubscriptionsRouteWithChildren,
+  AuthenticatedSettingsSourcesBankCallbackRoute:
+    AuthenticatedSettingsSourcesBankCallbackRoute,
 }
 
 const AuthenticatedSettingsRouteWithChildren =
