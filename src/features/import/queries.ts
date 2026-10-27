@@ -14,6 +14,7 @@ import {
   disconnectBankConnection,
   fetchBankConnections,
   fetchBankImportAvailable,
+  fetchBankTransactions,
   selectBankAccount,
   startBankAuth,
 } from './bankConnectionApi';
@@ -21,9 +22,13 @@ import {
   bankConnectionSchema,
   type BankConnectionSourceInput,
   type CompleteBankAuthInput,
+  type FetchBankTransactionsInput,
   type SelectBankAccountInput,
 } from './bankConnectionSchema';
-import type { ImportedTransaction } from './importedTransaction';
+import {
+  type ImportedTransaction,
+  importedTransactionSchema,
+} from './importedTransaction';
 import {
   type ImportTransactionsInput,
   suggestCategoriesSchema,
@@ -143,5 +148,21 @@ export function useDisconnectBankConnection() {
       disconnectBankConnection({ data: input }),
     onSuccess: () =>
       queryClient.invalidateQueries(getBankConnectionsQueryOptions()),
+  });
+}
+
+export function useFetchBankTransactions() {
+  return useMutation({
+    mutationFn: async (input: FetchBankTransactionsInput) => {
+      const result = await fetchBankTransactions({ data: input });
+      return result.status === 'fetched'
+        ? {
+            status: result.status,
+            transactions: result.transactions.map((row) =>
+              importedTransactionSchema.decode(row),
+            ),
+          }
+        : result;
+    },
   });
 }
