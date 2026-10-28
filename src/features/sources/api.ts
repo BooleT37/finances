@@ -79,15 +79,30 @@ export const updateSourceBank = createServerFn({ method: 'POST' })
     updateSourceBankSchema.parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertOwnedByProject(
-      prisma.source,
-      data.id,
-      context.projectId,
-      'Source',
-    );
-    const updated = await prisma.source.update({
-      where: { id: data.id },
-      data: { bank: data.bank },
+    const updated = await prisma.$transaction(async (tx) => {
+      await assertOwnedByProject(
+        tx.source,
+        data.id,
+        context.projectId,
+        'Source',
+      );
+      const bankConnection = await tx.bankConnection.findUnique({
+        where: {
+          sourceId_projectId: {
+            sourceId: data.id,
+            projectId: context.projectId,
+          },
+        },
+      });
+      if (bankConnection) {
+        throw new Error(
+          "A connected source's bank can't change. Disconnect it first",
+        );
+      }
+      return tx.source.update({
+        where: { id: data.id },
+        data: { bank: data.bank },
+      });
     });
     return sourceSchema.encode(updated);
   });

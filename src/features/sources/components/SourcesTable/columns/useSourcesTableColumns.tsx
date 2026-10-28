@@ -1,4 +1,4 @@
-import { Group, Select, Text, Tooltip } from '@mantine/core';
+import { Group, Text, Tooltip } from '@mantine/core';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { type MRT_ColumnDef } from 'mantine-react-table-open';
 import { useMemo } from 'react';
@@ -6,18 +6,16 @@ import { useTranslation } from 'react-i18next';
 
 import { ConnectedUntilCell } from '~/features/import/components/BankConnection/ConnectedUntilCell';
 import { useBankImportAvailable } from '~/features/import/components/BankConnection/useBankConnection';
-import {
-  useUpdateSourceBank,
-  useUpdateSourceName,
-} from '~/features/sources/queries';
+import { useUpdateSourceName } from '~/features/sources/queries';
 import type { Source } from '~/features/sources/schema';
 import { Bank } from '~/generated/prisma/enums';
 import { openCellForEditing } from '~/shared/utils/table/openCellForEditing';
 
+import { BankCell } from './BankCell';
+
 export function useSourcesTableColumns(): MRT_ColumnDef<Source>[] {
   const { t } = useTranslation('sources');
   const updateSourceName = useUpdateSourceName();
-  const updateSourceBank = useUpdateSourceBank();
   const bankImportAvailable = useBankImportAvailable();
 
   const bankOptions = useMemo(
@@ -67,19 +65,7 @@ export function useSourcesTableColumns(): MRT_ColumnDef<Source>[] {
         enableEditing: false,
         size: 160,
         Cell: ({ row }) => (
-          <Select
-            value={row.original.bank ?? ''}
-            data={bankOptions}
-            size="xs"
-            variant="unstyled"
-            allowDeselect={false}
-            onChange={(val) =>
-              updateSourceBank.mutate({
-                id: row.original.id,
-                bank: val === '' ? null : (val as Bank),
-              })
-            }
-          />
+          <BankCell source={row.original} bankOptions={bankOptions} />
         ),
       },
       ...(bankImportAvailable
@@ -96,6 +82,6 @@ export function useSourcesTableColumns(): MRT_ColumnDef<Source>[] {
           ]
         : []),
     ],
-    [t, updateSourceName, updateSourceBank, bankOptions, bankImportAvailable],
+    [t, updateSourceName, bankOptions, bankImportAvailable],
   );
 }

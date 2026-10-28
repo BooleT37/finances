@@ -6,6 +6,7 @@
     "name": "Name",
     "bank": "Bank",
     "bankTooltip": "The bank decides how this source's transactions can be imported on the Transactions page. Currently only Vivid is supported.",
+    "bankLockedTooltip": "Disconnect this source from the bank to change its bank.",
     "connectedUntil": "Connected until"
   },
   "banks": {
