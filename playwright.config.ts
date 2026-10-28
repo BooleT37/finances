@@ -1,3 +1,5 @@
+import { generateKeyPairSync } from 'node:crypto';
+
 import { defineConfig, devices } from '@playwright/test';
 
 import {
@@ -5,6 +7,13 @@ import {
   TEST_BETTER_AUTH_SECRET,
   TEST_DB_URL,
 } from './test/e2e/db/client';
+import { TEST_PROJECT_ID } from './test/e2e/db/seed';
+import { ENABLE_BANKING_STUB_URL } from './test/e2e/stubs/enableBankingStub';
+
+// A throwaway key: the stub doesn't check the signature, it only has to exist.
+const { privateKey: enableBankingKey } = generateKeyPairSync('rsa', {
+  modulusLength: 2048,
+});
 
 export default defineConfig({
   testDir: './test/e2e',
@@ -50,6 +59,14 @@ export default defineConfig({
       // "localhost:3002,...") would otherwise leak in and reject this
       // server's own port (3001) since it's not in that list.
       BETTER_AUTH_ALLOWED_HOSTS: 'localhost:3001',
+      // Bank import talks to a local stub instead of Enable Banking, see
+      // test/e2e/stubs/enableBankingStub.ts.
+      ENABLE_BANKING_APP_ID: 'e2e-app',
+      ENABLE_BANKING_PRIVATE_KEY: enableBankingKey
+        .export({ type: 'pkcs8', format: 'pem' })
+        .toString(),
+      ENABLE_BANKING_PROJECT_ID: TEST_PROJECT_ID,
+      ENABLE_BANKING_API_URL: ENABLE_BANKING_STUB_URL,
     },
   },
 });

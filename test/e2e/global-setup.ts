@@ -4,6 +4,7 @@ import { PostgreSqlContainer } from '@testcontainers/postgresql';
 
 import { TEST_DB_URL } from './db/client';
 import { seed } from './db/seed';
+import { startEnableBankingStub } from './stubs/enableBankingStub';
 
 export default async function globalSetup() {
   console.log('Starting PostgreSQL test container...');
@@ -28,4 +29,6 @@ export default async function globalSetup() {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (globalThis as any).__pgContainer__ = container;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (globalThis as any).__enableBankingStub__ = await startEnableBankingStub();
 }
