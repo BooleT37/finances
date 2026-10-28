@@ -5,7 +5,7 @@ import type { ImportedTransaction } from '~/features/import/importedTransaction'
 import { hash } from '~/server/hash';
 import { getToday } from '~/shared/utils/today';
 
-import type { BankSession, IBankConnector } from './BankConnector';
+import type { BankSession, BankUser, IBankConnector } from './BankConnector';
 import type {
   EnableBankingAccount,
   EnableBankingClient,
@@ -105,10 +105,12 @@ export class VividBankConnector implements IBankConnector {
   async fetchTransactions(params: {
     accountUid: string;
     dateFrom: dayjs.Dayjs;
+    user: BankUser;
   }) {
     const transactions = await this.client.fetchTransactions(
       params.accountUid,
       params.dateFrom,
+      params.user,
     );
     return transactions
       .filter((tx) => tx.status === 'BOOK')

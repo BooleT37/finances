@@ -4,7 +4,9 @@ import { createServerFn } from '@tanstack/react-start';
 import {
   deleteCookie,
   getCookie,
+  getRequestHeader,
   getRequestHost,
+  getRequestIP,
   setCookie,
 } from '@tanstack/react-start/server';
 import dayjs from 'dayjs';
@@ -261,6 +263,10 @@ export const fetchBankTransactions = createServerFn({ method: 'POST' })
       ).fetchTransactions({
         accountUid: connection.accountUid,
         dateFrom: dayjs(data.dateFrom),
+        user: {
+          ipAddress: getRequestIP({ xForwardedFor: true }) ?? null,
+          userAgent: getRequestHeader('user-agent') ?? null,
+        },
       });
       return {
         status: 'fetched' as const,

@@ -4,6 +4,8 @@ import type { Dayjs } from 'dayjs';
 
 import { ISO_DATE_FORMAT } from '~/shared/constants';
 
+import type { BankUser } from './BankConnector';
+
 export const ENABLE_BANKING_API_URL = 'https://api.enablebanking.com';
 const JWT_LIFETIME_SECONDS = 3600;
 
@@ -117,7 +119,7 @@ export class EnableBankingClient {
     await this.request('DELETE', `/sessions/${sessionId}`);
   }
 
-  async fetchTransactions(accountUid: string, dateFrom: Dayjs) {
+  async fetchTransactions(accountUid: string, dateFrom: Dayjs, user: BankUser) {
     const transactions: EnableBankingTransaction[] = [];
     let continuationKey: string | null | undefined;
     do {
@@ -130,6 +132,8 @@ export class EnableBankingClient {
       const page = await this.request<EnableBankingTransactionsPage>(
         'GET',
         `/accounts/${accountUid}/transactions?${query.toString()}`,
+        undefined,
+        psuHeaders(user),
       );
       transactions.push(...page.transactions);
       continuationKey = page.continuation_key;
@@ -163,10 +167,12 @@ export class EnableBankingClient {
     method: 'GET' | 'POST' | 'DELETE',
     path: string,
     body?: unknown,
+    headers: Record<string, string> = {},
   ): Promise<T> {
     const response = await fetch(`${this.credentials.apiUrl}${path}`, {
       method,
       headers: {
+        ...headers,
         Authorization: `Bearer ${this.buildJwt()}`,
         'Content-Type': 'application/json',
       },
@@ -183,6 +189,19 @@ export class EnableBankingClient {
     }
     return (text ? JSON.parse(text) : undefined) as T;
   }
+}
+
+// PSU headers tell the bank the account holder is making the request. Without
+// them it counts as background access, which PSD2 limits to 4 a day.
+function psuHeaders(user: BankUser): Record<string, string> {
+  const headers: Record<string, string> = {};
+  if (user.ipAddress) {
+    headers['Psu-Ip-Address'] = user.ipAddress;
+  }
+  if (user.userAgent) {
+    headers['Psu-User-Agent'] = user.userAgent;
+  }
+  return headers;
 }
 
 function parseErrorBody(text: string): {

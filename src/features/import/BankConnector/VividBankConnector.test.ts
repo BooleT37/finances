@@ -11,6 +11,7 @@ import type {
 import { VividBankConnector } from './VividBankConnector';
 
 const OWN_NAME = 'Alex Example';
+const NO_USER = { ipAddress: null, userAgent: null };
 
 function transaction(
   overrides: Partial<EnableBankingTransaction> = {},
@@ -42,6 +43,7 @@ const importOne = async (tx: EnableBankingTransaction) => {
   const [row] = await connectorReturning([tx]).fetchTransactions({
     accountUid: 'account',
     dateFrom: dayjs('2026-10-01'),
+    user: NO_USER,
   });
   return row!;
 };
@@ -114,7 +116,11 @@ describe('VividBankConnector.fetchTransactions', () => {
           sub_code: 'BOOK',
         },
       }),
-    ]).fetchTransactions({ accountUid: 'account', dateFrom: dayjs() });
+    ]).fetchTransactions({
+      accountUid: 'account',
+      dateFrom: dayjs(),
+      user: NO_USER,
+    });
 
     expect(out!.type).toBe('Transfer between own accounts');
     expect(out!.amount.isNegative()).toBe(true);
@@ -170,7 +176,11 @@ describe('VividBankConnector.fetchTransactions', () => {
     const rows = await connectorReturning([
       transaction({ entry_reference: 'booked' }),
       transaction({ entry_reference: 'pending', status: 'PDNG' }),
-    ]).fetchTransactions({ accountUid: 'account', dateFrom: dayjs() });
+    ]).fetchTransactions({
+      accountUid: 'account',
+      dateFrom: dayjs(),
+      user: NO_USER,
+    });
 
     expect(rows).toHaveLength(1);
   });

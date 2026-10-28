@@ -45,6 +45,7 @@ describe('EnableBankingClient.fetchTransactions', () => {
     const transactions = await client.fetchTransactions(
       'account',
       dayjs('2026-10-01'),
+      { ipAddress: '203.0.113.7', userAgent: 'Test browser' },
     );
 
     expect(transactions.map((tx) => tx.entry_reference)).toEqual([
@@ -58,6 +59,11 @@ describe('EnableBankingClient.fetchTransactions', () => {
       'https://bank.test/accounts/account/transactions?date_from=2026-10-01',
     );
     expect(secondUrl).toContain('continuation_key=next-page');
+    const [, firstInit] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(firstInit.headers).toMatchObject({
+      'Psu-Ip-Address': '203.0.113.7',
+      'Psu-User-Agent': 'Test browser',
+    });
   });
 });
 
