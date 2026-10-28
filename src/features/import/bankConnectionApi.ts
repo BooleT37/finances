@@ -13,9 +13,9 @@ import { adminMiddleware } from '~/middlewares/adminMiddleware';
 import { authMiddleware } from '~/middlewares/authMiddleware';
 import { trackInput } from '~/middlewares/tracking/trackInput';
 import { prisma } from '~/server/db';
-import { assertOwnedByProject } from '~/shared/utils/assertOwnedByProject';
 import { getToday } from '~/shared/utils/today';
 
+import { bankHasConnector } from './bankCapabilities';
 import {
   BANK_CALLBACK_PATH,
   type BankAccount,
@@ -36,6 +36,19 @@ import { importedTransactionSchema } from './importedTransaction';
 
 const BANK_AUTH_COOKIE = 'bank-auth';
 const BANK_AUTH_COOKIE_MAX_AGE_SECONDS = 15 * 60;
+
+async function findConnectableBank(sourceId: number, projectId: string) {
+  const source = await prisma.source.findFirst({
+    where: { id: sourceId, projectId },
+  });
+  if (!source) {
+    throw new Error('Source not found');
+  }
+  if (!bankHasConnector(source.bank)) {
+    throw new Error("This source's bank can't be connected");
+  }
+  return source.bank;
+}
 
 function requireEnableBankingCredentials(projectId: string) {
   const credentials = getEnableBankingCredentials(projectId);
@@ -75,12 +88,7 @@ export const startBankAuth = createServerFn({ method: 'POST' })
     bankConnectionSourceSchema.parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertOwnedByProject(
-      prisma.source,
-      data.sourceId,
-      context.projectId,
-      'Source',
-    );
+    const bank = await findConnectableBank(data.sourceId, context.projectId);
     const credentials = requireEnableBankingCredentials(context.projectId);
     const state = randomUUID();
     setCookie(
@@ -96,7 +104,7 @@ export const startBankAuth = createServerFn({ method: 'POST' })
         maxAge: BANK_AUTH_COOKIE_MAX_AGE_SECONDS,
       },
     );
-    return createBankConnector('VIVID', credentials).startAuth({
+    return createBankConnector(bank, credentials).startAuth({
       redirectUrl: `https://${getRequestHost()}${BANK_CALLBACK_PATH}`,
       state,
     });
@@ -119,14 +127,9 @@ export const completeBankAuth = createServerFn({ method: 'POST' })
     if (!pending || pending.state !== data.state) {
       throw new Error('This bank login was not started here, or it expired');
     }
-    await assertOwnedByProject(
-      prisma.source,
-      pending.sourceId,
-      context.projectId,
-      'Source',
-    );
+    const bank = await findConnectableBank(pending.sourceId, context.projectId);
     const connector = createBankConnector(
-      'VIVID',
+      bank,
       requireEnableBankingCredentials(context.projectId),
     );
     const session = await connector.completeAuth(data.code);
@@ -149,7 +152,7 @@ export const completeBankAuth = createServerFn({ method: 'POST' })
         },
       });
       const connection = {
-        connector: 'VIVID' as const,
+        connector: bank,
         sessionId: session.sessionId,
         accountUid,
         expiresAt: session.expiresAt.toDate(),

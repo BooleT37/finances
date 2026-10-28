@@ -2,12 +2,15 @@ import { ActionIcon, Tooltip } from '@mantine/core';
 import { IconPlugConnected, IconPlugX, IconRefresh } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 
+import { bankHasConnector } from '~/features/import/bankCapabilities';
+import type { Bank } from '~/generated/prisma/enums';
+
 import { useBankConnection } from './useBankConnection';
 import { useConnectBankAccount } from './useConnectBankAccount';
 import { useDisconnectBankAccount } from './useDisconnectBankAccount';
 
 interface Props {
-  source: { id: number; name: string };
+  source: { id: number; name: string; bank: Bank | null };
 }
 
 export function BankActions({ source }: Props) {
@@ -17,6 +20,9 @@ export function BankActions({ source }: Props) {
   const disconnectBankAccount = useDisconnectBankAccount();
 
   if (!bankConnection) {
+    if (!bankHasConnector(source.bank)) {
+      return null;
+    }
     return (
       <Tooltip label={t('bankConnections.connect')}>
         <ActionIcon
