@@ -11,15 +11,15 @@ import {
   createSource,
   deleteSource,
   fetchAllSources,
+  updateSourceBank,
   updateSourceName,
   updateSourceOrder,
-  updateSourceParser,
 } from './api';
 import type {
   CreateSourceInput,
+  UpdateSourceBankInput,
   UpdateSourceNameInput,
   UpdateSourceOrderInput,
-  UpdateSourceParserInput,
 } from './schema';
 import type { Source } from './schema';
 import { sourceSchema } from './schema';
@@ -59,11 +59,11 @@ export function useUpdateSourceName() {
   });
 }
 
-export function useUpdateSourceParser() {
+export function useUpdateSourceBank() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (input: UpdateSourceParserInput) =>
-      updateSourceParser({ data: input }),
+    mutationFn: (input: UpdateSourceBankInput) =>
+      updateSourceBank({ data: input }),
     onSuccess: () => queryClient.invalidateQueries(getSourcesQueryOptions()),
   });
 }

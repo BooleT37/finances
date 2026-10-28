@@ -161,7 +161,7 @@ export async function seed(): Promise<SeedData> {
 
   // Source
   const vivid = await testPrisma.source.create({
-    data: { name: 'Vivid', parser: 'VIVID', projectId: project.id },
+    data: { name: 'Vivid', bank: 'VIVID', projectId: project.id },
   });
 
   await testPrisma.projectSetting.create({

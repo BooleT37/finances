@@ -9,12 +9,12 @@ import {
   type CreateSourceInput,
   createSourceSchema,
   sourceSchema,
+  type UpdateSourceBankInput,
+  updateSourceBankSchema,
   type UpdateSourceNameInput,
   updateSourceNameSchema,
   type UpdateSourceOrderInput,
   updateSourceOrderSchema,
-  type UpdateSourceParserInput,
-  updateSourceParserSchema,
 } from './schema';
 
 export const createSource = createServerFn({ method: 'POST' })
@@ -70,13 +70,13 @@ export const updateSourceName = createServerFn({ method: 'POST' })
     return sourceSchema.encode(updated);
   });
 
-export const updateSourceParser = createServerFn({ method: 'POST' })
+export const updateSourceBank = createServerFn({ method: 'POST' })
   .middleware([
     authMiddleware,
-    trackInput<UpdateSourceParserInput>({ parser: 'send' }),
+    trackInput<UpdateSourceBankInput>({ bank: 'send' }),
   ])
-  .validator((input: UpdateSourceParserInput) =>
-    updateSourceParserSchema.parse(input),
+  .validator((input: UpdateSourceBankInput) =>
+    updateSourceBankSchema.parse(input),
   )
   .handler(async ({ data, context }) => {
     await assertOwnedByProject(
@@ -87,7 +87,7 @@ export const updateSourceParser = createServerFn({ method: 'POST' })
     );
     const updated = await prisma.source.update({
       where: { id: data.id },
-      data: { parser: data.parser },
+      data: { bank: data.bank },
     });
     return sourceSchema.encode(updated);
   });

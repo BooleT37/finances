@@ -46,7 +46,7 @@ export function SourcesTable() {
       columnOrder: [
         'mrt-row-drag',
         'name',
-        'parser',
+        'bank',
         ...(bankImportAvailable ? ['bankConnection'] : []),
         'mrt-row-actions',
       ],

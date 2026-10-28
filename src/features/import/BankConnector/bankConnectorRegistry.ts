@@ -1,4 +1,4 @@
-import type { BankConnector } from '~/generated/prisma/enums';
+import type { Bank } from '~/generated/prisma/enums';
 
 import type { IBankConnector } from './BankConnector';
 import {
@@ -7,15 +7,19 @@ import {
 } from './EnableBankingClient';
 import { VividBankConnector } from './VividBankConnector';
 
-const connectors: Record<
-  BankConnector,
-  (client: EnableBankingClient) => IBankConnector
+const connectors: Partial<
+  Record<Bank, (client: EnableBankingClient) => IBankConnector>
 > = {
   VIVID: (client) => new VividBankConnector(client),
 };
 
-export const createBankConnector = (
-  connector: BankConnector,
+export function createBankConnector(
+  bank: Bank,
   credentials: EnableBankingCredentials,
-): IBankConnector =>
-  connectors[connector](new EnableBankingClient(credentials));
+): IBankConnector {
+  const createConnector = connectors[bank];
+  if (!createConnector) {
+    throw new Error(`${bank} has no bank connector`);
+  }
+  return createConnector(new EnableBankingClient(credentials));
+}

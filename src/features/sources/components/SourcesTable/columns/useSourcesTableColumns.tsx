@@ -7,23 +7,23 @@ import { useTranslation } from 'react-i18next';
 import { ConnectedUntilCell } from '~/features/import/components/BankConnection/ConnectedUntilCell';
 import { useBankImportAvailable } from '~/features/import/components/BankConnection/useBankConnection';
 import {
+  useUpdateSourceBank,
   useUpdateSourceName,
-  useUpdateSourceParser,
 } from '~/features/sources/queries';
 import type { Source } from '~/features/sources/schema';
-import { ExpensesParser } from '~/generated/prisma/enums';
+import { Bank } from '~/generated/prisma/enums';
 import { openCellForEditing } from '~/shared/utils/table/openCellForEditing';
 
 export function useSourcesTableColumns(): MRT_ColumnDef<Source>[] {
   const { t } = useTranslation('sources');
   const updateSourceName = useUpdateSourceName();
-  const updateSourceParser = useUpdateSourceParser();
+  const updateSourceBank = useUpdateSourceBank();
   const bankImportAvailable = useBankImportAvailable();
 
-  const parserOptions = useMemo(
+  const bankOptions = useMemo(
     () => [
-      { value: '', label: t('parsers.none') },
-      { value: ExpensesParser.VIVID, label: t('parsers.VIVID') },
+      { value: '', label: t('banks.none') },
+      { value: Bank.VIVID, label: t('banks.VIVID') },
     ],
     [t],
   );
@@ -47,15 +47,15 @@ export function useSourcesTableColumns(): MRT_ColumnDef<Source>[] {
         }),
       },
       {
-        accessorKey: 'parser',
-        header: t('columns.parser'),
+        accessorKey: 'bank',
+        header: t('columns.bank'),
         Header: () => (
           <Group gap={4} wrap="nowrap">
             <Text size="sm" fw={700}>
-              {t('columns.parser')}
+              {t('columns.bank')}
             </Text>
             <Tooltip
-              label={t('columns.parserTooltip')}
+              label={t('columns.bankTooltip')}
               multiline
               maw={280}
               withArrow
@@ -68,15 +68,15 @@ export function useSourcesTableColumns(): MRT_ColumnDef<Source>[] {
         size: 160,
         Cell: ({ row }) => (
           <Select
-            value={row.original.parser ?? ''}
-            data={parserOptions}
+            value={row.original.bank ?? ''}
+            data={bankOptions}
             size="xs"
             variant="unstyled"
             allowDeselect={false}
             onChange={(val) =>
-              updateSourceParser.mutate({
+              updateSourceBank.mutate({
                 id: row.original.id,
-                parser: val === '' ? null : (val as ExpensesParser),
+                bank: val === '' ? null : (val as Bank),
               })
             }
           />
@@ -96,12 +96,6 @@ export function useSourcesTableColumns(): MRT_ColumnDef<Source>[] {
           ]
         : []),
     ],
-    [
-      t,
-      updateSourceName,
-      updateSourceParser,
-      parserOptions,
-      bankImportAvailable,
-    ],
+    [t, updateSourceName, updateSourceBank, bankOptions, bankImportAvailable],
   );
 }

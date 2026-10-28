@@ -56,7 +56,7 @@ export function ImportModal() {
     ) ?? null;
 
   const importableSources = sources.filter(
-    (s) => s.parser !== null || importableBankConnection(s.id) !== null,
+    (s) => s.bank !== null || importableBankConnection(s.id) !== null,
   );
   const sourceOptions = importableSources.map((s) => ({
     value: String(s.id),
@@ -69,7 +69,7 @@ export function ImportModal() {
   const selectedBankConnection = selectedSource
     ? importableBankConnection(selectedSource.id)
     : null;
-  const showStatementUpload = !selectedSource || selectedSource.parser !== null;
+  const showStatementUpload = !selectedSource || selectedSource.bank !== null;
   const showBothOptions =
     showStatementUpload && selectedBankConnection !== null;
 
@@ -90,7 +90,7 @@ export function ImportModal() {
   const canParse = selectedSource !== null && file !== null && !loading;
 
   const handleParse = async () => {
-    if (!selectedSource?.parser || !file) {
+    if (!selectedSource?.bank || !file) {
       return;
     }
     setLoading(true);
@@ -106,7 +106,7 @@ export function ImportModal() {
       });
 
       const rows = await parsePdfExpenses({
-        data: { fileBase64: base64, parser: selectedSource.parser as 'VIVID' },
+        data: { fileBase64: base64, parser: selectedSource.bank as 'VIVID' },
       });
       await openReview(
         rows.map((row) => importedTransactionSchema.decode(row)),

@@ -138,14 +138,15 @@ model Category {
   @@unique([id, projectId])
 }
 
-enum ExpensesParser {
+enum Bank {
   VIVID
+  COMMERZBANK
 }
 
 model Source {
   id             Int             @id @default(autoincrement())
   name           String
-  parser         ExpensesParser?
+  bank           Bank?
   subscriptions  Subscription[]
   expenses       Expense[]
   project        Project         @relation(fields: [projectId], references: [id])
@@ -155,23 +156,19 @@ model Source {
   @@unique([id, projectId])
 }
 
-enum BankConnector {
-  VIVID
-}
-
 model BankConnection {
-  id             Int           @id @default(autoincrement())
-  source         Source        @relation(fields: [sourceId, projectId], references: [id, projectId], onDelete: Cascade)
+  id             Int       @id @default(autoincrement())
+  source         Source    @relation(fields: [sourceId, projectId], references: [id, projectId], onDelete: Cascade)
   sourceId       Int
-  connector      BankConnector
+  connector      Bank
   sessionId      String
   accountUid     String?
   expiresAt      DateTime
   lastImportedAt DateTime?
-  project        Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project        Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId      String
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @default(now()) @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @default(now()) @updatedAt
 
   @@unique([sourceId, projectId])
 }
