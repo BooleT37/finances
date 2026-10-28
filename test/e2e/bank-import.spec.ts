@@ -65,13 +65,16 @@ async function vividSourceId() {
 
 async function connectSource(
   sourceId: number,
-  { expiresAt = new Date('2024-10-12') }: { expiresAt?: Date } = {},
+  {
+    expiresAt = new Date('2024-10-12'),
+    connector = 'VIVID',
+  }: { expiresAt?: Date; connector?: 'VIVID' | 'COMMERZBANK' } = {},
 ) {
   await testPrisma.bankConnection.create({
     data: {
       sourceId,
       projectId: TEST_PROJECT_ID,
-      connector: 'VIVID',
+      connector,
       sessionId: 'stub-session',
       accountUid: STUB_ACCOUNT.uid,
       expiresAt,
@@ -96,6 +99,55 @@ const importFromDate = (dialog: Locator) =>
 
 const rowCheckbox = (dialog: Locator, description: string) =>
   dialog.getByRole('checkbox', { name: `Импортировать «${description}»` });
+
+const importedRow = (dialog: Locator, description: string) =>
+  dialog.locator('[data-expense-row]').filter({
+    has: dialog
+      .page()
+      .getByRole('checkbox', { name: `Импортировать «${description}»` }),
+  });
+
+const sourceRow = (page: Page, name: string) =>
+  page.getByRole('row').filter({ hasText: name });
+
+const COMMERZBANK_TRANSACTIONS: EnableBankingTransaction[] = [
+  {
+    transaction_amount: { currency: 'EUR', amount: '23.40' },
+    credit_debit_indicator: 'DBIT',
+    status: 'BOOK',
+    booking_date: '2024-04-08',
+    creditor: { name: 'BIO MARKT Musterstr. 1 Berlin DE' },
+    remittance_information: [
+      'BIO MARKT/Musterstr. 1/Berlin\n2024-04-05T17:21:09 KFN 1  VJ 2912\nKartenzahlung',
+    ],
+  },
+  {
+    transaction_amount: { currency: 'EUR', amount: '44.75' },
+    credit_debit_indicator: 'DBIT',
+    status: 'BOOK',
+    booking_date: '2024-04-09',
+    creditor: { name: 'Power Company GmbH' },
+    remittance_information: [
+      'REF-123',
+      'Power Company GmbH\nREF-123\nMandatsref: M-1\nSEPA-BASISLASTSCHRIFT wiederholend',
+    ],
+  },
+  {
+    transaction_amount: { currency: 'EUR', amount: '0.00' },
+    credit_debit_indicator: 'CRDT',
+    status: 'BOOK',
+    booking_date: '2024-04-01',
+    debtor: { name: 'Rechnungsabschluss' },
+    remittance_information: ['Rechnungsabschluss\nKonto 123 EUR'],
+  },
+  {
+    transaction_amount: { currency: 'EUR', amount: '10.99' },
+    credit_debit_indicator: 'DBIT',
+    status: 'PDNG',
+    creditor: { name: 'Pending Shop' },
+    remittance_information: [],
+  },
+];
 
 test.describe('Bank import', () => {
   test('connects a source to the bank and disconnects it', async ({ page }) => {
@@ -270,5 +322,78 @@ test.describe('Bank import', () => {
     await expect(
       page.getByRole('button', { name: /банковский счёт/ }),
     ).toHaveCount(0);
+  });
+
+  test('imports a Commerzbank source, dating card payments by their purchase', async ({
+    page,
+  }) => {
+    const commerzbank = await testPrisma.source.create({
+      data: {
+        name: 'Commerzbank',
+        bank: 'COMMERZBANK',
+        projectId: TEST_PROJECT_ID,
+      },
+    });
+    await connectSource(commerzbank.id, { connector: 'COMMERZBANK' });
+    await setEnableBankingStub({
+      accounts: [STUB_ACCOUNT],
+      transactions: COMMERZBANK_TRANSACTIONS,
+    });
+
+    const dialog = await openImport(page, 'Commerzbank');
+    await expect(dialog.getByText('Загрузить PDF-выписку')).toHaveCount(0);
+    await bankImportButton(dialog).click();
+
+    const cardPayment = importedRow(dialog, 'BIO MARKT Musterstr. 1 Berlin DE');
+    await expect(
+      cardPayment.getByRole('button', { name: '05.04.2024' }),
+    ).toBeVisible();
+    await expect(cardPayment.getByRole('textbox').first()).toHaveValue(
+      'Card transaction',
+    );
+    const directDebit = importedRow(dialog, 'Power Company GmbH REF-123');
+    await expect(
+      directDebit.getByRole('button', { name: '09.04.2024' }),
+    ).toBeVisible();
+    await expect(directDebit.getByRole('textbox').first()).toHaveValue(
+      'Direct debit',
+    );
+    await expect(dialog.locator('[data-expense-row]')).toHaveCount(2);
+  });
+
+  test("offers Connect only for banks it can import from and keeps a connected source's bank", async ({
+    page,
+  }) => {
+    await testPrisma.source.create({
+      data: { name: 'Cash', projectId: TEST_PROJECT_ID },
+    });
+
+    await page.goto('/settings/sources');
+    const connectButton = { name: 'Подключить банковский счёт', exact: true };
+    await expect(
+      sourceRow(page, 'Vivid').getByRole('button', connectButton),
+    ).toBeVisible();
+    await expect(
+      sourceRow(page, 'Cash').getByRole('button', connectButton),
+    ).toHaveCount(0);
+
+    await sourceRow(page, 'Cash').getByRole('combobox').click();
+    await page
+      .getByRole('option', { name: 'Commerzbank', exact: true })
+      .click();
+    await expect(
+      sourceRow(page, 'Cash').getByRole('button', connectButton),
+    ).toBeVisible();
+
+    await connectSource(await vividSourceId());
+    await page.reload();
+    const vividBank = sourceRow(page, 'Vivid').getByRole('combobox');
+    await expect(vividBank).toBeDisabled();
+    await vividBank.hover({ force: true });
+    await expect(
+      page.getByText(
+        'Чтобы сменить банк, сначала отключите источник от банка.',
+      ),
+    ).toBeVisible();
   });
 });
