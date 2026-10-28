@@ -4,9 +4,13 @@ Import adds transactions in bulk from a bank instead of entering them one by one
 
 A source can be imported in two ways: by uploading a bank statement, or straight from the bank. A source that supports neither can't be imported.
 
+## Source Bank
+
+Each source has a bank (see [Sources](../sources/SOURCES.md)). Currently we have Vivid and Commerzbank as options. The bank decides how the source can be imported: by uploading a statement and/or straight from the bank.
+
 ## Statement Upload
 
-Each source can have its own statement parser (see [Sources](../sources/SOURCES.md)). Only Vivid's PDF statements can be parsed for now.
+Statement upload uses the parser of the source's bank. Only Vivid's PDF statements can be parsed for now.
 
 Statement upload stays even for a source connected to the bank as a plan B if something doesn't work with bank import, and since statements reach further back in time than the bank lets an app read.
 
@@ -18,6 +22,8 @@ Only booked transactions are imported. A pending one can still change its amount
 
 Bank import now goes through [Enable Banking](https://enablebanking.com), which connects to the bank under the EU's PSD2 rules. It only reads accounts and can never move money.
 
+Every request for transactions carries the user's IP address and browser, which is how PSD2 tells a request made by the account holder from one made in the background. Background requests are limited to 4 a day, and Commerzbank requires the IP address anyway. Both are only sent to Enable Banking and the bank.
+
 ## Bank Access
 
 Enable Banking's free terms only cover the bank accounts of the person who set it up, for personal use, and forbid giving anyone else access. So each environment has one Enable Banking application, and only one project may use it. Every other project can't use bank import and keeps uploading statements.
@@ -28,11 +34,13 @@ The server checks the project on every bank request. Even a bug in that check wo
 
 ## Bank Connections
 
-Connecting a source means logging in to the bank itself, so only an admin can connect, reconnect or disconnect a source, while every project member can import from a connected one. Each source can be connected to one bank account. To import another account, connect it to another source.
+Connecting a source means logging in to the source's bank itself, so only an admin can connect, reconnect or disconnect a source, while every project member can import from a connected one. Each source can be connected to one bank account. To import another account, connect it to another source.
+
+The bank of a connected source can't change, since the connection belongs to that bank. To change it, disconnect the source first.
 
 If the bank returns several EUR accounts, the user picks which one the source imports. Until then, the source can't import. Accounts in other currencies are never offered, since the app has no notion of currency.
 
-The bank allows a connection for 180 days at most (an EU rule, and Vivid's own limit too). A connection also ends early when the user revokes it in the bank. Either way the source has to be connected again, and importing from it is refused until then.
+The bank allows a connection for 180 days at most (an EU rule, and both Vivid's and Commerzbank's own limit too). A connection also ends early when the user revokes it in the bank. Either way the source has to be connected again, and importing from it is refused until then.
 
 ## Import Period
 
@@ -40,14 +48,26 @@ Once a source has been imported from the bank, the next import's start date is p
 
 ## Bank Rows
 
+Each bank sends its transactions in its own way, so each one has its own rules. For both banks, the amount is negative for money going out and positive for money coming in, and the type uses the wording of Vivid's statements.
+
+## Vivid Rows
+
 - The date is the day the bank booked the transaction. For card payments that's often a day off from the date in the banking app, which shows the purchase time, and the bank doesn't send the purchase date. Statements have the same problem.
-- The amount is negative for money going out and positive for money coming in.
 - The description is the other party's name (the merchant for card payments), followed by the payment reference when the bank sends one.
-- The type uses the statement's wording ("Card transaction", "Transfer between own accounts", "Incoming transfer", "Outgoing transfer", "Fees and charges").
+- The type is one of "Card transaction", "Transfer between own accounts", "Incoming transfer", "Outgoing transfer" and "Fees and charges".
+
+## Commerzbank Rows
+
+Commerzbank sends no transaction type and no reference for a transaction, but puts a lot into the payment text.
+
+- The date of a card payment is the purchase date from the payment text, since the bank books a card payment 1 to 4 days later. Every other row uses the booking date.
+- The description is the other party's name, followed by the payment reference when there is one. The bank's own details (End-to-End-Ref, Mandatsref and the like) are left out.
+- The type comes from the payment text: "Card transaction" (`Kartenzahlung`), "Direct debit" (`SEPA-BASISLASTSCHRIFT`), "Fees and charges" for the bank's own account fees and statements, and "Incoming transfer" or "Outgoing transfer" for everything else.
+- Rows with a zero amount are skipped. The bank's quarterly account statement (`Rechnungsabschluss`) comes as one.
 
 ## Import Deduplication
 
-Each transaction has an **`importHash`** used to detect whether it was already imported via the "Import" feature, preventing duplicates. For a statement row, the hash is computed from the row exactly as the statement shows it. For a bank row, it's computed from the bank's own reference for that transaction, so repeated bank imports recognise their rows exactly. Either way, editing the description or the amount in the import modal keeps it the same.
+Each transaction has an **`importHash`** used to detect whether it was already imported via the "Import" feature, preventing duplicates. For a statement row, the hash is computed from the row exactly as the statement shows it. For a Vivid bank row, it's computed from the bank's own reference for that transaction, so repeated bank imports recognise their rows exactly. Commerzbank sends no reference, so its hash is computed from the booking date, amount, other party and payment text. Identical rows on the same day are counted apart, so they get different hashes. Either way, editing the description or the amount in the import modal keeps it the same.
 
 A row also counts as already imported when a transaction with the same amount on the same day exists, which catches transactions entered by hand or by another import type. Rows that were already imported are still shown in the table, but deselected by default.
 
@@ -97,6 +117,6 @@ These results hold for the exact Jev version (`JEV_MODEL`) and the exact wording
 
 - Category suggestions use only the description, amount and date of an imported transaction. The bank's transaction type ("Card transaction", "Outgoing transfer", etc.) is left out for now, since its effect couldn't be measured on past imports
 
-- Only Vivid can be connected to the bank. Another bank needs its own connector: Commerzbank, for example, sends no transaction type and no reference, but puts the card purchase time in the payment reference
+- Commerzbank transfers to and from the user's own accounts show up as "Incoming transfer" and "Outgoing transfer", since the bank doesn't send the account holder's name to compare with
 
 - Vivid's Pockets can't be imported from the bank yet. Transfers to and from them show up as "Transfer between own accounts" on the main account
