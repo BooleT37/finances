@@ -41,7 +41,8 @@
       "reconnectLink": "Connect it again in settings",
       "expiredAskAdmin": "The bank connection has expired. Ask a project admin to renew it.",
       "failed": "Could not load transactions from the bank. Try again."
-    }
+    },
+    "selectRow": "Import “{{description}}”"
   },
   "form": {
     "errors": {

@@ -14,6 +14,7 @@ export function ImportButton() {
         <ActionIcon
           variant="default"
           size="lg"
+          aria-label={t('import')}
           onClick={() => setImportOpen(true)}
         >
           <IconFileImport size={16} />

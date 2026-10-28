@@ -63,6 +63,9 @@ export function ImportedTransactionRow({
     <div style={{ display: 'contents' }} data-expense-row={index}>
       <Checkbox
         style={{ marginTop: 5 }}
+        aria-label={t('importModal.selectRow', {
+          description: row.importedDescription,
+        })}
         checked={selected}
         onChange={(e) =>
           form.setFieldValue(
