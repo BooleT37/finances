@@ -15,6 +15,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { parsePdfExpenses } from '~/features/import/api';
+import { bankHasStatementParser } from '~/features/import/bankCapabilities';
 import { useBankImportAvailable } from '~/features/import/components/BankConnection/useBankConnection';
 import {
   type ImportedTransaction,
@@ -56,7 +57,8 @@ export function ImportModal() {
     ) ?? null;
 
   const importableSources = sources.filter(
-    (s) => s.bank !== null || importableBankConnection(s.id) !== null,
+    (s) =>
+      bankHasStatementParser(s.bank) || importableBankConnection(s.id) !== null,
   );
   const sourceOptions = importableSources.map((s) => ({
     value: String(s.id),
@@ -69,7 +71,8 @@ export function ImportModal() {
   const selectedBankConnection = selectedSource
     ? importableBankConnection(selectedSource.id)
     : null;
-  const showStatementUpload = !selectedSource || selectedSource.bank !== null;
+  const showStatementUpload =
+    !selectedSource || bankHasStatementParser(selectedSource.bank);
   const showBothOptions =
     showStatementUpload && selectedBankConnection !== null;
 
@@ -90,7 +93,7 @@ export function ImportModal() {
   const canParse = selectedSource !== null && file !== null && !loading;
 
   const handleParse = async () => {
-    if (!selectedSource?.bank || !file) {
+    if (!selectedSource || !file) {
       return;
     }
     setLoading(true);
@@ -106,7 +109,7 @@ export function ImportModal() {
       });
 
       const rows = await parsePdfExpenses({
-        data: { fileBase64: base64, parser: selectedSource.bank as 'VIVID' },
+        data: { sourceId: selectedSource.id, fileBase64: base64 },
       });
       await openReview(
         rows.map((row) => importedTransactionSchema.decode(row)),

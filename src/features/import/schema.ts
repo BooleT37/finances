@@ -33,7 +33,7 @@ export const suggestCategoriesSchema = z.object({
 export type SuggestCategoriesInput = z.input<typeof suggestCategoriesSchema>;
 
 export const parsePdfExpensesSchema = z.object({
+  sourceId: z.number(),
   fileBase64: z.string(),
-  parser: z.enum(['VIVID']),
 });
 export type ParsePdfExpensesInput = z.infer<typeof parsePdfExpensesSchema>;

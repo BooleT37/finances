@@ -11,6 +11,7 @@ import { getToday } from '~/shared/utils/today';
 
 import { scoreCategorySuggestions } from './categorySuggestions/langfuse/scoreCategorySuggestions';
 import { suggestCategoriesForProject } from './categorySuggestions/suggestCategories';
+import { createExpensesParser } from './ExpensesParser/expensesParserRegistry';
 import { importedTransactionSchema } from './importedTransaction';
 import {
   type ImportTransactionsInput,
@@ -24,12 +25,19 @@ import {
 export const parsePdfExpenses = createServerFn({ method: 'POST' })
   .middleware([
     authMiddleware,
-    trackInput<ParsePdfExpensesInput>({ fileBase64: 'length', parser: 'send' }),
+    trackInput<ParsePdfExpensesInput>({ fileBase64: 'length' }),
   ])
   .validator((input: ParsePdfExpensesInput) =>
     parsePdfExpensesSchema.parse(input),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    const source = await prisma.source.findFirst({
+      where: { id: data.sourceId, projectId: context.projectId },
+    });
+    if (!source) {
+      throw new Error('Source not found');
+    }
+
     // pdfjs-dist needs DOMMatrix on globalThis (not available in Vercel's
     // Node.js runtime). Polyfill before importing pdfjs.
     if (typeof globalThis.DOMMatrix === 'undefined') {
@@ -60,14 +68,12 @@ export const parsePdfExpenses = createServerFn({ method: 'POST' })
     const { unlinkSync, writeFileSync } = await import('node:fs');
     const { tmpdir } = await import('node:os');
     const { join } = await import('node:path');
-    const { VividPdfExpensesParser } =
-      await import('~/features/import/ExpensesParser/VividPdfExpensesParser');
 
     const buffer = Buffer.from(data.fileBase64, 'base64');
     const tmpPath = join(tmpdir(), `${randomUUID()}.pdf`);
     try {
       writeFileSync(tmpPath, buffer);
-      const parser = new VividPdfExpensesParser(tmpPath);
+      const parser = await createExpensesParser(source.bank, tmpPath);
       const importedTransactions = await parser.parse();
       return importedTransactions.map((importedTransaction) =>
         importedTransactionSchema.encode(importedTransaction),
