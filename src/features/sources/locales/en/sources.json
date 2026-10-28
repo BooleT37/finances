@@ -5,13 +5,14 @@
   "columns": {
     "name": "Name",
     "bank": "Bank",
-    "bankTooltip": "The bank decides how this source's transactions can be imported on the Transactions page. Currently only Vivid is supported.",
+    "bankTooltip": "The bank decides how this source's transactions can be imported on the Transactions page: Vivid from PDF statements or straight from the bank, Commerzbank straight from the bank.",
     "bankLockedTooltip": "Disconnect this source from the bank to change its bank.",
     "connectedUntil": "Connected until"
   },
   "banks": {
     "none": "None",
-    "VIVID": "Vivid"
+    "VIVID": "Vivid",
+    "COMMERZBANK": "Commerzbank"
   },
   "actions": {
     "delete": "Delete"

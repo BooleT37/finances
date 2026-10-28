@@ -1,6 +1,7 @@
 import type { Bank } from '~/generated/prisma/enums';
 
 import type { IBankConnector } from './BankConnector';
+import { CommerzbankBankConnector } from './CommerzbankBankConnector';
 import {
   EnableBankingClient,
   type EnableBankingCredentials,
@@ -11,6 +12,7 @@ const connectors: Partial<
   Record<Bank, (client: EnableBankingClient) => IBankConnector>
 > = {
   VIVID: (client) => new VividBankConnector(client),
+  COMMERZBANK: (client) => new CommerzbankBankConnector(client),
 };
 
 export function createBankConnector(

@@ -22,6 +22,7 @@ export function useSourcesTableColumns(): MRT_ColumnDef<Source>[] {
     () => [
       { value: '', label: t('banks.none') },
       { value: Bank.VIVID, label: t('banks.VIVID') },
+      { value: Bank.COMMERZBANK, label: t('banks.COMMERZBANK') },
     ],
     [t],
   );
