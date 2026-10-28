@@ -7,7 +7,14 @@ import '@gfazioli/mantine-onboarding-tour/styles.css';
 import 'dayjs/locale/ru';
 import '~/lib/dayjs';
 
-import { Code, createTheme, MantineProvider, Text, Title } from '@mantine/core';
+import {
+  Code,
+  createTheme,
+  Input,
+  MantineProvider,
+  Text,
+  Title,
+} from '@mantine/core';
 import { DatesProvider } from '@mantine/dates';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
@@ -29,10 +36,14 @@ import { useLayoutEffect } from 'react';
 import { I18nextProvider, useTranslation } from 'react-i18next';
 
 import i18n, { isSupportedLanguage, LANGUAGE_STORAGE_KEY } from '~/lib/i18n';
+import inputClasses from '~/lib/mantine/Input.module.css';
 import { trpc, trpcClient } from '~/lib/trpc/client';
 
 const theme = createTheme({
   cursorType: 'pointer',
+  components: {
+    Input: Input.extend({ classNames: { input: inputClasses.input } }),
+  },
 });
 
 interface RouterContext {

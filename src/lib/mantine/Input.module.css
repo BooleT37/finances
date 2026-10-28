@@ -1,0 +1,3 @@
+.input[data-variant='unstyled'][data-disabled] {
+  --input-padding-inline-start: var(--mantine-spacing-xs);
+}
