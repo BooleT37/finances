@@ -72,7 +72,7 @@ export function ImportModal() {
     ? importableBankConnection(selectedSource.id)
     : null;
   const showStatementUpload =
-    !selectedSource || bankHasStatementParser(selectedSource.bank);
+    selectedSource !== null && bankHasStatementParser(selectedSource.bank);
   const showBothOptions =
     showStatementUpload && selectedBankConnection !== null;
 
@@ -172,7 +172,6 @@ export function ImportModal() {
                 styles={{ description: { flex: 1 } }}
                 value={file}
                 onChange={setFile}
-                disabled={!selectedSource}
               />
 
               <Group justify="flex-end" mt="auto">
