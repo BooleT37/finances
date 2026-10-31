@@ -2,32 +2,27 @@ import {
   Alert,
   Anchor,
   Button,
+  Center,
   Group,
   Input,
+  Loader,
   Stack,
   Text,
 } from '@mantine/core';
 import { Link, useRouteContext } from '@tanstack/react-router';
+import type { Dayjs } from 'dayjs';
 import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { BankConnection } from '~/features/import/bankConnectionSchema';
+import { bankImportStartDate } from '~/features/import/bankImportStartDate';
 import type { ImportedTransaction } from '~/features/import/importedTransaction';
 import { useFetchBankTransactions } from '~/features/import/queries';
 import { DatePickerWithTodayInput } from '~/shared/components/DatePickerWithTodayInput';
 import { DATE_FORMAT, ISO_DATE_FORMAT } from '~/shared/constants';
 import { getToday } from '~/shared/utils/today';
 
-// Repeat imports start a little before the previous one, to catch rows the
-// bank published a day after booking them. Rows already imported are
-// recognised by their hash, so the overlap only adds unticked rows.
-const REPEAT_IMPORT_OVERLAP_DAYS = 2;
-
-const initialDateFrom = (connection: BankConnection) =>
-  (connection.lastImportedAt
-    ? connection.lastImportedAt.subtract(REPEAT_IMPORT_OVERLAP_DAYS, 'day')
-    : getToday().startOf('month')
-  ).format(ISO_DATE_FORMAT);
+import { useLastImportedTransactionDate } from './useLastImportedTransactionDate';
 
 interface Props {
   connection: BankConnection;
@@ -35,12 +30,41 @@ interface Props {
 }
 
 export function BankImportSection({ connection, onFetched }: Props) {
+  const lastImportedTransactionDate = useLastImportedTransactionDate(
+    connection.sourceId,
+  );
+
+  if (lastImportedTransactionDate === undefined) {
+    return (
+      <Center style={{ flex: 1 }}>
+        <Loader size="sm" />
+      </Center>
+    );
+  }
+
+  return (
+    <BankImportForm
+      connection={connection}
+      lastImportedTransactionDate={lastImportedTransactionDate}
+      onFetched={onFetched}
+    />
+  );
+}
+
+function BankImportForm({
+  connection,
+  lastImportedTransactionDate,
+  onFetched,
+}: Props & { lastImportedTransactionDate: Dayjs | null }) {
   const { t } = useTranslation('import');
   const { session } = useRouteContext({ from: '/_authenticated' });
   const dateFromId = useId();
   const fetchTransactions = useFetchBankTransactions();
   const [dateFrom, setDateFrom] = useState<string | null>(() =>
-    initialDateFrom(connection),
+    bankImportStartDate({
+      lastImportedAt: connection.lastImportedAt,
+      lastImportedTransactionDate,
+    }),
   );
   const [opening, setOpening] = useState(false);
 

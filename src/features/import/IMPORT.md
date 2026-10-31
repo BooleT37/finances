@@ -44,7 +44,14 @@ The bank allows a connection for 180 days at most (an EU rule, and both Vivid's 
 
 ## Import Period
 
-Once a source has been imported from the bank, the next import's start date is preselected as the last import date (`lastImportedAt`) minus 2 days, to catch transactions the bank publishes late.
+Once a source has been imported from the bank, the next import's start date is preselected as the earlier of these two dates, minus 2 days to catch transactions the bank publishes late:
+
+1. The last import date (`lastImportedAt`).
+2. The date of the source's newest imported transaction this year (or last year too, in January). If there isn't one, the last import date is used on its own.
+
+The second date matters when an import leaves out the newest rows: for example, when importing on the 5th, the user may only want the previous month. Those rows then show up again next time. The first date matters when the bank shows a transaction with a future date, and it gets imported. The days before that date may still get more transactions.
+
+If the user imports a row and leaves older ones unticked, the older ones can fall before the start date, and the user has to pick an earlier date to see them again.
 
 ## Bank Rows
 

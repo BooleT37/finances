@@ -264,7 +264,7 @@ test.describe('Bank import', () => {
     expect(imported.importHash).not.toBeNull();
 
     dialog = await openImport(page, 'Vivid');
-    await expect(importFromDate(dialog)).toHaveText('13.04.2024');
+    await expect(importFromDate(dialog)).toHaveText('08.04.2024');
     await bankImportButton(dialog).click();
 
     await expect(rowCheckbox(dialog, 'REWE Markt')).not.toBeChecked();
