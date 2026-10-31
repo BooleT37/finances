@@ -69,7 +69,7 @@ Commerzbank sends no transaction type and no reference for a transaction, but pu
 
 Each transaction has an **`importHash`** used to detect whether it was already imported via the "Import" feature, preventing duplicates. For a statement row, the hash is computed from the row exactly as the statement shows it. For a Vivid bank row, it's computed from the bank's own reference for that transaction, so repeated bank imports recognise their rows exactly. Commerzbank sends no reference, so its hash is computed from the booking date, amount, other party and payment text. Identical rows on the same day are counted apart, so they get different hashes. Either way, editing the description or the amount in the import modal keeps it the same.
 
-A row also counts as already imported when a transaction with the same amount on the same day exists, which catches transactions entered by hand or by another import type. Rows that were already imported are still shown in the table, but deselected by default.
+A row also counts as already imported when a transaction with the same amount on the same day exists, which catches transactions from another import type. A manually entered transaction gets a bigger window: the same amount, at most 5 days away and in the same month, since its date often differs from the bank's (for example, when it was created from an upcoming subscription, it has the subscription's date). Rows that were already imported are still shown in the table, but deselected by default.
 
 ## Imported Description
 

@@ -24,6 +24,7 @@ import {
   isSubscriptionValue,
   parseSubscriptionValue,
 } from '~/features/import/importedTransactionCategoryValue';
+import { isSameTransaction } from '~/features/import/isSameTransaction';
 import {
   getCategorySuggestionsQueryOptions,
   useImportTransactions,
@@ -110,11 +111,7 @@ export function ImportedTransactionsModal({
 
   const isDuplicateFn = useMemo(
     () => (e: ImportedTransaction) =>
-      existingTransactions.some(
-        (tx) =>
-          (tx.importHash != null && tx.importHash === e.hash) ||
-          (tx.date.isSame(e.date, 'day') && tx.cost.abs().eq(e.amount.abs())),
-      ),
+      existingTransactions.some((tx) => isSameTransaction(e, tx)),
     [existingTransactions],
   );
 
