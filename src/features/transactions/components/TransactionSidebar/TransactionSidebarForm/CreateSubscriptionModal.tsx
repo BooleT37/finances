@@ -164,6 +164,7 @@ export function CreateSubscriptionModal({ initialValues, onSuccess }: Props) {
           <TreeSelect
             treeData={categoryTreeData ?? []}
             titleRender={renderCategoryTreeNodeTitle}
+            searchProp="searchValue"
             value={form.values.categoryId}
             onChange={(v) => form.setFieldValue('categoryId', v)}
           />

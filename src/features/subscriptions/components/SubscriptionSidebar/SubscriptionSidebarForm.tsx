@@ -247,6 +247,7 @@ export function SubscriptionSidebarForm() {
           <TreeSelect
             treeData={categoryTreeData ?? []}
             titleRender={renderCategoryTreeNodeTitle}
+            searchProp="searchValue"
             {...form.getInputProps('categoryId')}
           />
         </Input.Wrapper>

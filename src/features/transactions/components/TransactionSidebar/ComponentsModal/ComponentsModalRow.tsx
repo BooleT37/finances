@@ -55,6 +55,7 @@ export function ComponentsModalRow({
             placeholder={t('components.categoryRequired')}
             notFoundContent={t('components.categoryNotFound')}
             titleRender={renderCategoryTreeNodeTitle}
+            searchProp="searchValue"
             {...form.getInputProps(`components.${index}.categoryId`)}
           />
         </div>

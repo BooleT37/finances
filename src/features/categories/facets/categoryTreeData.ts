@@ -7,10 +7,14 @@ import type { Category } from '../schema';
 import { useExpenseCategories } from './expenseCategories';
 import { useIncomeCategories } from './incomeCategories';
 
+export const categorySearchValue = (category: Category) =>
+  `${category.name} ${category.shortname}`;
+
 function categoryToTreeNode(cat: Category): TreeNode {
   const node: TreeNode = {
     value: buildCategorySubcategoryId({ categoryId: cat.id }),
-    title: cat.name,
+    title: cat.shortname,
+    searchValue: categorySearchValue(cat),
     icon: cat.icon,
   };
   if (cat.subcategories.length > 0) {
@@ -20,6 +24,7 @@ function categoryToTreeNode(cat: Category): TreeNode {
         subcategoryId: sub.id,
       }),
       title: sub.name,
+      searchValue: sub.name,
     }));
   }
   return node;

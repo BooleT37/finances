@@ -6,6 +6,7 @@ import { useMemo } from 'react';
 import { buildCategorySubcategoryId } from '~/features/categories/categorySubcategoryId';
 import { CategoryIconComp } from '~/features/categories/components/categoryIcons/CategoryIconComp';
 import { NameWithOptionalIcon } from '~/features/categories/components/NameWithOptionalIcon';
+import { categorySearchValue } from '~/features/categories/facets/categoryTreeData';
 import { useExpenseCategories } from '~/features/categories/facets/expenseCategories';
 import { useIncomeCategories } from '~/features/categories/facets/incomeCategories';
 import type { Category } from '~/features/categories/schema';
@@ -58,7 +59,7 @@ function subscriptionNode(
   return {
     value: buildSubscriptionValue(subscription.id),
     title: subscriptionDropdownTitle(subscription.name),
-    searchValue: `${category.name} ${subscription.name}`,
+    searchValue: `${categorySearchValue(category)} ${subscription.name}`,
     selectionTitle: renderSelection(
       <>
         {category.icon ? <CategoryIconComp value={category.icon} /> : null}
@@ -87,10 +88,10 @@ function categoryToTreeNode({
         subcategoryId: sub.id,
       }),
       title: <NameWithOptionalIcon name={sub.name} reserveIconSpace />,
-      searchValue: `${category.name} ${sub.name}`,
+      searchValue: `${categorySearchValue(category)} ${sub.name}`,
       selectionTitle: renderSelection(
         categoryIcon,
-        `${category.name} - ${sub.name}`,
+        `${category.shortname} - ${sub.name}`,
       ),
       children: subSubscriptions.map((s) => subscriptionNode(category, s)),
     };
@@ -106,13 +107,13 @@ function categoryToTreeNode({
     value: buildCategorySubcategoryId({ categoryId: category.id }),
     title: (
       <NameWithOptionalIcon
-        name={category.name}
+        name={category.shortname}
         icon={category.icon}
         reserveIconSpace
       />
     ),
-    searchValue: category.name,
-    selectionTitle: renderSelection(categoryIcon, category.name),
+    searchValue: categorySearchValue(category),
+    selectionTitle: renderSelection(categoryIcon, category.shortname),
     ...(children.length > 0 ? { children } : {}),
   };
 }
