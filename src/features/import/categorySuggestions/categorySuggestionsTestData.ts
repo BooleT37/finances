@@ -7,6 +7,13 @@ import type { ExpenseWithCategory } from './categoryJevQuestion';
 
 const projectId = 'project';
 
+const auditFields = {
+  createdAt: dayjs('2026-01-01').toDate(),
+  createdById: null,
+  updatedAt: dayjs('2026-01-01').toDate(),
+  updatedById: null,
+};
+
 export const categoryRow = (
   id: number,
   name: string,
@@ -21,10 +28,12 @@ export const categoryRow = (
   icon: null,
   type: null,
   projectId,
+  ...auditFields,
   subcategories: subcategories.map((subcategory) => ({
     ...subcategory,
     categoryId: id,
     projectId,
+    ...auditFields,
   })),
 });
 
@@ -44,6 +53,7 @@ export const subscriptionRow = (
   subcategoryId,
   sourceId: null,
   projectId,
+  ...auditFields,
 });
 
 export const expenseRow = ({
@@ -76,6 +86,7 @@ export const expenseRow = ({
   importHash: null,
   importedDescription,
   projectId,
+  ...auditFields,
   createdAt: dayjs(date).toDate(),
   category,
 });

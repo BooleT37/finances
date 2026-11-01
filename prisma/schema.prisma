@@ -25,25 +25,54 @@ model Project {
   expenseComponents        ExpenseComponent[]
   forecastLineItems        ForecastLineItem[]
   bankConnections          BankConnection[]
+  updatedById              String?
+  updatedBy                User?                    @relation("ProjectUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
 }
 
 model User {
-  id                    String    @id @default(cuid())
-  name                  String
-  email                 String    @unique
-  emailVerified         Boolean   @default(false)
-  image                 String?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @default(now()) @updatedAt
-  role                  String    @default("user")
-  banned                Boolean?  @default(false)
-  banReason             String?
-  banExpires            DateTime?
-  onboardingCompletedAt DateTime?
-  project               Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId             String
-  sessions              Session[]
-  accounts              Account[]
+  id                              String                   @id @default(cuid())
+  name                            String
+  email                           String                   @unique
+  emailVerified                   Boolean                  @default(false)
+  image                           String?
+  createdAt                       DateTime                 @default(now())
+  updatedAt                       DateTime                 @default(now()) @updatedAt
+  role                            String                   @default("user")
+  banned                          Boolean?                 @default(false)
+  banReason                       String?
+  banExpires                      DateTime?
+  onboardingCompletedAt           DateTime?
+  project                         Project                  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId                       String
+  sessions                        Session[]
+  accounts                        Account[]
+  createdById                     String?
+  createdBy                       User?                    @relation("UserCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  createdProjectSettings          ProjectSetting[]         @relation("ProjectSettingCreatedBy")
+  updatedProjectSettings          ProjectSetting[]         @relation("ProjectSettingUpdatedBy")
+  createdSubcategories            Subcategory[]            @relation("SubcategoryCreatedBy")
+  updatedSubcategories            Subcategory[]            @relation("SubcategoryUpdatedBy")
+  createdCategories               Category[]               @relation("CategoryCreatedBy")
+  updatedCategories               Category[]               @relation("CategoryUpdatedBy")
+  createdSources                  Source[]                 @relation("SourceCreatedBy")
+  updatedSources                  Source[]                 @relation("SourceUpdatedBy")
+  createdSavingSpendings          SavingSpending[]         @relation("SavingSpendingCreatedBy")
+  updatedSavingSpendings          SavingSpending[]         @relation("SavingSpendingUpdatedBy")
+  createdSavingSpendingCategories SavingSpendingCategory[] @relation("SavingSpendingCategoryCreatedBy")
+  updatedSavingSpendingCategories SavingSpendingCategory[] @relation("SavingSpendingCategoryUpdatedBy")
+  createdSubscriptions            Subscription[]           @relation("SubscriptionCreatedBy")
+  updatedSubscriptions            Subscription[]           @relation("SubscriptionUpdatedBy")
+  createdExpenseComponents        ExpenseComponent[]       @relation("ExpenseComponentCreatedBy")
+  updatedExpenseComponents        ExpenseComponent[]       @relation("ExpenseComponentUpdatedBy")
+  createdForecasts                Forecast[]               @relation("ForecastCreatedBy")
+  updatedForecasts                Forecast[]               @relation("ForecastUpdatedBy")
+  createdExpenses                 Expense[]                @relation("ExpenseCreatedBy")
+  updatedExpenses                 Expense[]                @relation("ExpenseUpdatedBy")
+  createdBankConnections          BankConnection[]         @relation("BankConnectionCreatedBy")
+  updatedBankConnections          BankConnection[]         @relation("BankConnectionUpdatedBy")
+  updatedProjects                 Project[]                @relation("ProjectUpdatedBy")
+  createdUsers                    User[]                   @relation("UserCreatedBy")
+  createdForecastLineItems        ForecastLineItem[]       @relation("ForecastLineItemCreatedBy")
 }
 
 model Session {
@@ -96,6 +125,12 @@ model ProjectSetting {
   expenseCategoriesOrder       Int[]     @default([])
   sourcesOrder                 Int[]     @default([])
   categorySuggestionsEnabledAt DateTime?
+  createdAt                    DateTime  @default(now())
+  createdById                  String?
+  createdBy                    User?     @relation("ProjectSettingCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedAt                    DateTime  @default(now()) @updatedAt
+  updatedById                  String?
+  updatedBy                    User?     @relation("ProjectSettingUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
 }
 
 model Subcategory {
@@ -109,6 +144,12 @@ model Subcategory {
   expenseComponents ExpenseComponent[]
   forecasts         Forecast[]
   subscriptions     Subscription[]
+  createdAt         DateTime           @default(now())
+  createdById       String?
+  createdBy         User?              @relation("SubcategoryCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedAt         DateTime           @default(now()) @updatedAt
+  updatedById       String?
+  updatedBy         User?              @relation("SubcategoryUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
 
   @@unique([id, projectId])
 }
@@ -133,6 +174,12 @@ model Category {
   project           Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId         String
   expenseComponents ExpenseComponent[]
+  createdAt         DateTime           @default(now())
+  createdById       String?
+  createdBy         User?              @relation("CategoryCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedAt         DateTime           @default(now()) @updatedAt
+  updatedById       String?
+  updatedBy         User?              @relation("CategoryUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
 
   @@unique([name, projectId])
   @@unique([id, projectId])
@@ -152,6 +199,12 @@ model Source {
   project        Project         @relation(fields: [projectId], references: [id])
   projectId      String
   bankConnection BankConnection?
+  createdAt      DateTime        @default(now())
+  createdById    String?
+  createdBy      User?           @relation("SourceCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedAt      DateTime        @default(now()) @updatedAt
+  updatedById    String?
+  updatedBy      User?           @relation("SourceUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
 
   @@unique([id, projectId])
 }
@@ -169,17 +222,27 @@ model BankConnection {
   projectId      String
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @default(now()) @updatedAt
+  createdById    String?
+  createdBy      User?     @relation("BankConnectionCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedById    String?
+  updatedBy      User?     @relation("BankConnectionUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
 
   @@unique([sourceId, projectId])
 }
 
 model SavingSpending {
-  id         Int                      @id @default(autoincrement())
-  name       String
-  completed  Boolean
-  categories SavingSpendingCategory[]
-  project    Project                  @relation(fields: [projectId], references: [id])
-  projectId  String
+  id          Int                      @id @default(autoincrement())
+  name        String
+  completed   Boolean
+  categories  SavingSpendingCategory[]
+  project     Project                  @relation(fields: [projectId], references: [id])
+  projectId   String
+  createdAt   DateTime                 @default(now())
+  createdById String?
+  createdBy   User?                    @relation("SavingSpendingCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedAt   DateTime                 @default(now()) @updatedAt
+  updatedById String?
+  updatedBy   User?                    @relation("SavingSpendingUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
 
   @@unique([id, projectId])
 }
@@ -194,6 +257,12 @@ model SavingSpendingCategory {
   project          Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId        String
   expenses         Expense[]
+  createdAt        DateTime        @default(now())
+  createdById      String?
+  createdBy        User?           @relation("SavingSpendingCategoryCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedAt        DateTime        @default(now()) @updatedAt
+  updatedById      String?
+  updatedBy        User?           @relation("SavingSpendingCategoryUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
 
   @@unique([id, projectId])
 }
@@ -216,6 +285,12 @@ model Subscription {
   forecastLineItems ForecastLineItem[]
   project           Project            @relation(fields: [projectId], references: [id], onDelete: Restrict)
   projectId         String
+  createdAt         DateTime           @default(now())
+  createdById       String?
+  createdBy         User?              @relation("SubscriptionCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedAt         DateTime           @default(now()) @updatedAt
+  updatedById       String?
+  updatedBy         User?              @relation("SubscriptionUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
 
   @@unique([id, projectId])
 }
@@ -243,6 +318,11 @@ model Expense {
   project                  Project                 @relation(fields: [projectId], references: [id])
   projectId                String
   createdAt                DateTime                @default(now())
+  createdById              String?
+  createdBy                User?                   @relation("ExpenseCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedAt                DateTime                @default(now()) @updatedAt
+  updatedById              String?
+  updatedBy                User?                   @relation("ExpenseUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
 
   @@unique([id, projectId])
 }
@@ -259,6 +339,12 @@ model ExpenseComponent {
   expenseId     Int
   project       Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId     String
+  createdAt     DateTime     @default(now())
+  createdById   String?
+  createdBy     User?        @relation("ExpenseComponentCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedAt     DateTime     @default(now()) @updatedAt
+  updatedById   String?
+  updatedBy     User?        @relation("ExpenseComponentUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
 
   @@map("ExpenseComponent")
 }
@@ -282,6 +368,12 @@ model Forecast {
   project       Project            @relation(fields: [projectId], references: [id])
   projectId     String
   lineItems     ForecastLineItem[]
+  createdAt     DateTime           @default(now())
+  createdById   String?
+  createdBy     User?              @relation("ForecastCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedAt     DateTime           @default(now()) @updatedAt
+  updatedById   String?
+  updatedBy     User?              @relation("ForecastUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
 
   @@unique([categoryId, subcategoryId, month, year, projectId, level])
   @@unique([id, projectId])
@@ -299,4 +391,7 @@ model ForecastLineItem {
   subscriptionId Int?
   project        Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId      String
+  createdAt      DateTime      @default(now())
+  createdById    String?
+  createdBy      User?         @relation("ForecastLineItemCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
 }
