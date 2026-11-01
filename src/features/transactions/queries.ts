@@ -17,6 +17,7 @@ import {
   transactionWithComponentsSchema,
   type UpdateTransactionInput,
 } from './schema';
+import { sortTransactions } from './utils/sortTransactions';
 
 const transactionsKeys = createQueryKeys('transactions', {
   byYear: (year: number) => ({
@@ -46,7 +47,11 @@ export const getUpdateTransactionMutationOptions = (
     onSuccess: (updatedTx) => {
       queryClient.setQueryData(
         getTransactionsQueryOptions(year).queryKey,
-        (old) => old?.map((tx) => (tx.id === updatedTx.id ? updatedTx : tx)),
+        (old) =>
+          old &&
+          sortTransactions(
+            old.map((tx) => (tx.id === updatedTx.id ? updatedTx : tx)),
+          ),
       );
     },
   });
@@ -79,7 +84,7 @@ export const getAddTransactionMutationOptions = (
     onSuccess: (newTx) => {
       queryClient.setQueryData(
         getTransactionsQueryOptions(year).queryKey,
-        (old) => (old ? [...old, newTx] : [newTx]),
+        (old) => sortTransactions([...(old ?? []), newTx]),
       );
     },
   });

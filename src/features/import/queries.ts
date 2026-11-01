@@ -7,6 +7,7 @@ import {
 
 import { getTransactionsQueryOptions } from '~/features/transactions/queries';
 import { transactionWithComponentsSchema } from '~/features/transactions/schema';
+import { sortTransactions } from '~/features/transactions/utils/sortTransactions';
 
 import { importTransactions, suggestCategories } from './api';
 import {
@@ -90,7 +91,7 @@ export function useImportTransactions() {
           getTransactionsQueryOptions(year).queryKey,
           (old) => {
             const additions = created.filter((tx) => tx.date.year() === year);
-            return old ? [...old, ...additions] : additions;
+            return sortTransactions([...(old ?? []), ...additions]);
           },
         );
       }

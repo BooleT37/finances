@@ -28,7 +28,7 @@ export const fetchTransactionsByYear = createServerFn({ method: 'GET' })
           lt: new Date(`${year + 1}-01-01`),
         },
       },
-      orderBy: { date: 'asc' },
+      orderBy: [{ date: 'asc' }, { id: 'asc' }],
       include: {
         category: true,
         components: { include: { category: true } },
