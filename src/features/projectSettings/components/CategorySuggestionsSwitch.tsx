@@ -2,8 +2,9 @@ import { Group, Switch, Tooltip } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
-import { useRouteContext } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
+
+import { useIsAdmin } from '~/shared/hooks/useIsAdmin';
 
 import {
   getProjectSettingsQueryOptions,
@@ -12,8 +13,7 @@ import {
 
 export function CategorySuggestionsSwitch() {
   const { t } = useTranslation('projectSettings');
-  const { session } = useRouteContext({ from: '/_authenticated' });
-  const isAdmin = session.role === 'admin';
+  const isAdmin = useIsAdmin();
   const { data: settings } = useQuery(getProjectSettingsQueryOptions());
   const setEnabledMutation = useSetCategorySuggestionsEnabled();
 

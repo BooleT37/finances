@@ -9,7 +9,7 @@ import {
   Stack,
   Text,
 } from '@mantine/core';
-import { Link, useRouteContext } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import type { Dayjs } from 'dayjs';
 import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,6 +20,7 @@ import type { ImportedTransaction } from '~/features/import/importedTransaction'
 import { useFetchBankTransactions } from '~/features/import/queries';
 import { DatePickerWithTodayInput } from '~/shared/components/DatePickerWithTodayInput';
 import { DATE_FORMAT, ISO_DATE_FORMAT } from '~/shared/constants';
+import { useIsAdmin } from '~/shared/hooks/useIsAdmin';
 import { getToday } from '~/shared/utils/today';
 
 import { useLastImportedTransactionDate } from './useLastImportedTransactionDate';
@@ -57,7 +58,7 @@ function BankImportForm({
   onFetched,
 }: Props & { lastImportedTransactionDate: Dayjs | null }) {
   const { t } = useTranslation('import');
-  const { session } = useRouteContext({ from: '/_authenticated' });
+  const isAdmin = useIsAdmin();
   const dateFromId = useId();
   const fetchTransactions = useFetchBankTransactions();
   const [dateFrom, setDateFrom] = useState<string | null>(() =>
@@ -111,7 +112,7 @@ function BankImportForm({
       </Group>
       {result?.status === 'expired' && (
         <Alert color="orange">
-          {session.role === 'admin' ? (
+          {isAdmin ? (
             <>
               {t('importModal.bank.expired')}{' '}
               <Anchor component={Link} to="/settings/sources">

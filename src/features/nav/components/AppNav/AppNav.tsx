@@ -1,6 +1,7 @@
 import { Box, Stack } from '@mantine/core';
-import { useRouteContext } from '@tanstack/react-router';
 import { useAtom } from 'jotai';
+
+import { useIsAdmin } from '~/shared/hooks/useIsAdmin';
 
 import { navCollapsedAtom } from '../../navCollapsed.atom';
 import { AppNavItem } from './AppNavItem';
@@ -9,8 +10,8 @@ import { filterNavItems, navItems } from './navItems';
 
 export function AppNav() {
   const [collapsed, setCollapsed] = useAtom(navCollapsedAtom);
-  const { session } = useRouteContext({ from: '/_authenticated' });
-  const visibleNavItems = filterNavItems(navItems, session.role === 'admin');
+  const isAdmin = useIsAdmin();
+  const visibleNavItems = filterNavItems(navItems, isAdmin);
 
   return (
     <Stack gap={0} pt="sm" h="100%">
