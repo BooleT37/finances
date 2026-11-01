@@ -68,6 +68,7 @@ test.describe('Categories inline editing', () => {
     expect(kept).not.toBeNull();
     expect(kept?.subcategoryId).toBeNull();
     expect(kept?.categoryId).toBe(seedData.categoryIds.продукты);
+    expect(kept?.updatedById).toBe(seedData.userId);
   });
 
   test('clicking outside the input saves the edit', async ({ page }) => {

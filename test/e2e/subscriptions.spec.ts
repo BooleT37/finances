@@ -110,6 +110,7 @@ test.describe('Subscriptions inline editing', () => {
     expect(kept).not.toBeNull();
     expect(kept?.subscriptionId).toBeNull();
     expect(kept?.categoryId).toBe(seedData.categoryIds.развлечения);
+    expect(kept?.updatedById).toBe(seedData.userId);
   });
 
   test('inline editing an invalid price value is not saved', async ({

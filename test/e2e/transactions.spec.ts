@@ -111,6 +111,15 @@ test.describe('Transaction creation', () => {
     await expect(row.getByText('-€30.00')).toBeVisible();
     await expect(row.getByText('Vivid')).toBeVisible();
 
+    const created = await testPrisma.expense.findFirstOrThrow({
+      where: {
+        subcategoryId: seedData.subcategoryIds.такси,
+        cost: 30,
+      },
+    });
+    expect(created.createdById).toBe(seedData.userId);
+    expect(created.updatedById).toBe(seedData.userId);
+
     await page.getByLabel('Сгруппировать по подкатегориям').click();
     await expect(
       page.locator(`.${transactionNameCellClass}[data-testing-depth="2"]`, {
@@ -558,7 +567,7 @@ test.describe('Transaction editing', () => {
     page,
     seedData,
   }) => {
-    await testPrisma.expense.create({
+    const tx = await testPrisma.expense.create({
       data: {
         name: 'Правка и удаление',
         cost: -50,
@@ -596,6 +605,12 @@ test.describe('Transaction editing', () => {
 
     await page.getByRole('button', { name: 'Закрыть' }).click();
     await page.waitForLoadState('networkidle');
+
+    const edited = await testPrisma.expense.findUniqueOrThrow({
+      where: { id: tx.id },
+    });
+    expect(edited.updatedById).toBe(seedData.userId);
+    expect(edited.createdById).toBeNull();
 
     await row.getByRole('button', { name: 'Удалить' }).click();
     await page

@@ -1,3 +1,4 @@
+import { testPrisma } from '../db/client';
 import { expect, test } from '../fixtures';
 import {
   expandRow,
@@ -14,6 +15,7 @@ import {
 test.describe('Budgeting composite plan', () => {
   test('builds a plan from a formula, locks the cell, and persists', async ({
     page,
+    seedData,
   }) => {
     await page.goto('/budgeting');
     const транспортRow = getRow(page, 'Транспорт');
@@ -47,6 +49,11 @@ test.describe('Budgeting composite plan', () => {
     await page.reload();
     await expect(getPlanCell(транспортRow)).toContainText('-€60.00');
     await expect(getBreakdownIcon(транспортRow)).toBeVisible();
+
+    const lineItem = await testPrisma.forecastLineItem.findFirstOrThrow({
+      where: { comment: 'Проездной' },
+    });
+    expect(lineItem.createdById).toBe(seedData.userId);
   });
 
   test('refuses a non-positive total and an unparseable formula', async ({

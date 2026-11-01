@@ -1,3 +1,4 @@
+import { testPrisma } from './db/client';
 import { expect, test } from './fixtures';
 
 test.describe('Project users', () => {
@@ -7,6 +8,7 @@ test.describe('Project users', () => {
 
   test('shows the seeded admin, adds a user via a one-time generated password, and removes a non-admin user', async ({
     page,
+    seedData,
   }) => {
     const adminRow = page.locator('tr', { hasText: 'test-admin@example.com' });
     await expect(adminRow).toBeVisible();
@@ -44,6 +46,23 @@ test.describe('Project users', () => {
     await expect(newUserRow).toBeVisible();
     await expect(newUserRow.getByText('Пользователь')).toBeVisible();
 
+    const newUser = await testPrisma.user.findUniqueOrThrow({
+      where: { email: 'qa-new-user@example.com' },
+    });
+    expect(newUser.createdById).toBe(seedData.userId);
+
+    const session = await (
+      await page.request.get('/api/auth/get-session')
+    ).json();
+    expect(session.user).not.toHaveProperty('createdById');
+
+    // A user who has created rows must still be removable.
+    const categoryId = seedData.categoryIds.продукты;
+    await testPrisma.category.update({
+      where: { id: categoryId },
+      data: { createdById: newUser.id, updatedById: newUser.id },
+    });
+
     // Remove the new user
     await newUserRow.getByRole('button', { name: 'Удалить' }).click();
     const confirmDialog = page.getByRole('dialog');
@@ -54,6 +73,12 @@ test.describe('Project users', () => {
 
     await expect(newUserRow).not.toBeVisible();
     await expect(page.getByText('«QA New User» удалён')).toBeVisible();
+
+    const category = await testPrisma.category.findUniqueOrThrow({
+      where: { id: categoryId },
+    });
+    expect(category.createdById).toBeNull();
+    expect(category.updatedById).toBeNull();
   });
 
   test("blocks removing the project's last admin", async ({ page }) => {

@@ -1,3 +1,4 @@
+import { testPrisma } from '../db/client';
 import { expect, test } from '../fixtures';
 import {
   editCommentCell,
@@ -11,6 +12,7 @@ test.describe('Budgeting inline editing', () => {
   // Test 1: display + basic plan edit + persistence
   test('displays seeded forecast, edits plan value, persists on reload', async ({
     page,
+    seedData,
   }) => {
     await page.goto('/budgeting');
 
@@ -36,6 +38,12 @@ test.describe('Budgeting inline editing', () => {
     // Reload confirms persistence
     await page.reload();
     await expect(getPlanCell(транспортRow)).toContainText('-€50.00');
+
+    const forecast = await testPrisma.forecast.findFirstOrThrow({
+      where: { categoryId: seedData.categoryIds.транспорт, sum: 50 },
+    });
+    expect(forecast.createdById).toBe(seedData.userId);
+    expect(forecast.updatedById).toBe(seedData.userId);
   });
 
   // Test 2: subcategory edit, additive total, locked parent, rest row, comment

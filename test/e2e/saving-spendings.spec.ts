@@ -161,6 +161,7 @@ test.describe('Saving Spendings', () => {
 
   test('creating an event with one category hides the category name column; editing to add categories shows all of them', async ({
     page,
+    seedData,
   }) => {
     await page.goto('/savings-spendings');
 
@@ -215,6 +216,18 @@ test.describe('Saving Spendings', () => {
     await expect(
       updatedCard.getByRole('cell', { name: 'Квартира' }),
     ).toBeVisible();
+
+    const event = await testPrisma.savingSpending.findFirstOrThrow({
+      where: { name: 'Тест поездка' },
+      include: { categories: true },
+    });
+    expect(event.createdById).toBe(seedData.userId);
+    expect(event.updatedById).toBe(seedData.userId);
+    expect(event.categories).toHaveLength(2);
+    for (const category of event.categories) {
+      expect(category.createdById).toBe(seedData.userId);
+      expect(category.updatedById).toBe(seedData.userId);
+    }
   });
 
   test('deleting a category — and the event containing it — is disabled when the category has expenses attached', async ({
