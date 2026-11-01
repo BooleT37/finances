@@ -10,15 +10,15 @@ A category is either an **income** or an **expense** category (`isIncome`). This
 
 Users can edit categories in the UI:
 
-- **Name** — must be unique per user
+- **Name** — must be unique per project
 - **Short name** — used in charts and other space-constrained views
-- **Icon** — selected from a set of predefined icons
+- **Icon** — optional, selected from a set of predefined icons
 - **Order** — categories can be reordered in the category editor
 - **Continuous** — see below
 
 ## Icon Display
 
-A category is always displayed together with its icon. Subcategories may skip the icon when shown in a context that already displays their parent category (e.g. grouped under the parent), since the icon would be redundant there.
+A category is always displayed together with its icon, if it has one. Subcategories may skip the icon when shown in a context that already displays their parent category (e.g. grouped under the parent), since the icon would be redundant there.
 
 ## Ordering
 
@@ -26,7 +26,7 @@ The order set in the category editor is reused across all views that display cat
 
 ## Continuous Categories
 
-A **continuous** category is one with many small, evenly spread expenses throughout the month (e.g. groceries, public transport). For continuous categories, we can extrapolate current spending mid-month to predict whether the plan will be exceeded at the current rate. If so, a warning is shown in the transactions UI.
+A **continuous** category is one with many small, evenly spread expenses throughout the month (e.g. groceries, public transport). For continuous categories, we can extrapolate current spending mid-month to predict whether the plan will be exceeded at the current rate. If so, a warning is shown in both the transactions and forecasts views.
 
 ## Special Categories
 
@@ -38,7 +38,7 @@ Indicates that an expense was paid from savings, not from the regular monthly bu
 
 ### type === `TO_SAVINGS`
 
-Indicates money transferred into savings. It may have subcategories for separate saving purposes (e.g. vacation fund, emergency fund). In the forecasts table, it is displayed in a dedicated **savings group**. Otherwise, it behaves like any other category.
+Indicates money transferred into savings. It may have subcategories for separate saving purposes (e.g. vacation fund, emergency fund). In the forecasts table, it is displayed in a dedicated **savings group**. It's also left out of the category comparison in statistics. Otherwise, it behaves like any other category.
 
 ---
 
