@@ -74,6 +74,8 @@ export const createTransaction = createServerFn({ method: 'POST' })
         subscriptionId: data.subscriptionId ?? null,
         savingSpendingCategoryId: data.savingSpendingCategoryId ?? null,
         projectId: context.projectId,
+        createdById: context.userId,
+        updatedById: context.userId,
         components: data.components?.length
           ? {
               createMany: {
@@ -82,6 +84,8 @@ export const createTransaction = createServerFn({ method: 'POST' })
                   cost: new Decimal(c.cost).abs(),
                   categoryId: c.categoryId,
                   subcategoryId: c.subcategoryId ?? null,
+                  createdById: context.userId,
+                  updatedById: context.userId,
                 })),
               },
             }
@@ -166,6 +170,7 @@ export const updateTransaction = createServerFn({ method: 'POST' })
         sourceId: fields.sourceId,
         subscriptionId: fields.subscriptionId,
         savingSpendingCategoryId: fields.savingSpendingCategoryId,
+        updatedById: context.userId,
         ...(components !== undefined && {
           components: {
             createMany: {
@@ -176,6 +181,8 @@ export const updateTransaction = createServerFn({ method: 'POST' })
                   cost: new Decimal(c.cost).abs(),
                   categoryId: c.categoryId,
                   subcategoryId: c.subcategoryId ?? null,
+                  createdById: context.userId,
+                  updatedById: context.userId,
                 })),
             },
             update: components
@@ -187,6 +194,7 @@ export const updateTransaction = createServerFn({ method: 'POST' })
                   cost: new Decimal(c.cost).abs(),
                   categoryId: c.categoryId,
                   subcategoryId: c.subcategoryId ?? null,
+                  updatedById: context.userId,
                 },
               })),
           },

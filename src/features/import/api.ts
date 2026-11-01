@@ -121,13 +121,18 @@ export const importTransactions = createServerFn({ method: 'POST' })
           importHash: item.importHash,
           importedDescription: item.importedDescription,
           projectId: context.projectId,
+          createdById: context.userId,
+          updatedById: context.userId,
         })),
         include: { category: true },
       });
       if (data.fromBank) {
         await tx.bankConnection.updateMany({
           where: { sourceId: data.sourceId, projectId: context.projectId },
-          data: { lastImportedAt: getToday().toDate() },
+          data: {
+            lastImportedAt: getToday().toDate(),
+            updatedById: context.userId,
+          },
         });
       }
       return rows;
