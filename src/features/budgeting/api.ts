@@ -46,6 +46,7 @@ async function findChildren(tx: Prisma.TransactionClient, key: ForecastKey) {
 async function findOrCreateCategoryRow(
   tx: Prisma.TransactionClient,
   key: ForecastKey,
+  userId: string,
 ) {
   const existing = await tx.forecast.findFirst({
     where: { ...key, subcategoryId: null, level: 'CATEGORY' },
@@ -60,6 +61,8 @@ async function findOrCreateCategoryRow(
       level: 'CATEGORY',
       sum: new Decimal(0),
       comment: '',
+      createdById: userId,
+      updatedById: userId,
     },
   });
 }
@@ -86,6 +89,7 @@ async function replaceLineItems(
   tx: Prisma.TransactionClient,
   forecastId: number,
   projectId: string,
+  userId: string,
   items: LineItemInput[],
 ) {
   await tx.forecastLineItem.deleteMany({ where: { forecastId, projectId } });
@@ -100,6 +104,7 @@ async function replaceLineItems(
       quantity: new Decimal(item.quantity),
       comment: item.comment,
       subscriptionId: item.subscriptionId,
+      createdById: userId,
     })),
   });
 }
@@ -160,7 +165,11 @@ export const upsertCategoryForecast = createServerFn({ method: 'POST' })
     };
 
     await prisma.$transaction(async (tx) => {
-      const categoryRow = await findOrCreateCategoryRow(tx, key);
+      const categoryRow = await findOrCreateCategoryRow(
+        tx,
+        key,
+        context.userId,
+      );
 
       if (data.sum === undefined) {
         if (data.lineItems !== undefined) {
@@ -168,12 +177,13 @@ export const upsertCategoryForecast = createServerFn({ method: 'POST' })
             tx,
             categoryRow.id,
             key.projectId,
+            context.userId,
             data.lineItems,
           );
         }
         await tx.forecast.update({
           where: { id: categoryRow.id },
-          data: { comment: data.comment },
+          data: { comment: data.comment, updatedById: context.userId },
         });
         return;
       }
@@ -190,6 +200,7 @@ export const upsertCategoryForecast = createServerFn({ method: 'POST' })
           tx,
           categoryRow.id,
           key.projectId,
+          context.userId,
           data.lineItems,
         );
       }
@@ -197,7 +208,7 @@ export const upsertCategoryForecast = createServerFn({ method: 'POST' })
       const newSum = new Decimal(data.sum).abs();
       await tx.forecast.update({
         where: { id: categoryRow.id },
-        data: { sum: newSum },
+        data: { sum: newSum, updatedById: context.userId },
       });
 
       const rest = children.find((c) => c.subcategoryId === null);
@@ -207,7 +218,10 @@ export const upsertCategoryForecast = createServerFn({ method: 'POST' })
           .reduce((s, c) => s.plus(c.sum), new Decimal(0));
         await tx.forecast.update({
           where: { id: rest.id },
-          data: { sum: newSum.minus(realSum) },
+          data: {
+            sum: newSum.minus(realSum),
+            updatedById: context.userId,
+          },
         });
       }
     });
@@ -261,7 +275,11 @@ export const upsertSubcategoryForecasts = createServerFn({ method: 'POST' })
     };
 
     await prisma.$transaction(async (tx) => {
-      const categoryRow = await findOrCreateCategoryRow(tx, key);
+      const categoryRow = await findOrCreateCategoryRow(
+        tx,
+        key,
+        context.userId,
+      );
       let children = await findChildren(tx, key);
 
       if (children.length === 0) {
@@ -272,6 +290,8 @@ export const upsertSubcategoryForecasts = createServerFn({ method: 'POST' })
             level: 'SUBCATEGORY',
             sum: categoryRow.sum,
             comment: '',
+            createdById: context.userId,
+            updatedById: context.userId,
           },
         });
         children = [{ ...rest, lineItems: [] }];
@@ -293,21 +313,31 @@ export const upsertSubcategoryForecasts = createServerFn({ method: 'POST' })
                   ? new Decimal(item.sum).abs()
                   : new Decimal(0),
               comment: item.comment ?? '',
+              createdById: context.userId,
+              updatedById: context.userId,
             },
           }));
 
         if (existingChild) {
           await tx.forecast.update({
             where: { id: existingChild.id },
-            data:
-              item.sum !== undefined
+            data: {
+              ...(item.sum !== undefined
                 ? { sum: new Decimal(item.sum).abs() }
-                : { comment: item.comment },
+                : { comment: item.comment }),
+              updatedById: context.userId,
+            },
           });
         }
 
         if (item.lineItems !== undefined) {
-          await replaceLineItems(tx, row.id, key.projectId, item.lineItems);
+          await replaceLineItems(
+            tx,
+            row.id,
+            key.projectId,
+            context.userId,
+            item.lineItems,
+          );
         }
       }
 
@@ -318,7 +348,7 @@ export const upsertSubcategoryForecasts = createServerFn({ method: 'POST' })
       );
       await tx.forecast.update({
         where: { id: categoryRow.id },
-        data: { sum: newSum },
+        data: { sum: newSum, updatedById: context.userId },
       });
     });
   });
