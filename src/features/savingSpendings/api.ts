@@ -75,12 +75,16 @@ export const createSavingSpending = createServerFn({ method: 'POST' })
         name: data.name,
         completed: false,
         projectId: context.projectId,
+        createdById: context.userId,
+        updatedById: context.userId,
         categories: {
           createMany: {
             data: data.categories.map((cat) => ({
               name: cat.name,
               forecast: new Decimal(cat.forecast),
               comment: cat.comment,
+              createdById: context.userId,
+              updatedById: context.userId,
             })),
           },
         },
@@ -138,6 +142,7 @@ export const updateSavingSpending = createServerFn({ method: 'POST' })
         where: { id },
         data: {
           name,
+          updatedById: context.userId,
           categories: {
             updateMany: categories
               .filter((c) => c.id !== undefined)
@@ -147,6 +152,7 @@ export const updateSavingSpending = createServerFn({ method: 'POST' })
                   name: c.name,
                   forecast: new Decimal(c.forecast),
                   comment: c.comment,
+                  updatedById: context.userId,
                 },
               })),
             createMany: {
@@ -156,6 +162,8 @@ export const updateSavingSpending = createServerFn({ method: 'POST' })
                   name: c.name,
                   forecast: new Decimal(c.forecast),
                   comment: c.comment,
+                  createdById: context.userId,
+                  updatedById: context.userId,
                 })),
             },
           },
@@ -207,7 +215,7 @@ export const archiveSavingSpending = createServerFn({ method: 'POST' })
     );
     await prisma.savingSpending.update({
       where: { id },
-      data: { completed: true },
+      data: { completed: true, updatedById: context.userId },
     });
   });
 
@@ -223,6 +231,6 @@ export const unarchiveSavingSpending = createServerFn({ method: 'POST' })
     );
     await prisma.savingSpending.update({
       where: { id },
-      data: { completed: false },
+      data: { completed: false, updatedById: context.userId },
     });
   });
