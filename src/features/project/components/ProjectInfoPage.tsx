@@ -1,6 +1,5 @@
 import { notifications } from '@mantine/notifications';
 import { useQuery } from '@tanstack/react-query';
-import { useRouteContext } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 import { EditableTitle } from '~/shared/components/EditableTitle';
@@ -19,8 +18,6 @@ interface ProjectTitleProps {
 
 function ProjectTitle({ project }: ProjectTitleProps) {
   const { t } = useTranslation('project');
-  const { session } = useRouteContext({ from: '/_authenticated' });
-  const isAdmin = session.role === 'admin';
   const renameMutation = useRenameProject();
 
   async function handleSave(newName: string) {
@@ -43,7 +40,6 @@ function ProjectTitle({ project }: ProjectTitleProps) {
     <EditableTitle
       prefix={`${t('pageTitle')} `}
       value={project.name}
-      editable={isAdmin}
       editLabel={t('actions.rename')}
       onSave={handleSave}
     />

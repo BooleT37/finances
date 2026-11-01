@@ -10,7 +10,7 @@ A new project is only ever created by `scripts/bootstrap-project.ts`, together w
 
 ## Name
 
-A project has a name. Only an admin can change it.
+A project has a name. Any member can change it.
 
 ## Settings
 

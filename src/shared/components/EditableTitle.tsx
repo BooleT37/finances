@@ -14,8 +14,6 @@ interface Props {
   /** Rendered before the value when not editing, e.g. "Проект ". */
   prefix?: string;
   value: string;
-  /** When false, renders as a plain title with no edit affordance at all. */
-  editable?: boolean;
   /** Accessible label for the edit (pencil) button, e.g. "Rename project". */
   editLabel: string;
   /** Awaited: rejecting keeps editing open, resolving closes it. The caller
@@ -32,7 +30,6 @@ interface Props {
 export function EditableTitle({
   prefix,
   value,
-  editable = true,
   editLabel,
   onSave,
   order = 3,
@@ -110,17 +107,15 @@ export function EditableTitle({
         {prefix}
         {value}
       </Title>
-      {editable && (
-        <Tooltip label={editLabel}>
-          <ActionIcon
-            variant="subtle"
-            onClick={startEditing}
-            aria-label={editLabel}
-          >
-            <IconPencil size={16} />
-          </ActionIcon>
-        </Tooltip>
-      )}
+      <Tooltip label={editLabel}>
+        <ActionIcon
+          variant="subtle"
+          onClick={startEditing}
+          aria-label={editLabel}
+        >
+          <IconPencil size={16} />
+        </ActionIcon>
+      </Tooltip>
     </Group>
   );
 }
