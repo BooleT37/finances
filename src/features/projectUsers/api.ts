@@ -3,6 +3,7 @@ import { getRequest } from '@tanstack/react-start/server';
 import { generateRandomString } from 'better-auth/crypto';
 
 import { adminMiddleware } from '~/middlewares/adminMiddleware';
+import { authMiddleware } from '~/middlewares/authMiddleware';
 import { trackInput } from '~/middlewares/tracking/trackInput';
 import { auth } from '~/server/auth';
 import { prisma } from '~/server/db';
@@ -15,7 +16,7 @@ import {
 } from './schema';
 
 export const fetchProjectUsers = createServerFn({ method: 'GET' })
-  .middleware([adminMiddleware])
+  .middleware([authMiddleware])
   .handler(async ({ context }): Promise<ProjectUser[]> => {
     const users = await prisma.user.findMany({
       where: { projectId: context.projectId },

@@ -1,13 +1,13 @@
 # Project Users
 
-Admin-only management of who has access to the current project (household). Every `User` belongs to exactly one `Project` for life — there is no cross-project membership or project switching.
+Who has access to the current project (household). Every member can see the list, only an admin can change it. Every `User` belongs to exactly one `Project` for life — there is no cross-project membership or project switching.
 
-This lives as a section (`ProjectUsersTable`) on the same `/settings/project` page as [Project](../project/PROJECT.md) info, composed together in the route file (`_authenticated.settings.project.tsx`) rather than in either feature — the route only renders this section when `session.role === 'admin'`, since `fetchProjectUsers` itself is `adminMiddleware`-gated and would error for anyone else.
+This lives as a section (`ProjectUsersTable`) on the same `/settings/project` page as [Project](../project/PROJECT.md) info, composed together in the route file (`_authenticated.settings.project.tsx`) rather than in either feature. For a non-admin the table has no add button and no row actions.
 
 ## Roles
 
-- `user` — default role, full access to all app features except the users section of this page.
-- `admin` — everything a `user` can do, plus the users section on `/settings/project` to add or remove other project members, and turning category autofill on or off. Role does not gate anything else in the app.
+- `user` — default role, full access to all app features, and can see the users section of this page without changing anything.
+- `admin` — everything a `user` can do, plus adding or removing other project members in the users section on `/settings/project`, and turning category autofill on or off. Role does not gate anything else in the app.
 
 ## Adding a user
 
@@ -17,7 +17,7 @@ Our Google OAuth consent screen is in "Testing" publishing mode, so Google sign-
 
 ## Passwords and account settings
 
-Nobody — not even an admin — can set or reset another user's password from the app. Every user (any role) manages their own name and password from **My Account** (`/settings/account`, `~/features/account`), reachable from the same nav group as this page — not gated by role, since regular users can't reach the users section. Password changes require the current password (Better Auth's built-in `changePassword` endpoint, called directly from the client via `ChangePasswordForm` in `~/features/auth`); email is not editable there. There is no self-service "forgot password" flow: if a user forgets their password and can't sign in to change it, the only recourse is `scripts/reset-password.ts`, run directly against the database by someone with infra access.
+Nobody — not even an admin — can set or reset another user's password from the app. Every user (any role) manages their own name and password from **My Account** (`/settings/account`, `~/features/account`), reachable from the same nav group as this page — not gated by role. Password changes require the current password (Better Auth's built-in `changePassword` endpoint, called directly from the client via `ChangePasswordForm` in `~/features/auth`); email is not editable there. There is no self-service "forgot password" flow: if a user forgets their password and can't sign in to change it, the only recourse is `scripts/reset-password.ts`, run directly against the database by someone with infra access.
 
 ## Removing a user
 

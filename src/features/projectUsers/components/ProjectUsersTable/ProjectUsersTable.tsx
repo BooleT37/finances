@@ -8,6 +8,7 @@ import {
 } from 'mantine-react-table-open';
 import { useTranslation } from 'react-i18next';
 
+import { useIsAdmin } from '~/shared/hooks/useIsAdmin';
 import { useTableLocalization } from '~/shared/hooks/useTableLocalization';
 
 import { getProjectUsersQueryOptions } from '../../queries';
@@ -17,6 +18,7 @@ import { RowActions } from './RowActions';
 
 export function ProjectUsersTable() {
   const { t } = useTranslation('projectUsers');
+  const isAdmin = useIsAdmin();
   const { data: users } = useQuery(getProjectUsersQueryOptions());
   const [createOpened, { open: openCreate, close: closeCreate }] =
     useDisclosure(false);
@@ -34,7 +36,7 @@ export function ProjectUsersTable() {
     enableColumnActions: false,
     enableColumnDragging: false,
     enableSorting: false,
-    enableRowActions: true,
+    enableRowActions: isAdmin,
     positionActionsColumn: 'last',
     layoutMode: 'grid-no-grow',
     initialState: { density: 'xs' },
@@ -51,14 +53,18 @@ export function ProjectUsersTable() {
     <>
       <Group justify="space-between" mb="md">
         <Title order={3}>{t('pageTitle')}</Title>
-        <Button leftSection={<IconPlus size={16} />} onClick={openCreate}>
-          {t('addUser')}
-        </Button>
+        {isAdmin && (
+          <Button leftSection={<IconPlus size={16} />} onClick={openCreate}>
+            {t('addUser')}
+          </Button>
+        )}
       </Group>
 
       <MantineReactTable table={table} />
 
-      <CreateProjectUserModal opened={createOpened} onClose={closeCreate} />
+      {isAdmin && (
+        <CreateProjectUserModal opened={createOpened} onClose={closeCreate} />
+      )}
     </>
   );
 }

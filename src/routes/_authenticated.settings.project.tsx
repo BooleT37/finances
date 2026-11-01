@@ -10,17 +10,11 @@ export const Route = createFileRoute('/_authenticated/settings/project')({
 });
 
 function ProjectPage() {
-  const { session } = Route.useRouteContext();
-
   return (
     <Stack gap="xl">
       <ProjectInfoPage />
-      {session.role === 'admin' && (
-        <>
-          <Divider />
-          <ProjectUsersTable />
-        </>
-      )}
+      <Divider />
+      <ProjectUsersTable />
       <Divider />
       <CategorySuggestionsSwitch />
     </Stack>
