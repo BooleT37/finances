@@ -22,7 +22,12 @@ export const createSource = createServerFn({ method: 'POST' })
   .validator((input: CreateSourceInput) => createSourceSchema.parse(input))
   .handler(async ({ data, context }) => {
     const created = await prisma.source.create({
-      data: { name: data.name, projectId: context.projectId },
+      data: {
+        name: data.name,
+        projectId: context.projectId,
+        createdById: context.userId,
+        updatedById: context.userId,
+      },
     });
 
     const settings = await prisma.projectSetting.findFirst({
@@ -31,7 +36,10 @@ export const createSource = createServerFn({ method: 'POST' })
     if (settings) {
       await prisma.projectSetting.update({
         where: { projectId: context.projectId },
-        data: { sourcesOrder: [...settings.sourcesOrder, created.id] },
+        data: {
+          sourcesOrder: [...settings.sourcesOrder, created.id],
+          updatedById: context.userId,
+        },
       });
     }
 
@@ -65,7 +73,7 @@ export const updateSourceName = createServerFn({ method: 'POST' })
     );
     const updated = await prisma.source.update({
       where: { id: data.id },
-      data: { name: data.name },
+      data: { name: data.name, updatedById: context.userId },
     });
     return sourceSchema.encode(updated);
   });
@@ -101,7 +109,7 @@ export const updateSourceBank = createServerFn({ method: 'POST' })
       }
       return tx.source.update({
         where: { id: data.id },
-        data: { bank: data.bank },
+        data: { bank: data.bank, updatedById: context.userId },
       });
     });
     return sourceSchema.encode(updated);
@@ -115,7 +123,7 @@ export const updateSourceOrder = createServerFn({ method: 'POST' })
   .handler(async ({ data, context }) => {
     await prisma.projectSetting.update({
       where: { projectId: context.projectId },
-      data: { sourcesOrder: data.sourceIds },
+      data: { sourcesOrder: data.sourceIds, updatedById: context.userId },
     });
   });
 
@@ -129,11 +137,11 @@ export const deleteSource = createServerFn({ method: 'POST' })
       // Composite FK can't SetNull — null the references first.
       await tx.subscription.updateMany({
         where: { sourceId: id, projectId: context.projectId },
-        data: { sourceId: null },
+        data: { sourceId: null, updatedById: context.userId },
       });
       await tx.expense.updateMany({
         where: { sourceId: id, projectId: context.projectId },
-        data: { sourceId: null },
+        data: { sourceId: null, updatedById: context.userId },
       });
       await tx.source.delete({ where: { id } });
 
@@ -145,6 +153,7 @@ export const deleteSource = createServerFn({ method: 'POST' })
           where: { projectId: context.projectId },
           data: {
             sourcesOrder: settings.sourcesOrder.filter((sId) => sId !== id),
+            updatedById: context.userId,
           },
         });
       }
