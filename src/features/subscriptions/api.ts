@@ -64,6 +64,8 @@ export const createSubscription = createServerFn({ method: 'POST' })
         subcategoryId: data.subcategoryId,
         sourceId: data.sourceId,
         projectId: context.projectId,
+        createdById: context.userId,
+        updatedById: context.userId,
       },
       include: { category: true },
     });
@@ -101,6 +103,7 @@ export const updateSubscription = createServerFn({ method: 'POST' })
         categoryId: fields.categoryId,
         subcategoryId: fields.subcategoryId,
         sourceId: fields.sourceId,
+        updatedById: context.userId,
       },
       include: { category: true },
     });
@@ -124,7 +127,7 @@ export const deleteSubscription = createServerFn({ method: 'POST' })
       // hand-written line.
       await tx.expense.updateMany({
         where: { subscriptionId: id, projectId: context.projectId },
-        data: { subscriptionId: null },
+        data: { subscriptionId: null, updatedById: context.userId },
       });
       await tx.forecastLineItem.updateMany({
         where: { subscriptionId: id, projectId: context.projectId },
