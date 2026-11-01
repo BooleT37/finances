@@ -42,6 +42,7 @@ export const setCategorySuggestionsEnabled = createServerFn({
       where: { projectId: context.projectId },
       data: {
         categorySuggestionsEnabledAt: data.enabled ? new Date() : null,
+        updatedById: context.userId,
       },
     });
   });

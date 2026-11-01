@@ -29,7 +29,7 @@ export const renameProject = createServerFn({ method: 'POST' })
   .handler(async ({ data, context }): Promise<ProjectInfo> => {
     return prisma.project.update({
       where: { id: context.projectId },
-      data: { name: data.name },
+      data: { name: data.name, updatedById: context.userId },
       select: { id: true, name: true },
     });
   });
