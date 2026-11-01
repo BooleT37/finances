@@ -22,7 +22,8 @@ export const fetchAllSavingSpendings = createServerFn({
     const [savingSpendings, actuals] = await Promise.all([
       prisma.savingSpending.findMany({
         where: { projectId: context.projectId },
-        include: { categories: true },
+        orderBy: { id: 'asc' },
+        include: { categories: { orderBy: { id: 'asc' } } },
       }),
       prisma.expense.groupBy({
         by: ['savingSpendingCategoryId'],
