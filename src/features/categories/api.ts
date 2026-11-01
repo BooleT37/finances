@@ -21,17 +21,16 @@ async function clearSubcategoryReferences(
   tx: Prisma.TransactionClient,
   subcategoryIds: number[],
   projectId: string,
+  userId: string,
 ) {
   if (subcategoryIds.length === 0) {
     return;
   }
   const where = { subcategoryId: { in: subcategoryIds }, projectId };
-  await tx.expense.updateMany({ where, data: { subcategoryId: null } });
-  await tx.subscription.updateMany({ where, data: { subcategoryId: null } });
-  await tx.expenseComponent.updateMany({
-    where,
-    data: { subcategoryId: null },
-  });
+  const data = { subcategoryId: null, updatedById: userId };
+  await tx.expense.updateMany({ where, data });
+  await tx.subscription.updateMany({ where, data });
+  await tx.expenseComponent.updateMany({ where, data });
 }
 
 export const fetchAllCategories = createServerFn({ method: 'GET' })
@@ -65,11 +64,15 @@ export const createCategory = createServerFn({ method: 'POST' })
         isIncome: data.isIncome,
         isContinuous: data.isContinuous,
         projectId: context.projectId,
+        createdById: context.userId,
+        updatedById: context.userId,
         subcategories: {
           createMany: {
             data: data.subcategories.map((s) => ({
               name: s.name,
               projectId: context.projectId,
+              createdById: context.userId,
+              updatedById: context.userId,
             })),
           },
         },
@@ -89,7 +92,10 @@ export const createCategory = createServerFn({ method: 'POST' })
         : settings.expenseCategoriesOrder;
       await prisma.projectSetting.update({
         where: { projectId: context.projectId },
-        data: { [orderField]: [...currentOrder, category.id] },
+        data: {
+          [orderField]: [...currentOrder, category.id],
+          updatedById: context.userId,
+        },
       });
     }
 
@@ -137,7 +143,12 @@ export const updateCategory = createServerFn({ method: 'POST' })
           select: { id: true },
         })
       ).map((s) => s.id);
-      await clearSubcategoryReferences(tx, removedIds, context.projectId);
+      await clearSubcategoryReferences(
+        tx,
+        removedIds,
+        context.projectId,
+        context.userId,
+      );
 
       // Delete subcategories removed from the list
       await tx.subcategory.deleteMany({
@@ -148,17 +159,22 @@ export const updateCategory = createServerFn({ method: 'POST' })
       for (const s of subcategories) {
         await tx.subcategory.upsert({
           where: { id: s.id ?? 0 },
-          update: { name: s.name },
+          update: { name: s.name, updatedById: context.userId },
           create: {
             name: s.name,
             categoryId: id,
             projectId: context.projectId,
+            createdById: context.userId,
+            updatedById: context.userId,
           },
         });
       }
 
       // Update category fields (isIncome is intentionally excluded from updateCategorySchema)
-      await tx.category.update({ where: { id }, data: fields });
+      await tx.category.update({
+        where: { id },
+        data: { ...fields, updatedById: context.userId },
+      });
     });
 
     const updated = await prisma.category.findUniqueOrThrow({
@@ -180,8 +196,13 @@ export const updateCategoryOrder = createServerFn({ method: 'POST' })
       : 'expenseCategoriesOrder';
     await prisma.projectSetting.upsert({
       where: { projectId: context.projectId },
-      create: { projectId: context.projectId, [orderField]: data.categoryIds },
-      update: { [orderField]: data.categoryIds },
+      create: {
+        projectId: context.projectId,
+        [orderField]: data.categoryIds,
+        createdById: context.userId,
+        updatedById: context.userId,
+      },
+      update: { [orderField]: data.categoryIds, updatedById: context.userId },
     });
   });
 
@@ -206,7 +227,12 @@ export const deleteCategory = createServerFn({ method: 'POST' })
           select: { id: true },
         })
       ).map((s) => s.id);
-      await clearSubcategoryReferences(tx, subcategoryIds, context.projectId);
+      await clearSubcategoryReferences(
+        tx,
+        subcategoryIds,
+        context.projectId,
+        context.userId,
+      );
       await tx.subcategory.deleteMany({ where: { categoryId: id } });
 
       // Delete the category — will throw if expenses/forecasts/subscriptions exist
@@ -227,6 +253,7 @@ export const deleteCategory = createServerFn({ method: 'POST' })
           where: { projectId: context.projectId },
           data: {
             [orderField]: currentOrder.filter((cId: number) => cId !== id),
+            updatedById: context.userId,
           },
         });
       }
