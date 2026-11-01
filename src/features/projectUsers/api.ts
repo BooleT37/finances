@@ -46,7 +46,11 @@ export const createProjectUser = createServerFn({ method: 'POST' })
         name: data.name,
         password,
         role: data.role,
-        data: { projectId: context.projectId, emailVerified: true },
+        data: {
+          projectId: context.projectId,
+          emailVerified: true,
+          createdById: context.userId,
+        },
       },
       headers: request.headers,
     });

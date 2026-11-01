@@ -54,6 +54,12 @@ export const auth = betterAuth({
         required: true,
         input: false,
       },
+      createdById: {
+        type: 'string',
+        required: false,
+        input: false,
+        returned: false,
+      },
     },
   },
   plugins: [
