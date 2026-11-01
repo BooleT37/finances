@@ -14,4 +14,4 @@ A project has a name. Any member can change it.
 
 ## Settings
 
-A project has one set of settings that applies to the whole household, such as the order of categories and sources and whether category autofill is on. They live in `~/features/projectSettings`. What category autofill does is described in [Transactions](../transactions/TRANSACTIONS.md).
+A project has one set of settings that applies to the whole household, such as the order of categories and sources and whether category autofill is on. They live in `~/features/projectSettings`. What category autofill does is described in [Import](../import/IMPORT.md).
