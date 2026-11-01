@@ -158,6 +158,7 @@ export const completeBankAuth = createServerFn({ method: 'POST' })
         sessionId: session.sessionId,
         accountUid,
         expiresAt: session.expiresAt.toDate(),
+        updatedById: context.userId,
       };
       await tx.bankConnection.upsert({
         where: {
@@ -170,6 +171,7 @@ export const completeBankAuth = createServerFn({ method: 'POST' })
           ...connection,
           sourceId: pending.sourceId,
           projectId: context.projectId,
+          createdById: context.userId,
         },
         update: connection,
       });
@@ -204,7 +206,7 @@ export const selectBankAccount = createServerFn({ method: 'POST' })
           projectId: context.projectId,
         },
       },
-      data: { accountUid: data.accountUid },
+      data: { accountUid: data.accountUid, updatedById: context.userId },
     });
   });
 
