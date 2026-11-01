@@ -10,7 +10,7 @@ Subcategories of `TO_SAVINGS` represent continuous saving streams (e.g. "vacatio
 
 ## Spending from Savings
 
-Spending from savings means recording a transaction with the `FROM_SAVINGS` category. When doing so, the user can optionally select a saving spending event to attribute the expense to. Transaction with a `FROM_SAVINGS` category are excluded from all totals calculations in the app (when we're spending from savings, we're not spending from our regular planned budget)
+Spending from savings means recording a transaction with the `FROM_SAVINGS` category. When doing so, the user can optionally select a saving spending event to attribute the expense to. Transactions with a `FROM_SAVINGS` category are excluded from all totals calculations in the app (when we're spending from savings, we're not spending from our regular planned budget)
 
 ## Saving Spending Events (`SavingSpending`)
 
@@ -33,4 +33,3 @@ A saving spending event can be marked as **completed**, which prevents new trans
 ## Temporary Notes
 
 - The rule "each saving event must have at least one category, but if there's only one it's hidden in the UI" is fragile and may be refactored in the future.
-- We used to store the
