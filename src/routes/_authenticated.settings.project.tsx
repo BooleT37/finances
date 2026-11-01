@@ -4,19 +4,26 @@ import { createFileRoute } from '@tanstack/react-router';
 import { ProjectInfoPage } from '~/features/project/components/ProjectInfoPage';
 import { CategorySuggestionsSwitch } from '~/features/projectSettings/components/CategorySuggestionsSwitch';
 import { ProjectUsersTable } from '~/features/projectUsers/components/ProjectUsersTable/ProjectUsersTable';
+import { useIsAdmin } from '~/shared/hooks/useIsAdmin';
 
 export const Route = createFileRoute('/_authenticated/settings/project')({
   component: ProjectPage,
 });
 
 function ProjectPage() {
+  const isAdmin = useIsAdmin();
+
   return (
     <Stack gap="xl">
       <ProjectInfoPage />
       <Divider />
       <ProjectUsersTable />
-      <Divider />
-      <CategorySuggestionsSwitch />
+      {isAdmin && (
+        <>
+          <Divider />
+          <CategorySuggestionsSwitch />
+        </>
+      )}
     </Stack>
   );
 }

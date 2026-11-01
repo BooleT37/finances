@@ -4,8 +4,6 @@ import { IconInfoCircle } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
-import { useIsAdmin } from '~/shared/hooks/useIsAdmin';
-
 import {
   getProjectSettingsQueryOptions,
   useSetCategorySuggestionsEnabled,
@@ -13,7 +11,6 @@ import {
 
 export function CategorySuggestionsSwitch() {
   const { t } = useTranslation('projectSettings');
-  const isAdmin = useIsAdmin();
   const { data: settings } = useQuery(getProjectSettingsQueryOptions());
   const setEnabledMutation = useSetCategorySuggestionsEnabled();
 
@@ -47,9 +44,8 @@ export function CategorySuggestionsSwitch() {
     <Group gap="xs" align="center">
       <Switch
         label={t('categorySuggestions.label')}
-        description={isAdmin ? undefined : t('categorySuggestions.adminOnly')}
         checked={settings.categorySuggestionsEnabled}
-        disabled={!isAdmin || setEnabledMutation.isPending}
+        disabled={setEnabledMutation.isPending}
         onChange={(event) => handleChange(event.currentTarget.checked)}
       />
       <Tooltip
