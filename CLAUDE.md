@@ -36,7 +36,7 @@ Detailed framework-specific documentation is split into separate files:
 
 ### Feature Documentation
 
-Each feature has a dedicated documentation file at `src/features/{feature}/{FEATURE}.md` describing its domain concepts, business rules, and known limitations. Read the relevant feature doc(s) before implementing significant new UI or writing tests for that feature:
+Each feature has a dedicated documentation file at `src/features/{feature}/{FEATURE}.md` describing its domain concepts, business rules, and known limitations. Use the `feature-docs` skill when creating or editing one. Read the relevant feature doc(s) before implementing significant new UI or writing tests for that feature:
 
 - [Transactions](src/features/transactions/TRANSACTIONS.md)
 - [Import](src/features/import/IMPORT.md)
