@@ -7,7 +7,7 @@ Transaction is the main entity in the app. It represents either an expense or in
 A transaction has two date fields:
 
 - **`date`** — the primary date used in app logic to determine which month the transaction belongs to.
-- **`actualDate`** — the date as it appears in the banking app, receipt, etc. Used outside the app to locate the transaction. This is why the "last transactions" tooltip in transaction editing mode uses `actualDate`, not `date` — we need the tooltip to help find transactions in banking apps.
+- **`actualDate`** — the optional date as it appears in the banking app, receipt, etc. Used outside the app to locate the transaction. That's why a source's last transactions (see [Sources](../sources/SOURCES.md)) go by `actualDate` when it's set and by `date` otherwise, since they help find transactions in banking apps.
 
 ## Category and Subcategory
 
@@ -29,13 +29,13 @@ A transaction may be linked to a **subscription**, indicating that the subscript
 
 ## Saving Spending
 
-A transaction may be linked to a **saving spending category** via `savingSpendingCategoryId`. This means the money were spent from savings and should not be counted toward any expense aggregations. However, we use this expense data in "actual spending for this saving event" aggregation, which is a part of "saving spendings" page.
+A transaction may be linked to a **saving spending category** via `savingSpendingCategoryId`. This means the money were spent from savings and should not be counted toward any expense aggregations. However, we use this expense data to calculate the actual spending of a saving event, see [Saving Spendings](../savingSpendings/SAVING_SPENDINGS.md).
 
 We don't support saving spendings for income transactions, and most likely never will
 
 ## Components
 
-A transaction may be split into **components**. In this case, the transaction's `cost` still holds the total amount, but that total is distributed across components. The sum of all the components doesn't have to be strictly equal to the transaction cost, but it should not exceed it. Each component can have a different category from the parent transaction, and must be accounted for separately in category totals.
+A transaction may be split into **components**. In this case, the transaction's `cost` still holds the total amount, but that total is distributed across components. The sum of all the components doesn't have to be strictly equal to the transaction cost, but it should not exceed it. There's currently no check for that. Each component can have a different category from the parent transaction, and must be accounted for separately in category totals.
 
 Example: an expense of 100 EUR in the "Food" category with a 30 EUR "Dog" component → 70 EUR is counted toward "Food", 30 EUR toward "Dog".
 
@@ -49,9 +49,9 @@ Transactions can be imported in bulk from a bank, see [Import](../import/IMPORT.
 
 ## Temporary Notes
 
-- In the database, the transaction table is still named **`expenses`**. It will be renamed once migration from the old app is complete.
+- In the database, the transaction table is named **`Expense`**. It will be renamed in future.
 
-- We exclude expenses from aggregation if it's a spending from savings. Currently, we detect that by its category's type "SAVING_SPENDING", not when its savingSpendingCategoryId is defined. In future, we might switch to only care about savingSpendingCategoryId, to have only one source of truth for when exclude the transaction from calculation (and in general, when consider it a spending from savings)
+- We exclude expenses from aggregation if it's a spending from savings. Currently, we detect that by its category's type `FROM_SAVINGS` (regardless of whether its savingSpendingCategoryId is defined). In future, we might switch to only care about savingSpendingCategoryId, to have only one source of truth for when exclude the transaction from calculation (and in general, when consider it a spending from savings)
 
 - We don't support subscriptions or components for income transactions yet. But we will in future
 
