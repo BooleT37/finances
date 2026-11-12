@@ -34,6 +34,7 @@ import { getSubscriptionsQueryOptions } from '~/features/subscriptions/queries';
 import { getTransactionsQueryOptions } from '~/features/transactions/queries';
 import { TextWithTooltipIcon } from '~/shared/components/TextWithTooltipIcon';
 import { ISO_DATE_FORMAT } from '~/shared/constants';
+import { useIsAdmin } from '~/shared/hooks/useIsAdmin';
 import { TableFlash, useFlashTrigger } from '~/shared/hooks/useTableFlash';
 import { findByIdOrThrow } from '~/shared/utils/getOrThrow';
 import { transactionRowId } from '~/shared/utils/transactionsRowId';
@@ -86,6 +87,7 @@ export function ImportedTransactionsModal({
   onClose,
 }: Props) {
   const { t } = useTranslation('import');
+  const isAdmin = useIsAdmin();
   const selectedYear = useAtomValue(selectedYearAtom);
   const previousYear = selectedYear - 1;
   const includesPreviousYear = importedTransactions.some(
@@ -343,7 +345,8 @@ export function ImportedTransactionsModal({
         </Alert>
       )}
 
-      {categorySuggestionsEnabled === false &&
+      {isAdmin &&
+        categorySuggestionsEnabled === false &&
         !categorySuggestionsOffHintHidden && (
           <Alert
             color="gray"
