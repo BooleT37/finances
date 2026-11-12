@@ -8,6 +8,7 @@ import { setEnableBankingStub } from './stubs/enableBankingStub';
 
 const OWN_NAME = 'Test Admin';
 const STUB_ACCOUNT = { uid: 'stub-account', currency: 'EUR', product: 'Main' };
+const AUTOFILL_OFF_HINT = /Автозаполнение категорий выключено/;
 
 function bankTransaction(
   overrides: Partial<EnableBankingTransaction>,
@@ -235,6 +236,7 @@ test.describe('Bank import', () => {
     await expect(importFromDate(dialog)).toHaveText('01.04.2024');
     await bankImportButton(dialog).click();
 
+    await expect(dialog.getByText(AUTOFILL_OFF_HINT)).toBeVisible();
     await expect(rowCheckbox(dialog, 'REWE Markt')).toBeChecked();
     await expect(rowCheckbox(dialog, 'Lidl')).not.toBeChecked();
     await expect(
@@ -263,11 +265,17 @@ test.describe('Bank import', () => {
     });
     expect(imported.importHash).not.toBeNull();
 
+    await testPrisma.user.update({
+      where: { id: TEST_USER_ID },
+      data: { role: 'user' },
+    });
+
     dialog = await openImport(page, 'Vivid');
     await expect(importFromDate(dialog)).toHaveText('08.04.2024');
     await bankImportButton(dialog).click();
 
     await expect(rowCheckbox(dialog, 'REWE Markt')).not.toBeChecked();
+    await expect(dialog.getByText(AUTOFILL_OFF_HINT)).toHaveCount(0);
     await expect(rowCheckbox(dialog, 'Lidl')).not.toBeChecked();
     await expect(
       rowCheckbox(dialog, 'Employer GmbH April salary'),

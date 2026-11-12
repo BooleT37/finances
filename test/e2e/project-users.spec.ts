@@ -93,4 +93,36 @@ test.describe('Project users', () => {
     // Deletion is rejected server-side (last admin) — the row must remain.
     await expect(adminRow).toBeVisible();
   });
+
+  test('shows a member the users without letting them change anything', async ({
+    page,
+    seedData,
+  }) => {
+    await testPrisma.user.create({
+      data: {
+        id: 'second-member',
+        email: 'second-member@example.com',
+        name: 'Second Member',
+        role: 'user',
+        emailVerified: true,
+        projectId: seedData.projectId,
+      },
+    });
+    await testPrisma.user.update({
+      where: { id: seedData.userId },
+      data: { role: 'user' },
+    });
+    await page.goto('/settings/project');
+
+    await expect(
+      page.locator('tr', { hasText: 'test-admin@example.com' }),
+    ).toBeVisible();
+    await expect(
+      page.locator('tr', { hasText: 'second-member@example.com' }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Добавить пользователя' }),
+    ).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Удалить' })).toHaveCount(0);
+  });
 });

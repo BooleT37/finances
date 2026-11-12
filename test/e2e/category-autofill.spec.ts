@@ -1,6 +1,5 @@
 import { testPrisma } from './db/client';
-import { TEST_PROJECT_ID } from './db/seed';
-import { testAuth } from './db/testAuth';
+import { TEST_PROJECT_ID, TEST_USER_ID } from './db/seed';
 import { expect, test } from './fixtures';
 
 const SWITCH_LABEL = 'Автозаполнение категорий';
@@ -50,39 +49,18 @@ test.describe('Category autofill', () => {
     expect(setting.categorySuggestionsEnabledAt).toBeNull();
   });
 
-  test('a non-admin sees the switch but cannot change it', async ({
-    page,
-    context,
-  }) => {
-    const email = 'category-autofill-non-admin@example.com';
-    const password = 'non-admin-password-123';
-    await testAuth.api.createUser({
-      body: {
-        email,
-        name: 'Non-Admin User',
-        password,
-        role: 'user',
-        data: { projectId: TEST_PROJECT_ID, emailVerified: true },
-      },
-    });
+  test('a member does not see the switch', async ({ page }) => {
     await testPrisma.user.update({
-      where: { email },
-      data: { onboardingCompletedAt: new Date() },
+      where: { id: TEST_USER_ID },
+      data: { role: 'user' },
     });
-
-    await context.clearCookies();
-    await page.goto('/login');
-    await page.getByLabel('Email').fill(email);
-    await page.getByLabel('Пароль').fill(password);
-    await page.getByRole('button', { name: 'Войти', exact: true }).click();
-    await expect(page).toHaveURL(/\/transactions/);
-
     await page.goto('/settings/project');
+
     await expect(
-      page.getByRole('switch', { name: SWITCH_LABEL }),
-    ).toBeDisabled();
-    await expect(
-      page.getByText('Изменить это может только администратор.'),
+      page.getByRole('heading', { name: 'Пользователи проекта' }),
     ).toBeVisible();
+    await expect(page.getByRole('switch', { name: SWITCH_LABEL })).toHaveCount(
+      0,
+    );
   });
 });
