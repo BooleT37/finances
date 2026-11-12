@@ -1,6 +1,6 @@
 # Import
 
-Import adds transactions in bulk from a bank instead of entering them one by one. The rows first show up in a review modal, where each one gets a category and can be unticked, and only the ticked rows are saved as transactions.
+Import adds transactions in bulk from a bank instead of entering them one by one. The user first reviews the rows and gives each one a category, and only the rows they keep are saved as transactions.
 
 A source can be imported in two ways: by uploading a bank statement, or straight from the bank. A source that supports neither can't be imported.
 
@@ -20,7 +20,7 @@ A source connected to the bank (see below) can import its transactions straight 
 
 Only booked transactions are imported. A pending one can still change its amount, date and reference when it's booked, so it would come back as a different row later.
 
-Bank import now goes through [Enable Banking](https://enablebanking.com), which connects to the bank under the EU's PSD2 rules. It only reads accounts and can never move money.
+Bank import goes through [Enable Banking](https://enablebanking.com), which connects to the bank under the EU's PSD2 rules. It only reads accounts and can never move money.
 
 Every request for transactions carries the user's IP address and browser, which is how PSD2 tells a request made by the account holder from one made in the background. Background requests are limited to 4 a day, and Commerzbank requires the IP address anyway. Both are only sent to Enable Banking and the bank.
 
@@ -44,14 +44,14 @@ The bank allows a connection for 180 days at most (an EU rule, and both Vivid's 
 
 ## Import Period
 
-Once a source has been imported from the bank, the next import's start date is preselected as the earlier of these two dates, minus 2 days to catch transactions the bank publishes late:
+Once a source has been imported from the bank, the next import starts by default from the earlier of these two dates, minus 2 days to catch transactions the bank publishes late:
 
 1. The last import date (`lastImportedAt`).
 2. The date of the source's newest imported transaction this year (or last year too, in January). If there isn't one, the last import date is used on its own.
 
 The second date matters when an import leaves out the newest rows: for example, when importing on the 5th, the user may only want the previous month. Those rows then show up again next time. The first date matters when the bank shows a transaction with a future date, and it gets imported. The days before that date may still get more transactions.
 
-If the user imports a row and leaves older ones unticked, the older ones can fall before the start date, and the user has to pick an earlier date to see them again.
+If the user imports a row and leaves out older ones, the older ones can fall before the default start date, and the user has to choose an earlier date to get them again.
 
 ## Bank Rows
 
@@ -74,35 +74,33 @@ Commerzbank sends no transaction type and no reference for a transaction, but pu
 
 ## Import Deduplication
 
-Each transaction has an **`importHash`** used to detect whether it was already imported via the "Import" feature, preventing duplicates. For a statement row, the hash is computed from the row exactly as the statement shows it. For a Vivid bank row, it's computed from the bank's own reference for that transaction, so repeated bank imports recognise their rows exactly. Commerzbank sends no reference, so its hash is computed from the booking date, amount, other party and payment text. Identical rows on the same day are counted apart, so they get different hashes. Either way, editing the description or the amount in the import modal keeps it the same.
+Each transaction has an **`importHash`** used to detect whether it was already imported via the "Import" feature, preventing duplicates. For a statement row, the hash is computed from the row exactly as the statement shows it. For a Vivid bank row, it's computed from the bank's own reference for that transaction, so repeated bank imports recognise their rows exactly. Commerzbank sends no reference, so its hash is computed from the booking date, amount, other party and payment text. Identical rows on the same day are counted apart, so they get different hashes. Either way, editing the description or the amount before saving keeps it the same.
 
-A row also counts as already imported when a transaction with the same amount on the same day exists, which catches transactions from another import type. A manually entered transaction gets a bigger window: the same amount, at most 5 days away and in the same month, since its date often differs from the bank's (for example, when it was created from an upcoming subscription, it has the subscription's date). Rows that were already imported are still shown in the table, but deselected by default.
+A row also counts as already imported when a transaction with the same amount on the same day exists, which catches transactions from another import type. A manually entered transaction gets a bigger window: the same amount, at most 5 days away and in the same month, since its date often differs from the bank's (for example, when it was created from an upcoming subscription, it has the subscription's date). A row that counts as already imported is only saved if the user picks it, since the same amount on the same day can also be a different transaction.
 
 ## Imported Description
 
-A transaction created by the import keeps the description exactly as the bank shows it in **`importedDescription`**, while its `name` can be edited freely, both in the import modal and later. Category suggestions (see below) rely on it, since the bank's own wording is what the next import will contain.
+A transaction created by the import keeps the description exactly as the bank shows it in **`importedDescription`**, while its `name` can be edited freely, both during the import and later. Category suggestions (see below) rely on it, since the bank's own wording is what the next import will contain.
 
-Transactions imported before this field existed were filled in from the saved bank statements. The ones whose statements weren't available stay empty.
+The field is optional, since only a transaction created by the import has it.
 
 ## Category Suggestions
 
-When importing, the app suggests a category for each imported transaction (a row from a statement or from the bank, not yet saved) and pre-fills it in the import modal:
+When importing, the app suggests a category for each imported transaction (a row from a statement or from the bank, not yet saved):
 
 1. It finds the similar transactions (see below).
-2. It sends Jev, a classification model by TypeSafe, a question: which of the row's criteria fits it. The criteria ("criteria" is Jev's own word) are the options the category picker offers for this row, each described in words, plus "unknown". Along with the imported transaction, Jev sees the similar transactions, each with the criterion it was filed under.
-3. Jev answers with a choice and its confidence. The app keeps the choice as the row's category suggestion only if Jev is confident enough (see below). Otherwise the row stays empty.
+2. It sends Jev, a classification model by TypeSafe, a question: which of the row's criteria fits it. The criteria ("criteria" is Jev's own word) are the categories, subcategories and subscriptions available for this row, each described in words, plus "unknown". Along with the imported transaction, Jev sees the similar transactions, each with the criterion it was filed under.
+3. Jev answers with a choice and its confidence. The app keeps the choice as the row's category suggestion only if Jev is confident enough (see below). Otherwise the row gets no suggestion.
 
-A category suggestion can be a subscription too. If the suggested subscription isn't offered for this row (e.g. it's already paid this period), the row gets the subscription's category and subcategory instead.
+A category suggestion can be a subscription too. If the suggested subscription isn't available for this row (e.g. it's already paid this period), the row gets the subscription's category and subcategory instead.
 
-A category suggestion fills a row only while its category is still empty, so a category the user has already picked always stays. The row is marked as suggested until the user changes it. If category suggestions can't be fetched, the modal says so and offers to retry, and the import works as usual.
+A category suggestion fills a row only while its category is still empty, so a category the user has already picked always stays. If category suggestions can't be fetched, the import works as usual without them.
 
 ## Category Autofill
 
-Category suggestions only run when the project has category autofill turned on. A project starts with it off, and only an admin can turn it on or off, on the project settings page (see [Project](../project/PROJECT.md)).
+Category suggestions only run when the project has category autofill turned on. It's a project setting (see [Project](../project/PROJECT.md)). A project starts with it off, and only an admin can turn it on or off.
 
 Turning it on is how the household agrees to its data going to TypeSafe, which is in the USA and has no EU data protection agreement. That's why it starts off, and why the server refuses to suggest categories while it's off, whoever asks.
-
-While it's off, the import modal says so and links to the project settings. The hint can be hidden, and then stays hidden in that browser.
 
 ## Similar Transactions
 
@@ -112,7 +110,7 @@ The search stays within one source, since each bank writes its descriptions in i
 
 ## Suggestion Confidence
 
-Jev returns a confidence from 0 to 1 with each choice, and a category suggestion is shown only when it's at least **0.8**.
+Jev returns a confidence from 0 to 1 with each choice, and a category suggestion is used only when it's at least **0.8**.
 
 This number, and the 10 similar transactions, were picked by replaying about 800 past Vivid imports (October 2026): at 0.8, about 63% of rows got a category, 80% of them exactly right and 89% in the right category. Most of the misses are merchants we file under different categories at different times (Wolt, Amazon, Rossmann), which no description can tell apart.
 
