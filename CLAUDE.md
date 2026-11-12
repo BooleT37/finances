@@ -127,6 +127,8 @@ npm run test:ui
 
 After making UI changes, run `npm test` to verify nothing broke. The Playwright MCP server is configured in `.mcp.json` — Claude can also use it to interactively inspect the app in a real browser.
 
+**Manual checks use the local database.** The local database (`DATABASE_URL` in `.env`) exists for testing, so check things in the browser against it rather than setting up a separate one. Add whatever a check needs: users, projects, transactions, settings. Never delete or change data you didn't create. Cleaning up afterwards isn't needed, unless the data you left would get in the way of later checks.
+
 ## Translations (i18n)
 
 Uses **react-i18next** with feature-colocated translations. Each feature owns its namespace:
